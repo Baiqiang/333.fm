@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@pinia-plugin-persistedstate/nuxt',
     '@freeloop/nuxt-transitions',
+    'dayjs-nuxt',
   ],
   i18n: {
     strategy: 'no_prefix',
