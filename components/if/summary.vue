@@ -66,7 +66,7 @@ const type = computed(() => isIF.value ? t('if.title') : t('sf.title'))
             {{ $t('common.createdAt') }}
           </div>
           <div class="text-true-gray-500">
-            {{ finder.createdAt }}
+            {{ $dayjs(finder.createdAt).format('YYYY-MM-DD HH:mm:ss') }}
           </div>
         </div>
       </NuxtLink>
