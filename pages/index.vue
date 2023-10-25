@@ -16,7 +16,6 @@ if (!finders.value)
         {{ $t('title') }}
       </h1>
       <I18nT tag="blockquote" keypath="index.defination" scope="global" cite="">
-        aaaa
         <template #title>
           <b>{{ $t('title') }}</b>
         </template>

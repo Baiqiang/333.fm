@@ -31,7 +31,7 @@ onMounted(() => {
 
 <style>
 body {
-  @apply font-inter;
+  @apply font-inter bg-gray-50;
 }
 h1, h2, h3, h4, h5, h6 {
   @apply font-poppins;
