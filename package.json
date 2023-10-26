@@ -1,0 +1,37 @@
+{
+  "name": "333.fm",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "insertionfinder": "^0.3.2"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.43.1",
+    "@freeloop/nuxt-transitions": "^0.1.5",
+    "@nuxt/devtools": "latest",
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@nuxtjs/eslint-module": "^4.1.0",
+    "@nuxtjs/google-fonts": "^3.0.2",
+    "@nuxtjs/i18n": "^8.0.0-rc.5",
+    "@nuxtjs/tailwindcss": "^6.8.0",
+    "@pinia-plugin-persistedstate/nuxt": "^1.1.2",
+    "@pinia/nuxt": "^0.5.1",
+    "@tailwindcss/forms": "^0.5.6",
+    "@vueuse/core": "^10.5.0",
+    "@vueuse/nuxt": "^10.5.0",
+    "eslint": "^8.52.0",
+    "less": "^4.2.0",
+    "nuxt": "^3.8.0",
+    "nuxt-icon": "^0.6.0",
+    "pinia": "^2.1.7",
+    "postcss-html": "^1.5.0",
+    "typescript": "^5.2.2"
+  }
+}
