@@ -2,9 +2,11 @@
 const props = withDefaults(defineProps<{
   solution: Solution
   merged?: boolean
+  isIf?: boolean
 }>(), {
   merged: true,
 })
+const router = useRouter()
 const formated = computed(() => {
   const indexes: Record<number, number> = {}
   const insertionSymbols: string[] = []
@@ -104,6 +106,32 @@ const formated = computed(() => {
   }
 })
 const _insertions = computed(() => props.merged ? formated.value.formatedMergedInsertions : formated.value.formatedInsertions)
+const loading = ref(false)
+async function findThis() {
+  loading.value = true
+  try {
+    const { data, refresh } = await useApiPost<InsertionFinder>('/if', {
+      body: {
+        type: IFType.SLICEY_FINDER,
+        name: '',
+        skeleton: props.solution.final_solution,
+      },
+      immediate: false,
+    })
+    await refresh()
+    router.push({
+      path: `/sf/${data.value!.hash}`,
+    })
+  }
+  catch (e: any) {
+    if (e.response && e.response.data && e.response.data.message)
+      alert(e.response.data.message)
+
+    else
+      alert(e.message)
+  }
+  loading.value = false
+}
 </script>
 
 <template>
@@ -135,6 +163,16 @@ const _insertions = computed(() => props.merged ? formated.value.formatedMergedI
     </div>
     <div class="col-span-12 md:col-span-9">
       <pre class="whitespace-pre-wrap">{{ solution.final_solution }}</pre>
+      <button
+        v-if="isIf"
+        class="bg-indigo-500 text-white px-2 py-1 text-sm h-7"
+        @click="findThis"
+      >
+        <Spinner v-if="loading" class="w-4 h-4 text-white border-[3px]" />
+        <template v-else>
+          {{ $t('sf.title') }}
+        </template>
+      </button>
     </div>
     <div class="font-semibold col-span-12 md:col-span-3 lg:col-span-2">
       {{ $t('if.solutions.cancellation') }}

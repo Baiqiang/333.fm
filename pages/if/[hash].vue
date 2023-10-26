@@ -111,7 +111,7 @@ const result = computed<IFResult | null>(() => finder.value?.result ?? null)
 const isIF = computed(() => finder.value?.type === IFType.INSERTION_FINDER)
 const form = useIFForm()
 const localForm = useLocalStorage('form.if', form.$state)
-function searchThis() {
+function findThis() {
   const scramble = finder.value?.scramble ?? ''
   const skeleton = finder.value?.skeleton ?? ''
   const algs = finder.value?.algs ?? []
@@ -157,7 +157,7 @@ onUnmounted(() => {
 <template>
   <div class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-y-1 mt-4">
     <div v-if="isIF" class="md:col-span-2 flex justify-end">
-      <button class="bg-indigo-500 px-2 py-1 text-white hover:bg-opacity-80" @click="searchThis">
+      <button class="bg-indigo-500 px-2 py-1 text-white hover:bg-opacity-80" @click="findThis">
         {{ $t('if.find') }}
       </button>
     </div>
@@ -248,7 +248,7 @@ onUnmounted(() => {
       </div>
       <div v-else>
         <template v-if="!result.solutions[0].merged_insertions">
-          <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="false" />
+          <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="false" :is-if="isIF" />
         </template>
         <template v-else>
           <div>
@@ -262,7 +262,7 @@ onUnmounted(() => {
               </div>
               <div class="flex-1 border-b border-gray-500" />
             </div>
-            <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="showMerged" />
+            <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="showMerged" :is-if="isIF" />
           </div>
         </template>
       </div>

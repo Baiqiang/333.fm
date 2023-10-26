@@ -64,9 +64,6 @@ function reset() {
     </h1>
     <p class="mb-2" v-html="$t('sf.description')" />
     <form class="pb-20" @submit="submit" @reset="reset">
-      <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none" @click.prevent="reset">
-        {{ $t('form.reset') }}
-      </button>
       <FormInput
         v-if="user.signedIn"
         v-model.trim="form.name"
