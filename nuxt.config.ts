@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      mode: 'production',
       baseURL: 'https://api.333.fm/',
     },
   },
@@ -48,6 +49,8 @@ export default defineNuxtConfig({
   experimental: {
     asyncContext: true,
     headNext: true,
+    // disable this to run in QQ browser for iOS
+    appManifest: false,
   },
   $development: {
     vite: {

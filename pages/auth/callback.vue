@@ -5,6 +5,7 @@ const { t } = useI18n()
 const { code } = route.query
 const accessToken = useAccessToken()
 const user = useUser()
+const runtimeConfig = useRuntimeConfig()
 useSeoMeta({
   title: t('header.signIn'),
 })
@@ -17,6 +18,7 @@ if (!code) {
 const { data } = await useApi<{ accessToken: string; user: User }>('/auth/callback', {
   params: {
     code,
+    mode: runtimeConfig.public.mode,
   },
 })
 if (!data.value) {

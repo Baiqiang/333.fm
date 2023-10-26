@@ -22,7 +22,7 @@ function switchLang() {
 </script>
 
 <template>
-  <header class="bg-indigo-500 text-white relative">
+  <header class="bg-indigo-500 text-white relative text-sm md:text-base">
     <div class="container flex items-center py-2 px-4 mx-auto gap-x-2">
       <h1 class="mr-2">
         <NuxtLink to="/" class="flex items-center">
@@ -33,16 +33,16 @@ function switchLang() {
       <NuxtLink v-for="{ title, path } in navs" :key="path" :to="path" class="nav">
         {{ $t(title) }}
       </NuxtLink>
-      <div class="ml-auto flex items-center gap-3">
-        <div class="cursor-pointer select-none flex flex-col items-stretch text-xs text-center leading-[0]" @click="switchLang">
-          <div class="text-xs border border-white" :class="{ 'bg-white text-indigo-500': locale === 'zh-CN' }">
+      <div class="ml-auto flex items-center gap-2">
+        <div class="cursor-pointer select-none flex flex-col items-stretch text-xs text-center leading-3" @click="switchLang">
+          <div class="border border-white" :class="{ 'bg-white text-indigo-500': locale === 'zh-CN' }">
             EN
           </div>
-          <div class="text-xs border border-white" :class="{ 'bg-white text-indigo-500': locale === 'en' }">
+          <div class="border border-white" :class="{ 'bg-white text-indigo-500': locale === 'en' }">
             简
           </div>
         </div>
-        <NuxtLink v-if="!user.signedIn" to="/sign-in" class="mr-2">
+        <NuxtLink v-if="!user.signedIn" to="/sign-in" class="text-xs md:text-base whitespace-nowrap">
           {{ $t('header.signIn') }}
         </NuxtLink>
         <div v-else class="relative">
@@ -68,16 +68,10 @@ function switchLang() {
 
 <style lang="less">
 .nav {
-  @apply text-gray-300 hover:text-white whitespace-nowrap text-sm;
+  @apply text-gray-300 hover:text-white whitespace-nowrap;
 
   &.router-link-active {
     @apply text-white;
-  }
-}
-
-@screen md {
-  .nav {
-    @apply text-base;
   }
 }
 </style>
