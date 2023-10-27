@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     '@pinia-plugin-persistedstate/nuxt',
     '@freeloop/nuxt-transitions',
     'dayjs-nuxt',
+    'nuxt-gtag',
   ],
   i18n: {
     strategy: 'no_prefix',
@@ -45,6 +46,9 @@ export default defineNuxtConfig({
       Poppins: [400, 600],
       Inter: [300, 400, 500, 600],
     },
+  },
+  gtag: {
+    id: 'G-4DDRHC6TDB',
   },
   experimental: {
     asyncContext: true,
