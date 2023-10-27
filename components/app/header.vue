@@ -51,10 +51,25 @@ function switchLang() {
             <Icon name="solar:alt-arrow-down-bold" size="20" />
           </div>
           <TransitionSlide>
-            <div v-if="showUserMenu" class="absolute right-0 bg-white text-black border border-gray-200 whitespace-nowrap py-1">
-              <NuxtLink to="/user/if" class="block" :class="menuClass">
+            <div v-if="showUserMenu" class="absolute right-0 bg-white text-black border border-gray-200 whitespace-nowrap py-1 flex flex-col items-stretch">
+              <div class="text-gray-400 px-3 py-1 text-sm">
+                {{ $i18n.locale === 'en' ? user.englishName : user.localName }}
+              </div>
+              <NuxtLink to="/user/if" :class="menuClass">
                 {{ $t('user.if') }}
               </NuxtLink>
+              <template v-if="user.isAdmin">
+                <hr>
+                <div class="text-gray-400 px-3 py-1 text-sm">
+                  {{ $t('admin.title') }}
+                </div>
+                <NuxtLink to="/admin/if" :class="menuClass">
+                  {{ $t('admin.if.title') }}
+                </NuxtLink>
+                <NuxtLink to="/admin/user" :class="menuClass">
+                  {{ $t('admin.user.title') }}
+                </NuxtLink>
+              </template>
               <div :class="menuClass" @click="user.signOut">
                 {{ $t('header.signOut') }}
               </div>

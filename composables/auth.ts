@@ -21,6 +21,9 @@ export const useUser = defineStore('user', {
       const matches = this.name.match(/\((.+)\)/)
       return matches ? matches[1] : this.name
     },
+    englishName(): string {
+      return this.name.split(' (')[0]
+    },
     isAdmin(): boolean {
       return this.roles.some(role => role.name === 'admin')
     },

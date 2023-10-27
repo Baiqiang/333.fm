@@ -175,7 +175,9 @@ onUnmounted(() => {
       <div>
         <pre v-html="commentedSkeleton" />
         <hr class="my-2">
-        {{ $t('if.skeleton.to', { length: formatAlgorithmToArray(realSkeleton).length, detail: formatedCycleDetail }) }}
+        <div v-if="formatedCycleDetail">
+          {{ $t('if.skeleton.to', { length: formatAlgorithmToArray(realSkeleton).length, detail: formatedCycleDetail }) }}
+        </div>
         <CubeExpanded :moves="`${scramble}\n${skeleton}`" best />
       </div>
       <div class="font-bold">

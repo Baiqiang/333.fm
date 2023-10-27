@@ -2,6 +2,7 @@
 const props = defineProps<{
   finder: InsertionFinder
   editable?: boolean
+  users?: User[]
 }>()
 const emit = defineEmits<{
   remove: [hash: string]
@@ -78,6 +79,11 @@ const type = computed(() => isIF.value ? t('if.title') : t('sf.title'))
       <button class="bg-rose-500 hover:bg-opacity-90 text-white px-2 py-1 flex items-center" @click="emit('remove', finder.hash)">
         <Icon name="solar:trash-bin-2-bold-duotone" size="20" />
       </button>
+    </div>
+    <div v-if="users">
+      <NuxtLink v-for="user in users" :key="user.id" :to="{ path: '/admin/user/if', query: { id: user.id } }" class="text-blue-500 my-2">
+        {{ user.name }}
+      </NuxtLink>
     </div>
   </div>
 </template>

@@ -1,5 +1,3 @@
-import type { InsertionFinder } from './if'
-
 export interface User {
   id: number
   wcaId: string
@@ -10,12 +8,12 @@ export interface User {
   roles: Role[]
 }
 
-export interface Role {
-  id: number
-  name: string
+export interface AdminUser extends User {
+  finders: number
 }
 
-export interface UserIF extends InsertionFinder {
+export interface Role {
+  id: number
   name: string
 }
 
