@@ -28,7 +28,8 @@ if (!finders.value)
         <template #wiki>
           <footer class="text-right">
             <span class="text-gray-500 -tracking-[0.15rem] mr-2 select-none">--</span>
-            <a href="https://www.speedsolving.com/wiki/index.php/Fewest_Moves_Challenge" target="_blank" class="text-blue-500">{{ $t('index.speedsolvingWiki') }}</a>
+            <a href="https://www.speedsolving.com/wiki/index.php/Fewest_Moves_Challenge" target="_blank"
+              class="text-blue-500">{{ $t('index.speedsolvingWiki') }}</a>
           </footer>
         </template>
       </I18nT>
@@ -38,7 +39,7 @@ if (!finders.value)
         {{ $t('index.latest') }}
       </h3>
       <div v-for="finder in finders" :key="finder.hash">
-        <IfSummary :finder="finder" class="mb-2" />
+        <IfSummary v-if="finder.result.solutions[0].insertions.length > 0" :finder="finder" class="mb-2" />
       </div>
     </div>
   </div>
