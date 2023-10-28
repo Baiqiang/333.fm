@@ -13,6 +13,17 @@ const hasName = computed(() => props.finder.name !== undefined)
 const isIF = computed(() => props.finder.type === IFType.INSERTION_FINDER)
 const isSF = computed(() => props.finder.type === IFType.SLICEY_FINDER)
 const type = computed(() => isIF.value ? t('if.title') : t('sf.title'))
+
+const commentedSkeleton = computed<string>(() => {
+  if (!props.finder)
+    return ''
+  return props.finder!.skeleton.split('\n').map((part: string) => {
+    const s = part.split('//')
+    if (s.length === 1)
+      return s[0]
+    return `${s[0]}<span class="text-gray-400">//${s.slice(1, s.length).join('//')}</span>`
+  }).join('\n')
+})
 </script>
 
 <template>
@@ -43,7 +54,7 @@ const type = computed(() => isIF.value ? t('if.title') : t('sf.title'))
             {{ $t('if.skeleton.label') }}
           </div>
           <div class="text-true-gray-500">
-            {{ finder.skeleton }}
+            <pre v-html="commentedSkeleton" />
           </div>
         </div>
         <div v-if="finder.status === IFStatus.FINISHED">

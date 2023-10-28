@@ -78,7 +78,8 @@ function reset() {
       </FormInput>
       <FormInput
         v-model.trim="form.skeleton"
-        type="text"
+        type="textarea"
+        :rows="4"
         :label="$t('if.skeleton.label')"
         :state="skeletonState"
         :error-message="$t('if.skeleton.invalid')"
