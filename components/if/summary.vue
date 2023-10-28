@@ -13,11 +13,25 @@ const hasName = computed(() => props.finder.name !== undefined)
 const isIF = computed(() => props.finder.type === IFType.INSERTION_FINDER)
 const isSF = computed(() => props.finder.type === IFType.SLICEY_FINDER)
 const type = computed(() => isIF.value ? t('if.title') : t('sf.title'))
+
+const commentedSkeleton = computed<string>(() => {
+  if (!props.finder)
+    return ''
+
+  return props.finder!.skeleton.split('\n').map((part: string) => {
+    const s = part.split('//')
+    if (s.length === 1)
+      return s[0]
+
+    return `${s[0]}<span class="text-gray-400">//${s.slice(1, s.length).join('//')}</span>`
+  }).join('\n')
+})
 </script>
 
 <template>
   <div class="flex flex-col">
-    <fieldset class="flex-1 border border-opacity-50 px-4 py-2 transition-colors hover:bg-opacity-50" :class="{ 'border-if hover:bg-if': isIF, 'border-sf hover:bg-sf': isSF }">
+    <fieldset class="flex-1 border border-opacity-50 px-4 py-2 transition-colors hover:bg-opacity-50"
+      :class="{ 'border-if hover:bg-if': isIF, 'border-sf hover:bg-sf': isSF }">
       <legend class="bg-opacity-50 px-2 text-gray" :class="{ 'bg-if': isIF, 'bg-sf': isSF }">
         {{ type }}
       </legend>
@@ -43,7 +57,7 @@ const type = computed(() => isIF.value ? t('if.title') : t('sf.title'))
             {{ $t('if.skeleton.label') }}
           </div>
           <div class="text-true-gray-500">
-            {{ finder.skeleton }}
+            <pre v-html="commentedSkeleton" />
           </div>
         </div>
         <div v-if="finder.status === IFStatus.FINISHED">
@@ -76,7 +90,8 @@ const type = computed(() => isIF.value ? t('if.title') : t('sf.title'))
       <button class="bg-sky-500 hover:bg-opacity-90 text-white px-2 py-1 flex items-center" @click="emit('edit', finder)">
         <Icon name="solar:pen-new-square-bold-duotone" size="20" />
       </button>
-      <button class="bg-rose-500 hover:bg-opacity-90 text-white px-2 py-1 flex items-center" @click="emit('remove', finder.hash)">
+      <button class="bg-rose-500 hover:bg-opacity-90 text-white px-2 py-1 flex items-center"
+        @click="emit('remove', finder.hash)">
         <Icon name="solar:trash-bin-2-bold-duotone" size="20" />
       </button>
     </div>
