@@ -64,33 +64,17 @@ function reset() {
     </h1>
     <p class="mb-2" v-html="$t('sf.description')" />
     <form class="pb-20" @submit="submit" @reset="reset">
-      <FormInput
-        v-if="user.signedIn"
-        v-model.trim="form.name"
-        type="text"
-        :label="$t('if.name.label')"
-        :state="null"
-        class="mb-4"
-      >
+      <FormInput v-if="user.signedIn" v-model.trim="form.name" type="text" :label="$t('if.name.label')" :state="null"
+        class="mb-4">
         <template #description>
           <p class="py-1" v-html="$t('if.name.description')" />
         </template>
       </FormInput>
-      <FormInput
-        v-model.trim="form.skeleton"
-        type="text"
-        :label="$t('if.skeleton.label')"
-        :state="skeletonState"
-        :error-message="$t('if.skeleton.invalid')"
-        :attrs="{ required: true }"
-      />
+      <FormInput v-model.trim="form.skeleton" type="textarea" :rows="4" :label="$t('if.skeleton.label')"
+        :state="skeletonState" :error-message="$t('if.skeleton.invalid')" :attrs="{ required: true }" />
       <div class="mt-4">
-        <button
-          class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
-          :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }"
-          :disabled="!formState"
-          @click.prevent="submit"
-        >
+        <button class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
+          :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }" :disabled="!formState" @click.prevent="submit">
           {{ $t('form.submit') }}
         </button>
         <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none ml-2" @click.prevent="reset">
