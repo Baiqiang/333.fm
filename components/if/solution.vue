@@ -113,7 +113,7 @@ async function findThis() {
     const { data, refresh } = await useApiPost<InsertionFinder>('/if', {
       body: {
         type: IFType.SLICEY_FINDER,
-        name: '',
+        // name: '',
         skeleton: props.solution.final_solution,
       },
       immediate: false,

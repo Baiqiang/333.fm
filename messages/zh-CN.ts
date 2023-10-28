@@ -181,6 +181,7 @@ export default {
     user: {
       title: '用户',
       if: '{name}的插入',
+      ifs: '找插入数',
     },
     if: {
       title: '插入',

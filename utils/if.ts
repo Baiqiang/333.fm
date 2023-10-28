@@ -13,7 +13,7 @@ export enum IFStatus {
 
 export interface InsertionFinder {
   type: IFType
-  name?: string
+  name: string
   hash: string
   scramble: string
   skeleton: string
@@ -26,6 +26,10 @@ export interface InsertionFinder {
   result: IFResult
   status: IFStatus
   createdAt: string
+}
+
+export interface AdminIF extends InsertionFinder {
+  users: User[]
 }
 
 export interface Cycles {

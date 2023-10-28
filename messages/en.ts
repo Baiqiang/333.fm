@@ -181,6 +181,7 @@ export default {
     user: {
       title: 'User',
       if: '{name}\'s IF',
+      ifs: 'Finder Count',
     },
     if: {
       title: 'IF',

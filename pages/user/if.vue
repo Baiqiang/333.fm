@@ -7,7 +7,7 @@ useSeoMeta({
 definePageMeta({
   middleware: 'auth',
 })
-const userIFs: Ref<UserIF[]> = ref([])
+const userIFs: Ref<InsertionFinder[]> = ref([])
 const meta: Ref<PaginationMeta> = ref({
   totalItems: 0,
   itemCount: 0,
@@ -21,7 +21,7 @@ const removeDialog = useConfirmDialog(removeModal)
 const editDialog = useConfirmDialog(editModal)
 const name = ref('')
 async function fetchData() {
-  const { data } = await useApi<Pagination<UserIF>>('/user/if', {
+  const { data } = await useApi<Pagination<InsertionFinder>>('/user/ifs', {
     params: {
       page: route.query.page,
       limit: DEFAULT_LIMIT,
@@ -42,7 +42,7 @@ async function remove(hash: string) {
     alert(error.value.message)
 }
 async function edit(userIF: InsertionFinder) {
-  name.value = userIF.name!
+  name.value = userIF.name
   const { isCanceled } = await editDialog.reveal()
   if (isCanceled) {
     name.value = ''
