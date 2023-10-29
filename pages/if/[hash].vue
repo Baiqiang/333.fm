@@ -173,7 +173,7 @@ onUnmounted(() => {
         {{ $t('if.skeleton.label') }}
       </div>
       <div>
-        <pre v-html="commentedSkeleton" />
+        <pre class="whitespace-pre-wrap" v-html="commentedSkeleton" />
         <hr class="my-2">
         <div v-if="formatedCycleDetail">
           {{ $t('if.skeleton.to', { length: formatAlgorithmToArray(realSkeleton).length, detail: formatedCycleDetail }) }}
@@ -215,7 +215,7 @@ onUnmounted(() => {
         {{ $t('if.skeleton.label') }}
       </div>
       <div>
-        <pre>{{ skeleton }}</pre>
+        <pre class="whitespace-pre-wrap">{{ skeleton }}</pre>
       </div>
     </template>
     <div class="font-bold">
