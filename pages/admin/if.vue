@@ -13,7 +13,7 @@ const meta: Ref<PaginationMeta> = ref({
   currentPage: 1,
 })
 async function fetchData() {
-  const { data } = await useApi<Pagination<AdminIF>>('/admin/if', {
+  const { data } = await useApi<Pagination<AdminIF>>('/admin/ifs', {
     params: {
       page: route.query.page,
       limit: DEFAULT_LIMIT,
