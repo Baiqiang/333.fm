@@ -54,7 +54,7 @@ const commentedSkeleton = computed<string>(() => {
             {{ $t('if.skeleton.label') }}
           </div>
           <div class="text-true-gray-500">
-            <pre class="whitespace-pre-line" v-html="commentedSkeleton" />
+            <pre class="whitespace-pre-wrap break-all" v-html="commentedSkeleton" />
           </div>
         </div>
         <div v-if="finder.status === IFStatus.FINISHED">

@@ -5,7 +5,7 @@
 <template>
   <div>
     <AppHeader />
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 min-h-[calc(100vh-104px)]">
       <slot />
     </div>
     <AppFooter />
