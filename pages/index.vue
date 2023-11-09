@@ -7,6 +7,7 @@ useSeoMeta({
 const { data: finders } = await useApi<InsertionFinder[]>('/if/latest')
 if (!finders.value)
   finders.value = []
+const { data: competition } = await useApi<Competition>('/weekly/on-going')
 </script>
 
 <template>
@@ -32,6 +33,12 @@ if (!finders.value)
           </footer>
         </template>
       </I18nT>
+      <div v-if="competition">
+        <h2 class="font-bold text-xl">
+          {{ competition.name }}
+        </h2>
+        <WeeklySummary :competition="competition" class="mt-4" />
+      </div>
     </div>
     <div class="">
       <h3 class="py-4 font-bold">

@@ -14,3 +14,10 @@ export const useSFForm = defineStore('form.sf', {
     skeleton: '',
   }),
 })
+
+export const useWeeklyForm = defineStore('form.weekly', {
+  state: () => ({
+    solution: '',
+    comment: '',
+  }),
+})

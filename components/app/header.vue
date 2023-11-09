@@ -8,6 +8,10 @@ const navs = computed(() => [
     title: 'sf.title',
     path: '/sf',
   },
+  {
+    title: 'weekly.title',
+    path: '/weekly',
+  },
 ])
 const user = useUser()
 const showUserMenu = ref(false)
@@ -31,7 +35,8 @@ function switchLang() {
         </NuxtLink>
       </h1>
       <NuxtLink v-for="{ title, path } in navs" :key="path" :to="path" class="nav">
-        {{ $t(title) }}
+        <span class="hidden md:inline">{{ $t(title) }}</span>
+        <span class="md:hidden">{{ $t(title.replace('title', 'shortTitle')) }}</span>
       </NuxtLink>
       <div class="ml-auto flex items-center gap-2">
         <div class="cursor-pointer select-none flex flex-col items-stretch text-xs text-center leading-3" @click="switchLang">
@@ -46,8 +51,10 @@ function switchLang() {
           {{ $t('header.signIn') }}
         </NuxtLink>
         <div v-else class="relative">
-          <div class="flex items-center">
-            <img class="w-8 cursor-pointer" :src="user.avatarThumb" @click.stop="showUserMenu = !showUserMenu">
+          <div class="flex items-center cursor-pointer" @click.stop="showUserMenu = !showUserMenu">
+            <div class="w-8 h-8 overflow-hidden">
+              <img class="w-8" :src="user.avatarThumb">
+            </div>
             <Icon name="solar:alt-arrow-down-bold" size="20" />
           </div>
           <TransitionSlide>

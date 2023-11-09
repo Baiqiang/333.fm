@@ -25,7 +25,6 @@ if ((finder.value.type === IFType.SLICEY_FINDER && path.startsWith('/if'))
 
 useSeoMeta({
   title: t('common.resultTitle', { t: finder.value.type === IFType.INSERTION_FINDER ? t('if.title') : t('sf.title') }),
-  titleTemplate: `%s - ${t('title')}`,
 })
 
 const commentedSkeleton = computed<string>(() => {
@@ -128,14 +127,6 @@ function findThis() {
   })
 }
 
-const showMerged = ref(true)
-function getTabClass(merged: boolean): string {
-  if (merged !== showMerged.value)
-    return 'border-b text-blue-500'
-
-  else
-    return 'border border-b-0'
-}
 let timer: NodeJS.Timeout
 if (status.value !== IFStatus.FINISHED) {
   timer = setInterval(async () => {
@@ -253,19 +244,14 @@ onUnmounted(() => {
           <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="false" :is-if="isIF" />
         </template>
         <template v-else>
-          <div>
-            <div class="flex text-sm">
-              <div class="w-2 border-b border-gray-500" />
-              <div class="cursor-pointer py-1 px-2 border-gray-500" :class="getTabClass(true)" @click="showMerged = true">
-                {{ $t('if.solutions.merged') }}
-              </div>
-              <div class="cursor-pointer py-1 px-2 border-gray-500" :class="getTabClass(false)" @click="showMerged = false">
-                {{ $t('if.solutions.expanded') }}
-              </div>
-              <div class="flex-1 border-b border-gray-500" />
-            </div>
-            <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="showMerged" :is-if="isIF" />
-          </div>
+          <Tabs>
+            <Tab :name="$t('if.solutions.merged')">
+              <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="false" :is-if="isIF" />
+            </Tab>
+            <Tab :name="$t('if.solutions.expanded')">
+              <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="true" :is-if="isIF" />
+            </Tab>
+          </Tabs>
         </template>
       </div>
     </template>

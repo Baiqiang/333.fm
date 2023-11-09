@@ -2,7 +2,6 @@
 const { t } = useI18n()
 useSeoMeta({
   title: t('sf.title'),
-  titleTemplate: `%s - ${t('title')}`,
 })
 const user = useUser()
 const router = useRouter()

@@ -9,6 +9,7 @@ export const useAccessToken = defineStore('accessToken', {
 
 export const useUser = defineStore('user', {
   state: () => ({
+    id: 0,
     wcaId: '',
     name: '',
     email: '',
@@ -33,6 +34,7 @@ export const useUser = defineStore('user', {
   },
   actions: {
     signIn(user: User) {
+      this.id = user.id
       this.wcaId = user.wcaId
       this.name = user.name
       this.email = user.email

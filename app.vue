@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const accessToken = useAccessToken()
 const user = useUser()
+const { t } = useI18n()
+useSeoMeta({
+  titleTemplate: `%s - ${t('title')}`,
+})
 async function checkAuth() {
   if (!accessToken.value)
     return

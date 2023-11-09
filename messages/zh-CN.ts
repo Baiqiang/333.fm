@@ -17,6 +17,7 @@ export default {
     notation: '转动步骤',
     notationURL: 'https://www.worldcubeassociation.org/regulations/translations/chinese/#12a',
     resultTitle: '{t}结果',
+    moves: '{moves}步',
   },
   error: {
     400: '错误请求',
@@ -36,10 +37,12 @@ export default {
   },
   sf: {
     title: '插中层',
+    shortTitle: '中层',
     description: '一个利用插入中层将复原步骤变短的工具。',
   },
   if: {
     title: '找插入',
+    shortTitle: '插入',
     description: '一个用于检查三阶最少步插入是否最优的实用工具。',
     latest: '最近的插入',
     find: '再找一次',
@@ -194,5 +197,32 @@ export default {
     cancel: '取消',
     remove: '删除',
     removeConfirm: '确认要删除这条记录吗？',
+  },
+  weekly: {
+    title: '周赛',
+    shortTitle: '周赛',
+    scrambles: '打乱',
+    scramble: '打乱{number}',
+    period: {
+      pendingStart: '将于{start}开始。',
+      onGoing: '{start}开始至{end}结束。',
+      ended: '已于{end}结束。',
+    },
+    join: '立即参加',
+    solution: {
+      label: '解法',
+      description: '请勿输入任何非法{notation}！',
+      invalid: '请检查你的解法！',
+    },
+    comment: {
+      label: '备注',
+      description: '可以输入一些解法过程，或者随便什么。',
+    },
+    submitted: '（已提交）',
+    solutions: '解法',
+    noSolution: '暂无解法',
+    seeSolutions: '点击查看{solutions}个解法',
+    results: '成绩',
+    past: '往期周赛',
   },
 }

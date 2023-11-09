@@ -24,6 +24,11 @@ export default defineNuxtConfig({
     'dayjs-nuxt',
     'nuxt-gtag',
   ],
+  dayjs: {
+    locales: ['en', 'zh-cn'],
+    defaultLocale: 'en',
+    plugins: ['relativeTime', 'utc', 'timezone', 'advancedFormat', 'weekOfYear', 'localizedFormat'],
+  },
   i18n: {
     strategy: 'no_prefix',
     detectBrowserLanguage: {

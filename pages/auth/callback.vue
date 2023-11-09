@@ -29,7 +29,8 @@ if (!data.value) {
 }
 accessToken.value = data.value.accessToken
 user.signIn(data.value.user)
-router.push('/')
+const previousUrl = useLocalStorage('previousUrl', '')
+router.push(previousUrl.value || '/')
 </script>
 
 <template>

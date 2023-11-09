@@ -5,7 +5,6 @@ const user = useUser()
 const { oauth } = useAppConfig()
 useSeoMeta({
   title: t('header.signIn'),
-  titleTemplate: `%s - ${t('title')}`,
 })
 if (user.signedIn)
   router.push('/')
@@ -21,6 +20,16 @@ onMounted(() => {
       window.location.href = `${oauth.wca.authorizationUrl}?${new URLSearchParams(params)}`
     }, 300)
   }
+})
+definePageMeta({
+  middleware: [
+    function (_, from) {
+      if (from.path !== '/sign-in') {
+        const previousUrl = useLocalStorage('previousUrl', '/')
+        previousUrl.value = from.fullPath
+      }
+    },
+  ],
 })
 </script>
 

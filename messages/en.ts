@@ -17,6 +17,7 @@ export default {
     notation: 'notation',
     notationURL: 'https://www.worldcubeassociation.org/regulations/#12a',
     resultTitle: '{t} Result',
+    moves: '{moves} moves',
   },
   error: {
     400: 'Bad Request',
@@ -36,10 +37,12 @@ export default {
   },
   sf: {
     title: 'Slicey Finder',
+    shortTitle: 'SF',
     description: 'It\'s a useful tool to check the slicey insertions for 3x3x3 Fewest Moves.',
   },
   if: {
     title: 'Insertion Finder',
+    shortTitle: 'IF',
     description: 'It\'s a useful tool to check the optimal insertions for 3x3x3 Fewest Moves.',
     latest: 'Latest IF',
     find: 'Find Again',
@@ -194,5 +197,32 @@ export default {
     cancel: 'Cancel',
     remove: 'Remove',
     removeConfirm: 'Are you sure to remove this?',
+  },
+  weekly: {
+    title: 'Weekly Competition',
+    shortTitle: 'Weekly',
+    scrambles: 'Scramble | Scrambles',
+    scramble: 'Scramble {number}',
+    period: {
+      pendingStart: 'Will start at {start}.',
+      onGoing: 'Started at {start} and will end at {end}.',
+      ended: 'Ended at {end}.',
+    },
+    join: 'Join Now',
+    solution: {
+      label: 'Solution',
+      description: 'Please don\'t input any invalid {notation}.',
+      invalid: 'Please check your solution!',
+    },
+    comment: {
+      label: 'Comment',
+      description: 'You can type something to describe your solution.',
+    },
+    submitted: ' (Submitted)',
+    solutions: 'Solutions',
+    noSolution: 'No Solution',
+    seeSolutions: 'Click to see {solutions} result | Click to see {solutions} solutions',
+    results: 'Results',
+    past: 'Past Competitions',
   },
 }
