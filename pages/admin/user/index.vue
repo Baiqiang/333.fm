@@ -76,5 +76,6 @@ await fetchData()
         </template>
       </div>
     </div>
+    <Pagination :meta="meta" />
   </div>
 </template>
