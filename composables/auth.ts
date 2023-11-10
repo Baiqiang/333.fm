@@ -3,7 +3,10 @@ export const useAccessToken = defineStore('accessToken', {
     value: '',
   }),
   persist: {
-    storage: persistedState.cookies,
+    storage: persistedState.cookiesWithOptions({
+      // 30 days
+      maxAge: 30 * 24 * 60 * 60,
+    }),
   },
 })
 
