@@ -33,11 +33,19 @@ watch(form, (state) => {
 })
 const moves = computed<number>(() => {
   try {
+    const cube = new Cube()
     const solutionAlg = new Algorithm(form.solution)
+    cube.twist(new Algorithm(props.scramble.scramble))
+    cube.twist(solutionAlg)
+    if (cube.getCornerCycles() > 0
+      || cube.getEdgeCycles() > 0
+      || cube.getCenterCycles() > 0
+      || cube.hasParity())
+      return DNF
     return solutionAlg.twists.length + solutionAlg.inverseTwists.length
   }
   catch (e) {
-    return 0
+    return DNF
   }
 })
 const solutionState = computed<boolean | null>(() => {
@@ -64,8 +72,9 @@ const solutionState = computed<boolean | null>(() => {
   }
 })
 const formState = computed<boolean>(() => {
-  return solutionState.value === true
+  return solutionState.value !== null
 })
+const { confirm, cancel, reveal, isRevealed } = useConfirmDialog()
 const loading = ref(false)
 async function submit() {
   loading.value = true
@@ -82,6 +91,11 @@ async function submit() {
         emit('submitted')
     }
     else {
+      if (moves.value === DNF) {
+        const { isCanceled } = await reveal()
+        if (isCanceled)
+          return
+      }
       const { data, refresh } = await useApiPost<Submission>(`/weekly/${week.value}`, {
         body: {
           scrambleId: props.scramble.id,
@@ -102,7 +116,9 @@ async function submit() {
     else
       alert(e.message)
   }
-  loading.value = false
+  finally {
+    loading.value = false
+  }
 }
 function reset() {
   if (!props.submission)
@@ -122,12 +138,14 @@ function reset() {
         :rows="4"
         :label="$t('weekly.solution.label') + (submission ? $t('weekly.submitted') : '')"
         :state="solutionState"
-        :error-message="$t('weekly.solution.invalid')"
         :attrs="{ required: true, disabled: submission !== undefined }"
       >
-        <template v-if="solutionState !== false" #description>
-          <div v-if="solutionState" class="text-green-500 text-bold">
+        <template #description>
+          <div v-if="moves !== DNF" class="text-green-500 text-bold">
             {{ $t('common.moves', { moves }) }}
+          </div>
+          <div v-else class="text-red-500 text-bold">
+            DNF
           </div>
           <I18nT keypath="if.scramble.description" tag="p" scope="global">
             <template #notation>
@@ -166,4 +184,19 @@ function reset() {
       </div>
     </form>
   </div>
+  <Teleport to="body">
+    <Modal v-if="isRevealed" :cancel="cancel">
+      <div class="mb-5 font-bold">
+        {{ $t('weekly.confirmDNF') }}
+      </div>
+      <div class="flex gap-2 justify-end">
+        <button class="bg-rose-500 hover:bg-opacity-90 text-white cursor-pointer px-2 py-1" @click="confirm">
+          {{ $t('form.confirm') }}
+        </button>
+        <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="cancel">
+          {{ $t('form.cancel') }}
+        </button>
+      </div>
+    </Modal>
+  </Teleport>
 </template>

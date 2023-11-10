@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <TransitionFade>
-    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" @click="cancel">
+    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" @click="cancel">
       <div class="bg-white p-5" @click.stop>
         <slot />
       </div>
