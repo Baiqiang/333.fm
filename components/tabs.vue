@@ -23,7 +23,7 @@ onMounted(() => selectTab(0))
     <div class="flex text-xs md:text-sm whitespace-nowrap">
       <div
         v-for="{ name }, index in tabs"
-        :key="name"
+        :key="index"
         class="cursor-pointer py-1 px-2 border-gray-500"
         :class="{ 'border-b text-blue-500': index !== activeIndex, 'border border-b-0': index === activeIndex }"
         @click="selectTab(index)"

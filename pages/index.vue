@@ -33,7 +33,10 @@ const { data: competition } = await useApi<Competition>('/weekly/on-going')
           </footer>
         </template>
       </I18nT>
-      <div v-if="competition">
+      <NuxtLink to="/tutorial/htr-diagram" class="text-blue-500 text-lg md:text-xl flex items-center">
+        <Icon name="game-icons:maze" size="30" />{{ $t('tutorial.htrDiagram.title') }}
+      </NuxtLink>
+      <div v-if="competition" class="mt-2">
         <h2 class="font-bold text-xl">
           {{ competition.name }}
         </h2>

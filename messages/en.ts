@@ -227,4 +227,11 @@ export default {
     results: 'Results',
     past: 'Past Competitions',
   },
+  tutorial: {
+    htrDiagram: {
+      title: 'HTR Diagram',
+      description: 'The amazing HTR Diagram is authorized by {author}.',
+      author: '2013PENG02',
+    },
+  },
 }

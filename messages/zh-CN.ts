@@ -227,4 +227,11 @@ export default {
     results: '成绩',
     past: '往期周赛',
   },
+  tutorial: {
+    htrDiagram: {
+      title: 'HTR 迷宫图',
+      description: 'HTR 迷宫图由{author}倾情创作。',
+      author: '天方魔',
+    },
+  },
 }
