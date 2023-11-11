@@ -1,3 +1,10 @@
+<script setup lang="ts">
+const { t } = useI18n()
+useSeoMeta({
+  title: t('tutorial.htrDiagram.title'),
+})
+</script>
+
 <template>
   <div>
     <h1 class="text-xl font-semibold py-3">
