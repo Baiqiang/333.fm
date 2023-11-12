@@ -147,14 +147,14 @@ async function findThis() {
         {{ $t('if.skeleton.label') }}
       </div>
       <div class="col-span-12 md:col-span-9">
-        <pre class="whitespace-pre-wrap break-all" v-html="formattedSkeleton" />
+        <Sequence :sequence="formattedSkeleton" html />
       </div>
       <template v-for="{ insertionSymbol, formattedInsertion }, j in insertions" :key="`${i}-${j}`">
         <div class="font-semibold col-span-12 md:col-span-3 lg:col-span-2">
           {{ insertionSymbol }}:
         </div>
         <div class="col-span-12 md:col-span-9">
-          <pre class="whitespace-pre-wrap break-all bg-gray-200" v-html="formattedInsertion" />
+          <Sequence :sequence="formattedInsertion" html />
         </div>
       </template>
     </template>
@@ -162,7 +162,7 @@ async function findThis() {
       {{ $t('if.solutions.final') }}
     </div>
     <div class="col-span-12 md:col-span-9">
-      <pre class="whitespace-pre-wrap break-all">{{ solution.final_solution }}</pre>
+      <Sequence :sequence="solution.final_solution" />
       <button
         v-if="isIf"
         class="bg-indigo-500 text-white px-2 py-1 text-sm h-7"

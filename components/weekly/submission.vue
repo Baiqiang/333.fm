@@ -10,7 +10,7 @@ const solution = computed(() => formatAlgorithm(props.submission.solution))
 <template>
   <div>
     <div class="flex gap-2 justify-start items-start">
-      <pre class="whitespace-pre-wrap break-all">{{ solution }}</pre>
+      <Sequence :sequence="props.submission.solution" />
       <button v-if="submission.comment.trim() !== ''" class="text-indigo-500" @click="showComment = !showComment">
         <Icon
           :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"
@@ -19,7 +19,7 @@ const solution = computed(() => formatAlgorithm(props.submission.solution))
       </button>
     </div>
     <TransitionExpand>
-      <pre v-if="showComment" class="whitespace-pre-wrap break-all bg-gray-200">{{ submission.comment }}</pre>
+      <Sequence v-if="showComment" :sequence="submission.comment" class="bg-gray-200" />
     </TransitionExpand>
   </div>
 </template>

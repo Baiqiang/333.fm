@@ -43,7 +43,7 @@ useSeoMeta({
         <WeeklyResults :results="results!" />
       </Tab>
       <Tab v-for="scramble in competition.scrambles" :key="scramble.id" :name="$t('weekly.scramble', { number: scramble.number })">
-        <pre class="whitespace-pre-wrap break-all">{{ scramble.scramble }}</pre>
+        <Sequence :sequence="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
         <WeeklyForm
           v-if="isOnGoing"

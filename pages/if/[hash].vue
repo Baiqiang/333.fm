@@ -157,14 +157,14 @@ onUnmounted(() => {
         {{ $t('if.scramble.label') }}
       </div>
       <div>
-        <pre class="whitespace-pre-wrap break-all">{{ scramble }}</pre>
+        <Sequence :sequence="scramble" />
         <CubeExpanded :moves="scramble" />
       </div>
       <div class="font-bold">
         {{ $t('if.skeleton.label') }}
       </div>
       <div>
-        <pre class="whitespace-pre-wrap break-all" v-html="commentedSkeleton" />
+        <Sequence :sequence="commentedSkeleton" html />
         <hr class="my-2">
         <div v-if="formatedCycleDetail">
           {{ $t('if.skeleton.to', { length: formatAlgorithmToArray(realSkeleton).length, detail: formatedCycleDetail }) }}
@@ -206,7 +206,7 @@ onUnmounted(() => {
         {{ $t('if.skeleton.label') }}
       </div>
       <div>
-        <pre class="whitespace-pre-wrap break-all">{{ skeleton }}</pre>
+        <Sequence :sequence="skeleton" />
       </div>
     </template>
     <div class="font-bold">
