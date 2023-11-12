@@ -13,6 +13,6 @@ defineProps<{
     {{ formatResult(result.average, 2) }}
   </div>
   <div class="col-start-4">
-    {{ result.values.map(formatResult).join(', ') }}
+    {{ result.values.map(v => formatResult(v)).join(', ') }}
   </div>
 </template>
