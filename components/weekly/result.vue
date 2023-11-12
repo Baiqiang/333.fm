@@ -20,7 +20,7 @@ defineProps<{
     v-for="value, index in result.values"
     :key="index"
     class="font-mono"
-    :class="[`col-start-${index + 4}`, {
+    :class="[`col-start-${index + 5}`, {
       'text-indigo-500 font-bold': value === bests[index],
       'text-red-400': value === DNF,
       'text-orange-400': value === DNS,
