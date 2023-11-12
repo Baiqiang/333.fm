@@ -230,7 +230,7 @@ export default {
   tutorial: {
     htrDiagram: {
       title: 'HTR Diagram',
-      description: 'The amazing HTR Diagram is authorized by {author}.',
+      description: 'The amazing HTR Diagram is created by {author}.',
       author: '2013PENG02',
     },
   },

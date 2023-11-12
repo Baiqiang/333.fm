@@ -31,18 +31,30 @@ watch(form, (state) => {
     },
   }
 })
+const solutionAlg = computed(() => {
+  // check NISS and ()
+  if (form.solution.includes('NISS') || form.solution.includes('('))
+    return null
+  try {
+    return new Algorithm(form.solution)
+  }
+  catch (e) {
+    return null
+  }
+})
 const moves = computed<number>(() => {
+  if (!solutionAlg.value)
+    return DNF
   try {
     const cube = new Cube()
-    const solutionAlg = new Algorithm(form.solution)
     cube.twist(new Algorithm(props.scramble.scramble))
-    cube.twist(solutionAlg)
+    cube.twist(solutionAlg.value)
     if (cube.getCornerCycles() > 0
       || cube.getEdgeCycles() > 0
       || cube.getCenterCycles() > 0
       || cube.hasParity())
       return DNF
-    return solutionAlg.twists.length + solutionAlg.inverseTwists.length
+    return solutionAlg.value.twists.length + solutionAlg.value.inverseTwists.length
   }
   catch (e) {
     return DNF
@@ -51,19 +63,20 @@ const moves = computed<number>(() => {
 const solutionState = computed<boolean | null>(() => {
   if (form.solution.length === 0)
     return null
+  if (!solutionAlg.value)
+    return false
 
   try {
     const cube = new Cube()
-    const solutionAlg = new Algorithm(form.solution)
     cube.twist(new Algorithm(props.scramble.scramble))
-    cube.twist(solutionAlg)
+    cube.twist(solutionAlg.value)
     if (cube.getCornerCycles() > 0
       || cube.getEdgeCycles() > 0
       || cube.getCenterCycles() > 0
       || cube.hasParity())
       return false
     // total moves cannot be more than 80
-    if (solutionAlg.twists.length + solutionAlg.inverseTwists.length > 80)
+    if (solutionAlg.value.twists.length + solutionAlg.value.inverseTwists.length > 80)
       return false
     return true
   }
@@ -133,7 +146,7 @@ function reset() {
     <form class="relative" @submit="submit" @reset="reset">
       <FormSignInRequired />
       <FormInput
-        v-model.trim="form.solution"
+        v-model="form.solution"
         type="textarea"
         :rows="4"
         :label="$t('weekly.solution.label') + (submission ? $t('weekly.submitted') : '')"
@@ -155,7 +168,7 @@ function reset() {
         </template>
       </FormInput>
       <FormInput
-        v-model.trim="form.comment"
+        v-model="form.comment"
         type="textarea"
         :rows="4"
         :label="$t('weekly.comment.label')"

@@ -65,7 +65,7 @@ function reset() {
     <form class="pb-20" @submit="submit" @reset="reset">
       <FormInput
         v-if="user.signedIn"
-        v-model.trim="form.name"
+        v-model="form.name"
         type="text"
         :label="$t('if.name.label')"
         :state="null"
@@ -76,7 +76,7 @@ function reset() {
         </template>
       </FormInput>
       <FormInput
-        v-model.trim="form.skeleton"
+        v-model="form.skeleton"
         type="textarea"
         :rows="4"
         :label="$t('if.skeleton.label')"
