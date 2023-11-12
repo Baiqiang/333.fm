@@ -226,6 +226,10 @@ export default {
     seeSolutions: '点击查看{solutions}个解法',
     results: '成绩',
     past: '往期周赛',
+    rank: '排名',
+    name: '姓名',
+    mean: '平均',
+    solves: '成绩',
   },
   tutorial: {
     htrDiagram: {

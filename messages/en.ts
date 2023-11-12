@@ -226,6 +226,10 @@ export default {
     seeSolutions: 'Click to see {solutions} result | Click to see {solutions} solutions',
     results: 'Results',
     past: 'Past Competitions',
+    rank: 'Rank',
+    name: 'Name',
+    mean: 'Mean',
+    solves: 'Solves',
   },
   tutorial: {
     htrDiagram: {
