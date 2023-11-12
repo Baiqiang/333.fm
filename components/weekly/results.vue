@@ -20,6 +20,8 @@ const bests = computed(() => [0, 1, 2].map(i => Math.min(...props.results.map(re
       <div class="col-start-4 font-semibold text-sm">
         {{ $t('weekly.solves') }}
       </div>
+      <div class="col-start-5" />
+      <div class="col-start-6" />
       <WeeklyResult v-for="result in results" :key="result.user.id" :result="result" :bests="bests" />
     </div>
   </div>
