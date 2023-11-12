@@ -13,8 +13,11 @@ const name = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center justify-start gap-2">
-    <img :src="user.avatarThumb" class="w-6 h-6">
-    {{ name }}
+  <div class="flex justify-between gap-2">
+    <div class="flex items-center justify-start gap-2">
+      <img :src="user.avatarThumb" class="w-6 h-6">
+      {{ name }}
+    </div>
+    <slot />
   </div>
 </template>

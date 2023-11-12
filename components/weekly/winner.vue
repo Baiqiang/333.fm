@@ -23,7 +23,7 @@ const name = computed(() => {
       <Icon name="solar:double-alt-arrow-right-linear" size="16" />
     </NuxtLink>
     <div>
-      {{ name }} {{ formatResult(competition.winner.average) }} ({{ competition.winner.values.map(formatResult).join(',') }})
+      {{ name }} {{ formatResult(competition.winner.average, 2) }} ({{ competition.winner.values.map(formatResult).join(',') }})
     </div>
   </div>
 </template>

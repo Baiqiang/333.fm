@@ -10,7 +10,7 @@ defineProps<{
   </div>
   <WeeklyUser :user="result.user" class="col-start-2" />
   <div class="col-start-3">
-    {{ formatResult(result.average) }}
+    {{ formatResult(result.average, 2) }}
   </div>
   <div class="col-start-4">
     {{ result.values.map(formatResult).join(', ') }}

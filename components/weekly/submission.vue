@@ -10,8 +10,7 @@ const solution = computed(() => formatAlgorithm(props.submission.solution))
 <template>
   <div>
     <div class="flex gap-2 justify-start items-start">
-      <pre v-if="hasResult" class="whitespace-pre-wrap break-all">{{ solution }} ({{ formatResult(submission.moves) }})</pre>
-      <span v-else class="text-red-500">{{ submission.moves === DNF ? 'DNF' : 'DNS' }}</span>
+      <pre class="whitespace-pre-wrap break-all">{{ solution }}</pre>
       <button v-if="submission.comment.trim() !== ''" class="text-indigo-500" @click="showComment = !showComment">
         <Icon
           :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"

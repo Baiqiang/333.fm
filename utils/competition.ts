@@ -59,10 +59,10 @@ export enum CompetitionStatus {
 export const DNF = 99999998
 export const DNS = 99999999
 
-export function formatResult(result: number) {
+export function formatResult(result: number, precision = 0) {
   if (result === DNF)
     return 'DNF'
   if (result === DNS)
     return 'DNS'
-  return result / 100
+  return (result / 100).toFixed(precision)
 }
