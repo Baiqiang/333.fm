@@ -7,7 +7,7 @@ const bests = computed(() => [0, 1, 2].map(i => Math.min(...props.results.map(re
 
 <template>
   <div class="overflow-x-auto">
-    <div class="grid grid-cols-[3rem_minmax(min-content,max-content)_3rem_3rem_3rem_minmax(3rem,1fr)] gap-2 md:gap-x-3 mt-2 whitespace-nowrap">
+    <div class="grid grid-cols-[3rem_minmax(max-content,max-content)_3rem_3rem_3rem_minmax(3rem,1fr)] gap-2 md:gap-x-3 mt-2 whitespace-nowrap">
       <div class="col-start-1 font-semibold text-sm text-right">
         {{ $t('weekly.rank') }}
       </div>
