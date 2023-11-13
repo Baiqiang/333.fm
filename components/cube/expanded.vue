@@ -42,15 +42,8 @@ function setSize() {
   group.scale = scale
   two.update()
 }
-onMounted(async () => {
-  const dom = cubeElement.value!
-  two = new Two({
-    type: Two.Types.canvas,
-  }).appendTo(dom)
-  group = two.makeGroup()
-  two.width = dom.clientWidth
+function init() {
   setSize()
-  window.addEventListener('resize', setSize)
   const rectSize = (two.width - 13) / 12 + 1
   for (let i = 0; i < 54; i++) {
     let x = i % 3
@@ -74,6 +67,27 @@ onMounted(async () => {
   }
   group.position.set(0, 0)
   two.update()
+}
+onMounted(async () => {
+  const dom = cubeElement.value!
+  // add events to detect if dom is visible
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        init()
+        observer.disconnect()
+      }
+    })
+  }, {
+    root: document.documentElement,
+  })
+  observer.observe(dom)
+  two = new Two({
+    type: Two.Types.canvas,
+  }).appendTo(dom)
+  group = two.makeGroup()
+  two.width = dom.clientWidth
+  window.addEventListener('resize', setSize)
 })
 </script>
 
