@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "insertionfinder": "^0.3.2"
+    "insertionfinder": "^0.3.2",
+    "two.js": "^0.8.12"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.43.1",

@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { Algorithm, Cube } from 'insertionfinder'
+import Two from 'two.js'
+import type { Group } from 'two.js/src/group'
 
 const props = defineProps<{
   moves: string
   best?: boolean
 }>()
+
+const cubeElement = ref<HTMLCanvasElement>()
 
 const facelet = computed(() => {
   try {
@@ -20,43 +24,59 @@ const facelet = computed(() => {
   }
 })
 const bgs = {
-  u: 'bg-white',
-  d: 'bg-[yellow]',
-  l: 'bg-[orange]',
-  r: 'bg-[red]',
-  f: 'bg-[green]',
-  b: 'bg-[blue]',
+  U: 'white',
+  D: 'yellow',
+  L: 'orange',
+  R: 'red',
+  F: 'green',
+  B: 'blue',
 }
-const faceOrders = ['U', 'L', 'F', 'R', 'B', 'D']
+let two: Two
+let group: Group
+let scale = 1
+function setSize() {
+  const dom = cubeElement.value!
+  scale = scale * dom.clientWidth / two.width
+  two.width = dom.clientWidth
+  two.height = dom.clientWidth * 3 / 4
+  group.scale = scale
+  two.update()
+}
+onMounted(async () => {
+  const dom = cubeElement.value!
+  two = new Two({
+    type: Two.Types.canvas,
+  }).appendTo(dom)
+  group = two.makeGroup()
+  two.width = dom.clientWidth
+  setSize()
+  window.addEventListener('resize', setSize)
+  const rectSize = (two.width - 13) / 12 + 1
+  for (let i = 0; i < 54; i++) {
+    let x = i % 3
+    let y = Math.floor(i / 3) % 3
+    if (i < 18) {
+      x += 3
+      if (i >= 9)
+        y += 6
+    }
+    else {
+      x += Math.floor(i / 9) % 3 * 3
+      if (i >= 45)
+        x += 3
+      y += 3
+    }
 
-function getFaceletIndex(face: string, row: number, col: number) {
-  return facelet.value.charAt('UDRLFB'.indexOf(face) * 9 + row * 3 + col).toLowerCase() as keyof typeof bgs
-}
-function getFaceClass(index: number) {
-  const row = Math.floor(index / 12)
-  const col = index % 12
-  let face: keyof typeof bgs | '' = ''
-  switch (true) {
-    case row < 3:
-      if (col >= 3 && col < 6)
-        face = getFaceletIndex('U', row, col - 3)
-      break
-    case row < 6:
-      face = getFaceletIndex(faceOrders[Math.floor(col / 3) + 1], row - 3, col % 3)
-      break
-    case row < 9:
-      if (col >= 3 && col < 6)
-        face = getFaceletIndex('D', row - 6, col - 3)
-      break
+    const rect = two.makeRectangle(x * rectSize + rectSize / 2, y * rectSize + rectSize / 2, rectSize, rectSize)
+    rect.fill = bgs[facelet.value[i] as keyof typeof bgs]
+    rect.stroke = 'black'
+    group.add(rect)
   }
-  if (face)
-    return `${bgs[face]} ring-1 ring-black`
-  return ''
-}
+  group.position.set(0, 0)
+  two.update()
+})
 </script>
 
 <template>
-  <div class="grid grid-cols-12 grid-rows-9 gap-[1px] max-w-xs">
-    <div v-for="(n, i) in 108" :key="i" class="pt-[100%]" :class="getFaceClass(i)" />
-  </div>
+  <div ref="cubeElement" class="max-w-xs" />
 </template>
