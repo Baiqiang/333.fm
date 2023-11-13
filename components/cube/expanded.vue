@@ -36,6 +36,8 @@ let group: Group
 let scale = 1
 function setSize() {
   const dom = cubeElement.value!
+  if (dom.clientWidth === 0)
+    return
   scale = scale * dom.clientWidth / two.width
   two.width = dom.clientWidth
   two.height = dom.clientWidth * 3 / 4
@@ -43,6 +45,8 @@ function setSize() {
   two.update()
 }
 function init() {
+  const dom = cubeElement.value!
+  two.width = dom.clientWidth
   setSize()
   const rectSize = (two.width - 13) / 12 + 1
   for (let i = 0; i < 54; i++) {
@@ -67,11 +71,13 @@ function init() {
   }
   group.position.set(0, 0)
   two.update()
+  window.addEventListener('resize', setSize)
 }
 onMounted(async () => {
   const dom = cubeElement.value!
   // add events to detect if dom is visible
   const observer = new IntersectionObserver((entries) => {
+    console.log(entries)
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         init()
@@ -86,8 +92,6 @@ onMounted(async () => {
     type: Two.Types.canvas,
   }).appendTo(dom)
   group = two.makeGroup()
-  two.width = dom.clientWidth
-  window.addEventListener('resize', setSize)
 })
 </script>
 
