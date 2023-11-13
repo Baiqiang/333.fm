@@ -230,6 +230,17 @@ export default {
     name: 'Name',
     mean: 'Mean',
     solves: 'Solves',
+    rules: {
+      basic: {
+        title: 'Basic Rules',
+        rules: [
+          'You can only use the {notation} that defined in WCA regulations.',
+          'You should finish the solve within 1 hour.',
+          'Any kind of cheating is not allowed.',
+          'Comment should be submitted too. You can change it after submitting though.',
+        ],
+      },
+    },
   },
   tutorial: {
     htrDiagram: {

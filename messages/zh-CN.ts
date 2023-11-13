@@ -230,6 +230,17 @@ export default {
     name: '姓名',
     mean: '平均',
     solves: '成绩',
+    rules: {
+      basic: {
+        title: '基本规则',
+        rules: [
+          '只能使用 WCA 官方规则规定的{notation}；',
+          '每个打乱应该在 1 小时内完成；',
+          '任何形式的作弊都是不允许的；',
+          '备注也应一并提交，不过提交解法后扔可修改。',
+        ],
+      },
+    },
   },
   tutorial: {
     htrDiagram: {

@@ -38,6 +38,7 @@ useSeoMeta({
       {{ competition.name }}
     </h1>
     <WeeklyStatus :competition="competition" />
+    <WeeklyRules />
     <Tabs>
       <Tab v-if="!isOnGoing" :name="$t('weekly.results')">
         <WeeklyResults :results="results!" />
