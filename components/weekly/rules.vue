@@ -9,7 +9,7 @@
           <Notation />
         </template>
       </I18nT>
-      <li v-for="i in 3" :key="i">
+      <li v-for="i in 4" :key="i">
         {{ $t(`weekly.rules.basic.rules.${i}`) }}
       </li>
     </ol>

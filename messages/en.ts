@@ -221,6 +221,7 @@ export default {
     unlimited: {
       label: 'Unlimited',
       description: 'No time limit. You can submit many times.',
+      invalid: 'Please submit better solution!',
     },
     solution: {
       label: 'Solution',
@@ -252,7 +253,8 @@ export default {
         title: 'Basic Rules',
         rules: [
           'You can only use the {notation} that defined in WCA regulations.',
-          'You should finish the solve within 1 hour.',
+          'For regular mode, you should finish the solve within 1 hour.',
+          'For unlimited mode, there\'s no time limit. You can submit many times. But only better result can be submitted.',
           'Any kind of cheating is not allowed.',
           'Comment should be submitted too. You can change it after submitting though.',
         ],

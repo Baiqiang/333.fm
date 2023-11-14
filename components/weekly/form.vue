@@ -120,8 +120,13 @@ const solutionDisabled = computed<boolean>(() => {
     return false
   return true
 })
+const unlimitedWorse = computed<boolean>(() => {
+  return form.mode === CompetitionMode.UNLIMITED && props.submissions.some(s => s.moves < moves.value * 100)
+})
 const formState = computed<boolean>(() => {
   if (form.mode === CompetitionMode.REGULAR && !submissionsMap.value[CompetitionMode.REGULAR] && submissionsMap.value[CompetitionMode.UNLIMITED])
+    return false
+  if (unlimitedWorse.value)
     return false
   return solutionState.value !== null
 })
@@ -229,6 +234,9 @@ function reset() {
         :attrs="{ required: true, disabled: solutionDisabled }"
       >
         <template #description>
+          <div v-if="unlimitedWorse" class="text-red-500">
+            {{ $t('weekly.unlimited.invalid') }}
+          </div>
           <div v-if="moves !== DNF" class="text-green-500 text-bold">
             {{ $t('common.moves', { moves }) }}
           </div>
