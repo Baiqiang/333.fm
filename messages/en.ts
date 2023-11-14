@@ -210,6 +210,18 @@ export default {
       ended: 'Ended at {end}.',
     },
     join: 'Join Now',
+    mode: {
+      label: 'Mode',
+    },
+    regular: {
+      label: 'Regular',
+      description: 'Regular FMC rules, 1 hour limit.',
+      unlimitedSubmitted: 'You have already submitted solution for unlimited mode. The result of regular mode will be DNFed.',
+    },
+    unlimited: {
+      label: 'Unlimited',
+      description: 'No time limit. You can submit many times.',
+    },
     solution: {
       label: 'Solution',
       description: 'Please don\'t input any invalid {notation}.',
@@ -225,11 +237,16 @@ export default {
     noSolution: 'No Solution',
     seeSolutions: 'Click to see {solutions} result | Click to see {solutions} solutions',
     results: 'Results',
+    unlimitedResults: 'Results (Unlimited)',
     past: 'Past Competitions',
     rank: 'Rank',
     name: 'Name',
     mean: 'Mean',
     solves: 'Solves',
+    turnToUnlimited: {
+      label: 'Turn to Unlimited',
+      confirm: 'Are you sure to turn this result to unlimited mode? This is irreversible. After that, you regular result will be DNFed and you CANNOT submit solution for regular mode on this attempt.',
+    },
     rules: {
       basic: {
         title: 'Basic Rules',

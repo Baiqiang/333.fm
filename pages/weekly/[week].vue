@@ -12,23 +12,34 @@ const competition = ref<Competition>(data.value)
 const isOnGoing = computed(() => competition.value.status === CompetitionStatus.ON_GOING)
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {
-  const ret: Record<number, Submission | undefined> = {}
+  const ret: Record<number, Submission[]> = {}
   for (const { id } of competition.value.scrambles)
-    ret[id] = submissions[id]?.find(submission => submission.user.id === user.id)
+    ret[id] = submissions[id]?.filter(submission => submission.user.id === user.id) ?? []
 
   return ret
 })
 const hideSolutions = reactive<Record<number, boolean>>({})
-const { data: results } = await useApi<Result[]>(`/weekly/${params.week}/results`)
+const { data: results } = await useApi<{ regular: Result[]; unlimited: Result[] }>(`/weekly/${params.week}/results`)
 await fetchSubmissions()
 async function fetchSubmissions() {
-  const { data, refresh } = await useApi<Record<number, Submission[]>>(`/weekly/${params.week}/submissions`)
+  const { data, refresh } = await useApi<Record<number, Submission[]>>(`/weekly/${params.week}/submissions`, {
+    immediate: false,
+  })
   await refresh()
   if (data.value)
     Object.assign(submissions, data.value)
 }
 useSeoMeta({
   title: `${competition.value.name} - ${t('weekly.title')}`,
+})
+let timer: NodeJS.Timeout
+onMounted(() => {
+  timer = setInterval(() => {
+    fetchSubmissions()
+  }, 5000)
+})
+onUnmounted(() => {
+  clearInterval(timer)
 })
 </script>
 
@@ -41,7 +52,10 @@ useSeoMeta({
     <WeeklyRules />
     <Tabs>
       <Tab v-if="!isOnGoing" :name="$t('weekly.results')">
-        <WeeklyResults :results="results!" />
+        <WeeklyResults :results="results!.regular" />
+      </Tab>
+      <Tab v-if="!isOnGoing && results?.unlimited.length" :name="$t('weekly.unlimitedResults')">
+        <WeeklyResults :results="results!.unlimited" />
       </Tab>
       <Tab v-for="scramble in competition.scrambles" :key="scramble.id" :name="$t('weekly.scramble', { number: scramble.number })">
         <Sequence :sequence="scramble.scramble" />
@@ -50,7 +64,7 @@ useSeoMeta({
           v-if="isOnGoing"
           :scramble="scramble"
           :competition="competition"
-          :submission="mySubmissions[scramble.id]"
+          :submissions="mySubmissions[scramble.id]"
           @submitted="fetchSubmissions"
         />
         <h2 class="text-lg font-semibold my-2">
@@ -61,7 +75,7 @@ useSeoMeta({
             {{ $t('weekly.noSolution') }}
           </div>
           <button
-            v-else-if="!mySubmissions[scramble.id] && !hideSolutions[scramble.id] && isOnGoing"
+            v-else-if="mySubmissions[scramble.id]?.length === 0 && !hideSolutions[scramble.id] && isOnGoing"
             class="bg-indigo-500 text-white p-2"
             @click="hideSolutions[scramble.id] = true"
           >

@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{
   description?: string
   attrs?: Record<string, unknown>
   rows?: number
-  options?: { label: string; value: string }[]
+  options?: { label: string; value: string | number; description?: string }[]
   errorMessage?: string
   state?: boolean | null
 }>(), {
@@ -49,6 +49,20 @@ const inputClass = computed<string>(() => {
         {{ option.label }}
       </option>
     </select>
+    <div v-else-if="type === 'radio'" class="flex flex-wrap gap-2 md:mt-3 mb-4">
+      <label v-for="option in options" :key="option.value" class="flex items-center gap-2 cursor-pointer">
+        <input
+          v-bind="attrs"
+          v-model="value"
+          :type="type"
+          :value="option.value"
+        >
+        {{ option.label }}
+      </label>
+      <div class="w-full text-sm text-gray-500">
+        {{ options?.find(o => o.value === value)?.description }}
+      </div>
+    </div>
     <textarea v-else-if="type === 'textarea'" v-model="value" v-bind="attrs" :class="inputClass" :rows="rows" />
     <input v-else-if="type" v-model="value" v-bind="attrs" :class="inputClass" :type="type">
     <div v-if="state === false && errorMessage" class="text-red-600 text-sm px-2 py-1" v-html="errorMessage" />

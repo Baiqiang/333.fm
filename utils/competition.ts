@@ -22,6 +22,7 @@ export interface Result {
   best: number
   average: number
   user: User
+  mode: CompetitionMode
 }
 
 export interface Scramble {
@@ -37,6 +38,7 @@ export interface Submission {
   moves: number
   scramble: Scramble
   user: User
+  mode: CompetitionMode
 }
 
 export enum CompetitionType {
@@ -54,6 +56,11 @@ export enum CompetitionStatus {
   NOT_STARTED,
   ON_GOING,
   ENDED,
+}
+
+export enum CompetitionMode {
+  REGULAR,
+  UNLIMITED,
 }
 
 export const DNF = 99999998

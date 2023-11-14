@@ -219,17 +219,34 @@ export default {
       label: '备注',
       description: '可以输入一些解法过程，或者随便什么。',
     },
+    mode: {
+      label: '模式',
+    },
+    regular: {
+      label: '常规',
+      description: '常规最少步规则，限时1小时。',
+      unlimitedSubmitted: '你已经提交了狂野模式的解法，常规模式的成绩将被 DNF。',
+    },
+    unlimited: {
+      label: '狂野',
+      description: '时间不限，可以多次提交。',
+    },
     confirmDNF: '确认要 DNF 掉吗？',
     submitted: '（已提交）',
     solutions: '解法',
     noSolution: '暂无解法',
     seeSolutions: '点击查看{solutions}个解法',
     results: '成绩',
+    unlimitedResults: '成绩（狂野）',
     past: '往期周赛',
     rank: '排名',
     name: '姓名',
     mean: '平均',
     solves: '成绩',
+    turnToUnlimited: {
+      label: '转为狂野模式',
+      confirm: '确认要将本次成绩转为狂野模式吗？此操作不可撤销，转换之后常规模式的成绩将被 DNF。',
+    },
     rules: {
       basic: {
         title: '基本规则',
@@ -237,7 +254,7 @@ export default {
           '只能使用 WCA 官方规则规定的{notation}；',
           '每个打乱应该在 1 小时内完成；',
           '任何形式的作弊都是不允许的；',
-          '备注也应一并提交，不过提交解法后扔可修改。',
+          '备注也应一并提交，不过提交解法后仍可修改。',
         ],
       },
     },
