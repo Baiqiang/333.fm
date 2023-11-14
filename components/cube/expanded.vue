@@ -2,6 +2,7 @@
 import { Algorithm, Cube } from 'insertionfinder'
 import Two from 'two.js'
 import type { Group } from 'two.js/src/group'
+import type { Rectangle } from 'two.js/src/shapes/rectangle'
 
 const props = defineProps<{
   moves: string
@@ -73,11 +74,17 @@ function init() {
   two.update()
   window.addEventListener('resize', setSize)
 }
+watch(facelet, () => {
+  for (let i = 0; i < facelet.value.length; i++) {
+    const rect = group.children[i] as Rectangle
+    rect.fill = bgs[facelet.value[i] as keyof typeof bgs]
+  }
+  two.update()
+})
 onMounted(async () => {
   const dom = cubeElement.value!
   // add events to detect if dom is visible
   const observer = new IntersectionObserver((entries) => {
-    console.log(entries)
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         init()
