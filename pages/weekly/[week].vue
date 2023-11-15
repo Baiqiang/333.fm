@@ -82,7 +82,7 @@ onUnmounted(() => {
             {{ $t('weekly.seeSolutions', { solutions: submissions[scramble.id].length }, submissions[scramble.id].length) }}
           </button>
           <template v-else>
-            <WeeklyUserSubmission v-for="submission in submissions[scramble.id]" :key="submission.id" :submission="submission" />
+            <WeeklySubmissions :submissions="submissions[scramble.id]" />
           </template>
         </div>
       </Tab>

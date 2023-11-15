@@ -18,6 +18,7 @@ export default {
     notationURL: 'https://www.worldcubeassociation.org/regulations/#12a',
     resultTitle: '{t} Result',
     moves: '{moves} moves',
+    all: 'All',
   },
   error: {
     400: 'Bad Request',

@@ -18,6 +18,7 @@ export default {
     notationURL: 'https://www.worldcubeassociation.org/regulations/translations/chinese/#12a',
     resultTitle: '{t}结果',
     moves: '{moves}步',
+    all: '全部',
   },
   error: {
     400: '错误请求',
