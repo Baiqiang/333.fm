@@ -58,7 +58,7 @@ onUnmounted(() => {
         <WeeklyResults :results="results!.unlimited" />
       </Tab>
       <Tab v-for="scramble in competition.scrambles" :key="scramble.id" :name="$t('weekly.scramble', { number: scramble.number })">
-        <Sequence :sequence="scramble.scramble" />
+        <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
         <WeeklyForm
           v-if="isOnGoing"

@@ -10,7 +10,7 @@ const week = computed(() => dayjs(props.competition.startTime).format('YYYY-ww')
   <div>
     <WeeklyStatus :competition="competition" />
     <div v-for="{ scramble, number } in competition.scrambles" :key="number" class="mt-2">
-      <Sequence :sequence="`No.${number} ${scramble}`" />
+      <Sequence :sequence="scramble" :source="scramble" :prefix="`No.${number} `" />
       <CubeExpanded :moves="scramble" />
     </div>
     <div class="mt-4">
