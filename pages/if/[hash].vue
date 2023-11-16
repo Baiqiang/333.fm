@@ -246,10 +246,10 @@ onUnmounted(() => {
         <template v-else>
           <Tabs>
             <Tab :name="$t('if.solutions.merged')">
-              <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="false" :is-if="isIF" />
+              <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="true" :is-if="isIF" />
             </Tab>
             <Tab :name="$t('if.solutions.expanded')">
-              <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="true" :is-if="isIF" />
+              <IfSolution v-for="(solution, index) in result.solutions" :key="index" :solution="solution" :merged="false" :is-if="isIF" />
             </Tab>
           </Tabs>
         </template>
