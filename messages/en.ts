@@ -254,7 +254,7 @@ export default {
         title: 'Basic Rules',
         rules: [
           'You can only use the {notation} that defined in WCA regulations.',
-          'For regular mode, you should finish the solve within 1 hour.',
+          'For regular mode, you should finish the solve within 1 hour. Result must be submitted before submitting in unlimited mode.',
           'For unlimited mode, there\'s no time limit. You can submit many times. But only better result can be submitted.',
           'Any kind of cheating is not allowed.',
           'Comment should be submitted too. You can change it after submitting though.',
