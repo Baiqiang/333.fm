@@ -1,9 +1,7 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   competition: Competition
 }>()
-const dayjs = useDayjs()
-const week = computed(() => dayjs(props.competition.startTime).format('YYYY-ww'))
 </script>
 
 <template>
@@ -14,7 +12,7 @@ const week = computed(() => dayjs(props.competition.startTime).format('YYYY-ww')
       <CubeExpanded :moves="scramble" />
     </div>
     <div class="mt-4">
-      <NuxtLink :to="`/weekly/${week}`" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+      <NuxtLink :to="`/weekly/${competition.alias}`" class="bg-indigo-500 text-white px-3 py-2 text-lg">
         {{ $t('weekly.join') }}
       </NuxtLink>
     </div>

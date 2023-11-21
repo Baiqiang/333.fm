@@ -2,6 +2,7 @@ import type { User } from './user'
 
 export interface Competition {
   id: number
+  alias: string
   type: CompetitionType
   name: string
   startTime: string

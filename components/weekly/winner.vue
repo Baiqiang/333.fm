@@ -2,8 +2,6 @@
 const props = defineProps<{
   competition: PastCompetition
 }>()
-const dayjs = useDayjs()
-const week = computed(() => dayjs(props.competition.startTime).format('YYYY-ww'))
 const { locale } = useI18n()
 const name = computed(() => {
   const matches = props.competition.winner.user.name.match(/^(.+?) \((.+)\)$/)
@@ -16,7 +14,7 @@ const name = computed(() => {
 
 <template>
   <div>
-    <NuxtLink :to="`/weekly/${week}`" class="text-blue-500 flex items-center">
+    <NuxtLink :to="`/weekly/${competition.alias}`" class="text-blue-500 flex items-center">
       <h3 class="font-bold text-lg my-2">
         {{ competition.name }}
       </h3>
