@@ -19,10 +19,19 @@ const menuClass = 'hover:bg-gray-200 cursor-pointer px-3 py-1'
 onMounted(() => {
   document.body.addEventListener('click', () => showUserMenu.value = false)
 })
-const { setLocale, locale } = useI18n()
-function switchLang() {
-  setLocale(locale.value === 'en' ? 'zh-CN' : 'en')
-}
+
+const langButton = ref()
+const { setLocale } = useI18n()
+const locales = [
+  { code: 'en', label: 'English' },
+  { code: 'zh-CN', label: '简体中文' },
+]
+const dropdowns = reactive({
+  lang: false,
+})
+onClickOutside(langButton, () => {
+  dropdowns.lang = false
+})
 </script>
 
 <template>
@@ -38,15 +47,21 @@ function switchLang() {
         <span class="hidden md:inline">{{ $t(title) }}</span>
         <span class="md:hidden">{{ $t(title.replace('title', 'shortTitle')) }}</span>
       </NuxtLink>
-      <div class="ml-auto flex items-center gap-2">
-        <div class="cursor-pointer select-none flex flex-col items-stretch text-xs text-center leading-3" @click="switchLang">
-          <div class="border border-white" :class="{ 'bg-white text-indigo-500': locale === 'zh-CN' }">
-            EN
-          </div>
-          <div class="border border-white" :class="{ 'bg-white text-indigo-500': locale === 'en' }">
-            简
-          </div>
+      <div class="ml-auto flex items-center gap-3">
+        <div class="relative">
+          <button ref="langButton" class="text-lg" @click="dropdowns.lang = !dropdowns.lang">
+            <Icon name="ic:round-translate" />
+          </button>
+
+          <TransitionSlide :offset="[0, 4]">
+            <div v-if="dropdowns.lang" class="flex flex-col gap-1 absolute top-10 right-0 bg-indigo-500 p-2 text-sm">
+              <button v-for="item in locales" :key="item.code" class="w-24 flex items-center text-left px-2 py-1 transition hover:bg-indigo-400" @click="setLocale(item.code)">
+                <span>{{ item.label }}</span>
+              </button>
+            </div>
+          </TransitionSlide>
         </div>
+
         <NuxtLink v-if="!user.signedIn" to="/sign-in" class="text-xs md:text-base whitespace-nowrap">
           {{ $t('header.signIn') }}
         </NuxtLink>
