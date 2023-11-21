@@ -17,7 +17,7 @@ if (!finder.value) {
 }
 
 if ((finder.value.type === IFType.SLICEY_FINDER && path.startsWith('/if'))
- || (finder.value.type === IFType.INSERTION_FINDER && path.startsWith('/sf'))) {
+  || (finder.value.type === IFType.INSERTION_FINDER && path.startsWith('/sf'))) {
   router.replace({
     path: `/${finder.value.type === IFType.INSERTION_FINDER ? 'if' : 'sf'}/${params.hash}`,
   })
@@ -67,8 +67,15 @@ const formatedCycleDetail = computed<string>(() => {
   return detail.join('')
 })
 const algKeys = [
-  '3CP', '3CP-pure', '2x2CP', 'CO', 'C-other',
-  '3EP', '2x2EP', 'EO', 'E-other',
+  '3CP',
+  '3CP-pure',
+  '2x2CP',
+  'CO',
+  'C-other',
+  '3EP',
+  '2x2EP',
+  'EO',
+  'E-other',
   'parity',
   'extras/parity',
   'center',
@@ -86,6 +93,7 @@ const cycles = computed<Partial<Cycles>>(() => {
     if (cycle)
       result[key as keyof Cycles] = cycle
   }
+
   return result
 })
 const greedy = computed<number>(() => finder.value?.greedy ?? 0)
@@ -139,6 +147,7 @@ if (status.value !== IFStatus.FINISHED) {
       clearInterval(timer)
   }, 1000)
 }
+
 onUnmounted(() => {
   if (timer)
     clearInterval(timer)

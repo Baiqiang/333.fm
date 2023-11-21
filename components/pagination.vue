@@ -10,8 +10,7 @@ const lastPage = computed(() => {
 })
 const pages = computed(() => {
   const pages: number[] = []
-  for (let i = startPage.value; i <= lastPage.value; i++)
-    pages.push(i)
+  for (let i = startPage.value; i <= lastPage.value; i++) pages.push(i)
   return pages
 })
 </script>

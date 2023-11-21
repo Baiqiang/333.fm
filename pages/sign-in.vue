@@ -8,6 +8,7 @@ useSeoMeta({
 })
 if (user.signedIn)
   router.push('/')
+
 onMounted(() => {
   if (!user.signedIn) {
     setTimeout(() => {

@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     },
   },
   modules: [
-    '@nuxtjs/eslint-module',
+    // '@nuxtjs/eslint-module',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/i18n',
     '@nuxtjs/google-fonts',
@@ -34,6 +34,7 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       useCookie: true,
     },
+    skipSettingLocaleOnNavigate: true,
     locales: [
       {
         code: 'en',
@@ -55,12 +56,12 @@ export default defineNuxtConfig({
   gtag: {
     id: 'G-4DDRHC6TDB',
   },
-  experimental: {
-    asyncContext: true,
-    headNext: true,
-    // disable this to run in QQ browser for iOS
-    appManifest: false,
-  },
+  // experimental: {
+  //   asyncContext: true,
+  //   headNext: true,
+  //   // disable this to run in QQ browser for iOS
+  //   appManifest: false,
+  // },
   $development: {
     vite: {
       server: {

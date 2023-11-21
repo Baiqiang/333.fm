@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CompetitionMode } from '~/utils/competition'
+
 const props = defineProps<{
   submissions?: Submission[]
 }>()
@@ -9,19 +11,30 @@ const filterSubmissions = computed(() => {
 
   return props.submissions?.filter(submission => submission.mode === mode.value) || []
 })
+const counts = computed(() => {
+  const counts: Record<CompetitionMode | 'all', number> = {
+    all: props.submissions?.length || 0,
+    [CompetitionMode.REGULAR]: 0,
+    [CompetitionMode.UNLIMITED]: 0,
+  }
+  for (const { mode } of props.submissions || [])
+    counts[mode]++
+
+  return counts
+})
 </script>
 
 <template>
   <div>
     <select v-model="mode">
       <option :value="null">
-        {{ $t('common.all') }}
+        {{ $t('common.all') }} ({{ counts.all }})
       </option>
       <option :value="CompetitionMode.REGULAR">
-        {{ $t('weekly.regular.label') }}
+        {{ $t('weekly.regular.label') }} ({{ counts[CompetitionMode.REGULAR] }})
       </option>
       <option :value="CompetitionMode.UNLIMITED">
-        {{ $t('weekly.unlimited.label') }}
+        {{ $t('weekly.unlimited.label') }} ({{ counts[CompetitionMode.UNLIMITED] }})
       </option>
     </select>
     <div

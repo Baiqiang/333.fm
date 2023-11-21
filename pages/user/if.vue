@@ -38,8 +38,7 @@ async function remove(hash: string) {
   if (!error.value)
     await fetchData()
 
-  else
-    alert(error.value.message)
+  else alert(error.value.message)
 }
 async function edit(userIF: InsertionFinder) {
   name.value = userIF.name

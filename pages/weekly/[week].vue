@@ -8,18 +8,18 @@ if (!data.value || error.value) {
     statusCode: 404,
   })
 }
+
 const competition = ref<Competition>(data.value)
 const isOnGoing = computed(() => competition.value.status === CompetitionStatus.ON_GOING)
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {
   const ret: Record<number, Submission[]> = {}
-  for (const { id } of competition.value.scrambles)
-    ret[id] = submissions[id]?.filter(submission => submission.user.id === user.id) ?? []
+  for (const { id } of competition.value.scrambles) ret[id] = submissions[id]?.filter(submission => submission.user.id === user.id) ?? []
 
   return ret
 })
 const hideSolutions = reactive<Record<number, boolean>>({})
-const { data: results } = await useApi<{ regular: Result[]; unlimited: Result[] }>(`/weekly/${params.week}/results`)
+const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/weekly/${params.week}/results`)
 await fetchSubmissions()
 async function fetchSubmissions() {
   const { data, refresh } = await useApi<Record<number, Submission[]>>(`/weekly/${params.week}/submissions`, {
@@ -51,13 +51,18 @@ onUnmounted(() => {
     <WeeklyStatus :competition="competition" />
     <WeeklyRules />
     <Tabs>
-      <Tab v-if="!isOnGoing" :name="$t('weekly.results')">
+      <Tab v-if="!isOnGoing" :name="$t('weekly.results')" hash="results">
         <WeeklyResults :results="results!.regular" />
       </Tab>
-      <Tab v-if="!isOnGoing && results?.unlimited.length" :name="$t('weekly.unlimitedResults')">
+      <Tab v-if="!isOnGoing && results?.unlimited.length" :name="$t('weekly.unlimitedResults')" hash="results-unlimited">
         <WeeklyResults :results="results!.unlimited" />
       </Tab>
-      <Tab v-for="scramble in competition.scrambles" :key="scramble.id" :name="$t('weekly.scramble', { number: scramble.number })">
+      <Tab
+        v-for="scramble in competition.scrambles"
+        :key="scramble.id"
+        :name="$t('weekly.scramble', { number: scramble.number })"
+        :hash="`scramble-${scramble.number}`"
+      >
         <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
         <WeeklyForm

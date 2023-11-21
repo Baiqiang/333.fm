@@ -9,8 +9,7 @@ function goPage(page: number | string) {
   const query = { ...route.query }
   if (page === 1)
     delete query.page
-  else
-    query.page = page.toString()
+  else query.page = page.toString()
   router.push({ ...route, query })
 }
 </script>

@@ -15,7 +15,8 @@ if (!code) {
     message: t('error.400'),
   })
 }
-const { data } = await useApi<{ accessToken: string; user: User }>('/auth/callback', {
+
+const { data } = await useApi<{ accessToken: string, user: User }>('/auth/callback', {
   params: {
     code,
     mode: runtimeConfig.public.mode,
@@ -27,6 +28,7 @@ if (!data.value) {
     message: t('error.400'),
   })
 }
+
 accessToken.value = data.value.accessToken
 user.signIn(data.value.user)
 const previousUrl = useLocalStorage('previousUrl', '')

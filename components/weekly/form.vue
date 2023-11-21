@@ -14,8 +14,7 @@ const dayjs = useDayjs()
 const week = computed(() => dayjs(props.competition.startTime).format('YYYY-ww'))
 const submissionsMap = computed(() => {
   const ret: Record<number, Submission> = {}
-  for (const submission of props.submissions)
-    ret[submission.mode] = submission
+  for (const submission of props.submissions) ret[submission.mode] = submission
 
   return ret
 })
@@ -27,7 +26,7 @@ const form = reactive({
 // if there is an unlimited submission, use unlimited mode
 if (submissionsMap.value[CompetitionMode.UNLIMITED])
   form.mode = CompetitionMode.UNLIMITED
-const localForm = useLocalStorage<Record<number, Record<number, { solution: string; comment: string }>>>(`form.weekly.${week.value}`, {})
+const localForm = useLocalStorage<Record<number, Record<number, { solution: string, comment: string }>>>(`form.weekly.${week.value}`, {})
 onMounted(() => {
   const localValue = submissionsMap.value[form.mode] || localForm.value[props.scramble.number]?.[form.mode]
   if (localValue) {
@@ -172,8 +171,7 @@ async function submit() {
     if (e.response && e.response.data && e.response.data.message)
       alert(e.response.data.message)
 
-    else
-      alert(e.message)
+    else alert(e.message)
   }
   finally {
     loading.value = false
@@ -198,8 +196,7 @@ async function turnToUnlimited() {
     if (e.response && e.response.data && e.response.data.message)
       alert(e.response.data.message)
 
-    else
-      alert(e.message)
+    else alert(e.message)
   }
 }
 function reset() {

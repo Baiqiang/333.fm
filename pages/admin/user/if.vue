@@ -8,6 +8,7 @@ if (error.value) {
     message: error.value.message,
   })
 }
+
 useSeoMeta({
   title: t('admin.user.if', { name: user.value!.name ?? 'Unknown' }),
 })

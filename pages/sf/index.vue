@@ -47,8 +47,7 @@ async function submit() {
     if (e.response && e.response.data && e.response.data.message)
       alert(e.response.data.message)
 
-    else
-      alert(e.message)
+    else alert(e.message)
   }
 }
 function reset() {

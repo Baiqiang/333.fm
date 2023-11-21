@@ -8,15 +8,18 @@ useSeoMeta({
 async function checkAuth() {
   if (!accessToken.value)
     return
+
   const { data, error } = await useApi<User>('/auth/me')
   if (error.value || !data.value)
     user.signOut()
+
   else if (data.value !== null)
     user.signIn(data.value)
 }
 watch(accessToken, async (token, oldToken) => {
   if (!token.value || token.value === oldToken?.value)
     return
+
   checkAuth()
 }, {
   immediate: true,

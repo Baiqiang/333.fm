@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{
   description?: string
   attrs?: Record<string, unknown>
   rows?: number
-  options?: { label: string; value: string | number; description?: string }[]
+  options?: { label: string, value: string | number, description?: string }[]
   errorMessage?: string
   state?: boolean | null
 }>(), {
@@ -29,8 +29,7 @@ const inputClass = computed<string>(() => {
     className += 'border-gray-300 focus:border-indigo-300 focus:ring-indigo-200'
   else if (props.state === true)
     className += 'border-green-600 focus:border-green-600 focus:ring-green-200'
-  else
-    className += 'border-red-600 focus:border-red-600 focus:ring-red-200'
+  else className += 'border-red-600 focus:border-red-600 focus:ring-red-200'
   if (props.attrs?.disabled)
     className += ' bg-gray-100 cursor-not-allowed'
 

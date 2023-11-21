@@ -56,6 +56,7 @@ const formated = computed(() => {
         insertions: [],
       }
     }
+
     const parts: string[][] = []
     let formattedSkeleton = skeleton.split(' ')
     let i: number
@@ -127,8 +128,7 @@ async function findThis() {
     if (e.response && e.response.data && e.response.data.message)
       alert(e.response.data.message)
 
-    else
-      alert(e.message)
+    else alert(e.message)
   }
   loading.value = false
 }

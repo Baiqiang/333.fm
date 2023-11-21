@@ -21,7 +21,7 @@ onMounted(() => {
 })
 
 const langButton = ref()
-const { setLocale } = useI18n()
+const { setLocale, finalizePendingLocaleChange } = useI18n()
 const locales = [
   { code: 'en', label: 'English' },
   { code: 'zh-CN', label: '简体中文' },
@@ -32,6 +32,10 @@ const dropdowns = reactive({
 onClickOutside(langButton, () => {
   dropdowns.lang = false
 })
+async function changeLocale(code: string) {
+  await setLocale(code)
+  await finalizePendingLocaleChange()
+}
 </script>
 
 <template>
@@ -55,7 +59,7 @@ onClickOutside(langButton, () => {
 
           <TransitionSlide :offset="[0, 4]">
             <div v-if="dropdowns.lang" class="flex flex-col gap-1 absolute top-10 right-0 bg-indigo-500 p-2 text-sm">
-              <button v-for="item in locales" :key="item.code" class="w-24 flex items-center text-left px-2 py-1 transition hover:bg-indigo-400" @click="setLocale(item.code)">
+              <button v-for="item in locales" :key="item.code" class="w-24 flex items-center text-left px-2 py-1 transition hover:bg-indigo-400" @click="changeLocale(item.code)">
                 <span>{{ item.label }}</span>
               </button>
             </div>

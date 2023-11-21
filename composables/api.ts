@@ -6,7 +6,7 @@ export async function useApi<DataT>(url: string, options?: UseFetchOptions<DataT
   const accessToken = useAccessToken()
   const headers: HeadersInit = {}
   if (accessToken.value)
-    headers['Authorization'] = `Bearer ${accessToken.value}`
+    headers.Authorization = `Bearer ${accessToken.value}`
 
   const res = await useFetch<DataT>(url, {
     baseURL: config.public.baseURL,
