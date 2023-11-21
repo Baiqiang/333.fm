@@ -21,7 +21,7 @@ onMounted(() => {
 })
 
 const langButton = ref()
-const { setLocale, finalizePendingLocaleChange } = useI18n()
+const { setLocale, setLocaleCookie, finalizePendingLocaleChange } = useI18n()
 const locales = [
   { code: 'en', label: 'English' },
   { code: 'zh-CN', label: '简体中文' },
@@ -33,6 +33,7 @@ onClickOutside(langButton, () => {
   dropdowns.lang = false
 })
 async function changeLocale(code: string) {
+  setLocaleCookie(code)
   await setLocale(code)
   await finalizePendingLocaleChange()
 }
