@@ -56,12 +56,12 @@ export default defineNuxtConfig({
   gtag: {
     id: 'G-4DDRHC6TDB',
   },
-  // experimental: {
-  //   asyncContext: true,
-  //   headNext: true,
-  //   // disable this to run in QQ browser for iOS
-  //   appManifest: false,
-  // },
+  experimental: {
+    asyncContext: true,
+    headNext: true,
+    // disable this to run in QQ browser for iOS
+    appManifest: false,
+  },
   $development: {
     vite: {
       server: {
