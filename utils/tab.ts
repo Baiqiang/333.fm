@@ -1,6 +1,6 @@
 export interface Tab {
   name: string | ComputedRef<string>
-  hash?: string | ComputedRef<string>
+  hash?: string
   active: boolean
 }
 

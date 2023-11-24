@@ -17,7 +17,7 @@ provide(SYMBOL_ADD_TAB, addTab)
 provide(SYMBOL_ACTIVE_INDEX, activeIndex)
 const route = useRoute()
 onMounted(() => {
-  const index = tabs.findIndex(tab => unref(tab.hash) === route.hash.replace('#', ''))
+  const index = tabs.findIndex(tab => tab.hash === route.hash.replace('#', ''))
   if (index !== -1)
     selectTab(index)
   else
@@ -31,6 +31,7 @@ onMounted(() => {
       <div class="flex text-xs md:text-sm whitespace-nowrap">
         <a
           v-for="{ name, hash }, index in tabs"
+          :id="hash"
           :key="index"
           class="cursor-pointer py-1 px-2 border-gray-500"
           :class="{ 'border-b text-blue-500': index !== activeIndex, 'border border-b-0': index === activeIndex }"
