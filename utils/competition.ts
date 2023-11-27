@@ -15,7 +15,6 @@ export interface Competition {
 export interface PastCompetition extends Competition {
   winner: Result
 }
-
 export interface Result {
   id: number
   rank: number
@@ -63,6 +62,39 @@ export enum CompetitionMode {
   REGULAR,
   UNLIMITED,
 }
+
+export interface Endless extends Competition {
+  levels: Level[]
+}
+
+export interface Level {
+  level: number
+  competitors: number
+  bestSubmissions: Submission[]
+  kickedOffs: Kickoff[]
+}
+
+export interface UserProgress {
+  current: Progress | null
+  next: Progress
+}
+
+export interface Progress {
+  level: number
+  scramble: Scramble
+  submission?: Submission
+  kickedBy?: Kickoff[]
+}
+
+export interface Kickoff {
+  id: number
+  user: User
+  submission: Submission
+}
+
+export const SYMBOL_ENDLESS = Symbol('endless')
+export const SYMBOL_ENDLESS_PROGRESS = Symbol('endless.progress')
+export const SYMBOL_ENDLESS_UPDATE_PROGRESS = Symbol('endless.progress.update')
 
 export const DNF = 99999998
 export const DNS = 99999999

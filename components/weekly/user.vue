@@ -1,15 +1,11 @@
 <script setup lang="ts">
+import { localeName } from '~/utils/user'
+
 const props = defineProps<{
   user: User
 }>()
 const { locale } = useI18n()
-const name = computed(() => {
-  const matches = props.user.name.match(/^(.+?) \((.+)\)$/)
-  if (!matches)
-    return props.user.name
-
-  return locale.value === 'en' ? matches[1] : matches[2]
-})
+const name = computed(() => localeName(props.user.name, locale.value))
 </script>
 
 <template>

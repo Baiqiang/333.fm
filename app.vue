@@ -32,6 +32,9 @@ onMounted(() => {
 
 <template>
   <NuxtLayout>
+    <Link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <Meta name="theme-color" content="#6366f1" />
+    <NuxtPwaManifest />
     <NuxtPage />
   </NuxtLayout>
 </template>

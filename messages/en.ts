@@ -13,12 +13,14 @@ export default {
     yes: 'Yes',
     createdAt: 'Created At',
     signingInRequired: 'Sign in Required',
+    signingToJoin: 'Sign in to join',
     signingIn: 'Signing in with WCA ...',
     notation: 'notation',
     notationURL: 'https://www.worldcubeassociation.org/regulations/#12a',
     resultTitle: '{t} Result',
     moves: '{moves} moves',
     all: 'All',
+    basicRules: 'Basic Rules',
   },
   error: {
     400: 'Bad Request',
@@ -206,6 +208,7 @@ export default {
     scrambles: 'Scramble | Scrambles',
     scramble: 'Scramble {number}',
     period: {
+      started: 'Started at {start}.',
       pendingStart: 'Will start at {start}.',
       onGoing: 'Started at {start} and will end at {end}.',
       ended: 'Ended at {end}.',
@@ -241,10 +244,6 @@ export default {
     results: 'Results',
     unlimitedResults: 'Results (Unlimited)',
     past: 'Past Competitions',
-    rank: 'Rank',
-    name: 'Name',
-    mean: 'Mean',
-    solves: 'Solves',
     turnToUnlimited: {
       label: 'Turn to Unlimited',
       confirm: 'Are you sure to turn this result to unlimited mode? This is irreversible. After that, you regular result will be DNFed and you CANNOT submit solution for regular mode on this attempt.',
@@ -253,7 +252,7 @@ export default {
       basic: {
         title: 'Basic Rules',
         rules: [
-          'You can only use the {notation} that defined in WCA regulations.',
+          'You can only use the {notation} that is defined in WCA regulations.',
           'For regular mode, you should finish the solve within 1 hour. Result must be submitted before submitting in unlimited mode.',
           'For unlimited mode, there\'s no time limit. You can submit many times. But only better result can be submitted.',
           'Any kind of cheating is not allowed.',
@@ -268,5 +267,41 @@ export default {
       description: 'The amazing HTR Diagram is created by {author}.',
       author: '2013PENG02',
     },
+  },
+  endless: {
+    title: 'Endless Chanllenge',
+    shortTitle: 'Endless',
+    description: 'Endless Chanllenge is a new event that you can challenge yourself to pass through levels as many as possible. It\'s a pre-alpha version. The rules may change in the future.',
+    rules: [
+      'Only valid solutions can be submitted.',
+      'At the beginning, all people will start from level 1.',
+      {
+        rule: 'New level will open once one of the following conditions is satisfied:',
+        rules: [
+          'A person gets a result that is less than or equal to 24 moves.',
+          '3 persons get results that are less than or equal to 30 moves.',
+        ],
+      },
+      'Each level\'s scramble is visible after you enter the level.',
+      'Each level\'s solutions are visible after you submit a valid result.',
+      'Any kind of cheating is not allowed.',
+    ],
+    level: 'LV {level}',
+    progress: {
+      title: 'Progress',
+      competitors: '{competitors} People',
+    },
+    continue: 'Continue',
+    previous: 'Previous Level',
+    next: 'Next Level',
+    toBeContinued: 'To be Continued',
+    kickedBy: 'Kicked by',
+  },
+  result: {
+    rank: 'Rank',
+    name: 'Name',
+    best: 'Best',
+    mean: 'Mean',
+    solves: 'Solves',
   },
 }

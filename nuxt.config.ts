@@ -23,7 +23,36 @@ export default defineNuxtConfig({
     '@freeloop/nuxt-transitions',
     'dayjs-nuxt',
     'nuxt-gtag',
+    '@vite-pwa/nuxt',
   ],
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: '333.fm',
+      short_name: '333.fm',
+      theme_color: '#6366f1',
+      display: 'standalone',
+      icons: [
+        {
+          src: 'logo.svg',
+          sizes: '72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512',
+          type: 'image/svg+xml',
+        },
+      ],
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+    client: {
+      installPrompt: true,
+    },
+    devOptions: {
+      enabled: true,
+      suppressWarnings: true,
+      navigateFallbackAllowlist: [/^\/$/],
+      type: 'module',
+    },
+  },
   dayjs: {
     locales: ['en', 'zh-cn'],
     defaultLocale: 'en',

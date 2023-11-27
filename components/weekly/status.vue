@@ -11,8 +11,11 @@ const endTime = computed(() => dayjs(props.competition.endTime).locale(locale.va
 </script>
 
 <template>
-  <p v-if="isOnGoing">
+  <p v-if="isOnGoing && competition.endTime">
     {{ $t('weekly.period.onGoing', { start: startTime, end: endTime }) }}
+  </p>
+  <p v-else-if="isOnGoing">
+    {{ $t('weekly.period.started', { start: startTime }) }}
   </p>
   <p v-else-if="hasEnded">
     {{ $t('weekly.period.ended', { end: endTime }) }}

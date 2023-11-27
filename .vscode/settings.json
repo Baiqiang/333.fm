@@ -60,5 +60,6 @@
     "json",
     "jsonc",
     "yaml"
-  ]
+  ],
+  "i18n-ally.keystyle": "nested"
 }

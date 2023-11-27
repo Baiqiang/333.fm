@@ -12,6 +12,10 @@ const navs = computed(() => [
     title: 'weekly.title',
     path: '/weekly',
   },
+  {
+    title: 'endless.title',
+    path: '/endless',
+  },
 ])
 const user = useUser()
 const showUserMenu = ref(false)
