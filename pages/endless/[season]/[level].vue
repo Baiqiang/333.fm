@@ -40,9 +40,22 @@ async function updateData(submission: Submission) {
 
 <template>
   <div>
-    <h2 class="font-bold mb-2">
+    <h2 class="font-bold mb-2 text-xl">
       {{ $t('endless.level', { level: params.level }) }}
     </h2>
+    <div class="mb-2">
+      <div class="font-bold text-lg">
+        {{ $t('endless.kickedBy') }}
+      </div>
+      <div class="flex flex-col md:flex-row gap-2">
+        <div v-for="kickedBy in progress.kickedBy" :key="kickedBy.id" class="flex items-center">
+          <img :src="kickedBy.user.avatarThumb" class="w-6 h-6 mr-1">{{ localeName(kickedBy.user.name, $i18n.locale) }} ({{ formatResult(kickedBy.submission.moves) }})
+        </div>
+      </div>
+    </div>
+    <div class="font-bold text-lg">
+      {{ $t('if.scramble.label') }}
+    </div>
     <Sequence :sequence="progress.scramble.scramble" :source="progress.scramble.scramble" />
     <CubeExpanded :moves="progress.scramble.scramble" />
     <EndlessForm

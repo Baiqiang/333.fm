@@ -71,7 +71,7 @@ if (user.signedIn) {
     <h2 class="font-bold my-2 md:text-lg">
       {{ $t('endless.progress.title') }}
     </h2>
-    <div class="grid grid-cols-[max-content_1fr_1fr] md:grid-cols-[max-content_max-content_max-content_1fr] gap-x-2 gap-y-1 md:gap-y-2 mb-2">
+    <div class="grid grid-cols-[max-content_1fr_max-content] md:grid-cols-[max-content_max-content_max-content_1fr] gap-x-2 gap-y-1 md:gap-y-2 mb-2">
       <div class="font-bold">
         Level
       </div>
@@ -91,7 +91,7 @@ if (user.signedIn) {
             <img :src="kickedOffs[0].user.avatarThumb" class="w-6 h-6 mr-1">{{ localeName(kickedOffs[0].user.name, $i18n.locale) }} ({{ formatResult(kickedOffs[0].submission.moves) }})
           </template>
           <template v-if="kickedOffs.length > 1">
-            <div v-for="kickedOff in kickedOffs" :key="kickedOff.id" class="flex">
+            <div v-for="kickedOff in kickedOffs" :key="kickedOff.id" class="flex" :title="kickedOff.user.name">
               <img :src="kickedOff.user.avatarThumb" class="w-6 h-6"> ({{ formatResult(kickedOff.submission.moves) }})
             </div>
           </template>
@@ -101,12 +101,12 @@ if (user.signedIn) {
             <div class="mr-1">
               {{ formatResult(bestSubmissions[0].moves) }}
             </div>
-            <img v-for="b in bestSubmissions" :key="b.id" :src="b.user.avatarThumb" class="w-6 h-6">
+            <img v-for="b in bestSubmissions" :key="b.id" :src="b.user.avatarThumb" class="w-6 h-6" :title="b.user.name">
           </template>
         </div>
-        <div class=" invert-[1] col-span-3 md:col-span-1">
-          <div class="whitespace-nowrap border px-1 text-white relative" style="mix-blend-mode: difference;">
-            <div class="bg-[#9c990e] absolute -z-10 inset-0" :style="{ width: `${competitors / maxCompetitors * 100}%` }" />
+        <div class="col-span-3 md:col-span-1">
+          <div class="whitespace-nowrap border px-1 relative">
+            <div class="bg-indigo-500 absolute -z-10 inset-0" :style="{ width: `${competitors / maxCompetitors * 100}%` }" />
             {{ $t('endless.progress.competitors', { competitors }) }}
           </div>
         </div>
