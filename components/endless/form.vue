@@ -13,7 +13,7 @@ const form = reactive({
   comment: '',
 })
 const localForm = useLocalStorage<{ solution: string, comment: string }>(
-  `form.endless.${props.competition.alias}`,
+  `form.endless.${props.competition.alias}.${props.level}`,
   {
     solution: '',
     comment: '',
