@@ -20,8 +20,9 @@ const localForm = useLocalStorage<{ solution: string, comment: string }>(
   },
 )
 onMounted(() => {
-  form.solution = localForm.value.solution
-  form.comment = localForm.value.comment
+  const localValue = props.submission || localForm.value
+  form.solution = localValue.solution
+  form.comment = localValue.comment
 })
 watch(form, (state) => {
   localForm.value = {
