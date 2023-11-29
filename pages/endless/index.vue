@@ -7,16 +7,17 @@ if (!data.value) {
 }
 const endless = ref<Endless>(data.value)
 const { t } = useI18n()
-const user = useUser()
+const me = useUser()
 useSeoMeta({
   title: t('endless.title'),
 })
 const maxCompetitors = computed(() => Math.max(...endless.value.levels.map(l => l.competitors)) || 1)
 const myProgress = ref<UserProgress | null>()
-if (user.signedIn) {
+if (me.signedIn) {
   const { data } = await useApi<UserProgress>(`/endless/${endless.value.alias}/progress`)
   myProgress.value = data.value
 }
+const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
 </script>
 
 <template>
@@ -83,16 +84,19 @@ if (user.signedIn) {
       </div>
       <div class="col-span-3 md:col-span-1" />
       <template v-for="{ level, competitors, bestSubmissions, kickedOffs } in endless.levels" :key="level">
-        <div>
+        <div v-if="myLevel < level">
           {{ $t('endless.level', { level }) }}
         </div>
+        <NuxtLink v-else :to="`/endless/${endless.alias}/${level}`" class="text-indigo-500">
+          {{ $t('endless.level', { level }) }}
+        </NuxtLink>
         <div class="flex items-center">
-          <template v-if="kickedOffs.length === 1">
-            <img :src="kickedOffs[0].user.avatarThumb" class="w-6 h-6 mr-1">{{ localeName(kickedOffs[0].user.name, $i18n.locale) }} ({{ formatResult(kickedOffs[0].submission.moves) }})
-          </template>
+          <UserAvatarName v-if="kickedOffs.length === 1" :user="kickedOffs[0].user">
+            ({{ formatResult(kickedOffs[0].submission.moves) }})
+          </UserAvatarName>
           <template v-if="kickedOffs.length > 1">
-            <div v-for="kickedOff in kickedOffs" :key="kickedOff.id" class="flex" :title="kickedOff.user.name">
-              <img :src="kickedOff.user.avatarThumb" class="w-6 h-6"> ({{ formatResult(kickedOff.submission.moves) }})
+            <div v-for="{ user, submission } in kickedOffs" :key="user.id" class="flex">
+              <UserAvatar :user="user" /> ({{ formatResult(submission.moves) }})
             </div>
           </template>
         </div>
@@ -101,7 +105,7 @@ if (user.signedIn) {
             <div class="mr-1">
               {{ formatResult(bestSubmissions[0].moves) }}
             </div>
-            <img v-for="b in bestSubmissions" :key="b.id" :src="b.user.avatarThumb" class="w-6 h-6" :title="b.user.name">
+            <UserAvatar v-for="b in bestSubmissions" :key="b.id" :user="b.user" />
           </template>
         </div>
         <div class="col-span-3 md:col-span-1">

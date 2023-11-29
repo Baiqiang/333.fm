@@ -48,8 +48,10 @@ async function updateData(submission: Submission) {
         {{ $t('endless.kickedBy') }}
       </div>
       <div class="flex flex-col md:flex-row gap-2">
-        <div v-for="kickedBy in progress.kickedBy" :key="kickedBy.id" class="flex items-center">
-          <img :src="kickedBy.user.avatarThumb" class="w-6 h-6 mr-1">{{ localeName(kickedBy.user.name, $i18n.locale) }} ({{ formatResult(kickedBy.submission.moves) }})
+        <div v-for="{ user, submission } in progress.kickedBy" :key="user.id" class="flex items-center">
+          <UserAvatarName :user="user">
+            ({{ formatResult(submission.moves) }})
+          </UserAvatarName>
         </div>
       </div>
     </div>

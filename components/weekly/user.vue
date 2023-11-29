@@ -11,7 +11,7 @@ const name = computed(() => localeName(props.user.name, locale.value))
 <template>
   <div class="flex justify-between gap-2 shrink-0">
     <div class="flex items-center justify-start gap-2">
-      <img :src="user.avatarThumb" class="w-6 h-6">
+      <UserAvatar :user="user" />
       <div class="whitespace-nowrap">
         {{ name }}
       </div>
