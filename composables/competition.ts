@@ -6,7 +6,7 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
     if (form.solution.includes('NISS') || form.solution.includes('('))
       return null
     try {
-      return new Algorithm(form.solution)
+      return new Algorithm(replaceQuote(form.solution))
     }
     catch (e) {
       return null

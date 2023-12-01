@@ -164,6 +164,10 @@ export function applyMark(alg: string, mark: MARKS) {
   }
 }
 
+export function replaceQuote(string: string): string {
+  return string.replace(/[‘’`]/g, '\'')
+}
+
 export function formatAlgorithm(string: string | string[], placement: number = 0) {
   string = removeComment(string)
   const algorithm = new Algorithm(string)
@@ -181,7 +185,7 @@ export function removeComment(string: string | string[]) {
     string = string.join(' ')
 
   // remove comments
-  string = string.replace(/[‘’`]/g, '\'')
+  string = replaceQuote(string)
   return string.split('\n').map(s => s.split('//')[0]).join('')
 }
 

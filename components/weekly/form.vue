@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Algorithm, Cube } from 'insertionfinder'
-
 const props = defineProps<{
   scramble: Scramble
   competition: Competition
@@ -59,58 +57,13 @@ watch(() => form.mode, (mode) => {
   if (mode === CompetitionMode.REGULAR && submissionsMap.value[CompetitionMode.UNLIMITED] && !submissionsMap.value[CompetitionMode.REGULAR])
     form.solution = t('weekly.regular.unlimitedSubmitted')
 })
-const solutionAlg = computed(() => {
-  // check NISS and ()
-  if (form.solution.includes('NISS') || form.solution.includes('('))
-    return null
-  try {
-    return new Algorithm(form.solution)
-  }
-  catch (e) {
-    return null
-  }
-})
-const moves = computed<number>(() => {
-  if (!solutionAlg.value)
-    return DNF
-  try {
-    const cube = new Cube()
-    cube.twist(new Algorithm(props.scramble.scramble))
-    cube.twist(solutionAlg.value)
-    if (cube.getCornerCycles() > 0
-      || cube.getEdgeCycles() > 0
-      || cube.getCenterCycles() > 0
-      || cube.hasParity())
-      return DNF
-    return solutionAlg.value.twists.length + solutionAlg.value.inverseTwists.length
-  }
-  catch (e) {
-    return DNF
-  }
-})
+const { moves, isSolved } = useComputedState(props, form)
 const solutionState = computed<boolean | null>(() => {
   if (form.solution.length === 0)
     return null
-  if (!solutionAlg.value)
+  if (!isSolved.value)
     return false
-
-  try {
-    const cube = new Cube()
-    cube.twist(new Algorithm(props.scramble.scramble))
-    cube.twist(solutionAlg.value)
-    if (cube.getCornerCycles() > 0
-      || cube.getEdgeCycles() > 0
-      || cube.getCenterCycles() > 0
-      || cube.hasParity())
-      return false
-    // total moves cannot be more than 80
-    if (solutionAlg.value.twists.length + solutionAlg.value.inverseTwists.length > 80)
-      return false
-    return true
-  }
-  catch (e) {
-    return false
-  }
+  return moves.value !== DNF
 })
 const solutionDisabled = computed<boolean>(() => {
   if (form.mode === CompetitionMode.UNLIMITED)
