@@ -10,11 +10,19 @@ async function checkAuth() {
     return
 
   const { data, error } = await useApi<User>('/auth/me')
-  if (error.value || !data.value)
-    user.signOut()
-
-  else if (data.value !== null)
+  if (error.value || !data.value) {
+    // user.signOut()
+    // report error
+    await useApiPost('/report', {
+      body: {
+        error: error.value,
+        data: data.value,
+      },
+    })
+  }
+  else if (data.value !== null) {
     user.signIn(data.value)
+  }
 }
 watch(accessToken, async (token, oldToken) => {
   if (!token.value || token.value === oldToken?.value)

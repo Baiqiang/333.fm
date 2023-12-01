@@ -37,7 +37,7 @@ let group: Group
 let scale = 1
 function setSize() {
   const dom = cubeElement.value!
-  if (dom.clientWidth === 0)
+  if (!dom || dom.clientWidth === 0)
     return
   scale = scale * dom.clientWidth / two.width
   two.width = dom.clientWidth
