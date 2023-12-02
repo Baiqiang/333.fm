@@ -17,16 +17,16 @@ const stats = ref<EndlessStats>(data.value!)
           <h4 class="font-bold mb-2">
             {{ $t(`endless.stats.${key}`) }}
           </h4>
-          <div v-for="r, k in stat" :key="k" class="flex mb-2 gap-1">
-            <div>
-              {{ r.rank }}.
-            </div>
-            <UserAvatarName v-if="key === 'singles'" :user="r.user">
-              {{ formatResult(r.best) }}
-            </UserAvatarName>
-            <UserAvatarName v-else :user="r.user">
-              {{ formatResult(r.average, 2) }}
-            </UserAvatarName>
+          <div class="grid grid-cols-[max-content_max-content_1fr] gap-2">
+            <template v-for="r, k in stat" :key="k">
+              <div class="font-mono text-right">
+                {{ r.rank }}.
+              </div>
+              <UserAvatarName :user="r.user" />
+              <div>
+                {{ key === 'singles' ? formatResult(r.best) : formatResult(r.average, 2) }}
+              </div>
+            </template>
           </div>
         </div>
       </div>
