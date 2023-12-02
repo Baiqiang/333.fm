@@ -262,6 +262,7 @@ export default {
     },
   },
   tutorial: {
+    title: '教程',
     htrDiagram: {
       title: 'HTR 迷宫图',
       description: 'HTR 迷宫图由{author}倾情创作。',
@@ -296,6 +297,14 @@ export default {
     next: '下一层',
     toBeContinued: '未完待续',
     kickedBy: '破关者',
+    stats: {
+      title: '统计',
+      singles: '最佳单次',
+      means: '最佳平均',
+      rollingMo3: '最佳滚动 Mo3',
+      rollingAo5: '最佳滚动 Ao5',
+      rollingAo12: '最佳滚动 Ao12',
+    },
   },
   result: {
     rank: '排名',

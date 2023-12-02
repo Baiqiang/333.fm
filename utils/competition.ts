@@ -23,6 +23,7 @@ export interface Result {
   average: number
   user: User
   mode: CompetitionMode
+  rollingStart: number
 }
 
 export interface Scramble {
@@ -65,6 +66,14 @@ export enum CompetitionMode {
 
 export interface Endless extends Competition {
   levels: Level[]
+}
+
+export interface EndlessStats {
+  singles: Result[]
+  means: Result[]
+  rollingMo3: Result[]
+  rollingAo5: Result[]
+  rollingAo12: Result[]
 }
 
 export interface Level {

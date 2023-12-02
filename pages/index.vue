@@ -33,14 +33,32 @@ const { data: competition } = await useApi<Competition>('/weekly/on-going')
           </footer>
         </template>
       </I18nT>
-      <NuxtLink to="/tutorial/htr-diagram" class="text-blue-500 text-lg md:text-xl flex items-center">
-        <Icon name="game-icons:maze" size="30" />{{ $t('tutorial.htrDiagram.title') }}
-      </NuxtLink>
-      <div v-if="competition" class="mt-2">
-        <h2 class="font-bold text-xl">
-          {{ competition.name }}
+      <div>
+        <h2 class="font-bold text-xl mb-2">
+          {{ $t('tutorial.title') }}
         </h2>
-        <WeeklySummary :competition="competition" class="mt-4" />
+        <NuxtLink to="/tutorial/htr-diagram" class="text-blue-500 text-lg md:text-xl flex items-center">
+          <Icon name="game-icons:maze" size="30" />{{ $t('tutorial.htrDiagram.title') }}
+        </NuxtLink>
+      </div>
+      <div class="flex flex-col md:flex-row gap-2 mt-2">
+        <div v-if="competition" class="flex-1">
+          <h2 class="font-bold text-xl">
+            {{ competition.name }}
+          </h2>
+          <WeeklySummary :competition="competition" class="mt-4" />
+        </div>
+        <div class="flex-1">
+          <h2 class="font-bold text-xl">
+            {{ $t('endless.title') }}
+          </h2>
+          <p class="mb-2 mt-4">
+            {{ $t('endless.description') }}
+          </p>
+          <NuxtLink to="/endless" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+            {{ $t('weekly.join') }}
+          </NuxtLink>
+        </div>
       </div>
     </div>
     <div class="">

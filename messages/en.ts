@@ -262,6 +262,7 @@ export default {
     },
   },
   tutorial: {
+    title: 'Tutorial',
     htrDiagram: {
       title: 'HTR Diagram',
       description: 'The amazing HTR Diagram is created by {author}.',
@@ -296,6 +297,14 @@ export default {
     next: 'Next Level',
     toBeContinued: 'To be Continued',
     kickedBy: 'Kicked by',
+    stats: {
+      title: 'Statistics',
+      singles: 'Best Singles',
+      means: 'Best Means',
+      rollingMo3: 'Best Rolling Mo3',
+      rollingAo5: 'Best Rolling Ao5',
+      rollingAo12: 'Best Rolling Ao12',
+    },
   },
   result: {
     rank: 'Rank',

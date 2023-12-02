@@ -116,5 +116,6 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
         </div>
       </template>
     </div>
+    <EndlessStats :endless="endless" />
   </div>
 </template>
