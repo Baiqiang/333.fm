@@ -305,6 +305,8 @@ export default {
       rollingAo5: 'Best Rolling Ao5',
       rollingAo12: 'Best Rolling Ao12',
     },
+    openAt: 'Open at {time}.',
+    kickedAt: 'Kicked at {time}.',
   },
   result: {
     rank: 'Rank',

@@ -305,6 +305,8 @@ export default {
       rollingAo5: '最佳滚动 Ao5',
       rollingAo12: '最佳滚动 Ao12',
     },
+    openAt: '{time}开放。',
+    kickedAt: '{time}破关。',
   },
   result: {
     rank: '排名',

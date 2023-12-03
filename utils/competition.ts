@@ -1,5 +1,10 @@
 import type { User } from './user'
 
+export interface Time {
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Competition {
   id: number
   alias: string
@@ -26,13 +31,13 @@ export interface Result {
   rollingStart: number
 }
 
-export interface Scramble {
+export interface Scramble extends Time {
   id: number
   number: number
   scramble: string
 }
 
-export interface Submission {
+export interface Submission extends Time {
   id: number
   solution: string
   comment: string
@@ -92,10 +97,10 @@ export interface Progress {
   level: number
   scramble: Scramble
   submission?: Submission
-  kickedBy?: Kickoff[]
+  kickedBy: Kickoff[]
 }
 
-export interface Kickoff {
+export interface Kickoff extends Time {
   id: number
   user: User
   submission: Submission

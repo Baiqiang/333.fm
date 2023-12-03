@@ -44,16 +44,24 @@ async function updateData(submission: Submission) {
       {{ $t('endless.level', { level: params.level }) }}
     </h2>
     <div class="mb-2">
-      <div class="font-bold text-lg">
-        {{ $t('endless.kickedBy') }}
+      <div class="mb-2">
+        {{ $t('endless.openAt', { time: $dayjs(progress.scramble.createdAt).locale($i18n.locale).format('LLL') }) }}
       </div>
-      <div class="flex flex-col md:flex-row gap-2">
-        <div v-for="{ user, submission } in progress.kickedBy" :key="user.id" class="flex items-center">
-          <UserAvatarName :user="user">
-            ({{ formatResult(submission.moves) }})
-          </UserAvatarName>
+      <template v-if="progress.kickedBy.length > 0">
+        <div class="mb-2">
+          {{ $t('endless.kickedAt', { time: $dayjs(progress.kickedBy[0].createdAt).locale($i18n.locale).format('LLL') }) }}
         </div>
-      </div>
+        <div class="font-bold text-lg">
+          {{ $t('endless.kickedBy') }}
+        </div>
+        <div class="flex flex-col md:flex-row gap-2">
+          <div v-for="{ user, submission } in progress.kickedBy" :key="user.id" class="flex items-center">
+            <UserAvatarName :user="user">
+              ({{ formatResult(submission.moves) }})
+            </UserAvatarName>
+          </div>
+        </div>
+      </template>
     </div>
     <div class="font-bold text-lg">
       {{ $t('if.scramble.label') }}
