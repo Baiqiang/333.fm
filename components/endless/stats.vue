@@ -17,10 +17,10 @@ const stats = ref<EndlessStats>(data.value!)
           <h4 class="font-bold mb-2">
             {{ $t(`endless.stats.${key}`) }}
           </h4>
-          <div class="grid grid-cols-[max-content_max-content_1fr] gap-2">
+          <div class="grid grid-cols-[1.5rem_max-content_1fr] gap-2">
             <template v-for="r, k in stat" :key="k">
               <div class="font-mono text-right">
-                {{ r.rank }}.
+                {{ r.rank }}
               </div>
               <UserAvatarName :user="r.user" />
               <div>
