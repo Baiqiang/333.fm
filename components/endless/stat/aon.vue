@@ -17,7 +17,7 @@ defineProps<{
         </div>
         <UserAvatarName :user="r.user" />
         <div class="font-mono">
-          {{ formatResult(r.average) }} ({{ r.rollingStart + 1 }}-{{ r.rollingStart + r.values.length }})
+          {{ formatResult(r.average, 2) }} ({{ r.rollingStart + 1 }}-{{ r.rollingStart + r.values.length }})
         </div>
       </template>
     </div>

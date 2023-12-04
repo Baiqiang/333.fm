@@ -16,7 +16,7 @@ defineProps<{
         </div>
         <UserAvatarName :user="r.user" />
         <div class="font-mono">
-          {{ formatResult(r.average) }} (Mo{{ r.values.length }})
+          {{ formatResult(r.average, 2) }} (Mo{{ r.values.length }})
         </div>
       </template>
     </div>
