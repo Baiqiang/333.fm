@@ -304,6 +304,7 @@ export default {
       rollingMo3: '最佳滚动 Mo3',
       rollingAo5: '最佳滚动 Ao5',
       rollingAo12: '最佳滚动 Ao12',
+      highestLevels: '最高层数',
     },
     openAt: '{time}开放。',
     kickedAt: '{time}破关。',

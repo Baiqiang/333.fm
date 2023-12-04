@@ -74,11 +74,7 @@ export interface Endless extends Competition {
 }
 
 export interface EndlessStats {
-  singles: Result[]
-  means: Result[]
-  rollingMo3: Result[]
-  rollingAo5: Result[]
-  rollingAo12: Result[]
+  [key: string]: any[]
 }
 
 export interface Level {

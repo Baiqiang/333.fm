@@ -12,23 +12,13 @@ const stats = ref<EndlessStats>(data.value!)
       {{ $t('endless.stats.title') }}
     </h3>
     <div class="overflow-x-auto">
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 whitespace-nowrap">
-        <div v-for="stat, key in stats" :key="key">
-          <h4 class="font-bold mb-2">
-            {{ $t(`endless.stats.${key}`) }}
-          </h4>
-          <div class="grid grid-cols-[1.5rem_max-content_1fr] gap-2">
-            <template v-for="r, k in stat" :key="k">
-              <div class="font-mono text-right">
-                {{ r.rank }}
-              </div>
-              <UserAvatarName :user="r.user" />
-              <div>
-                {{ key === 'singles' ? formatResult(r.best) : formatResult(r.average, 2) }}
-              </div>
-            </template>
-          </div>
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-4 whitespace-nowrap">
+        <template v-for="stat, key in stats" :key="key">
+          <EndlessStatSingles v-if="key === 'singles'" :results="stat" />
+          <EndlessStatMeans v-else-if="key === 'means'" :results="stat" />
+          <EndlessStatHighestLevels v-else-if="key === 'highestLevels'" :results="stat" />
+          <EndlessStatAon v-else-if="key.toString().startsWith('rolling')" :results="stat" :type="key" />
+        </template>
       </div>
     </div>
   </div>

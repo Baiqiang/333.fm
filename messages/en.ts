@@ -304,6 +304,7 @@ export default {
       rollingMo3: 'Best Rolling Mo3',
       rollingAo5: 'Best Rolling Ao5',
       rollingAo12: 'Best Rolling Ao12',
+      highestLevels: 'Highest Levels',
     },
     openAt: 'Open at {time}.',
     kickedAt: 'Kicked at {time}.',
