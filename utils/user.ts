@@ -22,7 +22,7 @@ export function hasRole(user: User, role: Role): boolean {
 }
 
 export function localeName(name: string, locale: string): string {
-  const matches = name.match(/^(.+?) \((.+)\)$/)
+  const matches = name.match(/^(.+?)\s*\((.+)\)$/)
   if (!matches)
     return name
 
