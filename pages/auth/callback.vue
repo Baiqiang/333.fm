@@ -28,11 +28,15 @@ if (!data.value) {
     message: t('error.400'),
   })
 }
-
 accessToken.value = data.value.accessToken
 user.signIn(data.value.user)
 const previousUrl = useLocalStorage('previousUrl', '')
 router.push(previousUrl.value || '/')
+onMounted(() => {
+  const value = accessToken.value
+  accessToken.value = ''
+  accessToken.value = value
+})
 </script>
 
 <template>

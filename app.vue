@@ -24,8 +24,8 @@ async function checkAuth() {
     user.signIn(data.value)
   }
 }
-watch(accessToken, async (token, oldToken) => {
-  if (!token.value || token.value === oldToken?.value)
+accessToken.$subscribe(async (_, token) => {
+  if (!token.value)
     return
 
   checkAuth()
