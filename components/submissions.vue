@@ -88,7 +88,7 @@ const counts = computed(() => {
           DNF
         </div>
       </UserAvatarName>
-      <WeeklySubmission :submission="submission" />
+      <Submission :submission="submission" />
     </div>
   </div>
 </template>
