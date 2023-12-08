@@ -21,6 +21,16 @@ export default {
     moves: '{moves}步',
     all: '全部',
     basicRules: '基本规则',
+    filterBy: {
+      label: '筛选',
+    },
+    sortBy: {
+      label: '排序',
+      moves: '步数',
+      sumittedAt: '提交时间',
+      fewest: '最少',
+      latest: '最新',
+    },
   },
   error: {
     400: '错误请求',

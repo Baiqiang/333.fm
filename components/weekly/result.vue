@@ -12,7 +12,7 @@ defineProps<{
     <Icon v-if="result.rank === 3" name="openmoji:3rd-place-medal" size="24" />
     {{ result.rank }}
   </div>
-  <WeeklyUser :user="result.user" class="col-start-2" />
+  <UserAvatarName :user="result.user" class="col-start-2" />
   <div class="col-start-3 text-right font-mono font-bold">
     {{ formatResult(result.average, 2) }}
   </div>

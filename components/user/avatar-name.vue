@@ -7,7 +7,9 @@ defineProps<{
 <template>
   <div class="flex items-center">
     <UserAvatar :user="user" class="mr-1" />
-    {{ localeName(user.name, $i18n.locale) }}
+    <div class="whitespace-nowrap">
+      {{ localeName(user.name, $i18n.locale) }}
+    </div>
     <slot />
   </div>
 </template>

@@ -21,6 +21,16 @@ export default {
     moves: '{moves} moves',
     all: 'All',
     basicRules: 'Basic Rules',
+    filterBy: {
+      label: 'Filter By',
+    },
+    sortBy: {
+      label: 'Sort By',
+      moves: 'Moves',
+      sumittedAt: 'Submitted At',
+      fewest: 'Fewest',
+      latest: 'Latest',
+    },
   },
   error: {
     400: 'Bad Request',
