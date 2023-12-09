@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CompetitionMode } from '~/utils/competition'
+
 const props = defineProps<{
   scramble: Scramble
   competition: Endless
@@ -9,23 +11,27 @@ const emit = defineEmits<{
   submitted: [Submission]
 }>()
 const form = reactive({
+  mode: CompetitionMode.REGULAR,
   solution: '',
   comment: '',
 })
-const localForm = useLocalStorage<{ solution: string, comment: string }>(
+const localForm = useLocalStorage<{ solution: string, comment: string, mode: CompetitionMode }>(
   `form.endless.${props.competition.alias}.${props.level}`,
   {
+    mode: CompetitionMode.REGULAR,
     solution: '',
     comment: '',
   },
 )
 onMounted(() => {
   const localValue = props.submission || localForm.value
+  form.mode = localValue.mode
   form.solution = localValue.solution
   form.comment = localValue.comment
 })
 watch(form, (state) => {
   localForm.value = {
+    mode: state.mode,
     solution: state.solution,
     comment: state.comment,
   }
@@ -53,6 +59,7 @@ async function submit() {
     if (props.submission) {
       const { data, refresh } = await useApiPost<Submission>(`/endless/${props.competition.alias}/${props.submission.id}`, {
         body: {
+          mode: form.mode,
           comment: form.comment,
         },
         immediate: false,
@@ -65,7 +72,7 @@ async function submit() {
       const { data, refresh } = await useApiPost<Submission>(`/endless/${props.competition.alias}`, {
         body: {
           scrambleId: props.scramble.id,
-          mode: CompetitionMode.REGULAR,
+          mode: form.mode,
           solution: form.solution,
           comment: form.comment,
         },
@@ -98,6 +105,22 @@ function reset() {
   <div class="mt-6">
     <form class="relative" @submit="submit" @reset="reset">
       <FormSignInRequired />
+      <FormInput
+        v-model="form.mode"
+        type="radio"
+        :label="$t('weekly.mode.label')"
+        :state="null"
+        :attrs="{ required: true }"
+        :options="[
+          { label: $t('weekly.regular.label'), description: $t('weekly.regular.description'), value: CompetitionMode.REGULAR },
+          { label: $t('weekly.unlimited.label'), description: $t('endless.unlimited.description'), value: CompetitionMode.UNLIMITED },
+        ]"
+        class="mb-4"
+      >
+        <template #description>
+          {{ $t('endless.mode.description') }}
+        </template>
+      </FormInput>
       <FormInput
         v-model="form.solution"
         type="textarea"

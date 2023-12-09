@@ -318,6 +318,12 @@ export default {
     },
     openAt: '{time}开放。',
     kickedAt: '{time}破关。',
+    mode: {
+      description: '仅标记一下是解法的模式。',
+    },
+    unlimited: {
+      description: '时间不限，尽可能取得好解法。',
+    },
   },
   result: {
     rank: '排名',

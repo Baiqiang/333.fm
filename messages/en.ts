@@ -318,6 +318,12 @@ export default {
     },
     openAt: 'Open at {time}.',
     kickedAt: 'Kicked at {time}.',
+    mode: {
+      description: 'This only marks the mode of the solution.',
+    },
+    unlimited: {
+      description: 'No time limit. Try to get good solutions.',
+    },
   },
   result: {
     rank: 'Rank',

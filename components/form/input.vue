@@ -48,7 +48,7 @@ const inputClass = computed<string>(() => {
         {{ option.label }}
       </option>
     </select>
-    <div v-else-if="type === 'radio'" class="flex flex-wrap gap-2 md:mt-3 mb-4">
+    <div v-else-if="type === 'radio'" class="flex flex-wrap gap-2 md:mt-3 mb-2 px-2">
       <label v-for="option in options" :key="option.value" class="flex items-center gap-2 cursor-pointer">
         <input
           v-bind="attrs"
