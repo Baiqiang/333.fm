@@ -1,15 +1,7 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   competition: PastCompetition
 }>()
-const { locale } = useI18n()
-const name = computed(() => {
-  const matches = props.competition.winner.user.name.match(/^(.+?) \((.+)\)$/)
-  if (!matches)
-    return props.competition.winner.user.name
-
-  return locale.value === 'en' ? matches[1] : matches[2]
-})
 </script>
 
 <template>
@@ -20,8 +12,10 @@ const name = computed(() => {
       </h3>
       <Icon name="solar:double-alt-arrow-right-linear" size="16" />
     </NuxtLink>
-    <div>
-      {{ name }} {{ formatResult(competition.winner.average, 2) }} ({{ competition.winner.values.map(v => formatResult(v)).join(', ') }})
+    <div v-for="winner in competition.winners" :key="winner.id" class="mb-1">
+      <UserAvatarName :user="winner.user" class="gap-1">
+        {{ formatResult(winner.average, 2) }} ({{ winner.values.map(v => formatResult(v)).join(', ') }})
+      </UserAvatarName>
     </div>
   </div>
 </template>

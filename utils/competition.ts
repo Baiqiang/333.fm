@@ -18,7 +18,7 @@ export interface Competition {
 }
 
 export interface PastCompetition extends Competition {
-  winner: Result
+  winners: Result[]
 }
 export interface Result {
   id: number
