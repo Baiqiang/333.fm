@@ -27,6 +27,18 @@ const scrambleState = computed<boolean | null>(() => {
     return false
   }
 })
+const formattedSkeletonLength = computed<number>(() => {
+  if (!scrambleState.value)
+    return 0
+
+  try {
+    const alg = new Algorithm(removeComment(form.skeleton))
+    return alg.twists.length + alg.inverseTwists.length
+  }
+  catch (e) {
+    return 0
+  }
+})
 const skeletonState = computed<boolean | null>(() => {
   if (form.skeleton.length === 0)
     return null
@@ -39,18 +51,29 @@ const skeletonState = computed<boolean | null>(() => {
     return false
   }
 })
-const cycles = computed<Partial<Cycles>>(() => {
+const bestCube = computed<Cube | null>(() => {
   if (!scrambleState.value || !skeletonState.value)
-    return {}
+    return null
   try {
     const cube = new Cube()
     cube.twist(new Algorithm(formatAlgorithm(form.scramble)))
     cube.twist(new Algorithm(removeComment(form.skeleton)))
-    const bestCube = cube.getBestPlacement() as Cube
-    const corners = bestCube.getCornerCycles()
-    const edges = bestCube.getEdgeCycles()
-    const centers = centerCycleTable[bestCube.placement]
-    const parity = bestCube.hasParity()
+    return cube.getBestPlacement()
+  }
+  catch (e) {
+    return null
+  }
+})
+const cycles = computed<Partial<Cycles>>(() => {
+  if (!scrambleState.value || !skeletonState.value)
+    return {}
+  if (!bestCube.value)
+    return {}
+  try {
+    const corners = bestCube.value.getCornerCycles()
+    const edges = bestCube.value.getEdgeCycles()
+    const centers = centerCycleTable[bestCube.value.placement]
+    const parity = bestCube.value.hasParity()
     const cycles: Partial<Cycles> = { }
     if (corners > 0)
       cycles.corners = corners
@@ -65,6 +88,25 @@ const cycles = computed<Partial<Cycles>>(() => {
   catch (e) {
     return {}
   }
+})
+
+const formatedCycleDetail = computed<string>(() => {
+  if (!bestCube.value)
+    return ''
+  const placement = bestCube.value.placement
+  const centerCycles = centerCycleTable[placement]
+  const cycleDetail = {
+    corner: bestCube.value.getCornerStatus(),
+    edge: bestCube.value.getEdgeStatus(),
+    center: centerCycles > 0
+      ? [
+          {
+            length: centerLength(centerCycles, placement),
+          },
+        ]
+      : [],
+  }
+  return formatCycleDetail(cycleDetail)
 })
 const totalCycle = computed<number>(() => {
   if (!cycles.value)
@@ -235,6 +277,9 @@ function reset() {
       >
         <CubeExpanded v-if="scrambleState && skeletonState" class="my-2" :moves="`${form.scramble}\n${form.skeleton}`" />
         <template #description>
+          <div v-if="formatedCycleDetail" class="text-green-600">
+            {{ $t('if.skeleton.to', { length: formattedSkeletonLength, detail: formatedCycleDetail }) }}
+          </div>
           <div v-if="!cycleState" class="text-red-500">
             {{ $t('if.solutions.exceed') }}
           </div>

@@ -45,26 +45,7 @@ const realSkeleton = computed<string>(() => finder.value?.realSkeleton ?? '')
 const formatedCycleDetail = computed<string>(() => {
   if (!finder.value)
     return ''
-  const cycleDetail = finder.value.cycleDetail
-  const detail: string[] = []
-  cycleDetail.corner.filter(cycle => cycle.length > 1).forEach((cycle) => {
-    detail.push(`${cycle.length}C`)
-  })
-  const twist = cycleDetail.corner.filter(cycle => cycle.length === 1).reduce((t, cycle) => cycle.length + t, 0)
-  if (twist)
-    detail.push(`${twist}T`)
-
-  cycleDetail.edge.filter(cycle => cycle.length > 1).forEach((cycle) => {
-    detail.push(`${cycle.length}E`)
-  })
-  const flip = cycleDetail.edge.filter(cycle => cycle.length === 1).reduce((f, cycle) => cycle.length + f, 0)
-  if (flip)
-    detail.push(`${flip}F`)
-
-  cycleDetail.center.forEach((cycle) => {
-    detail.push(`${cycle.length}X`)
-  })
-  return detail.join('')
+  return formatCycleDetail(finder.value.cycleDetail)
 })
 const algKeys = [
   '3CP',
