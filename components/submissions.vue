@@ -80,7 +80,7 @@ const counts = computed(() => {
       :key="submission.id"
       class="border-t border-gray-300 pt-2 mt-2 flex flex-col md:flex-row gap-2 items-start"
     >
-      <UserAvatarName :user="submission.user" class="gap-2">
+      <UserAvatarName :user="submission.user" class="gap-2 shrink-0">
         <div v-if="submission.moves !== DNF" class="font-bold" :class="{ 'text-indigo-500': submission.mode === CompetitionMode.REGULAR, 'text-orange-500': submission.mode === CompetitionMode.UNLIMITED }">
           {{ formatResult(submission.moves) }}
         </div>
