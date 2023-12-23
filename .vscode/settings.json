@@ -61,5 +61,8 @@
     "jsonc",
     "yaml"
   ],
-  "i18n-ally.keystyle": "nested"
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.localesPaths": [
+    "messages"
+  ]
 }
