@@ -8,8 +8,6 @@ const emit = defineEmits<{
   submitted: []
 }>()
 const { t } = useI18n()
-const dayjs = useDayjs()
-const week = computed(() => dayjs(props.competition.startTime).format('YYYY-ww'))
 const submissionsMap = computed(() => {
   const ret: Record<number, Submission> = {}
   for (const submission of props.submissions) ret[submission.mode] = submission
@@ -24,7 +22,7 @@ const form = reactive({
 // if there is an unlimited submission, use unlimited mode
 if (submissionsMap.value[CompetitionMode.UNLIMITED])
   form.mode = CompetitionMode.UNLIMITED
-const localForm = useLocalStorage<Record<number, Record<number, { solution: string, comment: string }>>>(`form.weekly.${week.value}`, {})
+const localForm = useLocalStorage<Record<number, Record<number, { solution: string, comment: string }>>>(`form.weekly.${props.competition.alias}`, {})
 onMounted(() => {
   const localValue = submissionsMap.value[form.mode] || localForm.value[props.scramble.number]?.[form.mode]
   if (localValue) {
