@@ -89,7 +89,7 @@ async function submit() {
   loading.value = true
   try {
     if (form.mode === CompetitionMode.REGULAR && submissionsMap.value[CompetitionMode.REGULAR]) {
-      const { data, refresh } = await useApiPost<Submission>(`/weekly/${week.value}/${submissionsMap.value[CompetitionMode.REGULAR].id}`, {
+      const { data, refresh } = await useApiPost<Submission>(`/weekly/${props.competition.alias}/${submissionsMap.value[CompetitionMode.REGULAR].id}`, {
         body: {
           comment: form.comment,
         },
@@ -106,7 +106,7 @@ async function submit() {
         if (isCanceled)
           return
       }
-      const { data, refresh } = await useApiPost<Submission>(`/weekly/${week.value}`, {
+      const { data, refresh } = await useApiPost<Submission>(`/weekly/${props.competition.alias}`, {
         body: {
           scrambleId: props.scramble.id,
           mode: form.mode,
@@ -136,7 +136,7 @@ async function turnToUnlimited() {
     const { isCanceled } = await reveal()
     if (isCanceled)
       return
-    const { data, refresh } = await useApiPost<Submission>(`/weekly/${week.value}/${submissionsMap.value[CompetitionMode.REGULAR].id}/unlimited`, {
+    const { data, refresh } = await useApiPost<Submission>(`/weekly/${props.competition.alias}/${submissionsMap.value[CompetitionMode.REGULAR].id}/unlimited`, {
       immediate: false,
     })
     await refresh()
