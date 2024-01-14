@@ -6,7 +6,7 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
     if (form.solution.includes('NISS') || form.solution.includes('('))
       return null
     try {
-      return new Algorithm(replaceQuote(form.solution))
+      return replaceQuote(form.solution)
     }
     catch (e) {
       return null
@@ -18,7 +18,7 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
 
     const cube = new Cube()
     cube.twist(new Algorithm(props.scramble.scramble))
-    cube.twist(solutionAlg.value)
+    cube.twist(new Algorithm(formatAlgorithm(solutionAlg.value)))
     if (cube.getCornerCycles() > 0
       || cube.getEdgeCycles() > 0
       || cube.getCenterCycles() > 0
@@ -30,7 +30,8 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
     if (!isSolved.value || !solutionAlg.value)
       return DNF
     try {
-      const moves = solutionAlg.value.twists.length + solutionAlg.value.inverseTwists.length
+      const solution = new Algorithm(solutionAlg.value)
+      const moves = solution.twists.length + solution.inverseTwists.length
       if (moves > 80)
         return DNF
       return moves
