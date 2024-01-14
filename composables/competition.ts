@@ -19,10 +19,11 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
     const cube = new Cube()
     cube.twist(new Algorithm(props.scramble.scramble))
     cube.twist(solutionAlg.value)
-    if (cube.getCornerCycles() > 0
-      || cube.getEdgeCycles() > 0
-      || cube.getCenterCycles() > 0
-      || cube.hasParity())
+    const bestCube = cube.getBestPlacement()
+    if (bestCube.getCornerCycles() > 0
+      || bestCube.getEdgeCycles() > 0
+      || bestCube.getCenterCycles() > 0
+      || bestCube.hasParity())
       return false
     return true
   })
