@@ -78,6 +78,7 @@ export default {
         '每一行的"//"及其之后的内容表示注释。',
       ],
       to: '{length}步剩{detail}',
+      solved: '{length}步还原',
     },
     algs: {
       'label': '公式集',

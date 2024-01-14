@@ -280,6 +280,9 @@ function reset() {
           <div v-if="formatedCycleDetail" class="text-green-600">
             {{ $t('if.skeleton.to', { length: formattedSkeletonLength, detail: formatedCycleDetail }) }}
           </div>
+          <div v-else-if="skeletonState" class="text-green-600">
+            {{ $t('if.skeleton.solved', { length: formattedSkeletonLength }) }}
+          </div>
           <div v-if="!cycleState" class="text-red-500">
             {{ $t('if.solutions.exceed') }}
           </div>

@@ -78,6 +78,7 @@ export default {
         'Any content after "//" in each line will be considered as comments.',
       ],
       to: '{length} to {detail}',
+      solved: '{length} to solved',
     },
     algs: {
       'label': 'Algorithms',
