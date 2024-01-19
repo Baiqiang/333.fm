@@ -47,7 +47,7 @@ async function updateData(submission: Submission) {
       <div class="mb-2">
         {{ $t('endless.openAt', { time: $dayjs(progress.scramble.createdAt).locale($i18n.locale).format('LLL') }) }}
       </div>
-      <template v-if="progress.kickedBy.length > 0">
+      <template v-if="progress.kickedBy.length > 0 && progress.submission">
         <div class="mb-2">
           {{ $t('endless.kickedAt', { time: $dayjs(progress.kickedBy[0].createdAt).locale($i18n.locale).format('LLL') }) }}
         </div>

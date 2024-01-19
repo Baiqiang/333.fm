@@ -16,7 +16,7 @@ defineProps<{
         </div>
         <UserAvatarName :user="r.user" />
         <div class="font-mono">
-          {{ formatResult(r.best) }} ({{ r.level }})
+          {{ formatResult(r.best) }}
         </div>
       </template>
     </div>

@@ -91,17 +91,19 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
           {{ $t('endless.level', { level }) }}
         </NuxtLink>
         <div class="flex items-center">
-          <UserAvatarName v-if="kickedOffs.length === 1" :user="kickedOffs[0].user">
+          <Icon v-if="myLevel <= level" name="material-symbols:lock-outline-sharp" />
+          <UserAvatarName v-else-if="kickedOffs.length === 1" :user="kickedOffs[0].user">
             ({{ formatResult(kickedOffs[0].submission.moves) }})
           </UserAvatarName>
-          <template v-if="kickedOffs.length > 1">
+          <template v-else-if="kickedOffs.length > 1">
             <div v-for="{ user, submission } in kickedOffs" :key="user.id" class="flex">
               <UserAvatar :user="user" /> ({{ formatResult(submission.moves) }})
             </div>
           </template>
         </div>
         <div class="text-indigo-500 font-semibold flex items-center">
-          <template v-if="bestSubmissions.length > 0">
+          <Icon v-if="myLevel <= level" name="material-symbols:lock-outline-sharp" class="text-black" />
+          <template v-else-if="bestSubmissions.length > 0">
             <div class="mr-1">
               {{ formatResult(bestSubmissions[0].moves) }}
             </div>
