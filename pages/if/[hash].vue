@@ -82,7 +82,7 @@ const status = computed<number>(() => finder.value?.status ?? -1)
 const duration = computed<string>(() => {
   if (!finder.value)
     return ''
-  const nanoseconds = finder.value.result.duration ?? 0
+  const nanoseconds = finder.value.result?.duration ?? 0
   const milliseconds = nanoseconds / 1e6
   const seconds = nanoseconds / 1e9
   const minutes = Math.floor(seconds / 60)
@@ -94,7 +94,7 @@ const duration = computed<string>(() => {
 
   return `${minutes}m${Math.floor(seconds % 60)}s`
 })
-const fewestMoves = computed(() => finder.value?.result.fewest_moves ?? '-')
+const fewestMoves = computed(() => finder.value?.result?.fewest_moves ?? '-')
 const result = computed<IFResult | null>(() => finder.value?.result ?? null)
 const isIF = computed(() => finder.value?.type === IFType.INSERTION_FINDER)
 const form = useIFForm()
