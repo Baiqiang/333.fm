@@ -287,17 +287,16 @@ export default {
     rules: [
       '只有有效解法才能提交；',
       '每个人都从第一层开始；',
-      {
-        rule: '满足以下条件之一即可开启下一层：',
-        rules: [
-          '有人提交了少于等于 24 步的解法；',
-          '有 3 人提交了少于等于 30 步的解法；',
-        ],
-      },
+      '满足以下条件之一即可开启下一层：',
       '每一层的打乱在进入关卡之后才能看到；',
       '每一层在提交有效解法后方可查看其他选手的解法;',
       '任何形式的作弊都是不允许的。',
     ],
+    chanllenge: {
+      any: '有人提交了有效解法',
+      single: '有人提交了少于等于 {moves} 步的解法；',
+      team: '有 {persons} 人提交了少于等于 {moves} 步的解法；',
+    },
     level: '{level} 层',
     progress: {
       title: '无尽之塔',
@@ -308,6 +307,7 @@ export default {
     next: '下一层',
     toBeContinued: '未完待续',
     kickedBy: '破关者',
+    kickCondition: '下一关开启：有人提交 ≤{single} 步或者 {persons} 个人提交 ≤{team} 步。',
     stats: {
       title: '统计',
       singles: '最佳单次',
@@ -325,6 +325,13 @@ export default {
     unlimited: {
       description: '时间不限，尽可能取得好解法。',
     },
+    type: [
+      '常规爬塔，每一层要求一样。',
+      'Boss 挑战，每个整 10 关难度大提升，每过 10 关难度稍微提升。',
+      'EO 练习塔，每个打乱的 EO 已做好。',
+      'DR 练习塔，每个打乱的 DR 已做好。',
+      'HTR 练习塔，每个打乱的 HTR 已做好。',
+    ],
   },
   result: {
     rank: '排名',

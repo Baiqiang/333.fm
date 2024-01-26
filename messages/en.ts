@@ -287,17 +287,16 @@ export default {
     rules: [
       'Only valid solutions can be submitted.',
       'At the beginning, all people will start from level 1.',
-      {
-        rule: 'New level will open once one of the following conditions is satisfied:',
-        rules: [
-          'A person gets a result that is less than or equal to 24 moves.',
-          '3 persons get results that are less than or equal to 30 moves.',
-        ],
-      },
+      'New level will open once one of the following conditions is satisfied:',
       'Each level\'s scramble is visible after you enter the level.',
       'Each level\'s solutions are visible after you submit a valid result.',
       'Any kind of cheating is not allowed.',
     ],
+    chanllenge: {
+      any: 'A person submits a valid solution.',
+      single: 'A person gets a result that is less than or equal to {moves} moves.',
+      team: '{persons} persons get results that are less than or equal to {moves} moves.',
+    },
     level: 'LV {level}',
     progress: {
       title: 'Progress',
@@ -308,6 +307,7 @@ export default {
     next: 'Next Level',
     toBeContinued: 'To be Continued',
     kickedBy: 'Kicked by',
+    kickCondition: 'Next Level: A result that ≤{single} moves or {persons} results that ≤{team} moves submitted.',
     stats: {
       title: 'Statistics',
       singles: 'Best Singles',
@@ -325,6 +325,13 @@ export default {
     unlimited: {
       description: 'No time limit. Try to get good solutions.',
     },
+    type: [
+      'Regular endless chanllenge with same requirements for every level.',
+      'Every 10th level is a boss level with difficulty increased. And difficulty increases a little every 10 levels.',
+      'The EO practice has EO done in every scramble.',
+      'The DR practice has DR done in every scramble.',
+      'The HTR practice has HTR done in every scramble.',
+    ],
   },
   result: {
     rank: 'Rank',

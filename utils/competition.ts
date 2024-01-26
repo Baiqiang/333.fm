@@ -9,6 +9,7 @@ export interface Competition {
   id: number
   alias: string
   type: CompetitionType
+  subType: CompetitionSubType
   name: string
   startTime: string
   endTime: string
@@ -52,6 +53,14 @@ export enum CompetitionType {
   RANDOM,
 }
 
+export enum CompetitionSubType {
+  REGULAR,
+  BOSS_CHANLLENGE,
+  EO_PRACTICE,
+  DR_PRACTICE,
+  HTR_PRACTICE,
+}
+
 export enum CompetitionFormat {
   MO3,
   BO1,
@@ -71,6 +80,14 @@ export enum CompetitionMode {
 
 export interface Endless extends Competition {
   levels: Level[]
+  chanllenges?: Chanllenge[]
+}
+export interface Chanllenge {
+  single: number
+  team: [number, number]
+  startLevel?: number
+  endLevel?: number
+  levels?: number[]
 }
 
 export interface EndlessStats {

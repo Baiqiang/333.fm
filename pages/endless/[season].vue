@@ -21,8 +21,7 @@ provide<() => void>(SYMBOL_ENDLESS_UPDATE_PROGRESS, updateMyProgress)
 <template>
   <div>
     <h1 class="font-bold text-lg md:text-3xl my-2">
-      {{ $t('endless.title') }}
-      <span class="testsm md:text-base">({{ endless.name }})</span>
+      {{ endless.name }} - {{ $t('endless.title') }}
     </h1>
     <NuxtPage />
   </div>

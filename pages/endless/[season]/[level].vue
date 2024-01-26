@@ -15,6 +15,24 @@ const myProgress = inject<Ref<UserProgress>>(SYMBOL_ENDLESS_PROGRESS)!
 const updateMyProgress = inject<() => void>(SYMBOL_ENDLESS_UPDATE_PROGRESS)!
 const level = computed<number>(() => Number.parseInt(params.level as string))
 const myLevel = computed(() => myProgress.value.next?.level ?? 0)
+const chanllenge = computed<Chanllenge | undefined>(() => {
+  const chanllenges = endless.value.chanllenges
+  if (!chanllenges)
+    return
+
+  if (chanllenges.length === 1)
+    return chanllenges[0]
+
+  let chanllenge = chanllenges.find(c => c.levels?.includes(level.value))
+  if (chanllenge)
+    return chanllenge
+
+  chanllenge = chanllenges.find(c => c.startLevel! <= level.value && c.endLevel! >= level.value)
+  if (chanllenge)
+    return chanllenge
+
+  return level.value % 10 === 0 ? chanllenges[chanllenges.length - 1] : chanllenges[chanllenges.length - 2]
+})
 const submissions = ref<Submission[]>([])
 const { t } = useI18n()
 useSeoMeta({
@@ -44,6 +62,9 @@ async function updateData(submission: Submission) {
       {{ $t('endless.level', { level: params.level }) }}
     </h2>
     <div class="mb-2">
+      <div v-if="chanllenge" class="mb-2">
+        {{ $t('endless.kickCondition', { single: formatResult(chanllenge.single), team: formatResult(chanllenge.team[0]), persons: chanllenge.team[1] }) }}
+      </div>
       <div class="mb-2">
         {{ $t('endless.openAt', { time: $dayjs(progress.scramble.createdAt).locale($i18n.locale).format('LLL') }) }}
       </div>
