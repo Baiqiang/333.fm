@@ -122,6 +122,7 @@ export interface Kickoff extends Time {
 export const SYMBOL_ENDLESS = Symbol('endless')
 export const SYMBOL_ENDLESS_PROGRESS = Symbol('endless.progress')
 export const SYMBOL_ENDLESS_UPDATE_PROGRESS = Symbol('endless.progress.update')
+export const SYMBOL_ENDLESS_UPDATE = Symbol('endless.update')
 
 export const DNF = 99999998
 export const DNS = 99999999

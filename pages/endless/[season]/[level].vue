@@ -13,6 +13,7 @@ const progress = reactive<Progress>(data.value)
 const endless = inject<Ref<Endless>>(SYMBOL_ENDLESS)!
 const myProgress = inject<Ref<UserProgress>>(SYMBOL_ENDLESS_PROGRESS)!
 const updateMyProgress = inject<() => void>(SYMBOL_ENDLESS_UPDATE_PROGRESS)!
+const updateEndless = inject<() => void>(SYMBOL_ENDLESS_UPDATE)!
 const level = computed<number>(() => Number.parseInt(params.level as string))
 const myLevel = computed(() => myProgress.value.next?.level ?? 0)
 const chanllenge = computed<Chanllenge | undefined>(() => {
@@ -53,6 +54,8 @@ async function updateData(submission: Submission) {
   progress.submission = submission
   await updateMyProgress()
   await fetchSubmissions()
+  if (endless.value.levels.length === level.value)
+    await updateEndless()
 }
 </script>
 

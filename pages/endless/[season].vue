@@ -12,10 +12,16 @@ async function updateMyProgress() {
   const { data } = await useApi<UserProgress>(`/endless/${endless.value.alias}/progress`)
   myProgress.value = data.value!
 }
+async function updateEndless() {
+  const { data, error } = await useApi<Endless>(`/endless/${endless.value.alias}`)
+  if (!error.value)
+    endless.value = data.value!
+}
 await updateMyProgress()
 provide<Ref<Endless>>(SYMBOL_ENDLESS, endless)
 provide<Ref<UserProgress | undefined>>(SYMBOL_ENDLESS_PROGRESS, myProgress)
 provide<() => void>(SYMBOL_ENDLESS_UPDATE_PROGRESS, updateMyProgress)
+provide<() => void>(SYMBOL_ENDLESS_UPDATE, updateEndless)
 </script>
 
 <template>
