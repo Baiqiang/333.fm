@@ -25,10 +25,10 @@ const name = computed(() => {
   if (scramble) {
     switch (competition?.type) {
       case CompetitionType.WEEKLY:
-        name += t('weekly.scramble', { number: scramble.number })
+        name += ` ${t('weekly.scramble', { number: scramble.number })}`
         break
       case CompetitionType.ENDLESS:
-        name += t('endless.level', { level: scramble.number })
+        name += ` ${t('endless.level', { level: scramble.number })}`
         break
     }
   }
