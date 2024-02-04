@@ -5,11 +5,11 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex items-center">
-    <UserAvatar :user="user" class="mr-1" />
+  <NuxtLink :to="`/profile/${user.id}`" class="flex items-center">
+    <UserAvatar :user="user" class="mr-1" :link="false" />
     <div class="whitespace-nowrap">
       {{ localeName(user.name, $i18n.locale) }}
     </div>
     <slot />
-  </div>
+  </NuxtLink>
 </template>

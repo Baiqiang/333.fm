@@ -44,13 +44,16 @@ export interface Submission extends Time {
   comment: string
   moves: number
   scramble: Scramble
+  competition: Competition
   user: User
   mode: CompetitionMode
+  alreadySubmitted?: boolean
 }
 
 export enum CompetitionType {
   WEEKLY,
   RANDOM,
+  ENDLESS,
 }
 
 export enum CompetitionSubType {

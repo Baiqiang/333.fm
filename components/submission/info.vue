@@ -1,0 +1,31 @@
+<script setup lang="ts">
+const props = defineProps<{
+  competition: Competition
+  scramble: Scramble
+}>()
+const competitionLink = computed(() => {
+  switch (props.competition.type) {
+    case CompetitionType.WEEKLY:
+      return `/weekly/${props.competition.alias}#scramble-${props.scramble.number}`
+    case CompetitionType.ENDLESS:
+      return `/endless/${props.competition.alias}`
+    default:
+      return `/competition/${props.competition.alias}`
+  }
+})
+</script>
+
+<template>
+  <div class="flex gap-2 flex-wrap">
+    <NuxtLink :to="competitionLink" class="text-blue-500 hover:text-blue-300">
+      {{ competition.name }}
+    </NuxtLink>
+    <div v-if="competition.type === CompetitionType.WEEKLY">
+      {{ $t('weekly.scramble', { number: scramble.number }) }}
+    </div>
+    <div v-else-if="competition.type === CompetitionType.ENDLESS">
+      {{ $t('endless.level', { level: scramble.number }) }}
+    </div>
+    <Sequence class="basis-full" :sequence="scramble.scramble" />
+  </div>
+</template>

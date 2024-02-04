@@ -31,6 +31,7 @@ export default {
       fewest: 'Fewest',
       latest: 'Latest',
     },
+    spoiler: 'Spoiler for {for}. Click to see.',
   },
   error: {
     400: 'Bad Request',

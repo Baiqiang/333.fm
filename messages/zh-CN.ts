@@ -31,6 +31,7 @@ export default {
       fewest: '最少',
       latest: '最新',
     },
+    spoiler: '将剧透{for}，点击查看。',
   },
   error: {
     400: '错误请求',
