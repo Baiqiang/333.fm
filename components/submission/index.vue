@@ -4,7 +4,7 @@ const props = defineProps<{
   spoiler?: boolean
 }>()
 const { t } = useI18n()
-const showComment = ref(false)
+const showComment = ref(props.spoiler)
 const showOriginal = ref(false)
 const show = ref(false)
 const solution = computed(() => {
@@ -34,12 +34,21 @@ const name = computed(() => {
   }
   return name
 })
+const showSpoiler = computed(() => {
+  if (!props.spoiler || show.value || props.submission.alreadySubmitted)
+    return false
+
+  if (props.submission.competition.type === CompetitionType.WEEKLY)
+    return props.submission.competition.status !== CompetitionStatus.ENDED
+
+  return true
+})
 </script>
 
 <template>
   <div class="relative">
     <div
-      v-if="spoiler && !submission.alreadySubmitted && !show"
+      v-if="showSpoiler"
       class="absolute inset-0 z-50 bg-indigo-500 text-white flex flex-col items-center justify-center cursor-pointer"
       @click="show = true"
     >
