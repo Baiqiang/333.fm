@@ -73,7 +73,7 @@ const showSpoiler = computed(() => {
             size="20"
           />
         </button>
-        <button v-if="submission.comment.trim() !== ''" class="text-indigo-500" @click="showComment = !showComment">
+        <button class="text-indigo-500" @click="showComment = !showComment">
           <Icon
             :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"
             size="20"
@@ -81,7 +81,12 @@ const showSpoiler = computed(() => {
         </button>
       </div>
       <TransitionExpand>
-        <Sequence v-if="showComment" :sequence="submission.comment" class="bg-gray-200" />
+        <div v-if="showComment">
+          <Sequence :sequence="submission.comment" class="bg-gray-200" />
+          <div class="text-gray-400 text-sm">
+            {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
+          </div>
+        </div>
       </TransitionExpand>
     </div>
   </div>

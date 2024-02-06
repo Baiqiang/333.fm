@@ -18,11 +18,14 @@ const meta: Ref<PaginationMeta> = ref({
   itemsPerPage: DEFAULT_LIMIT,
   totalPages: 0,
   currentPage: 1,
+  filters: [],
 })
 const filters = computed(() => {
   if (meta.value.totalItems === 0)
     return []
-  const filters: { to: RouteLocationRaw, label: string }[] = [{
+
+  const total = (meta.value as any).filters.reduce((n: number, { count }: any) => Number(count) + n, 0)
+  const filters: { to: RouteLocationRaw, label: string, type?: any }[] = [{
     to: {
       ...route,
       query: {
@@ -31,7 +34,7 @@ const filters = computed(() => {
         page: undefined,
       },
     },
-    label: `${t('common.all')} (${meta.value.totalItems})`,
+    label: `${t('common.all')} (${total})`,
   }]
   for (const filter of (meta.value as any).filters || []) {
     let label = ''
@@ -53,6 +56,7 @@ const filters = computed(() => {
         },
       },
       label: `${label} (${filter.count})`,
+      type: filter.type,
     })
   }
   return filters
@@ -74,6 +78,13 @@ async function fetchData() {
   submissions.value = data.value!.items
   meta.value = data.value!.meta
 }
+function isSameType(a: any, b: any): boolean {
+  console.log(a, b)
+  if (a === undefined)
+    return b === undefined
+
+  return Number(a) === Number(b)
+}
 useSeoMeta({
   title: user.value.name,
 })
@@ -89,8 +100,17 @@ useSeoMeta({
         <img src="https://www.worldcubeassociation.org/files/WCAlogo_notext.svg" class="w-6">
       </a>
     </div>
-    <div v-if="filters.length > 0" class="flex gap-2 mt-2">
-      <NuxtLink v-for="{ to, label }, i in filters" :key="i" :to="to" class="px-2 py-2 text-white bg-indigo-500">
+    <div v-if="filters.length > 0" class="flex flex-wrap gap-2 mt-2">
+      <NuxtLink
+        v-for="{ to, label, type }, i in filters"
+        :key="i"
+        :to="to"
+        class="px-2 py-2 text-white whitespace-nowrap"
+        :class="{
+          'bg-indigo-500': !isSameType($route.query.type, type),
+          'bg-gray-500': isSameType($route.query.type, type),
+        }"
+      >
         {{ label }}
       </NuxtLink>
     </div>
