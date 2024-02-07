@@ -32,6 +32,7 @@ export default {
       latest: '最新',
     },
     spoiler: '将剧透{for}，点击查看。',
+    backTo: '返回{to}',
   },
   error: {
     400: '错误请求',

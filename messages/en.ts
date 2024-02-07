@@ -32,6 +32,7 @@ export default {
       latest: 'Latest',
     },
     spoiler: 'Spoiler for {for}. Click to see.',
+    backTo: 'Back to {to}',
   },
   error: {
     400: 'Bad Request',
