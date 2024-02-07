@@ -32,44 +32,43 @@ const showSolution = computed(() => {
       :scramble="submission.scramble"
       class="basis-full"
     />
-    <div class="flex flex-col md:flex-row flex-wrap gap-x-2 items-start">
-      <template v-if="showSolution">
-        <UserAvatarName v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
-          <SubmissionMoves :submission="submission" />
-        </UserAvatarName>
-        <template v-else>
-          <div class="text-sm text-gray-600 basis-full">
-            {{ $t('weekly.results') }}
-          </div>
-          <SubmissionMoves :submission="submission" />
-          <div class="text-sm text-gray-600 basis-full">
-            {{ $t('weekly.solution.label') }}
-          </div>
+    <template v-if="showSolution">
+      <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
+        <template #info>
+          {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
         </template>
-        <div class="flex gap-2 justify-start items-start">
-          <Sequence :sequence="solution" />
-          <button class="text-indigo-500" @click="showOriginal = !showOriginal">
-            <Icon
-              :name="showOriginal ? 'ic:sharp-rotate-90-degrees-cw' : 'ic:sharp-rotate-90-degrees-ccw'"
-              size="20"
-            />
-          </button>
-          <button class="text-indigo-500" @click="showComment = !showComment">
-            <Icon
-              :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"
-              size="20"
-            />
-          </button>
+        <SubmissionMoves :submission="submission" class="text-lg" />
+      </UserAvatarInfo>
+      <template v-else>
+        <div class="text-sm text-gray-600 basis-full">
+          {{ $t('weekly.results') }}
+        </div>
+        <SubmissionMoves :submission="submission" />
+        <div class="text-sm text-gray-600 basis-full">
+          {{ $t('weekly.solution.label') }}
         </div>
       </template>
+      <div class="flex gap-2 justify-start items-start">
+        <Sequence :sequence="solution" />
+        <button class="text-indigo-500" @click="showOriginal = !showOriginal">
+          <Icon
+            :name="showOriginal ? 'ic:sharp-rotate-90-degrees-cw' : 'ic:sharp-rotate-90-degrees-ccw'"
+            size="20"
+          />
+        </button>
+        <button class="text-indigo-500" @click="showComment = !showComment">
+          <Icon
+            :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"
+            size="20"
+          />
+        </button>
+      </div>
       <TransitionExpand>
         <div v-if="showComment" class="basis-full">
           <Sequence :sequence="submission.comment" class="bg-gray-200" />
-          <div class="text-gray-400 text-sm">
-            {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
-          </div>
         </div>
       </TransitionExpand>
-    </div>
+      <SubmissionMeta :submission="submission" />
+    </template>
   </div>
 </template>

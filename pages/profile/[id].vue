@@ -3,6 +3,7 @@ import type { RouteLocationRaw } from '#vue-router'
 
 const route = useRoute()
 const { t } = useI18n()
+const bus = useEventBus('submission')
 const { data, error } = await useApi<User>(`/profile/${route.params.id}`)
 if (error.value || !data.value) {
   console.log(error.value)
@@ -61,6 +62,7 @@ const filters = computed(() => {
   }
   return filters
 })
+bus.on(fetchData)
 await fetchData()
 watch(() => route.query, async () => {
   await fetchData()

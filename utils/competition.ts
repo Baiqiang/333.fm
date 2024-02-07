@@ -48,6 +48,10 @@ export interface Submission extends Time {
   user: User
   mode: CompetitionMode
   alreadySubmitted?: boolean
+  likes: number
+  liked: boolean
+  favorites: number
+  favorited: boolean
 }
 
 export enum CompetitionType {

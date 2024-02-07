@@ -8,6 +8,9 @@ const competitionLink = computed(() => {
     case CompetitionType.WEEKLY:
       return `/weekly/${props.competition.alias}#scramble-${props.scramble.number}`
     case CompetitionType.ENDLESS:
+      if (props.scramble.scramble)
+        return `/endless/${props.competition.alias}/${props.scramble.number}`
+
       return `/endless/${props.competition.alias}`
     default:
       return `/competition/${props.competition.alias}`
@@ -26,11 +29,11 @@ const competitionLink = computed(() => {
     <div v-else-if="competition.type === CompetitionType.ENDLESS">
       {{ $t('endless.level', { level: scramble.number }) }}
     </div>
-    <template v-if="scramble.scramble">
-      <div class="text-sm text-gray-600 basis-full">
-        {{ $t('if.scramble.label') }}
-      </div>
-      <Sequence class="basis-full" :sequence="scramble.scramble" />
-    </template>
   </div>
+  <template v-if="scramble.scramble">
+    <div class="text-sm text-gray-600">
+      {{ $t('if.scramble.label') }}
+    </div>
+    <Sequence :sequence="scramble.scramble" />
+  </template>
 </template>
