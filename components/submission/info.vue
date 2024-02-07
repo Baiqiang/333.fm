@@ -16,7 +16,7 @@ const competitionLink = computed(() => {
 </script>
 
 <template>
-  <div class="flex gap-2 flex-wrap">
+  <div class="flex gap-x-2 flex-wrap">
     <NuxtLink :to="competitionLink" class="text-blue-500 hover:text-blue-300">
       {{ competition.name }}
     </NuxtLink>
@@ -26,6 +26,11 @@ const competitionLink = computed(() => {
     <div v-else-if="competition.type === CompetitionType.ENDLESS">
       {{ $t('endless.level', { level: scramble.number }) }}
     </div>
-    <Sequence class="basis-full" :sequence="scramble.scramble" />
+    <template v-if="scramble.scramble">
+      <div class="text-sm text-gray-600 basis-full">
+        {{ $t('if.scramble.label') }}
+      </div>
+      <Sequence class="basis-full" :sequence="scramble.scramble" />
+    </template>
   </div>
 </template>

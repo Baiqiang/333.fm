@@ -14,11 +14,11 @@ const isOnGoing = computed(() => competition.value.status === CompetitionStatus.
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {
   const ret: Record<number, Submission[]> = {}
-  for (const { id } of competition.value.scrambles) ret[id] = submissions[id]?.filter(submission => submission.user.id === user.id) ?? []
+  for (const { id } of competition.value.scrambles)
+    ret[id] = submissions[id]?.filter(submission => submission.user.id === user.id) ?? []
 
   return ret
 })
-const hideSolutions = reactive<Record<number, boolean>>({})
 const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/weekly/${params.week}/results`)
 await fetchSubmissions()
 async function fetchSubmissions() {
@@ -32,15 +32,7 @@ async function fetchSubmissions() {
 useSeoMeta({
   title: `${competition.value.name} - ${t('weekly.title')}`,
 })
-let timer: NodeJS.Timeout
-onMounted(() => {
-  timer = setInterval(() => {
-    fetchSubmissions()
-  }, 5000)
-})
-onUnmounted(() => {
-  clearInterval(timer)
-})
+useIntervalFn(fetchSubmissions, 5000)
 </script>
 
 <template>
@@ -79,13 +71,11 @@ onUnmounted(() => {
           <div v-if="!submissions[scramble.id]">
             {{ $t('weekly.noSolution') }}
           </div>
-          <button
-            v-else-if="mySubmissions[scramble.id]?.length === 0 && !hideSolutions[scramble.id] && isOnGoing"
-            class="bg-indigo-500 text-white p-2"
-            @click="hideSolutions[scramble.id] = true"
+          <div
+            v-else-if="mySubmissions[scramble.id]?.length === 0 && isOnGoing"
           >
             {{ $t('weekly.seeSolutions', { solutions: submissions[scramble.id].length }, submissions[scramble.id].length) }}
-          </button>
+          </div>
           <template v-else>
             <Submissions :submissions="submissions[scramble.id]" filterable />
           </template>

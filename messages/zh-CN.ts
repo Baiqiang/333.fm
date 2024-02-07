@@ -252,7 +252,7 @@ export default {
     submitted: '（已提交）',
     solutions: '解法',
     noSolution: '暂无解法',
-    seeSolutions: '点击查看{solutions}个解法',
+    seeSolutions: '提交之后方可查看其他{solutions}个解法',
     results: '成绩',
     unlimitedResults: '成绩（狂野）',
     past: '往期周赛',

@@ -116,23 +116,17 @@ function findThis() {
   })
 }
 
-let timer: NodeJS.Timeout
 if (status.value !== IFStatus.FINISHED) {
-  timer = setInterval(async () => {
+  const { pause } = useIntervalFn(async () => {
     const { data, error } = await useApi<InsertionFinder>(`/if/${params.hash}`)
     if (error.value)
       return
 
     finder.value = data.value
     if (status.value === IFStatus.FINISHED)
-      clearInterval(timer)
+      pause()
   }, 1000)
 }
-
-onUnmounted(() => {
-  if (timer)
-    clearInterval(timer)
-})
 </script>
 
 <template>

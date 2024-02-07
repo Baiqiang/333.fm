@@ -1,12 +1,9 @@
 <script setup lang="ts">
 const props = defineProps<{
   submission: Submission
-  spoiler?: boolean
 }>()
-const { t } = useI18n()
-const showComment = ref(props.spoiler)
+const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(false)
-const show = ref(false)
 const solution = computed(() => {
   if (showOriginal.value)
     return props.submission.solution
@@ -18,70 +15,55 @@ const solution = computed(() => {
     return props.submission.solution.replaceAll('\n', ' ')
   }
 })
-const name = computed(() => {
-  const competition = props.submission.competition
+const showSolution = computed(() => {
   const scramble = props.submission.scramble
-  let name = competition?.name || props.submission.id
-  if (scramble) {
-    switch (competition?.type) {
-      case CompetitionType.WEEKLY:
-        name += ` ${t('weekly.scramble', { number: scramble.number })}`
-        break
-      case CompetitionType.ENDLESS:
-        name += ` ${t('endless.level', { level: scramble.number })}`
-        break
-    }
-  }
-  return name
-})
-const showSpoiler = computed(() => {
-  if (!props.spoiler || show.value || props.submission.alreadySubmitted)
-    return false
+  if (scramble === undefined)
+    return true
 
-  if (props.submission.competition.type === CompetitionType.WEEKLY)
-    return props.submission.competition.status !== CompetitionStatus.ENDED
-
-  return true
+  return scramble.scramble !== ''
 })
 </script>
 
 <template>
-  <div class="relative">
-    <div
-      v-if="showSpoiler"
-      class="absolute inset-0 z-50 bg-indigo-500 text-white flex flex-col items-center justify-center cursor-pointer"
-      @click="show = true"
-    >
-      {{ $t('common.spoiler', { for: name }) }}
-    </div>
+  <div class="border-t first:border-t-0 border-gray-300 pt-2 mt-2">
     <SubmissionInfo
       v-if="submission.competition"
       :competition="submission.competition"
       :scramble="submission.scramble"
       class="basis-full"
     />
-    <UserAvatarName v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
-      <SubmissionMoves :submission="submission" />
-    </UserAvatarName>
-    <SubmissionMoves v-else :submission="submission" />
-    <div>
-      <div class="flex gap-2 justify-start items-start">
-        <Sequence :sequence="solution" />
-        <button class="text-indigo-500" @click="showOriginal = !showOriginal">
-          <Icon
-            :name="showOriginal ? 'ic:sharp-rotate-90-degrees-cw' : 'ic:sharp-rotate-90-degrees-ccw'"
-            size="20"
-          />
-        </button>
-        <button class="text-indigo-500" @click="showComment = !showComment">
-          <Icon
-            :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"
-            size="20"
-          />
-        </button>
-      </div>
+    <div class="flex flex-col md:flex-row flex-wrap gap-x-2 items-start">
+      <template v-if="showSolution">
+        <UserAvatarName v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
+          <SubmissionMoves :submission="submission" />
+        </UserAvatarName>
+        <template v-else>
+          <div class="text-sm text-gray-600 basis-full">
+            {{ $t('weekly.results') }}
+          </div>
+          <SubmissionMoves :submission="submission" />
+          <div class="text-sm text-gray-600 basis-full">
+            {{ $t('weekly.solution.label') }}
+          </div>
+        </template>
+        <div class="flex gap-2 justify-start items-start">
+          <Sequence :sequence="solution" />
+          <button class="text-indigo-500" @click="showOriginal = !showOriginal">
+            <Icon
+              :name="showOriginal ? 'ic:sharp-rotate-90-degrees-cw' : 'ic:sharp-rotate-90-degrees-ccw'"
+              size="20"
+            />
+          </button>
+          <button class="text-indigo-500" @click="showComment = !showComment">
+            <Icon
+              :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"
+              size="20"
+            />
+          </button>
+        </div>
+      </template>
       <TransitionExpand>
-        <div v-if="showComment">
+        <div v-if="showComment" class="basis-full">
           <Sequence :sequence="submission.comment" class="bg-gray-200" />
           <div class="text-gray-400 text-sm">
             {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}

@@ -114,7 +114,7 @@ useSeoMeta({
         {{ label }}
       </NuxtLink>
     </div>
-    <Submissions :submissions="submissions" spoiler />
+    <Submissions :submissions="submissions" />
     <Pagination :meta="meta" />
   </div>
 </template>

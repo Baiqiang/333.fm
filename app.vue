@@ -33,9 +33,7 @@ accessToken.$subscribe(async (_, token) => {
   immediate: true,
   deep: true,
 })
-onMounted(() => {
-  setInterval(checkAuth, 1000 * 60 * 5)
-})
+useIntervalFn(checkAuth, 1000 * 60 * 5)
 </script>
 
 <template>

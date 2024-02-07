@@ -252,7 +252,7 @@ export default {
     submitted: ' (Submitted)',
     solutions: 'Solutions',
     noSolution: 'No Solution',
-    seeSolutions: 'Click to see {solutions} result | Click to see {solutions} solutions',
+    seeSolutions: 'Submit your solution to see {solutions} result | Submit your solution to see {solutions} solutions',
     results: 'Results',
     unlimitedResults: 'Results (Unlimited)',
     past: 'Past Competitions',

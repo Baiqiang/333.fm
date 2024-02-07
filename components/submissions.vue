@@ -5,11 +5,9 @@ const props = withDefaults(defineProps<{
   submissions?: Submission[]
   filterable?: boolean
   sortable?: boolean
-  spoiler?: boolean
 }>(), {
   filterable: false,
   sortable: false,
-  spoiler: false,
 })
 const mode = ref<CompetitionMode | null>(null)
 const sortBy = ref<string>('moves')
@@ -82,8 +80,6 @@ const counts = computed(() => {
         v-for="submission in filteredSortedSubmissions"
         :key="submission.id"
         :submission="submission"
-        :spoiler="spoiler"
-        class="border-t first:border-t-0 border-gray-300 pt-2 mt-2 flex flex-col md:flex-row flex-wrap gap-2 items-start"
       />
     </div>
   </div>
