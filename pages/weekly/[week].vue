@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const { params } = useRoute()
+const bus = useEventBus('submission')
 const user = useUser()
 const { data, error } = await useApi<Competition>(`/weekly/${params.week}`)
 if (!data.value || error.value) {
@@ -33,6 +34,7 @@ useSeoMeta({
   title: `${competition.value.name} - ${t('weekly.title')}`,
 })
 useIntervalFn(fetchSubmissions, 5000)
+bus.on(fetchSubmissions)
 </script>
 
 <template>

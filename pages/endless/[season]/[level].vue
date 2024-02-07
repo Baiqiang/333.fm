@@ -3,6 +3,7 @@ definePageMeta({
   middleware: 'auth',
 })
 const { params } = useRoute()
+const bus = useEventBus('submission')
 const { data, error } = await useApi<Progress>(`/endless/${params.season}/${params.level}`)
 if (!data.value || error.value) {
   throw createError({
@@ -41,6 +42,7 @@ useSeoMeta({
 })
 if (progress.submission)
   await fetchSubmissions()
+bus.on(fetchSubmissions)
 
 async function fetchSubmissions() {
   const { data, refresh } = await useApi<Submission[]>(`/endless/${endless.value.alias}/${params.level}/submissions`, {
