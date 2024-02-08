@@ -89,6 +89,12 @@ async function changeLocale(code: string) {
               <NuxtLink to="/user/if" :class="menuClass">
                 {{ $t('user.if') }}
               </NuxtLink>
+              <NuxtLink to="/user/likes" :class="menuClass">
+                {{ $t('user.likes') }}
+              </NuxtLink>
+              <NuxtLink to="/user/favorites" :class="menuClass">
+                {{ $t('user.favorites') }}
+              </NuxtLink>
               <template v-if="user.isAdmin">
                 <hr>
                 <div class="text-gray-400 px-3 py-1 text-sm">

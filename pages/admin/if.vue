@@ -5,13 +5,7 @@ useSeoMeta({
   title: t('admin.if.title'),
 })
 const adminIFs: Ref<AdminIF[]> = ref([])
-const meta: Ref<PaginationMeta> = ref({
-  totalItems: 0,
-  itemCount: 0,
-  itemsPerPage: DEFAULT_LIMIT,
-  totalPages: 0,
-  currentPage: 1,
-})
+const meta = usePaginationMeta()
 async function fetchData() {
   const { data } = await useApi<Pagination<AdminIF>>('/admin/ifs', {
     params: {
@@ -22,12 +16,6 @@ async function fetchData() {
   adminIFs.value = data.value!.items
   meta.value = data.value!.meta
 }
-watch(() => route.query.page, async () => {
-  await fetchData()
-}, {
-  // immediate: true,
-  deep: true,
-})
 await fetchData()
 </script>
 
@@ -39,6 +27,6 @@ await fetchData()
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 sm:gap-x-2 md:gap-x-3 gap-y-1">
       <IfSummary v-for="adminIF in adminIFs" :key="adminIF.hash" :finder="adminIF" :users="adminIF.users" />
     </div>
-    <Pagination :meta="meta" />
+    <Pagination :meta="meta" @update="fetchData" />
   </div>
 </template>

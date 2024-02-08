@@ -8,13 +8,7 @@ useSeoMeta({
 })
 const users: Ref<AdminUser[]> = ref([])
 const PER_PAGE = 50
-const meta: Ref<PaginationMeta> = ref({
-  totalItems: 0,
-  itemCount: 0,
-  itemsPerPage: PER_PAGE,
-  totalPages: 0,
-  currentPage: 1,
-})
+const meta = usePaginationMeta()
 async function fetchData() {
   const { data } = await useApi<Pagination<AdminUser>>('/admin/users', {
     params: {
@@ -25,12 +19,6 @@ async function fetchData() {
   users.value = data.value!.items
   meta.value = data.value!.meta
 }
-watch(() => route.query.page, async () => {
-  await fetchData()
-}, {
-  // immediate: true,
-  deep: true,
-})
 await fetchData()
 </script>
 
@@ -76,6 +64,6 @@ await fetchData()
         </template>
       </div>
     </div>
-    <Pagination :meta="meta" />
+    <Pagination :meta="meta" @update="fetchData" />
   </div>
 </template>

@@ -13,13 +13,7 @@ useSeoMeta({
   title: t('admin.user.if', { name: user.value!.name ?? 'Unknown' }),
 })
 const userIFs: Ref<InsertionFinder[]> = ref([])
-const meta: Ref<PaginationMeta> = ref({
-  totalItems: 0,
-  itemCount: 0,
-  itemsPerPage: DEFAULT_LIMIT,
-  totalPages: 0,
-  currentPage: 1,
-})
+const meta = usePaginationMeta()
 async function fetchData() {
   const { data } = await useApi<Pagination<InsertionFinder>>(`/admin/user/${route.query.id}/ifs`, {
     params: {
@@ -30,12 +24,6 @@ async function fetchData() {
   userIFs.value = data.value!.items
   meta.value = data.value!.meta
 }
-watch(() => route.query.page, async () => {
-  await fetchData()
-}, {
-  // immediate: true,
-  deep: true,
-})
 await fetchData()
 </script>
 
@@ -47,6 +35,6 @@ await fetchData()
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 sm:gap-x-2 md:gap-x-3 gap-y-1">
       <IfSummary v-for="userIF in userIFs" :key="userIF.hash" :finder="userIF" />
     </div>
-    <Pagination :meta="meta" />
+    <Pagination :meta="meta" @update="fetchData" />
   </div>
 </template>

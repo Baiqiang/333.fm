@@ -47,7 +47,7 @@ export interface Submission extends Time {
   competition: Competition
   user: User
   mode: CompetitionMode
-  alreadySubmitted?: boolean
+  hideSolution: boolean
   likes: number
   liked: boolean
   favorites: number

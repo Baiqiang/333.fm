@@ -1,19 +1,20 @@
 <script setup lang="ts">
 const props = defineProps<{
-  competition: Competition
-  scramble: Scramble
+  submission: Submission
 }>()
+const { competition, scramble } = toRefs(props.submission)
 const competitionLink = computed(() => {
-  switch (props.competition.type) {
+  const { competition, scramble } = props.submission
+  switch (competition.type) {
     case CompetitionType.WEEKLY:
-      return `/weekly/${props.competition.alias}#scramble-${props.scramble.number}`
+      return `/weekly/${competition.alias}#scramble-${scramble.number}`
     case CompetitionType.ENDLESS:
-      if (props.scramble.scramble)
-        return `/endless/${props.competition.alias}/${props.scramble.number}`
+      if (!props.submission.hideSolution)
+        return `/endless/${competition.alias}/${scramble.number}`
 
-      return `/endless/${props.competition.alias}`
+      return `/endless/${competition.alias}`
     default:
-      return `/competition/${props.competition.alias}`
+      return `/competition/${competition.alias}`
   }
 })
 </script>

@@ -15,39 +15,30 @@ const solution = computed(() => {
     return props.submission.solution.replaceAll('\n', ' ')
   }
 })
-const showSolution = computed(() => {
-  const scramble = props.submission.scramble
-  if (scramble === undefined)
-    return true
-
-  return scramble.scramble !== ''
-})
 </script>
 
 <template>
   <div class="border-t first:border-t-0 border-gray-300 pt-2 mt-2">
+    <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
+      <template #info>
+        {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
+      </template>
+      <SubmissionMoves :submission="submission" class="text-lg" />
+    </UserAvatarInfo>
     <SubmissionInfo
       v-if="submission.competition"
-      :competition="submission.competition"
-      :scramble="submission.scramble"
-      class="basis-full"
+      :submission="submission"
     />
-    <template v-if="showSolution">
-      <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
-        <template #info>
-          {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
-        </template>
-        <SubmissionMoves :submission="submission" class="text-lg" />
-      </UserAvatarInfo>
-      <template v-else>
+    <template v-if="!submission.hideSolution">
+      <template v-if="!submission.user">
         <div class="text-sm text-gray-600 basis-full">
           {{ $t('weekly.results') }}
         </div>
         <SubmissionMoves :submission="submission" />
-        <div class="text-sm text-gray-600 basis-full">
-          {{ $t('weekly.solution.label') }}
-        </div>
       </template>
+      <div v-if="submission.competition" class="text-sm text-gray-600 basis-full">
+        {{ $t('weekly.solution.label') }}
+      </div>
       <div class="flex gap-2 justify-start items-start">
         <Sequence :sequence="solution" />
         <button class="text-indigo-500" @click="showOriginal = !showOriginal">
@@ -70,5 +61,8 @@ const showSolution = computed(() => {
       </TransitionExpand>
       <SubmissionMeta :submission="submission" />
     </template>
+    <div v-if="!submission.user" class="text-xs text-gray-400">
+      {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
+    </div>
   </div>
 </template>

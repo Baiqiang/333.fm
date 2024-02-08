@@ -6,21 +6,13 @@ const { t } = useI18n()
 const bus = useEventBus('submission')
 const { data, error } = await useApi<User>(`/profile/${route.params.id}`)
 if (error.value || !data.value) {
-  console.log(error.value)
   throw createError({
     statusCode: error.value?.statusCode ?? 404,
   })
 }
 const user = ref<User>(data.value)
 const submissions: Ref<Submission[]> = ref([])
-const meta: Ref<PaginationMeta> = ref({
-  totalItems: 0,
-  itemCount: 0,
-  itemsPerPage: DEFAULT_LIMIT,
-  totalPages: 0,
-  currentPage: 1,
-  filters: [],
-})
+const meta = usePaginationMeta()
 const filters = computed(() => {
   if (meta.value.totalItems === 0)
     return []
@@ -81,7 +73,6 @@ async function fetchData() {
   meta.value = data.value!.meta
 }
 function isSameType(a: any, b: any): boolean {
-  console.log(a, b)
   if (a === undefined)
     return b === undefined
 

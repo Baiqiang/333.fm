@@ -191,6 +191,8 @@ export default {
   },
   user: {
     if: 'My IF',
+    likes: 'Likes',
+    favorites: 'Favorites',
     name: 'Name',
     avatar: 'Avatar',
     changeName: 'Change Name',

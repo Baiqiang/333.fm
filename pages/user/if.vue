@@ -8,13 +8,7 @@ definePageMeta({
   middleware: 'auth',
 })
 const userIFs: Ref<InsertionFinder[]> = ref([])
-const meta: Ref<PaginationMeta> = ref({
-  totalItems: 0,
-  itemCount: 0,
-  itemsPerPage: DEFAULT_LIMIT,
-  totalPages: 0,
-  currentPage: 1,
-})
+const meta = usePaginationMeta()
 const removeModal = ref(false)
 const editModal = ref(false)
 const removeDialog = useConfirmDialog(removeModal)
@@ -57,12 +51,6 @@ async function edit(userIF: InsertionFinder) {
     name.value = ''
   }
 }
-watch(() => route.query.page, async () => {
-  await fetchData()
-}, {
-  // immediate: true,
-  deep: true,
-})
 await fetchData()
 </script>
 
@@ -74,7 +62,7 @@ await fetchData()
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 sm:gap-x-2 md:gap-x-3">
       <IfSummary v-for="userIF in userIFs" :key="userIF.hash" :finder="userIF" editable @remove="remove" @edit="edit" />
     </div>
-    <Pagination :meta="meta" />
+    <Pagination :meta="meta" @update="fetchData" />
   </div>
   <Teleport to="body">
     <Modal v-if="removeModal" :cancel="removeDialog.cancel">

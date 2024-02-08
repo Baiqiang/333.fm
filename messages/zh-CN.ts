@@ -191,6 +191,8 @@ export default {
   },
   user: {
     if: '我的插入',
+    likes: '赞过',
+    favorites: '收藏',
     name: '姓名',
     avatar: '头像',
     changeName: '修改名称',
