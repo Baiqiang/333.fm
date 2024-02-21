@@ -296,7 +296,7 @@ export default {
       '每一层在提交有效解法后方可查看其他选手的解法;',
       '任何形式的作弊都是不允许的。',
     ],
-    chanllenge: {
+    challenge: {
       any: '有人提交了有效解法',
       single: '有人提交了少于等于 {moves} 步的解法；',
       team: '有 {persons} 人提交了少于等于 {moves} 步的解法；',

@@ -1,20 +1,20 @@
 <script setup lang="ts">
 defineProps<{
-  chanllenges?: Chanllenge[]
+  challenges?: Challenge[]
 }>()
 </script>
 
 <template>
   <ol class="list-disc list-inside marker:text-indigo-500 pl-4 text-gray-800">
-    <li v-if="!chanllenges">
-      {{ $t('endless.chanllenge.any') }}
+    <li v-if="!challenges">
+      {{ $t('endless.challenge.any') }}
     </li>
-    <template v-else-if="chanllenges.length === 1">
+    <template v-else-if="challenges.length === 1">
       <li>
-        {{ $t('endless.chanllenge.single', { moves: formatResult(chanllenges[0].single) }) }}
+        {{ $t('endless.challenge.single', { moves: formatResult(challenges[0].single) }) }}
       </li>
       <li>
-        {{ $t('endless.chanllenge.team', { moves: formatResult(chanllenges[0].team[0]), persons: chanllenges[0].team[1] }) }}
+        {{ $t('endless.challenge.team', { moves: formatResult(challenges[0].team[0]), persons: challenges[0].team[1] }) }}
       </li>
     </template>
     <template v-else>
@@ -33,7 +33,7 @@ defineProps<{
           </tr>
         </thead>
         <tbody>
-          <tr v-for="{ single, team, startLevel, endLevel, levels }, i in chanllenges" :key="i" class="border-b border-gray-400 odd:bg-gray-200">
+          <tr v-for="{ single, team, startLevel, endLevel, levels }, i in challenges" :key="i" class="border-b border-gray-400 odd:bg-gray-200">
             <td v-if="levels" class="pl-1">
               {{ levels.join(', ') }}
             </td>

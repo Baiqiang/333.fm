@@ -67,7 +67,7 @@ export enum CompetitionType {
 
 export enum CompetitionSubType {
   REGULAR,
-  BOSS_CHANLLENGE,
+  BOSS_CHALLENGE,
   EO_PRACTICE,
   DR_PRACTICE,
   HTR_PRACTICE,
@@ -92,9 +92,9 @@ export enum CompetitionMode {
 
 export interface Endless extends Competition {
   levels: Level[]
-  chanllenges?: Chanllenge[]
+  challenges?: Challenge[]
 }
-export interface Chanllenge {
+export interface Challenge {
   single: number
   team: [number, number]
   startLevel?: number

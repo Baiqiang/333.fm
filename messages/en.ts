@@ -285,9 +285,9 @@ export default {
     },
   },
   endless: {
-    title: 'Endless Chanllenge',
+    title: 'Endless Challenge',
     shortTitle: 'Endless',
-    description: 'Endless Chanllenge is a new event that you can challenge yourself to pass through levels as many as possible. It\'s a pre-alpha version. The rules may change in the future.',
+    description: 'Endless Challenge is a new event that you can challenge yourself to pass through levels as many as possible. It\'s a pre-alpha version. The rules may change in the future.',
     rules: [
       'Only valid solutions can be submitted.',
       'At the beginning, all people will start from level 1.',
@@ -296,7 +296,7 @@ export default {
       'Each level\'s solutions are visible after you submit a valid result.',
       'Any kind of cheating is not allowed.',
     ],
-    chanllenge: {
+    challenge: {
       any: 'A person submits a valid solution.',
       single: 'A person gets a result that is less than or equal to {moves} moves.',
       team: '{persons} persons get results that are less than or equal to {moves} moves.',
@@ -330,12 +330,12 @@ export default {
       description: 'No time limit. Try to get good solutions.',
     },
     type: [
-      'Regular endless chanllenge with same requirements for every level.',
+      'Regular endless challenge with same requirements for every level.',
       'Every 10th level is a boss level with difficulty increased. And difficulty increases a little every 10 levels.',
       'The EO practice has EO done in every scramble.',
       'The DR practice has DR done in every scramble.',
       'The HTR practice has HTR done in every scramble.',
-      'In the hidden scramble chanllenge, the scramble is hidden and only the scrambled state is given. It means you need to clone a scrambled cube by yourself.',
+      'In the hidden scramble challenge, the scramble is hidden and only the scrambled state is given. It means you need to clone a scrambled cube by yourself.',
     ],
   },
   result: {

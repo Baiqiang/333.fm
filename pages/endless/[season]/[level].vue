@@ -17,23 +17,23 @@ const updateMyProgress = inject<() => void>(SYMBOL_ENDLESS_UPDATE_PROGRESS)!
 const updateEndless = inject<() => void>(SYMBOL_ENDLESS_UPDATE)!
 const level = computed<number>(() => Number.parseInt(params.level as string))
 const myLevel = computed(() => myProgress.value.next?.level ?? 0)
-const chanllenge = computed<Chanllenge | undefined>(() => {
-  const chanllenges = endless.value.chanllenges
-  if (!chanllenges)
+const challenge = computed<Challenge | undefined>(() => {
+  const challenges = endless.value.challenges
+  if (!challenges)
     return
 
-  if (chanllenges.length === 1)
-    return chanllenges[0]
+  if (challenges.length === 1)
+    return challenges[0]
 
-  let chanllenge = chanllenges.find(c => c.levels?.includes(level.value))
-  if (chanllenge)
-    return chanllenge
+  let challenge = challenges.find(c => c.levels?.includes(level.value))
+  if (challenge)
+    return challenge
 
-  chanllenge = chanllenges.find(c => c.startLevel! <= level.value && c.endLevel! >= level.value)
-  if (chanllenge)
-    return chanllenge
+  challenge = challenges.find(c => c.startLevel! <= level.value && c.endLevel! >= level.value)
+  if (challenge)
+    return challenge
 
-  return level.value % 10 === 0 ? chanllenges[chanllenges.length - 1] : chanllenges[chanllenges.length - 2]
+  return level.value % 10 === 0 ? challenges[challenges.length - 1] : challenges[challenges.length - 2]
 })
 const submissions = ref<Submission[]>([])
 const { t } = useI18n()
@@ -70,8 +70,8 @@ async function updateData(submission: Submission) {
       {{ $t('endless.level', { level: params.level }) }}
     </h2>
     <div class="mb-2">
-      <div v-if="chanllenge" class="mb-2">
-        {{ $t('endless.kickCondition', { single: formatResult(chanllenge.single), team: formatResult(chanllenge.team[0]), persons: chanllenge.team[1] }) }}
+      <div v-if="challenge" class="mb-2">
+        {{ $t('endless.kickCondition', { single: formatResult(challenge.single), team: formatResult(challenge.team[0]), persons: challenge.team[1] }) }}
       </div>
       <div class="mb-2">
         {{ $t('endless.openAt', { time: $dayjs(progress.scramble.createdAt).locale($i18n.locale).format('LLL') }) }}
