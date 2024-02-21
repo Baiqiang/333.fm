@@ -36,6 +36,11 @@ export interface Scramble extends Time {
   id: number
   number: number
   scramble: string
+  cubieCube?: {
+    corners: number[]
+    edges: number[]
+    placement: number
+  }
 }
 
 export interface Submission extends Time {

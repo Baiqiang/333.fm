@@ -12,20 +12,24 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
       return null
     }
   })
+  const scrambledCube = computed(() => {
+    if (props.scramble.cubieCube) {
+      const cubieCube = props.scramble.cubieCube
+      return Cube.fromCubieCube(cubieCube.corners, cubieCube.edges, cubieCube.placement)
+    }
+
+    const cube = new Cube()
+    cube.twist(new Algorithm(props.scramble.scramble))
+    return cube
+  })
   const isSolved = computed<boolean>(() => {
     if (!solutionAlg.value)
       return false
 
-    const cube = new Cube()
-    cube.twist(new Algorithm(props.scramble.scramble))
+    const cube = scrambledCube.value.clone()
     cube.twist(solutionAlg.value)
     const bestCube = cube.getBestPlacement()
-    if (bestCube.getCornerCycles() > 0
-      || bestCube.getEdgeCycles() > 0
-      || bestCube.getCenterCycles() > 0
-      || bestCube.hasParity())
-      return false
-    return true
+    return bestCube.isSolved()
   })
   const moves = computed<number>(() => {
     if (!isSolved.value || !solutionAlg.value)

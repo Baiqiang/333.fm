@@ -335,6 +335,7 @@ export default {
       'The EO practice has EO done in every scramble.',
       'The DR practice has DR done in every scramble.',
       'The HTR practice has HTR done in every scramble.',
+      'In the hidden scramble chanllenge, the scramble is hidden and only the scrambled state is given. It means you need to clone a scrambled cube by yourself.',
     ],
   },
   result: {

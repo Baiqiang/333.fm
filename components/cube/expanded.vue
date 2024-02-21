@@ -6,12 +6,19 @@ import type { Rectangle } from 'two.js/src/shapes/rectangle'
 
 const props = defineProps<{
   moves: string
+  cubieCube?: {
+    corners: number[]
+    edges: number[]
+    placement: number
+  }
   best?: boolean
 }>()
 
 const cubeElement = ref<HTMLCanvasElement>()
 
 const facelet = computed(() => {
+  if (props.cubieCube)
+    return Cube.fromCubieCube(props.cubieCube.corners, props.cubieCube.edges, props.cubieCube.placement).toFaceletString()
   try {
     const cube = new Cube()
     cube.twist(new Algorithm(removeComment(props.moves)))

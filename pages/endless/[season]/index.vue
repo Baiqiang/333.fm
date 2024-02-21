@@ -39,7 +39,7 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
       </I18nT>
       <li v-for="m, i in $tm('endless.rules')" :key="i">
         {{ m }}
-        <template v-if="i === '2'">
+        <template v-if="i === 2">
           <EndlessChanllenges :chanllenges="endless.chanllenges" />
         </template>
       </li>
