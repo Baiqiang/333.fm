@@ -14,7 +14,7 @@ const props = defineProps<{
   best?: boolean
 }>()
 
-const cubeElement = ref<HTMLCanvasElement>()
+const cubeElement = ref<HTMLElement>()
 
 const facelet = computed(() => {
   if (props.cubieCube)
