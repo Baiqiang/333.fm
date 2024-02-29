@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Algorithm, Cube } from 'insertionfinder'
 import { BoxGeometry, Color, Mesh, PerspectiveCamera, Scene, ShaderMaterial, WebGLRenderer } from 'three'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { TrackballControls } from 'three/addons/controls/TrackballControls.js'
 
 type Axis = 'x' | 'y' | 'z'
 
@@ -19,7 +19,7 @@ const { width } = useElementSize(cubeElement)
 let scene: Scene
 let camera: PerspectiveCamera
 let renderer: WebGLRenderer
-let controls: OrbitControls
+let controls: TrackballControls
 const cubes: Mesh[] = []
 
 const bgs: Record<string, string> = {
@@ -141,10 +141,10 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio)
   camera = new PerspectiveCamera(45, 1, 1, 1000)
   camera.position.set(4, 4, 4)
-  controls = new OrbitControls(camera, canvas)
+  controls = new TrackballControls(camera, canvas)
   // disallow drag and zoom
-  controls.enablePan = false
-  controls.enableZoom = false
+  controls.noPan = true
+  controls.noZoom = true
   createCube()
   render()
 
@@ -182,6 +182,7 @@ function createCube() {
 function render() {
   requestAnimationFrame(render)
   renderer.render(scene, camera)
+  controls.update()
 }
 onMounted(async () => {
   const dom = cubeElement.value!
