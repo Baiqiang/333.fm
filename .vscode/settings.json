@@ -65,10 +65,8 @@
   "i18n-ally.parsers.typescript.compilerOptions": {
     "moduleResolution": "node"
   },
-  "i18n-ally.displayLanguage": "zh-CN",
   "i18n-ally.keystyle": "nested",
   "i18n-ally.localesPaths": [
     "messages"
   ],
-  "i18n-ally.sourceLanguage": "zh-CN"
 }
