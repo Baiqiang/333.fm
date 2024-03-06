@@ -61,8 +61,12 @@
     "jsonc",
     "yaml"
   ],
+  "i18n-ally.enabledParsers": ["ts", "yaml"],
+  "i18n-ally.parsers.typescript.compilerOptions": {
+    "moduleResolution": "node"
+  },
   "i18n-ally.keystyle": "nested",
   "i18n-ally.localesPaths": [
     "messages"
-  ]
+  ],
 }
