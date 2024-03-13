@@ -33,6 +33,13 @@ export default {
     },
     spoiler: '将剧透{for}，点击查看。',
     backTo: '返回{to}',
+    insertions: {
+      mode: {
+        normal: '正序',
+        inverse: '逆序',
+        both: '双向',
+      },
+    },
   },
   error: {
     400: '错误请求',
@@ -344,5 +351,19 @@ export default {
     best: '单次',
     mean: '平均',
     solves: '成绩',
+  },
+  chain: {
+    title: '最少步链',
+    shortTitle: '链',
+    description: '最少步链是一个全新的玩法，每个人在之前的基础上提交一个不同的局部解法，可以是EO、DR、HTR或者L3E之类的。每个解法链接在上一个解法上，最终所有的解法将会变成一颗最少步树。',
+    rules: [
+      '只能提交不同的解法；',
+      '每个解法应该让魔方离复原态更近；',
+      '在某些阶段中最后一步是顺时针或者逆时针计为两种不同的解法，如 EO、DR或者HTR；',
+      '逆序解法只能放在“()”或者“^()”里，不允许使用“NISS”。',
+    ],
+    continue: '续接',
+    tip: '点击打乱或者各阶段解法可以返回对应阶段。',
+    bestResult: '最佳成绩',
   },
 }

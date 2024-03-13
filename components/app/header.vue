@@ -16,6 +16,10 @@ const navs = computed(() => [
     title: 'endless.title',
     path: '/endless',
   },
+  {
+    title: 'chain.title',
+    path: '/chain',
+  },
 ])
 const user = useUser()
 const showUserMenu = ref(false)

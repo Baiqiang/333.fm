@@ -5,9 +5,12 @@ const props = withDefaults(defineProps<{
   submissions?: Submission[]
   filterable?: boolean
   sortable?: boolean
+  chain?: boolean
+  chainedSkeleton?: string
 }>(), {
   filterable: false,
   sortable: false,
+  chain: false,
 })
 const mode = ref<CompetitionMode | null>(null)
 const sortBy = ref<string>('moves')
@@ -22,9 +25,14 @@ const filteredSortedSubmissions = computed(() => {
     return filteredSubmissions.value
   switch (sortBy.value) {
     case 'moves':
-      return filteredSubmissions.value.sort((a, b) => a.moves - b.moves)
+      return filteredSubmissions.value.slice().sort((a, b) => {
+        const tmp = a.cumulativeMoves - b.cumulativeMoves
+        if (tmp !== 0)
+          return tmp
+        return a.moves - b.moves
+      })
     case 'createdAt':
-      return filteredSubmissions.value.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      return filteredSubmissions.value.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     default:
       return filteredSubmissions.value
   }
@@ -80,6 +88,8 @@ const counts = computed(() => {
         v-for="submission in filteredSortedSubmissions"
         :key="submission.id"
         :submission="submission"
+        :chain="chain"
+        :chained-skeleton="chainedSkeleton"
       />
     </div>
   </div>

@@ -33,6 +33,13 @@ export default {
     },
     spoiler: 'Spoiler for {for}. Click to see.',
     backTo: 'Back to {to}',
+    insertions: {
+      mode: {
+        normal: 'Normal',
+        inverse: 'Inverse',
+        both: 'Both',
+      },
+    },
   },
   error: {
     400: 'Bad Request',
@@ -344,5 +351,19 @@ export default {
     best: 'Best',
     mean: 'Mean',
     solves: 'Solves',
+  },
+  chain: {
+    title: 'FMC Chain',
+    shortTitle: 'Chain',
+    description: 'FMC Chain is a new event that everyone can submit a partial solution to continue the previous one. You can submit in different phases like EO, DR, L3E, L3C3E, etc. A solution is chained by the previous one. Finally all solutions make a big tree for the given scramble.',
+    rules: [
+      'Only different solutions can be submitted.',
+      'Each solution should let the cube be more closer to solved.',
+      'In some phases like EO, DR and HTR, it counts as 2 different solutions if the last move is clockwise or not.',
+      'Inverse moves are allowed and must be marked with "()" or "^()". "NISS" is not allowed for not mixing with "()".',
+    ],
+    continue: 'Continue',
+    tip: 'Click on the scramble or each phase to get back to the corresponding phase.',
+    bestResults: 'Best Results',
   },
 }

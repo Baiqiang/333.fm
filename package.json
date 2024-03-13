@@ -7,15 +7,19 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "insertionfinder": "^0.4.2",
-    "three": "^0.161.0",
-    "two.js": "^0.8.12"
+    "insertionfinder": "^0.5.0",
+    "three": "^0.162.0",
+    "two.js": "^0.8.13",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.6.4",
+    "@antfu/eslint-config": "^2.8.1",
     "@freeloop/nuxt-transitions": "^0.1.7",
     "@nuxt/devtools": "latest",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
@@ -26,19 +30,19 @@
     "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
     "@pinia/nuxt": "^0.5.1",
     "@tailwindcss/forms": "^0.5.7",
-    "@types/three": "^0.161.2",
+    "@types/three": "^0.162.0",
     "@vite-pwa/assets-generator": "^0.2.4",
-    "@vite-pwa/nuxt": "^0.5.0",
-    "@vueuse/core": "^10.8.0",
-    "@vueuse/nuxt": "^10.8.0",
+    "@vite-pwa/nuxt": "^0.6.0",
+    "@vueuse/core": "^10.9.0",
+    "@vueuse/nuxt": "^10.9.0",
     "dayjs-nuxt": "^2.1.9",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "less": "^4.2.0",
-    "nuxt": "^3.10.1",
-    "nuxt-gtag": "^1.2.0",
-    "nuxt-icon": "^0.6.8",
+    "nuxt": "^3.10.3",
+    "nuxt-gtag": "^2.0.5",
+    "nuxt-icon": "^0.6.9",
     "pinia": "^2.1.7",
     "postcss-html": "^1.6.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.2"
   }
 }

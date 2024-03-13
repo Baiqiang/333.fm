@@ -5,5 +5,13 @@ export default antfu({
     'no-console': 'off',
     'no-alert': 'off',
     'n/prefer-global/process': 'off',
+    'vue/max-attributes-per-line': ['error', {
+      singleline: {
+        max: 6,
+      },
+      multiline: {
+        max: 1,
+      },
+    }],
   },
 })

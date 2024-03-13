@@ -33,7 +33,7 @@ const formattedSkeletonLength = computed<number>(() => {
 
   try {
     const alg = new Algorithm(removeComment(form.skeleton))
-    return alg.twists.length + alg.inverseTwists.length
+    return alg.length
   }
   catch (e) {
     return 0

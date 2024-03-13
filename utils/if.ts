@@ -1,3 +1,4 @@
+import type { Cube } from 'insertionfinder'
 import { Algorithm } from 'insertionfinder'
 
 export enum IFType {
@@ -136,7 +137,7 @@ export const emojis = [
 ]
 
 export function calcMarks(...algs: (string | string[])[]): MARKS[] {
-  return new Algorithm(algs.map(alg => Array.isArray(alg) ? alg.join('') : alg).join('')).cancelMoves() as MARKS[]
+  return new Algorithm(algs.map(alg => Array.isArray(alg) ? alg.join('') : alg).join('')).cancelMoves()[0] as MARKS[]
 }
 
 export function applyMarks(algs: string[][], marks: MARKS[]) {
@@ -287,4 +288,12 @@ export function formatCycleDetail(cycleDetail: CycleDetail): string {
     detail.push(`${cycle.length}X`)
   })
   return detail.join('')
+}
+
+export function getCubieCube(cube: Cube) {
+  return {
+    corners: cube.getRawCorners(),
+    edges: cube.getRawEdges(),
+    placement: cube.placement,
+  }
 }

@@ -5,7 +5,7 @@ import type { Group } from 'two.js/src/group'
 import type { Rectangle } from 'two.js/src/shapes/rectangle'
 
 const props = defineProps<{
-  moves: string
+  moves?: string
   cubieCube?: {
     corners: number[]
     edges: number[]
@@ -21,7 +21,7 @@ const facelet = computed(() => {
     return Cube.fromCubieCube(props.cubieCube.corners, props.cubieCube.edges, props.cubieCube.placement).toFaceletString()
   try {
     const cube = new Cube()
-    cube.twist(new Algorithm(removeComment(props.moves)))
+    cube.twist(new Algorithm(removeComment(props.moves || '')))
     if (props.best) {
       // cube = cube.getBestPlacement()
     }
@@ -82,6 +82,8 @@ function init() {
   window.addEventListener('resize', setSize)
 }
 watch(facelet, () => {
+  if (!group || group.children.length < facelet.value.length)
+    return
   for (let i = 0; i < facelet.value.length; i++) {
     const rect = group.children[i] as Rectangle
     rect.fill = bgs[facelet.value[i] as keyof typeof bgs]

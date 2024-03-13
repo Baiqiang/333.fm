@@ -4,15 +4,20 @@ const props = defineProps<{
 }>()
 const { competition, scramble } = toRefs(props.submission)
 const competitionLink = computed(() => {
-  const { competition, scramble } = props.submission
+  const submission = props.submission
+  const { competition, scramble } = submission
   switch (competition.type) {
     case CompetitionType.WEEKLY:
       return `/weekly/${competition.alias}#scramble-${scramble.number}`
     case CompetitionType.ENDLESS:
-      if (!props.submission.hideSolution)
+      if (!submission.hideSolution)
         return `/endless/${competition.alias}/${scramble.number}`
 
       return `/endless/${competition.alias}`
+    case CompetitionType.FMC_CHAIN:
+      if (submission.parentId === null)
+        return `/chain/${scramble.number}`
+      return `/chain/${scramble.number}/${submission.parentId}`
     default:
       return `/competition/${competition.alias}`
   }

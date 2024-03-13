@@ -42,12 +42,25 @@ export interface Scramble extends Time {
     placement: number
   }
 }
+export enum SubmissionPhase {
+  FINISHED,
+  SCRAMBLED,
+  EO,
+  DR,
+  HTR,
+  SKELETON,
+  INSERTIONS,
+}
 
 export interface Submission extends Time {
   id: number
   solution: string
+  insertions: ChainInsertion[]
+  inverse: boolean
   comment: string
   moves: number
+  cancelMoves: number
+  cumulativeMoves: number
   scramble: Scramble
   competition: Competition
   user: User
@@ -57,12 +70,17 @@ export interface Submission extends Time {
   liked: boolean
   favorites: number
   favorited: boolean
+
+  phase: SubmissionPhase
+  parentId: number | null
+  parent: Submission | null
 }
 
 export enum CompetitionType {
   WEEKLY,
   RANDOM,
   ENDLESS,
+  FMC_CHAIN,
 }
 
 export enum CompetitionSubType {

@@ -38,6 +38,9 @@ const filters = computed(() => {
       case CompetitionType.ENDLESS:
         label = t('endless.title')
         break
+      case CompetitionType.FMC_CHAIN:
+        label = t('chain.title')
+        break
     }
     filters.push({
       to: {

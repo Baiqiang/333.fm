@@ -60,7 +60,14 @@ await fetchData()
       {{ $t('user.if') }}
     </h1>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 sm:gap-x-2 md:gap-x-3">
-      <IfSummary v-for="userIF in userIFs" :key="userIF.hash" :finder="userIF" editable @remove="remove" @edit="edit" />
+      <IfSummary
+        v-for="userIF in userIFs"
+        :key="userIF.hash"
+        :finder="userIF"
+        editable
+        @remove="remove"
+        @edit="edit"
+      />
     </div>
     <Pagination :meta="meta" @update="fetchData" />
   </div>
@@ -86,7 +93,8 @@ await fetchData()
           {{ $t('if.name.description') }}
         </p>
         <input
-          v-model="name" class="w-full"
+          v-model="name"
+          class="w-full"
         >
       </div>
       <div class="flex gap-2 justify-end">

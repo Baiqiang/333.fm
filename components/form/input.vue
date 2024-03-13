@@ -1,7 +1,5 @@
-import { FormLabel } from '#build/components';
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  modelValue?: string | number
   type?: string
   label?: string
   description?: string
@@ -14,15 +12,7 @@ const props = withDefaults(defineProps<{
   label: '',
   rows: 4,
 })
-const emit = defineEmits(['update:modelValue'])
-const value = computed<string | number>({
-  get() {
-    return props.modelValue!
-  },
-  set(value: string | number) {
-    emit('update:modelValue', value)
-  },
-})
+const value = defineModel<string | number>()
 const inputClass = computed<string>(() => {
   let className = 'block w-full shadow-sm focus:ring-2 focus:ring-opacity-50 '
   if (props.state === null)
@@ -38,7 +28,7 @@ const inputClass = computed<string>(() => {
 </script>
 
 <template>
-  <FormLabel :label="label" class="form-label">
+  <FormLabel :label="label">
     <select v-if="type === 'select'" v-model="value" v-bind="attrs" :class="inputClass">
       <option
         v-for="option in options"
@@ -71,9 +61,3 @@ const inputClass = computed<string>(() => {
     </div>
   </FormLabel>
 </template>
-
-<style>
-.form-label a {
-  @apply text-blue-500;
-}
-</style>

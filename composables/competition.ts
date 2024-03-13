@@ -35,7 +35,7 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
     if (!isSolved.value || !solutionAlg.value)
       return DNF
     try {
-      const moves = solutionAlg.value.twists.length + solutionAlg.value.inverseTwists.length
+      const moves = solutionAlg.value.length
       if (moves > 80)
         return DNF
       return moves
