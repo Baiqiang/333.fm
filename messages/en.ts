@@ -360,7 +360,7 @@ export default {
     rules: [
       'Only different solutions can be submitted.',
       'Each solution should let the cube be more closer to solved.',
-      'In some phases like EO, DR and HTR, it counts as 2 different solutions if the last move is clockwise or not.',
+      'In some phases like EO, DR and HTR, the last move must be clockwise. No meaningless half-turns are allowed.',
       'Inverse moves are allowed and must be marked with "()" or "^()". "NISS" is not allowed for not mixing with "()".',
     ],
     continue: 'Continue',
