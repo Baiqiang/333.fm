@@ -148,7 +148,7 @@ export function getPhase(cube: Cube) {
   // check if skeleton is LxEyC
   const cornerCycles = bestCube.getCornerCycles()
   const edgeCycles = bestCube.getEdgeCycles()
-  if (cornerCycles + edgeCycles <= 3)
+  if (cornerCycles + edgeCycles <= 3 && !bestCube.hasParity())
     phase = SubmissionPhase.SKELETON
 
   return phase

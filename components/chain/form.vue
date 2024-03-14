@@ -45,7 +45,10 @@ const solutionState = computed<boolean | null>(() => {
     case SubmissionPhase.DR:
     case SubmissionPhase.HTR:
     case SubmissionPhase.SKELETON:
-      if (props.tree && phase.value <= props.tree.phase)
+      if (props.tree
+        && (phase.value <= props.tree.phase || props.tree.phase === SubmissionPhase.FINISHED)
+        && !(phase.value === SubmissionPhase.HTR && props.tree.phase === SubmissionPhase.SKELETON)
+      )
         return false
       if (phase.value !== SubmissionPhase.SKELETON && !checkLastQuarterTurns(solutionAlg.value?.twists ?? [], solutionAlg.value?.inverseTwists ?? []))
         return false
