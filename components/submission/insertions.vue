@@ -9,7 +9,6 @@ const props = defineProps<{
 const insertionStatus = computed(() => props.insertions.map((insertion: ChainInsertion) => {
   const cube = new Cube()
   cube.twist(new Algorithm(props.scramble?.scramble ?? ''))
-  console.log(props.scramble)
   try {
     const nextSkeleton = getNextSkeleton(insertion)
     const nextAlg = new Algorithm(nextSkeleton)

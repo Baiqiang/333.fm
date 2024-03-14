@@ -74,6 +74,7 @@ export interface Submission extends Time {
   phase: SubmissionPhase
   parentId: number | null
   parent: Submission | null
+  childrenLength: number
 }
 
 export enum CompetitionType {

@@ -85,7 +85,10 @@ const to = computed(() => isChain.value && props.submission.phase !== Submission
           <Sequence :sequence="submission.comment" class="bg-gray-200" />
         </div>
       </TransitionExpand>
-      <NuxtLink v-if="to" :to="to" class="text-sm bg-indigo-500 text-white px-2 py-1 mt-1">
+      <NuxtLink v-if="to" :to="to" class="text-sm bg-indigo-500 text-white px-2 py-1 mt-1 flex-inline items-center">
+        <span v-if="submission.childrenLength > 0">
+          ({{ submission.childrenLength }})
+        </span>
         {{ $t('chain.continue') }} <Icon name="ic:round-keyboard-double-arrow-right" />
       </NuxtLink>
       <SubmissionMeta :submission="submission" />

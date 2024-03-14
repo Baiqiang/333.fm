@@ -54,7 +54,7 @@ const isInsertion = computed(() => (props.submission?.phase ?? props.phase) === 
 
 <template>
   <div>
-    <NuxtLink :to="to">
+    <NuxtLink v-if="to" :to="to">
       <div v-if="!isInsertion" class="flex gap-x-1 flex-wrap">
         <Sequence :sequence="(submission?.solution ?? solution ?? '').replaceAll(/\s+/g, ' ') + phaseHTML" html />
       </div>
@@ -65,5 +65,16 @@ const isInsertion = computed(() => (props.submission?.phase ?? props.phase) === 
         :inverse="submission!.inverse"
       />
     </NuxtLink>
+    <template v-else>
+      <div v-if="!isInsertion" class="flex gap-x-1 flex-wrap">
+        <Sequence :sequence="(submission?.solution ?? solution ?? '').replaceAll(/\s+/g, ' ') + phaseHTML" html />
+      </div>
+      <SubmissionInsertions
+        v-else
+        :insertions="submission!.insertions"
+        :scramble="scramble ?? submission!.scramble"
+        :inverse="submission!.inverse"
+      />
+    </template>
   </div>
 </template>
