@@ -43,7 +43,7 @@ async function fetchTop10() {
 useSeoMeta({
   title: `${t('weekly.scramble', { number: params.number })} - ${t('chain.title')}`,
 })
-useIntervalFn(fetchData, 5000)
+useIntervalFn(fetchSubmissions, 5000)
 bus.on(fetchSubmissions)
 </script>
 
@@ -75,7 +75,5 @@ bus.on(fetchSubmissions)
     <CubeExpanded :moves="scramble.scramble + flatSkeleton" />
     <ChainForm :scramble="scramble" :tree="tree" @submitted="fetchSubmissions" />
     <Submissions :submissions="submissions" sortable chain :chained-skeleton="scramble.scramble + flatSkeleton" />
-    <hr class="my-2">
-    <ChainTop :submissions="top10" :scramble="scramble" />
   </div>
 </template>
