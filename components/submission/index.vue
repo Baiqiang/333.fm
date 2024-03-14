@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { Algorithm, Cube } from 'insertionfinder'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   submission: Submission
   chain?: boolean
   chainedSkeleton?: string
-}>()
+}>(), {
+  chain: false,
+  chainedSkeleton: '',
+})
 const route = useRoute()
 const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(!!props.chain)
@@ -22,10 +25,7 @@ const solution = computed(() => {
 })
 const status = computed(() => {
   const cube = new Cube()
-  if (props.chainedSkeleton)
-    cube.twist(new Algorithm(props.chainedSkeleton))
-
-  cube.twist(new Algorithm(props.submission.solution))
+  cube.twist(new Algorithm(props.chainedSkeleton + props.submission.solution))
   return getStatus(cube, props.submission.phase)
 })
 const isChain = computed(() => props.chain || props.submission.competition?.type === CompetitionType.FMC_CHAIN)
