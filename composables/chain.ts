@@ -49,16 +49,20 @@ export function useComputedPhases(
   })
   const solutionAlg = computed(() => {
     try {
+      let alg: Algorithm
       if (!isInsertion.value) {
-        return new Algorithm(form.solution)
+        alg = new Algorithm(form.solution)
       }
       else {
         let skeleton = nextSkeleton.value
         if (form.inverse)
           skeleton = reverseTwists(skeleton)
 
-        return new Algorithm(skeleton)
+        alg = new Algorithm(skeleton)
       }
+      alg.normalize()
+      alg.cancelMoves()
+      return alg
     }
     catch (e) {
       return null
