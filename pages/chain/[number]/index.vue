@@ -61,7 +61,7 @@ bus.on(fetchSubmissions)
       {{ $t('if.scramble.label') }}
     </div>
     <NuxtLink :to="`/chain/${scramble.number}`">
-      <Sequence :sequence="scramble.scramble" />
+      <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
     </NuxtLink>
     <div v-if="tree" class="my-2">
       <ChainPhase
@@ -71,6 +71,9 @@ bus.on(fetchSubmissions)
         comment
         link
       />
+      <div class="italic text-sm mt-1">
+        * {{ $t('chain.tip') }}
+      </div>
     </div>
     <CubeExpanded :moves="scramble.scramble + flatSkeleton" />
     <ChainForm :scramble="scramble" :tree="tree" @submitted="fetchSubmissions" />

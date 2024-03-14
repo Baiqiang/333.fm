@@ -26,20 +26,35 @@ export function useComputedPhases(
   props: { scramble: Scramble, tree: Submission | null },
   form: { solution: string, mode: SolutionMode, insertions: ChainInsertion[], inverse: boolean },
 ) {
-  const skeleton = computed(() => flattenSkeleton(props.tree))
+  const parentSkeleton = computed(() => flattenSkeleton(props.tree))
+  const parentSkeletonAlg = computed(() => {
+    const alg = new Algorithm(parentSkeleton.value)
+    alg.cancelMoves()
+    return alg
+  })
+  const isInsertion = computed(() => form.mode === SolutionMode.INSERTIONS)
+  const nextSkeleton = computed(() => isInsertion.value ? getNextSkeleton(form.insertions[form.insertions.length - 1], true) : '')
+  const skeleton = computed(() => {
+    if (!isInsertion.value) {
+      return parentSkeleton.value + form.solution
+    }
+    else {
+      const alg = new Algorithm(nextSkeleton.value)
+      alg.cancelMoves()
+      return alg.toString()
+    }
+  })
   const solutionAlg = computed(() => {
     try {
-      if (form.mode === SolutionMode.REGULAR) {
+      if (!isInsertion.value) {
         return new Algorithm(form.solution)
       }
       else {
-        const insertions = form.insertions
-        const lastInsertion = insertions[insertions.length - 1]
-        let nextSkeleton = getNextSkeleton(lastInsertion, true)
+        let skeleton = nextSkeleton.value
         if (form.inverse)
-          nextSkeleton = reverseTwists(nextSkeleton)
+          skeleton = reverseTwists(skeleton)
 
-        return new Algorithm(nextSkeleton)
+        return new Algorithm(skeleton)
       }
     }
     catch (e) {
@@ -47,23 +62,24 @@ export function useComputedPhases(
     }
   })
   const skeletonAlg = computed(() => {
-    const alg = new Algorithm(skeleton.value)
-    alg.cancelMoves()
-    return alg
+    try {
+      const alg = new Algorithm(skeleton.value)
+      alg.cancelMoves()
+      return alg
+    }
+    catch (e) {
+      return new Algorithm('')
+    }
   })
   const cube = computed(() => {
     const cube = new Cube()
     cube.twist(new Algorithm(props.scramble.scramble))
-    if (form.mode === SolutionMode.REGULAR)
-      cube.twist(skeletonAlg.value)
-    if (solutionAlg.value)
-      cube.twist(solutionAlg.value)
-
+    cube.twist(skeletonAlg.value)
     return cube
   })
   const phase = computed(() => getPhase(cube.value))
   const moves = computed(() => {
-    if (form.mode === SolutionMode.REGULAR) {
+    if (!isInsertion.value) {
       return countMoves(form.solution)
     }
     else {
@@ -76,27 +92,27 @@ export function useComputedPhases(
       }
     }
   })
+  const cumulativeMoves = computed(() => {
+    if (!isInsertion.value)
+      return skeletonAlg.value.length * 100
+    else
+      return countMoves(solutionAlg.value?.toString() ?? '')
+  })
   const cancelMoves = computed(() => {
     if (!solutionAlg.value)
       return 0
-    if (form.mode === SolutionMode.REGULAR) {
-      const alg = new Algorithm(skeletonAlg.value.toString() + solutionAlg.value.toString())
-      const totalMoves = alg.length
-      alg.cancelMoves()
-      return (totalMoves - alg.length) * 100
+    if (!isInsertion.value) {
+      const totalMoves = moves.value + parentSkeletonAlg.value.length * 100
+      return totalMoves - skeletonAlg.value.length * 100
     }
     else {
-      const insertions = form.insertions
-      const skeletonLength = formatAlgorithmToArray(insertions[0].skeleton).length
-      return (skeletonLength - solutionAlg.value.length) * 100 + moves.value
+      return moves.value + parentSkeletonAlg.value.length * 100 - cumulativeMoves.value
     }
   })
-  const cumulativeMoves = computed(() => skeletonAlg.value.length * 100 + moves.value - cancelMoves.value)
   const status = computed(() => getStatus(cube.value, phase.value))
 
   return {
     cube,
-    skeleton,
     solutionAlg,
     phase,
     moves,
@@ -138,7 +154,7 @@ export function flattenSkeleton(submission: Submission | null): string {
     skeletons.unshift(parent.solution)
     parent = parent.parent
   }
-  return skeletons.join(' ')
+  return skeletons.join('\n')
 }
 
 export function flattenPhases(scramble: Scramble, submission: Submission | null) {
@@ -215,7 +231,11 @@ export function getStatus(cube: Cube, phase: SubmissionPhase): string {
   return ''
 }
 
-export function getNextSkeleton({ skeleton, insertPlace, insertion }: ChainInsertion, cancelMoves = false) {
+export function getNextSkeleton(chainInsertion: ChainInsertion, cancelMoves = false) {
+  if (!chainInsertion)
+    return ''
+
+  const { skeleton, insertPlace, insertion } = chainInsertion
   const twists = skeleton.split(' ')
   try {
     const alg = new Algorithm(`${twists.slice(0, insertPlace).join(' ')} ${insertion} ${twists.slice(insertPlace).join(' ')}`)

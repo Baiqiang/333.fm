@@ -32,7 +32,7 @@ const phaseString = computed(() => {
     str += `${str ? '-' : ''}${props.status}`
 
   if (props.moves) {
-    str += ` (${formatResult(props.moves)}`
+    str += `${str ? ' ' : ''}(${formatResult(props.moves)}`
     if (props.cancelMoves)
       str += `-${formatResult(props.cancelMoves)}`
 
