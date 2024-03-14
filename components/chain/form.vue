@@ -47,7 +47,8 @@ const solutionState = computed<boolean | null>(() => {
     case SubmissionPhase.SKELETON:
       if (props.tree && phase.value <= props.tree.phase)
         return false
-
+      if (phase.value !== SubmissionPhase.SKELETON && !checkLastQuarterTurns(solutionAlg.value?.twists ?? [], solutionAlg.value?.inverseTwists ?? []))
+        return false
       break
     case SubmissionPhase.FINISHED:
       break
