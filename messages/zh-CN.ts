@@ -30,6 +30,7 @@ export default {
       sumittedAt: '提交时间',
       fewest: '最少',
       latest: '最新',
+      mostContinuations: '最多续接',
     },
     spoiler: '将剧透{for}，点击查看。',
     backTo: '返回{to}',

@@ -30,6 +30,7 @@ export default {
       sumittedAt: 'Submitted At',
       fewest: 'Fewest',
       latest: 'Latest',
+      mostContinuations: 'Most Continuations',
     },
     spoiler: 'Spoiler for {for}. Click to see.',
     backTo: 'Back to {to}',
