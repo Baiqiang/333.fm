@@ -41,7 +41,10 @@ export function useComputedPhases(
     else {
       const alg = new Algorithm(nextSkeleton.value)
       alg.cancelMoves()
-      return alg.toString()
+      let skeleton = alg.toString()
+      if (form.inverse)
+        skeleton = reverseTwists(skeleton)
+      return skeleton
     }
   })
   const solutionAlg = computed(() => {
@@ -164,8 +167,6 @@ export function flattenPhases(scramble: Scramble, submission: Submission | null)
     submissions.unshift(parent)
     parent = parent.parent
   }
-  const cube = new Cube()
-  cube.twist(new Algorithm(scramble.scramble))
   const phases: {
     submission: Submission
     scramble: Scramble
@@ -181,9 +182,11 @@ export function flattenPhases(scramble: Scramble, submission: Submission | null)
   for (const submission of submissions) {
     skeleton += submission.solution
     const alg = new Algorithm(submission.solution)
-    cube.twist(alg)
     const moves = alg.length * 100
     const cumulativeAlg = new Algorithm(skeleton)
+    const cube = new Cube()
+    cube.twist(new Algorithm(scramble.scramble))
+    cube.twist(cumulativeAlg)
     cumulativeAlg.cancelMoves()
     cumulativeMoves += moves
     const cancelMoves = cumulativeMoves - cumulativeAlg.length * 100
