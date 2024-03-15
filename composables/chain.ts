@@ -191,7 +191,10 @@ export function flattenPhases(scramble: Scramble, submission: Submission | null)
     const cube = new Cube()
     cube.twist(new Algorithm(scramble.scramble))
     cube.twist(cumulativeAlg)
-    cumulativeAlg.cancelMoves()
+    if (submission.phase === SubmissionPhase.SKELETON)
+      cumulativeAlg.clearFlags()
+    else
+      cumulativeAlg.cancelMoves()
     cumulativeMoves += moves
     const cancelMoves = cumulativeMoves - cumulativeAlg.length * 100
     cumulativeMoves -= cancelMoves

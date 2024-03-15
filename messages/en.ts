@@ -224,6 +224,8 @@ export default {
     cancel: 'Cancel',
     remove: 'Remove',
     removeConfirm: 'Are you sure to remove this?',
+    decline: 'Decline',
+    incline: 'Incline',
   },
   weekly: {
     title: 'Weekly Competition',
@@ -370,5 +372,12 @@ export default {
     tip: 'Click on the scramble or each phase to get back to the corresponding phase.',
     bestResults: 'Best Results',
     duplicate: 'This solution has been submitted by someone else.',
+    status: {
+      yet: 'Yet Started',
+      declined: 'Declined',
+      viewed: 'Viewed',
+      latest: 'My Latest Submission',
+      notification: 'New Submission',
+    },
   },
 }

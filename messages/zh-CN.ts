@@ -224,6 +224,8 @@ export default {
     cancel: '取消',
     remove: '删除',
     removeConfirm: '确认要删除这条记录吗？',
+    decline: '弃疗',
+    incline: '不放弃',
   },
   weekly: {
     title: '周赛',
@@ -370,5 +372,12 @@ export default {
     tip: '点击打乱或者各阶段解法可以返回对应阶段。',
     bestResults: '最佳成绩',
     duplicate: '该解法已有人提交',
+    status: {
+      yet: '还没看',
+      declined: '弃疗',
+      viewed: '已看',
+      latest: '最新提交',
+      notification: '有新提交',
+    },
   },
 }

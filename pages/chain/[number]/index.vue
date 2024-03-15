@@ -15,14 +15,21 @@ const tree = ref<Submission | null>(data.value.tree)
 if (tree.value && tree.value.phase === SubmissionPhase.INSERTIONS)
   router.push(`/chain/${scramble.value.number}/${tree.value.parentId}`)
 
-const top10 = ref<Submission[]>([])
 const submissions = ref<Submission[]>([])
 const phases = computed(() => flattenPhases(scramble.value, tree.value))
 const flatSkeleton = flattenSkeleton(tree.value)
 await fetchData()
 async function fetchData() {
   fetchSubmissions()
-  fetchTop10()
+  fetchTree()
+}
+async function fetchTree() {
+  const { data, refresh } = await useApi<{ scramble: Scramble, tree: Submission | null }>(`${apiPath.value}`, {
+    immediate: false,
+  })
+  await refresh()
+  if (data.value)
+    tree.value = data.value.tree
 }
 async function fetchSubmissions() {
   const { data, refresh } = await useApi<Submission[]>(`${apiPath.value}/submissions`, {
@@ -32,19 +39,11 @@ async function fetchSubmissions() {
   if (data.value)
     submissions.value = data.value
 }
-async function fetchTop10() {
-  const { data, refresh } = await useApi<Submission[]>(`/chain/${params.number}/top10`, {
-    immediate: false,
-  })
-  await refresh()
-  if (data.value)
-    top10.value = data.value
-}
 useSeoMeta({
   title: `${t('weekly.scramble', { number: params.number })} - ${t('chain.title')}`,
 })
 useIntervalFn(fetchSubmissions, 5000)
-bus.on(fetchSubmissions)
+bus.on(fetchData)
 </script>
 
 <template>
@@ -77,6 +76,20 @@ bus.on(fetchSubmissions)
     </div>
     <CubeExpanded :moves="scramble.scramble + flatSkeleton" />
     <ChainForm :scramble="scramble" :tree="tree" :submissions="submissions" @submitted="fetchSubmissions" />
-    <Submissions :submissions="submissions" sortable chain :chained-skeleton="scramble.scramble + flatSkeleton" />
+    <div class="flex gap-1 flex-wrap text-xs text-white mt-2">
+      <div class="bg-blue-500 px-2 py-1">
+        {{ $t('chain.status.yet') }}
+      </div>
+      <div class="bg-green-500 px-2 py-1">
+        {{ $t('chain.status.latest') }}
+      </div>
+      <div class="bg-yellow-500 px-2 py-1">
+        {{ $t('chain.status.declined') }}
+      </div>
+      <div class="bg-gray-500 px-2 py-1">
+        {{ $t('chain.status.viewed') }}
+      </div>
+    </div>
+    <Submissions class="mt-2" :submissions="submissions" sortable chain :chained-skeleton="scramble.scramble + flatSkeleton" />
   </div>
 </template>

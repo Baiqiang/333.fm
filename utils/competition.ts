@@ -71,6 +71,11 @@ export interface Submission extends Time {
   favorites: number
   favorited: boolean
 
+  viewed: boolean
+  declined: boolean
+  notification: boolean
+  latestSubmitted: boolean
+
   phase: SubmissionPhase
   parentId: number | null
   parent: Submission | null

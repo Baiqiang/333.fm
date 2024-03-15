@@ -9,6 +9,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   submitted: [Submission]
 }>()
+const bus = useEventBus('submission')
 const form = reactive({
   mode: SolutionMode.REGULAR,
   solution: '',
@@ -32,8 +33,9 @@ const localForm = useLocalStorage<{
     insertions: [],
   },
 )
-const canInsert = computed(() => props.tree && [SubmissionPhase.FINISHED, SubmissionPhase.SKELETON].includes(props.tree.phase))
 const { phase, moves, cumulativeMoves, cancelMoves, cube, status, solutionAlg } = useComputedPhases(props, form)
+const loading = ref(false)
+const canInsert = computed(() => props.tree && [SubmissionPhase.FINISHED, SubmissionPhase.SKELETON].includes(props.tree.phase))
 const solutionState = computed<boolean | null>(() => {
   if (form.solution.length === 0 && form.insertions.length === 0)
     return null
@@ -65,9 +67,8 @@ const duplicate = computed<boolean>(() => {
   return props.submissions.some(submission => submission.solution === solutionAlg.value?.toString())
 })
 const formState = computed<boolean>(() => {
-  return solutionState.value === true && !duplicate.value
+  return solutionState.value === true && !duplicate.value && !loading.value
 })
-const loading = ref(false)
 onMounted(() => {
   const localValue = localForm.value
   form.mode = localValue.mode
@@ -103,8 +104,11 @@ async function submit() {
     await refresh()
     if (error.value)
       alert(error.value.data?.message || error.value.message)
-    if (data.value)
+    if (data.value) {
+      form.solution = ''
+      form.comment = ''
       emit('submitted', data.value)
+    }
   }
   catch (e: any) {
     if (e.response && e.response.data && e.response.data.message)
@@ -119,6 +123,30 @@ async function submit() {
 function reset() {
   form.solution = ''
   form.comment = ''
+}
+async function decline() {
+  if (!props.tree)
+    return
+
+  loading.value = true
+  try {
+    const { data, error } = await useApiPost<{ like: boolean, favorite: boolean }>('/user/act', {
+      body: {
+        id: props.tree.id,
+        decline: !props.tree.declined,
+      },
+    })
+    if (error.value || !data.value)
+      return
+
+    bus.emit()
+  }
+  catch (e) {
+
+  }
+  finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -194,7 +222,7 @@ function reset() {
           <p class="py-1" v-html="$t('weekly.comment.description')" />
         </template>
       </FormInput>
-      <div class="mt-4">
+      <div class="mt-4 flex gap-2">
         <button
           class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
           :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }"
@@ -206,8 +234,18 @@ function reset() {
             {{ $t('form.submit') }}
           </template>
         </button>
-        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none ml-2" @click.prevent="reset">
+        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none" @click.prevent="reset">
           {{ $t('form.reset') }}
+        </button>
+        <button
+          v-if="tree"
+          class="px-2 py-1 text-white bg-yellow-500 focus:outline-none"
+          @click.prevent="decline"
+        >
+          <Spinner v-if="loading" class="w-4 h-4 text-white border-[3px]" />
+          <template v-else>
+            {{ tree.declined ? $t('form.incline') : $t('form.decline') }}
+          </template>
         </button>
       </div>
     </form>
