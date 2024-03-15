@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{
   chain: false,
 })
 const mode = ref<CompetitionMode | null>(null)
-const sortBy = ref<string>(props.chain ? 'childrenLength' : 'moves')
+const sortBy = ref<string>(props.chain ? 'continuations' : 'moves')
 const filteredSubmissions = computed(() => {
   if (!props.filterable || mode.value === null)
     return props.submissions || []
@@ -24,9 +24,9 @@ const filteredSortedSubmissions = computed(() => {
   if (!props.sortable)
     return filteredSubmissions.value
   switch (sortBy.value) {
-    case 'childrenLength':
+    case 'continuations':
       return filteredSubmissions.value.slice().sort((a, b) => {
-        let tmp = b.childrenLength - a.childrenLength
+        let tmp = b.continuations - a.continuations
         if (tmp === 0)
           tmp = a.cumulativeMoves - b.cumulativeMoves
         if (tmp === 0)
@@ -83,7 +83,7 @@ const counts = computed(() => {
           {{ $t('common.sortBy.label') }}
         </div>
         <select v-model="sortBy">
-          <option v-if="chain" value="childrenLength">
+          <option v-if="chain" value="continuations">
             {{ $t('common.sortBy.mostContinuations') }}
           </option>
           <option value="moves">

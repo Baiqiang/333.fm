@@ -4,6 +4,7 @@ import { type ChainInsertion, SolutionMode } from '#imports'
 const props = defineProps<{
   scramble: Scramble
   tree: Submission | null
+  submissions: Submission[]
 }>()
 const emit = defineEmits<{
   submitted: [Submission]
@@ -58,8 +59,13 @@ const solutionState = computed<boolean | null>(() => {
   }
   return true
 })
+const duplicate = computed<boolean>(() => {
+  if (form.solution.length === 0)
+    return false
+  return props.submissions.some(submission => submission.solution === solutionAlg.value?.toString())
+})
 const formState = computed<boolean>(() => {
-  return solutionState.value === true
+  return solutionState.value === true && !duplicate.value
 })
 const loading = ref(false)
 onMounted(() => {
@@ -144,6 +150,9 @@ function reset() {
         <template #description>
           <div v-if="!solutionAlg" class="text-red-500">
             {{ $t('if.skeleton.invalid') }}
+          </div>
+          <div v-else-if="duplicate" class="text-yellow-500">
+            {{ $t('chain.duplicate') }}
           </div>
           <ChainPhase
             v-else

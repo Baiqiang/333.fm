@@ -76,7 +76,7 @@ bus.on(fetchSubmissions)
       </div>
     </div>
     <CubeExpanded :moves="scramble.scramble + flatSkeleton" />
-    <ChainForm :scramble="scramble" :tree="tree" @submitted="fetchSubmissions" />
+    <ChainForm :scramble="scramble" :tree="tree" :submissions="submissions" @submitted="fetchSubmissions" />
     <Submissions :submissions="submissions" sortable chain :chained-skeleton="scramble.scramble + flatSkeleton" />
   </div>
 </template>

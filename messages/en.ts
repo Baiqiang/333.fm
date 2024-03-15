@@ -364,7 +364,11 @@ export default {
       'Inverse moves are allowed and must be marked with "()" or "^()". "NISS" is not allowed for not mixing with "()".',
     ],
     continue: 'Continue',
+    continuances: '{n} Continuance | {n} Continuances',
+    finishes: '{n} Finish | {n} Finishes',
+    best: 'Best',
     tip: 'Click on the scramble or each phase to get back to the corresponding phase.',
     bestResults: 'Best Results',
+    duplicate: 'This solution has been submitted by someone else.',
   },
 }

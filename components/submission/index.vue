@@ -9,7 +9,6 @@ const props = withDefaults(defineProps<{
   chain: false,
   chainedSkeleton: '',
 })
-const route = useRoute()
 const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(!!props.chain)
 const solution = computed(() => {
@@ -29,9 +28,6 @@ const status = computed(() => {
   return getStatus(cube, props.submission.phase)
 })
 const isChain = computed(() => props.chain || props.submission.competition?.type === CompetitionType.FMC_CHAIN)
-const to = computed(() => isChain.value && props.submission.phase !== SubmissionPhase.INSERTIONS
-  ? `/chain/${props.submission.scramble?.number ?? route.params.number}/${props.submission.id}`
-  : undefined)
 </script>
 
 <template>
@@ -85,12 +81,7 @@ const to = computed(() => isChain.value && props.submission.phase !== Submission
           <Sequence :sequence="submission.comment" class="bg-gray-200" />
         </div>
       </TransitionExpand>
-      <NuxtLink v-if="to" :to="to" class="text-sm bg-indigo-500 text-white px-2 py-1 mt-1 flex-inline items-center">
-        <span v-if="submission.childrenLength > 0">
-          ({{ submission.childrenLength }})
-        </span>
-        {{ $t('chain.continue') }} <Icon name="ic:round-keyboard-double-arrow-right" />
-      </NuxtLink>
+      <SubmissionChainInfo :submission="submission" />
       <SubmissionMeta :submission="submission" />
     </template>
     <div v-if="!submission.user" class="text-xs text-gray-400">

@@ -364,7 +364,11 @@ export default {
       '逆序解法只能放在“()”或者“^()”里，不允许使用“NISS”。',
     ],
     continue: '续接',
+    continuances: '{n} 个续接',
+    finishes: '{n} 个完整解法',
+    best: '最佳成绩',
     tip: '点击打乱或者各阶段解法可以返回对应阶段。',
-    bestResult: '最佳成绩',
+    bestResults: '最佳成绩',
+    duplicate: '该解法已有人提交',
   },
 }
