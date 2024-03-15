@@ -81,7 +81,7 @@ const isChain = computed(() => props.chain || props.submission.competition?.type
           <Sequence :sequence="submission.comment" class="bg-gray-200" />
         </div>
       </TransitionExpand>
-      <SubmissionChainInfo :submission="submission" />
+      <SubmissionChainInfo v-if="isChain" :submission="submission" />
       <SubmissionMeta :submission="submission" />
     </template>
     <div v-if="!submission.user" class="text-xs text-gray-400">
