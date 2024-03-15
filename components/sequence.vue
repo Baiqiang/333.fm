@@ -20,7 +20,7 @@ const { copy, copied } = useClipboard()
         v-else
         name="ion:ios-copy"
         class="cursor-pointer text-indigo-500"
-        @click="copy(source)"
+        @click.stop.prevent="copy(source)"
       />
     </div>
   </div>
