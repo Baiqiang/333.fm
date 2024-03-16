@@ -41,6 +41,8 @@ export default {
         both: 'Both',
       },
     },
+    total: 'Total',
+    result: 'Result',
   },
   error: {
     400: 'Bad Request',

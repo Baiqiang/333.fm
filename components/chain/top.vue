@@ -19,7 +19,7 @@ function getFinalSolution(submission: Submission) {
 </script>
 
 <template>
-  <div>
+  <div class="mt-4">
     <div class="font-bold">
       {{ $t('chain.bestResults') }}
     </div>
@@ -27,7 +27,13 @@ function getFinalSolution(submission: Submission) {
       <div class="text-sm">
         {{ $t('if.solutions.final') }}
       </div>
-      <Sequence :sequence="`${getFinalSolution(submission)} (${formatResult(submission.cumulativeMoves)})`" />
+      <Sequence :sequence="getFinalSolution(submission)" />
+      <div class="text-sm">
+        {{ $t('common.result') }}
+      </div>
+      <div>
+        {{ $t('common.moves', { moves: formatResult(submission.cumulativeMoves) }) }}
+      </div>
       <div class="text-sm mt-1">
         {{ $t('weekly.comment.label') }}
       </div>

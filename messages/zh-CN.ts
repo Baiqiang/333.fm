@@ -41,6 +41,8 @@ export default {
         both: '双向',
       },
     },
+    total: '总计',
+    result: '成绩',
   },
   error: {
     400: '错误请求',

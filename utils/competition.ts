@@ -132,6 +132,17 @@ export interface EndlessStats {
   [key: string]: any[]
 }
 
+export interface ChainStats {
+  competitors: string
+  total: number
+  phaseCount: {
+    phase: SubmissionPhase
+    count: number
+    competitors: string
+  }[]
+  top10: Submission[]
+}
+
 export interface Level {
   level: number
   competitors: number
