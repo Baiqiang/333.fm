@@ -36,6 +36,10 @@ async function fetchSubmissions() {
     immediate: false,
   })
   await refresh()
+  for (const submission of data.value || []) {
+    submission.scramble = scramble.value
+    submission.parent = tree.value
+  }
   if (data.value)
     submissions.value = data.value
 }
@@ -90,6 +94,6 @@ bus.on(fetchData)
         {{ $t('chain.status.viewed') }}
       </div>
     </div>
-    <Submissions class="mt-2" :submissions="submissions" sortable chain :chained-skeleton="scramble.scramble + flatSkeleton" />
+    <Submissions class="mt-2" :submissions="submissions" sortable chain />
   </div>
 </template>

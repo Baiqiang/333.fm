@@ -25,9 +25,9 @@ const stats = ref<ChainStats>(data.value!)
         :key="phase"
         class="grid grid-cols-subgrid col-span-3 border-t border-gray-200"
       >
-        <div class="font-bold">
+        <NuxtLink class="font-bold text-blue-500" :to="`/chain/${scramble.number}/phase/${SubmissionPhase[phase]}`">
           {{ SubmissionPhase[phase] }}
-        </div>
+        </NuxtLink>
         <div>
           {{ count }}
         </div>

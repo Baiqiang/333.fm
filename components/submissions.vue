@@ -6,7 +6,6 @@ const props = withDefaults(defineProps<{
   filterable?: boolean
   sortable?: boolean
   chain?: boolean
-  chainedSkeleton?: string
 }>(), {
   filterable: false,
   sortable: false,
@@ -33,6 +32,8 @@ const filteredSortedSubmissions = computed(() => {
           tmp = a.moves - b.moves
         return tmp
       })
+    case 'best':
+      return filteredSubmissions.value.slice().sort((a, b) => a.best - b.best)
     case 'moves':
       return filteredSubmissions.value.slice().sort((a, b) => {
         let tmp = a.cumulativeMoves - b.cumulativeMoves
@@ -86,6 +87,9 @@ const counts = computed(() => {
           <option v-if="chain" value="continuances">
             {{ $t('common.sortBy.mostContinuations') }}
           </option>
+          <option v-if="chain" value="best">
+            {{ $t('chain.best') }}
+          </option>
           <option value="moves">
             {{ $t('common.sortBy.fewest') }}
           </option>
@@ -101,7 +105,6 @@ const counts = computed(() => {
         :key="submission.id"
         :submission="submission"
         :chain="chain"
-        :chained-skeleton="chainedSkeleton"
       />
     </div>
   </div>

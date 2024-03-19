@@ -4,10 +4,8 @@ import { Algorithm, Cube } from 'insertionfinder'
 const props = withDefaults(defineProps<{
   submission: Submission
   chain?: boolean
-  chainedSkeleton?: string
 }>(), {
   chain: false,
-  chainedSkeleton: '',
 })
 const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(!!props.chain)
@@ -24,7 +22,14 @@ const solution = computed(() => {
 })
 const status = computed(() => {
   const cube = new Cube()
-  cube.twist(new Algorithm(props.chainedSkeleton + props.submission.solution))
+  const { submission } = props
+  let skeleton = ''
+  if (submission.scramble)
+    skeleton += submission.scramble.scramble
+  if (submission.parent)
+    skeleton += flattenSkeleton(submission.parent)
+  skeleton += submission.solution
+  cube.twist(new Algorithm(skeleton))
   return getStatus(cube, props.submission.phase)
 })
 const isChain = computed(() => props.chain || props.submission.competition?.type === CompetitionType.FMC_CHAIN)

@@ -69,7 +69,7 @@ async function fetchData() {
     params: {
       page: route.query.page,
       type: route.query.type,
-      limit: DEFAULT_LIMIT,
+      limit: 50,
     },
   })
   submissions.value = data.value!.items
