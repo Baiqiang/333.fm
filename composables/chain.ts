@@ -59,6 +59,7 @@ export function useComputedPhases(
           skeleton = reverseTwists(skeleton)
 
         alg = new Algorithm(skeleton)
+        alg.clearFlags()
       }
       alg.normalize()
       alg.cancelMoves()
@@ -100,21 +101,22 @@ export function useComputedPhases(
     }
   })
   const cumulativeMoves = computed(() => {
-    if (!isInsertion.value)
+    if (!isInsertion.value) {
+      if (phase.value === SubmissionPhase.FINISHED) {
+        const alg = new Algorithm(skeleton.value)
+        alg.clearFlags()
+        return alg.length * 100
+      }
       return skeletonAlg.value.length * 100
-    else
+    }
+    else {
       return countMoves(solutionAlg.value?.toString() ?? '')
+    }
   })
   const cancelMoves = computed(() => {
     if (!solutionAlg.value)
       return 0
-    if (!isInsertion.value) {
-      const totalMoves = moves.value + parentSkeletonAlg.value.length * 100
-      return totalMoves - skeletonAlg.value.length * 100
-    }
-    else {
-      return moves.value + parentSkeletonAlg.value.length * 100 - cumulativeMoves.value
-    }
+    return moves.value + parentSkeletonAlg.value.length * 100 - cumulativeMoves.value
   })
   const status = computed(() => getStatus(cube.value, phase.value))
 
@@ -191,7 +193,7 @@ export function flattenPhases(scramble: Scramble, submission: Submission | null)
     const cube = new Cube()
     cube.twist(new Algorithm(scramble.scramble))
     cube.twist(cumulativeAlg)
-    if (submission.phase === SubmissionPhase.SKELETON)
+    if (submission.phase === SubmissionPhase.SKELETON || submission.phase === SubmissionPhase.FINISHED)
       cumulativeAlg.clearFlags()
     else
       cumulativeAlg.cancelMoves()
