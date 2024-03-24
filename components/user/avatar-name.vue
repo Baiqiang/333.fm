@@ -10,7 +10,7 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <NuxtLink :to="`/profile/${user.id}`" class="flex items-center">
+  <NuxtLink :to="`/profile/${user.wcaId || user.id}`" class="flex items-center">
     <UserAvatar :user="user" class="mr-1" :size="size" :link="false" />
     <div class="whitespace-nowrap text-blue-500">
       {{ localeName(user.name, $i18n.locale) }}
