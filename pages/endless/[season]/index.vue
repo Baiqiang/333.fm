@@ -63,7 +63,7 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
     <h2 class="font-bold my-2 md:text-lg">
       {{ $t('endless.progress.title') }}
     </h2>
-    <div class="grid grid-cols-[max-content_minmax(auto,max-content)_minmax(auto,max-content)] md:grid-cols-[max-content_max-content_max-content_1fr] gap-x-2 gap-y-1 md:gap-y-2 mb-2">
+    <div class="grid grid-cols-auto md:grid-cols-[max-content_max-content_max-content_1fr] gap-x-2 gap-y-1 md:gap-y-2 mb-2">
       <div class="font-bold">
         Level
       </div>
