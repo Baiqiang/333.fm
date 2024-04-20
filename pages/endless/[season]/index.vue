@@ -63,7 +63,7 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
     <h2 class="font-bold my-2 md:text-lg">
       {{ $t('endless.progress.title') }}
     </h2>
-    <div class="grid grid-cols-[max-content_max-content_1fr] md:grid-cols-[max-content_max-content_max-content_1fr] gap-x-2 gap-y-1 md:gap-y-2 mb-2">
+    <div class="grid grid-cols-[max-content_minmax(auto,max-content)_minmax(auto,max-content)] md:grid-cols-[max-content_max-content_max-content_1fr] gap-x-2 gap-y-1 md:gap-y-2 mb-2">
       <div class="font-bold">
         Level
       </div>
@@ -81,7 +81,7 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
         <NuxtLink v-else :to="`/endless/${endless.alias}/${level}`" class="text-indigo-500 flex items-center">
           {{ $t('endless.level', { level }) }}
         </NuxtLink>
-        <div class="flex items-center">
+        <div class="flex items-center flex-wrap">
           <Icon v-if="myLevel <= level" name="material-symbols:lock-outline-sharp" />
           <UserAvatarName v-else-if="kickedOffs.length === 1" :user="kickedOffs[0].user">
             ({{ formatResult(kickedOffs[0].submission.moves) }})
