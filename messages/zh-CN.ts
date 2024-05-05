@@ -206,6 +206,7 @@ export default {
     name: '姓名',
     avatar: '头像',
     changeName: '修改名称',
+    solutions: '我的解法',
   },
   admin: {
     title: '管理',

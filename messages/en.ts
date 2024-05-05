@@ -206,6 +206,7 @@ export default {
     name: 'Name',
     avatar: 'Avatar',
     changeName: 'Change Name',
+    solutions: 'My Solutions',
   },
   admin: {
     title: 'Admin',
