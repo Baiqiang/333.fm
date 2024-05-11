@@ -123,6 +123,9 @@ async function changeLocale(code: string) {
                 <NuxtLink to="/user/if" :class="menuClass">
                   {{ $t('user.if') }}
                 </NuxtLink>
+                <NuxtLink :to="`/profile/${user.wcaId || user.id}`" :class="menuClass">
+                  {{ $t('user.solutions') }}
+                </NuxtLink>
                 <NuxtLink to="/user/likes" :class="menuClass">
                   {{ $t('user.likes') }}
                 </NuxtLink>
