@@ -110,7 +110,7 @@ const levels = computed(() => {
           </div>
         </div>
         <template v-if="!expanded && (level === highestLevel && highestLevel - myLevel > 1 || level === myLevel && highestLevel - myLevel <= 1)">
-          <div class="col-span-4">
+          <div class="col-span-3 md:col-span-4">
             <button class="text-indigo-500 flex items-center gap-2" @click="expanded = true">
               <Icon name="mdi:arrow-expand-vertical" />
               {{ $t('endless.showAll') }}
