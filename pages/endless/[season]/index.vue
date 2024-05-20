@@ -1,24 +1,24 @@
 <script setup lang="ts">
-const { params } = useRoute()
-const { data } = await useApi<Endless>(`/endless/${params.season}`)
-if (!data.value) {
-  throw createError({
-    statusCode: 500,
-  })
-}
-const endless = ref<Endless>(data.value)
+const endless = inject<Ref<Endless>>(SYMBOL_ENDLESS)!
+const myProgress = inject<Ref<UserProgress>>(SYMBOL_ENDLESS_PROGRESS)!
 const { t } = useI18n()
-const me = useUser()
 useSeoMeta({
   title: `${t('endless.title')} ${endless.value.name}`,
 })
 const maxCompetitors = computed(() => Math.max(...endless.value.levels.map(l => l.competitors)) || 1)
-const myProgress = ref<UserProgress | null>()
-if (me.signedIn) {
-  const { data } = await useApi<UserProgress>(`/endless/${endless.value.alias}/progress`)
-  myProgress.value = data.value
-}
+
 const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
+const highestLevel = computed(() => Math.max(...endless.value.levels.map(l => l.level)))
+const expanded = ref(false)
+const levels = computed(() => {
+  if (expanded.value)
+    return endless.value.levels
+  return endless.value.levels.filter(l =>
+    l.level <= Math.min(10, myLevel.value)
+    || l.level === highestLevel.value
+    || l.level === myLevel.value,
+  )
+})
 </script>
 
 <template>
@@ -74,7 +74,7 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
         {{ $t('result.best') }}
       </div>
       <div class="col-span-3 md:col-span-1" />
-      <template v-for="{ level, competitors, bestSubmissions, kickedOffs } in endless.levels" :key="level">
+      <template v-for="{ level, competitors, bestSubmissions, kickedOffs } in levels" :key="level">
         <div v-if="myLevel < level" class="flex items-center">
           {{ $t('endless.level', { level }) }}
         </div>
@@ -109,6 +109,14 @@ const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
             {{ $t('endless.progress.competitors', { competitors }) }}
           </div>
         </div>
+        <template v-if="!expanded && level === highestLevel">
+          <div class="col-span-4">
+            <button class="text-indigo-500 flex items-center gap-2" @click="expanded = true">
+              <Icon name="mdi:arrow-expand-vertical" />
+              {{ $t('endless.showAll') }}
+            </button>
+          </div>
+        </template>
       </template>
     </div>
     <EndlessStats :endless="endless" />

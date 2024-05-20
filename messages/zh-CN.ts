@@ -350,6 +350,7 @@ export default {
       'HTR 练习塔，每个打乱的 HTR 已做好。',
       '无打乱挑战，只给出打乱状态，需要自行克隆魔方。',
     ],
+    showAll: '显示全部',
   },
   result: {
     rank: '排名',

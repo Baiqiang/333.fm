@@ -350,6 +350,7 @@ export default {
       'The HTR practice has HTR done in every scramble.',
       'In the hidden scramble challenge, the scramble is hidden and only the scrambled state is given. It means you need to clone a scrambled cube by yourself.',
     ],
+    showAll: 'Show All',
   },
   result: {
     rank: 'Rank',

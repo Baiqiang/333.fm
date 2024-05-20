@@ -93,7 +93,7 @@ useSeoMeta({
         {{ user.name }}
       </div>
       <a v-if="user.wcaId" :href="`https://www.worldcubeassociation.org/persons/${user.wcaId}`" target="_blank" class="text-blue-500">
-        <img src="https://www.worldcubeassociation.org/files/WCAlogo_notext.svg" class="w-6">
+        <WcaLogo class="w-6" />
       </a>
     </div>
     <div v-if="filters.length > 0" class="flex flex-wrap gap-2 mt-2">

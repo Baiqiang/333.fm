@@ -40,6 +40,6 @@ definePageMeta({
       <Spinner class="w-6 h-6 mr-1 text-if border-[3px]" />
       {{ $t('common.signingIn') }}
     </div>
-    <img src="https://www.worldcubeassociation.org/files/WCAlogo_notext.svg" class="w-20 mt-4">
+    <WcaLogo class="w-20 mt-4" />
   </div>
 </template>
