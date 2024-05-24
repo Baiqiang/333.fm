@@ -19,6 +19,11 @@ const levels = computed(() => {
     || l.level === myLevel.value,
   )
 })
+const expandLevel = computed(() => {
+  if (highestLevel.value - myLevel.value > 1)
+    return highestLevel.value
+  return myLevel.value
+})
 </script>
 
 <template>
@@ -109,7 +114,7 @@ const levels = computed(() => {
             {{ $t('endless.progress.competitors', { competitors }) }}
           </div>
         </div>
-        <template v-if="!expanded && (level === highestLevel && highestLevel - myLevel > 1 || level === myLevel && highestLevel - myLevel <= 1)">
+        <template v-if="!expanded && level === expandLevel">
           <div class="col-span-3 md:col-span-4">
             <button class="text-indigo-500 flex items-center gap-2" @click="expanded = true">
               <Icon name="mdi:arrow-expand-vertical" />
