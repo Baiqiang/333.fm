@@ -218,6 +218,7 @@ async function submit() {
   }
 }
 function reset() {
+  form.name = ''
   form.scramble = ''
   form.skeleton = ''
   form.algs = []
