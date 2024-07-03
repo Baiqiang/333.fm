@@ -11,6 +11,8 @@ const props = withDefaults(defineProps<{
   chain: false,
 })
 const { copy, copied } = useClipboard()
+const dayjs = useDayjs()
+const { locale } = useI18n()
 const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(!!props.chain)
 const solution = computed(() => {
@@ -42,7 +44,6 @@ function copySolution() {
   const scramble = props.scramble || props.submission.scramble
   const competition = props.competition || props.submission.competition
   const user = props.user || props.submission.user
-  console.log(competition, scramble)
   const competitionInfo = [competition.name]
   if (competition.type === CompetitionType.WEEKLY)
     competitionInfo.push(`Scramble ${scramble?.number}`)
@@ -52,7 +53,7 @@ function copySolution() {
   solution.push(`Scramble:\n${scramble?.scramble}`)
   solution.push(`Solution:\n${props.submission.solution} (${formatResult(props.submission.moves)})`)
   solution.push(props.submission.comment)
-  solution.push(`By ${user?.name}\n${useDayjs()(props.submission.createdAt).locale(useI18n().locale.value).format('LLL')}`)
+  solution.push(`By ${user?.name}\n${dayjs(props.submission.createdAt).locale(locale.value).format('LLL')}`)
   copy(solution.join('\n\n'))
 }
 </script>
