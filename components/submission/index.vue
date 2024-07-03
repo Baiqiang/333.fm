@@ -3,10 +3,14 @@ import { Algorithm, Cube } from 'insertionfinder'
 
 const props = withDefaults(defineProps<{
   submission: Submission
+  scramble?: Scramble
+  competition?: Competition
+  user?: User
   chain?: boolean
 }>(), {
   chain: false,
 })
+const { copy, copied } = useClipboard()
 const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(!!props.chain)
 const solution = computed(() => {
@@ -33,6 +37,24 @@ const status = computed(() => {
   return getStatus(cube, props.submission.phase)
 })
 const isChain = computed(() => props.chain || props.submission.competition?.type === CompetitionType.FMC_CHAIN)
+function copySolution() {
+  const solution = []
+  const scramble = props.scramble || props.submission.scramble
+  const competition = props.competition || props.submission.competition
+  const user = props.user || props.submission.user
+  console.log(competition, scramble)
+  const competitionInfo = [competition.name]
+  if (competition.type === CompetitionType.WEEKLY)
+    competitionInfo.push(`Scramble ${scramble?.number}`)
+  if (competition.type === CompetitionType.ENDLESS)
+    competitionInfo.push(`Level ${scramble?.number}`)
+  solution.push(competitionInfo.join(' - '))
+  solution.push(`Scramble:\n${scramble?.scramble}`)
+  solution.push(`Solution:\n${props.submission.solution} (${formatResult(props.submission.moves)})`)
+  solution.push(props.submission.comment)
+  solution.push(`By ${user?.name}\n${useDayjs()(props.submission.createdAt).locale(useI18n().locale.value).format('LLL')}`)
+  copy(solution.join('\n\n'))
+}
 </script>
 
 <template>
@@ -80,6 +102,13 @@ const isChain = computed(() => props.chain || props.submission.competition?.type
             size="20"
           />
         </button>
+        <div v-if="competition || submission.competition" :class="{ 'text-indigo-500': !copied, 'text-gray-400': copied }">
+          <Icon
+            name="ion:ios-copy"
+            class="cursor-pointer"
+            @click.stop.prevent="copySolution"
+          />
+        </div>
       </div>
       <TransitionExpand>
         <div v-if="showComment" class="basis-full">

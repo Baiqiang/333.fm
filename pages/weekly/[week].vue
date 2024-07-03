@@ -79,7 +79,7 @@ bus.on(fetchSubmissions)
             {{ $t('weekly.seeSolutions', { solutions: submissions[scramble.id].length }, submissions[scramble.id].length) }}
           </div>
           <template v-else>
-            <Submissions :submissions="submissions[scramble.id]" filterable />
+            <Submissions :submissions="submissions[scramble.id]" :competition="competition" :scramble="scramble" filterable />
           </template>
         </div>
       </Tab>
