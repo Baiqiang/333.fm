@@ -118,7 +118,7 @@ async function updateData(submission: Submission) {
       </div>
     </div>
     <div v-if="progress.submission">
-      <Submissions :submissions="submissions" sortable />
+      <Submissions :submissions="submissions" :scramble="progress.scramble" :competition="endless" sortable />
     </div>
   </div>
 </template>

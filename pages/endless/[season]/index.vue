@@ -20,7 +20,7 @@ const levels = computed(() => {
   )
 })
 const expandLevel = computed(() => {
-  if (highestLevel.value - myLevel.value > 1)
+  if (highestLevel.value - myLevel.value > 1 || myLevel.value >= highestLevel.value)
     return highestLevel.value
   return myLevel.value
 })

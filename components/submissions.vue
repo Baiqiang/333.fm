@@ -3,6 +3,9 @@ import { CompetitionMode } from '~/utils/competition'
 
 const props = withDefaults(defineProps<{
   submissions?: Submission[]
+  scramble?: Scramble
+  competition?: Competition
+  user?: User
   filterable?: boolean
   sortable?: boolean
   chain?: boolean
@@ -104,6 +107,9 @@ const counts = computed(() => {
         v-for="submission in filteredSortedSubmissions"
         :key="submission.id"
         :submission="submission"
+        :scramble="scramble"
+        :competition="competition"
+        :user="user"
         :chain="chain"
       />
     </div>
