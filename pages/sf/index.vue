@@ -51,6 +51,7 @@ async function submit() {
   }
 }
 function reset() {
+  form.name = ''
   form.skeleton = ''
 }
 </script>
