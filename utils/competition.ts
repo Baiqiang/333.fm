@@ -177,9 +177,28 @@ export const DNF = 99999998
 export const DNS = 99999999
 
 export function formatResult(result: number, precision = 0) {
+  if (Number.isNaN(result))
+    return 'N/A'
+
   if (result === DNF)
     return 'DNF'
   if (result === DNS)
     return 'DNS'
   return (result / 100).toFixed(precision)
+}
+
+export function aoN(results: number[], n: number, mean = false) {
+  if (n === 0)
+    n = results.length
+  if (results.length < n)
+    return Number.NaN
+
+  let total = results.slice(-n).reduce((a, b) => a + b, 0)
+  if (!mean) {
+    const best = Math.min(...results)
+    const worst = Math.max(...results)
+    total -= best + worst
+    n -= 2
+  }
+  return total / n
 }
