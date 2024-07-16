@@ -2,6 +2,7 @@
 const props = defineProps<{
   endless: Endless
 }>()
+const user = useUser()
 const { data } = await useApi<EndlessStats>(`/endless/${props.endless.alias}/stats`)
 const stats = ref<EndlessStats>(data.value!)
 </script>
@@ -21,5 +22,6 @@ const stats = ref<EndlessStats>(data.value!)
         </template>
       </div>
     </div>
+    <EndlessStatPersonal v-if="user.signedIn" :endless="endless" />
   </div>
 </template>
