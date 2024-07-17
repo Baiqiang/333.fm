@@ -193,7 +193,8 @@ export function aoN(results: number[], n: number, mean = false) {
   if (results.length < n)
     return Number.NaN
 
-  let total = results.slice(-n).reduce((a, b) => a + b, 0)
+  results = results.slice(-n)
+  let total = results.reduce((a, b) => a + b, 0)
   if (!mean) {
     const best = Math.min(...results)
     const worst = Math.max(...results)
