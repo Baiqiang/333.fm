@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { twMerge } from 'tailwind-merge'
+
 const props = defineProps<{
   endless: Endless
 }>()
@@ -19,6 +21,7 @@ const stats = computed<{
   movesCount: {
     moves: number
     count: number
+    unlimited: number
   }[]
   best: {
     single: number
@@ -39,6 +42,7 @@ const stats = computed<{
   const movesCountMap: Record<number, {
     moves: number
     count: number
+    unlimited: number
   }> = {}
   const moves: number[] = []
   const best = {
@@ -59,6 +63,7 @@ const stats = computed<{
     movesCountMap[submission.moves] = {
       moves: submission.moves,
       count: (movesCountMap[submission.moves]?.count || 0) + 1,
+      unlimited: (movesCountMap[submission.moves]?.unlimited || 0) + (submission.mode === CompetitionMode.UNLIMITED ? 1 : 0),
     }
     moves.push(submission.moves)
     const mo3 = aoN(moves, 3, true)
@@ -109,6 +114,56 @@ const stats = computed<{
 const best = computed(() => stats.value.best)
 const worst = computed(() => stats.value.worst)
 const movesCount = computed(() => stats.value.movesCount)
+const currentCell = reactive({
+  type: 0,
+  index: -1,
+})
+
+function enterCell(type: number, index: number) {
+  currentCell.type = type
+  currentCell.index = index
+}
+
+function leaveCell() {
+  currentCell.type = 0
+  currentCell.index = -1
+}
+
+function getResultClass(index: number) {
+  const startIndex = currentCell.index
+  const endIndex = currentCell.index + currentCell.type - 1
+  if (index > endIndex || index < startIndex)
+    return ''
+  const results = stats.value.results.slice(startIndex, endIndex + 1)
+  const first = results[0]
+  const key = {
+    3: 'mo3',
+    5: 'ao5',
+    12: 'ao12',
+  }[currentCell.type]
+  if (Number.isNaN(first[key as keyof PersonalResult]))
+    return ''
+  const cls = ['transition-all']
+  if (currentCell.type === 3) {
+    cls.push('bg-indigo-500')
+  }
+  else {
+    const best = results.reduce((a, b) => a.moves < b.moves ? a : b)
+    const worst = results.reduce((a, b) => a.moves > b.moves ? a : b)
+    const bestIndex = stats.value.results.findIndex(r => r === best)
+    const worstIndex = stats.value.results.findIndex(r => r === worst)
+
+    if (index === bestIndex)
+      cls.push('bg-green-500')
+    else if (index === worstIndex)
+      cls.push('bg-red-500')
+    else
+      cls.push('bg-indigo-500')
+  }
+
+  cls.push('transform scale-125')
+  return cls.join(' ')
+}
 
 function getClass(value: number, best: number, worst: number, unlimited = false) {
   const cls = []
@@ -130,6 +185,8 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
         cls.push('to-red-500')
     }
   }
+  if (!Number.isNaN(value))
+    cls.push('hover:bg-indigo-500')
   return cls.join(' ')
 }
 </script>
@@ -160,20 +217,20 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
           {{ $t('result.mean') }}
         </div>
       </div>
-      <div v-for="r in stats.results" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
+      <div v-for="r, i in stats.results" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
         <div class="">
           {{ r.level }}
         </div>
-        <div class="font-bold py-1" :class="getClass(r.moves, best.single, worst.single, r.unlimited)">
+        <div class="font-bold py-1" :class="twMerge(getClass(r.moves, best.single, worst.single, r.unlimited), getResultClass(i))">
           {{ formatResult(r.moves) }}
         </div>
-        <div :class="getClass(r.mo3, best.mo3, worst.mo3)">
+        <div class="py-1" :class="getClass(r.mo3, best.mo3, worst.mo3)" @mouseenter="enterCell(3, i)" @mouseleave="leaveCell">
           {{ formatResult(r.mo3, 2) }}
         </div>
-        <div :class="getClass(r.ao5, best.ao5, worst.ao5)">
+        <div class="py-1" :class="getClass(r.ao5, best.ao5, worst.ao5)" @mouseenter="enterCell(5, i)" @mouseleave="leaveCell">
           {{ formatResult(r.ao5, 2) }}
         </div>
-        <div :class="getClass(r.ao12, best.ao12, worst.ao12)">
+        <div class="py-1" :class="getClass(r.ao12, best.ao12, worst.ao12)" @mouseenter="enterCell(12, i)" @mouseleave="leaveCell">
           {{ formatResult(r.ao12, 2) }}
         </div>
         <div :class="getClass(r.mean, best.mean, worst.mean)">
@@ -182,20 +239,26 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
       </div>
     </div>
     <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center mt-4">
-      <div class="grid grid-cols-subgrid col-span-2 font-bold bg-gray-200 py-1">
+      <div class="grid grid-cols-subgrid col-span-3 font-bold bg-gray-200 py-1">
         <div class="px-2">
           {{ $t('endless.stats.moves') }}
         </div>
         <div class="px-2">
           {{ $t('endless.stats.count') }}
         </div>
+        <div class="px-2">
+          {{ $t('weekly.unlimited.label') }}
+        </div>
       </div>
-      <div v-for="m in movesCount" :key="m.moves" class="grid grid-cols-subgrid col-span-2 font-mono odd:bg-gray-200 items-center">
+      <div v-for="m in movesCount" :key="m.moves" class="grid grid-cols-subgrid col-span-3 font-mono odd:bg-gray-200 items-center">
         <div class="py-1">
           {{ formatResult(m.moves) }}
         </div>
         <div>
           {{ m.count }}
+        </div>
+        <div>
+          {{ m.unlimited }}
         </div>
       </div>
     </div>

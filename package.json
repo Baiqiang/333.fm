@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "insertionfinder": "^0.5.0",
+    "tailwind-merge": "^2.4.0",
     "three": "^0.162.0",
     "two.js": "^0.8.13",
     "vue": "^3.4.21",
