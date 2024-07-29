@@ -10,9 +10,11 @@ const props = withDefaults(defineProps<{
 }>(), {
   chain: false,
 })
+const { hash } = useRoute()
 const { copy, copied } = useClipboard()
 const dayjs = useDayjs()
 const { locale } = useI18n()
+const el = ref<HTMLElement>()
 const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(!!props.chain)
 const solution = computed(() => {
@@ -39,6 +41,10 @@ const status = computed(() => {
   return getStatus(cube, props.submission.phase)
 })
 const isChain = computed(() => props.chain || props.submission.competition?.type === CompetitionType.FMC_CHAIN)
+const match = hash.match(/^#submission-(\d+)$/)
+if (match && match[1] === props.submission.id.toString())
+  showComment.value = true
+
 function copySolution() {
   const solution = []
   const scramble = props.scramble || props.submission.scramble
@@ -59,7 +65,7 @@ function copySolution() {
 </script>
 
 <template>
-  <div class="border-t first:border-t-0 border-gray-300 pt-2 mt-2">
+  <div :id="`submission-${submission.id}`" ref="el" class="border-t first:border-t-0 border-gray-300 pt-2 mt-2">
     <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
       <template #info>
         {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}

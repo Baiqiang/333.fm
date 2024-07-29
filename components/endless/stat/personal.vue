@@ -8,6 +8,7 @@ const { data } = await useApi<{ submissions: Submission[] }>(`/endless/${props.e
 
 interface PersonalResult {
   level: number
+  id: number
   moves: number
   mo3: number
   ao5: number
@@ -93,6 +94,7 @@ const stats = computed<{
 
     results.push({
       level: results.length + 1,
+      id: submission.id,
       moves: submission.moves,
       mo3,
       ao5,
@@ -218,12 +220,12 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
         </div>
       </div>
       <div v-for="r, i in stats.results" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
-        <div class="">
+        <NuxtLink :to="`/endless/${endless.alias}/${r.level}`" class="text-blue-500 hover:text-white hover:bg-blue-500 py-1">
           {{ r.level }}
-        </div>
-        <div class="font-bold py-1" :class="twMerge(getClass(r.moves, best.single, worst.single, r.unlimited), getResultClass(i))">
+        </NuxtLink>
+        <NuxtLink :to="`/endless/${endless.alias}/${r.level}#submission-${r.id}`" class="font-bold py-1" :class="twMerge(getClass(r.moves, best.single, worst.single, r.unlimited), getResultClass(i))">
           {{ formatResult(r.moves) }}
-        </div>
+        </NuxtLink>
         <div class="py-1" :class="getClass(r.mo3, best.mo3, worst.mo3)" @mouseenter="enterCell(3, i)" @mouseleave="leaveCell">
           {{ formatResult(r.mo3, 2) }}
         </div>

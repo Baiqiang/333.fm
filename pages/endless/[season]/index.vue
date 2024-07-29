@@ -14,15 +14,19 @@ const levels = computed(() => {
   if (expanded.value)
     return endless.value.levels
   return endless.value.levels.filter(l =>
-    l.level <= Math.min(10, myLevel.value)
+    l.level === 1
+    || (l.level <= myLevel.value - 1 && l.level >= myLevel.value - 10)
     || l.level === highestLevel.value
     || l.level === myLevel.value,
   )
 })
-const expandLevel = computed(() => {
+const expandLevels = computed<number[]>(() => {
+  const levels: number[] = []
   if (highestLevel.value - myLevel.value > 1 || myLevel.value >= highestLevel.value)
-    return highestLevel.value
-  return myLevel.value
+    levels.push(highestLevel.value)
+  if (myLevel.value > 11)
+    levels.push(myLevel.value - 10)
+  return levels
 })
 </script>
 
@@ -114,7 +118,7 @@ const expandLevel = computed(() => {
             {{ $t('endless.progress.competitors', { competitors }) }}
           </div>
         </div>
-        <template v-if="!expanded && level === expandLevel">
+        <template v-if="!expanded && expandLevels.includes(level)">
           <div class="col-span-3 md:col-span-4">
             <button class="text-indigo-500 flex items-center gap-2" @click="expanded = true">
               <Icon name="mdi:arrow-expand-vertical" />
