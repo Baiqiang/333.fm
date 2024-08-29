@@ -1,3 +1,3 @@
 <template>
-  <img src="https://www.worldcubeassociation.org/files/WCAlogo.svg">
+  <img src="/images/wca/logo.svg">
 </template>
