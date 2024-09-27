@@ -352,6 +352,7 @@ export default {
       'The DR practice has DR done in every scramble.',
       'The HTR practice has HTR done in every scramble.',
       'In the hidden scramble challenge, the scramble is hidden and only the scrambled state is given. It means you need to clone a scrambled cube by yourself.',
+      'The JZP practice has JZP done in every scramble.',
     ],
     showAll: 'Show All',
   },
