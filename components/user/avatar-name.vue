@@ -1,20 +1,20 @@
 <script setup lang="ts">
+import { NuxtLink } from '#components'
+
 withDefaults(defineProps<{
   user: User
-  link?: boolean
   size?: number
+  link?: boolean
 }>(), {
-  link: true,
   size: 6,
+  link: true,
 })
 </script>
 
 <template>
-  <NuxtLink :to="`/profile/${user.wcaId || user.id}`" class="flex items-center">
+  <component :is="link ? NuxtLink : 'div'" :to="`/profile/${user.wcaId || user.id}`" class="flex items-center">
     <UserAvatar :user="user" class="mr-1" :size="size" :link="false" />
-    <div class="whitespace-nowrap text-blue-500">
-      {{ localeName(user.name, $i18n.locale) }}
-    </div>
+    <UserName :user="user" :class="{ 'text-blue-500': link }" />
     <slot />
-  </NuxtLink>
+  </component>
 </template>

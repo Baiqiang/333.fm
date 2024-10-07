@@ -1,3 +1,5 @@
+import type { CompetitionFormat } from '@/utils/competition'
+
 export const useIFForm = defineStore('form.if', {
   state: () => ({
     name: '',
@@ -19,5 +21,11 @@ export const useWeeklyForm = defineStore('form.weekly', {
   state: () => ({
     solution: '',
     comment: '',
+  }),
+})
+
+export const useNewPracticeForm = defineStore('form.practice.new', {
+  state: () => ({
+    format: 0 as CompetitionFormat,
   }),
 })

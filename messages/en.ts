@@ -43,6 +43,11 @@ export default {
     },
     total: 'Total',
     result: 'Result',
+    new: 'New',
+    format: 'Format',
+    bo1: 'Best of 1',
+    bo2: 'Best of 2',
+    mo3: 'Mean of 3',
   },
   error: {
     400: 'Bad Request',
@@ -387,5 +392,19 @@ export default {
       latest: 'My Latest Submission',
       notification: 'New Submission',
     },
+  },
+  practice: {
+    title: 'Practice Book',
+    new: {
+      title: 'New Practice',
+    },
+    user: {
+      title: '{name}\'s Practice Book',
+    },
+    latest: 'Latest Practice',
+    mostAttended: 'Most Attended',
+    number: 'Practice #{number}',
+    previous: 'Previous',
+    next: 'Next',
   },
 }

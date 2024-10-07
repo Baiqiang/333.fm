@@ -41,6 +41,9 @@ const filters = computed(() => {
       case CompetitionType.FMC_CHAIN:
         label = t('chain.title')
         break
+      case CompetitionType.PERSONAL_PRACTICE:
+        label = t('practice.title')
+        break
     }
     filters.push({
       to: {

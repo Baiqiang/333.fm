@@ -4,8 +4,7 @@ export interface Tab {
   active: boolean
 }
 
-export const SYMBOL_ACTIVE_INDEX = Symbol('activeIndex')
-export const SYMBOL_ADD_TAB = Symbol('addTab')
-export const SYMBOL_REMOVE_TAB = Symbol('removeTab')
-export const SYMBOL_SET_TAB = Symbol('setTab')
-export const TAB_INDEX = ref(1)
+export const SYMBOL_ACTIVE_INDEX: InjectionKey<Ref<number>> = Symbol('activeIndex')
+export const SYMBOL_ADD_TAB: InjectionKey<(tab: Tab) => void> = Symbol('addTab')
+export const SYMBOL_REMOVE_TAB: InjectionKey<(tab: Tab) => void> = Symbol('removeTab')
+export const SYMBOL_SET_TAB: InjectionKey<(tab: Tab) => void> = Symbol('setTab')

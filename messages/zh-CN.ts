@@ -32,7 +32,7 @@ export default {
       latest: '最新',
       mostContinuations: '最多续接',
     },
-    spoiler: '将剧透{for}，点击查看。',
+    spoiler: '点击剧透{for}。',
     backTo: '返回{to}',
     insertions: {
       mode: {
@@ -43,6 +43,11 @@ export default {
     },
     total: '总计',
     result: '成绩',
+    new: '新建',
+    format: '赛制',
+    bo1: '单次计最好',
+    bo2: '两次计最好',
+    mo3: '三次计平均',
   },
   error: {
     400: '错误请求',
@@ -387,5 +392,19 @@ export default {
       latest: '最新提交',
       notification: '有新提交',
     },
+  },
+  practice: {
+    title: '练习本',
+    new: {
+      title: '新建练习',
+    },
+    user: {
+      title: '{name}的练习本',
+    },
+    latest: '最新练习',
+    mostAttended: '最多参加',
+    number: '练习 {number}',
+    previous: '上一个',
+    next: '下一个',
   },
 }

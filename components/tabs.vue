@@ -27,7 +27,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="overflow-x-auto">
+    <div v-if="tabs.length > 1" class="overflow-x-auto">
       <div class="flex text-xs md:text-sm whitespace-nowrap">
         <a
           v-for="{ name, hash }, index in tabs"

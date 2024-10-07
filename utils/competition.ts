@@ -16,6 +16,7 @@ export interface Competition {
   format: CompetitionFormat
   scrambles: Scramble[]
   status: CompetitionStatus
+  user: User
 }
 
 export interface PastCompetition extends Competition {
@@ -89,6 +90,7 @@ export enum CompetitionType {
   RANDOM,
   ENDLESS,
   FMC_CHAIN,
+  PERSONAL_PRACTICE,
 }
 
 export enum CompetitionSubType {
@@ -168,6 +170,13 @@ export interface Kickoff extends Time {
   submission: Submission
 }
 
+export interface Practice extends Competition {
+  attendees: number
+  ownerResult: Result
+  prevIndex?: number
+  nextIndex?: number
+}
+
 export const SYMBOL_ENDLESS = Symbol('endless')
 export const SYMBOL_ENDLESS_PROGRESS = Symbol('endless.progress')
 export const SYMBOL_ENDLESS_UPDATE_PROGRESS = Symbol('endless.progress.update')
@@ -180,6 +189,8 @@ export function formatResult(result: number, precision = 0) {
   if (Number.isNaN(result))
     return 'N/A'
 
+  if (result === 0)
+    return ''
   if (result === DNF)
     return 'DNF'
   if (result === DNS)

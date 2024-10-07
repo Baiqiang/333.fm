@@ -28,3 +28,5 @@ export function localeName(name: string, locale: string): string {
 
   return locale === 'en' ? matches[1] : matches[2]
 }
+
+export const SYMBOL_USER: InjectionKey<Ref<User>> = Symbol('user')
