@@ -214,3 +214,31 @@ export function aoN(results: number[], n: number, mean = false) {
   }
   return total / n
 }
+
+export function competitionPath(competition: Competition, scramble?: { number: number }, submission?: Submission) {
+  const { alias, type, user } = competition
+  switch (type) {
+    case CompetitionType.WEEKLY:
+      if (scramble)
+        return `/weekly/${alias}#scramble-${scramble.number}`
+      return `/weekly/${alias}`
+    case CompetitionType.ENDLESS:
+      if (scramble)
+        return `/endless/${alias}/${scramble.number}`
+      return `/endless/${alias}`
+    case CompetitionType.FMC_CHAIN:
+      if (!scramble)
+        return '/chain'
+      if (!submission)
+        return `/chain/${scramble.number}`
+      return `/chain/${scramble.number}/${submission.parentId}`
+    case CompetitionType.PERSONAL_PRACTICE:
+      if (!user)
+        return '/practice'
+      if (scramble)
+        return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}#scramble-${scramble.number}`
+      return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}`
+    default:
+      return ''
+  }
+}

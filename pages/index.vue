@@ -61,7 +61,7 @@ const { data: endlesses } = await useApi<Endless[]>('/endless/on-going')
               <div class="mb-2">
                 {{ $t(`endless.type.${endless.subType}`) }}
               </div>
-              <NuxtLink :to="`/endless/${endless.alias}`" class="bg-indigo-500 text-white px-3 py-2">
+              <NuxtLink :to="competitionPath(endless)" class="bg-indigo-500 text-white px-3 py-2">
                 {{ endless.name }} <Icon name="ic:round-keyboard-double-arrow-right" />
               </NuxtLink>
             </div>

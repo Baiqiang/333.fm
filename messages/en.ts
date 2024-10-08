@@ -400,10 +400,11 @@ export default {
     },
     user: {
       title: '{name}\'s Practice Book',
+      index: '{name}\'s Practice #{index}',
     },
     latest: 'Latest Practice',
     mostAttended: 'Most Attended',
-    number: 'Practice #{number}',
+    index: 'Practice #{index}',
     previous: 'Previous',
     next: 'Next',
   },

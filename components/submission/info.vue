@@ -2,24 +2,23 @@
 const props = defineProps<{
   submission: Submission
 }>()
+const { t, locale } = useI18n()
 const { competition, scramble } = toRefs(props.submission)
+const competitionIndex = computed(() => competition.value.alias.split('-').pop())
 const competitionLink = computed(() => {
   const submission = props.submission
   const { competition, scramble } = submission
+  return competitionPath(competition, scramble, submission)
+})
+const competitionName = computed(() => {
+  const { competition } = props.submission
   switch (competition.type) {
     case CompetitionType.WEEKLY:
-      return `/weekly/${competition.alias}#scramble-${scramble.number}`
-    case CompetitionType.ENDLESS:
-      if (!submission.hideSolution)
-        return `/endless/${competition.alias}/${scramble.number}`
-
-      return `/endless/${competition.alias}`
-    case CompetitionType.FMC_CHAIN:
-      if (submission.parentId === null)
-        return `/chain/${scramble.number}`
-      return `/chain/${scramble.number}/${submission.parentId}`
+      return `${t('weekly.title')} ${competition.alias}`
+    case CompetitionType.PERSONAL_PRACTICE:
+      return t('practice.user.index', { name: localeName(competition.user.name, locale.value), index: competitionIndex.value })
     default:
-      return `/competition/${competition.alias}`
+      return competition.name
   }
 })
 </script>
@@ -27,9 +26,9 @@ const competitionLink = computed(() => {
 <template>
   <div class="flex gap-x-2 flex-wrap">
     <NuxtLink :to="competitionLink" class="text-blue-500 hover:text-blue-300">
-      {{ competition.name }}
+      {{ competitionName }}
     </NuxtLink>
-    <div v-if="competition.type === CompetitionType.WEEKLY">
+    <div v-if="competition.type === CompetitionType.WEEKLY || competition.type === CompetitionType.PERSONAL_PRACTICE">
       {{ $t('weekly.scramble', { number: scramble.number }) }}
     </div>
     <div v-else-if="competition.type === CompetitionType.ENDLESS">

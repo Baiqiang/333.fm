@@ -2,18 +2,14 @@
 const props = defineProps<{
   competition: Practice
 }>()
-const index = computed(() => props.competition.alias.split('-').reverse()[0])
-const link = computed(() => {
-  const { user } = props.competition
-  return `/practice/${user.wcaId || user.id}/${index.value}`
-})
+const index = computed(() => props.competition.alias.split('-').pop())
 </script>
 
 <template>
   <div class="pt-2">
-    <NuxtLink :to="link" class="col-span-12 md:col-span-6 lg:col-span-4 flex items-center gap-2 text-blue-500">
+    <NuxtLink :to="competitionPath(competition)" class="col-span-12 md:col-span-6 lg:col-span-4 flex items-center gap-2 text-blue-500">
       <div>
-        {{ $t('practice.number', { number: index }) }}
+        {{ $t('practice.index', { index }) }}
       </div>
       <UserAvatarName :user="competition.user" :link="false" />
     </NuxtLink>

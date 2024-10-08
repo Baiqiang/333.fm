@@ -9,8 +9,8 @@ if (!profile) {
     statusCode: 404,
   })
 }
-const id = params.id as string
-const basePath = `/practice/practice-${profile.value.id}-${id}`
+const index = params.id as string
+const basePath = `/practice/practice-${profile.value.id}-${index}`
 const { data, error } = await useApi<Practice>(basePath)
 if (error.value || !data.value) {
   throw createError({
@@ -51,7 +51,7 @@ async function fetchSubmissions() {
     Object.assign(submissions, data.value)
 }
 useSeoMeta({
-  title: computed(() => `${t('practice.number', { number: id })} - ${t('practice.user.title', {
+  title: computed(() => `${t('practice.index', { index })} - ${t('practice.user.title', {
     name: localeName(profile.value.name, locale.value),
   })}`),
 })
@@ -71,7 +71,7 @@ bus.on(fetchData)
       }) }) }}
     </NuxtLink>
     <h2 class="font-semibold text-lg mt-2">
-      {{ $t('practice.number', { number: id }) }}
+      {{ $t('practice.index', { index }) }}
     </h2>
     <WeeklyStatus :competition="competition" />
     <Tabs>

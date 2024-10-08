@@ -220,10 +220,10 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
         </div>
       </div>
       <div v-for="r, i in stats.results" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
-        <NuxtLink :to="`/endless/${endless.alias}/${r.level}`" class="text-blue-500 hover:text-white hover:bg-blue-500 py-1">
+        <NuxtLink :to="competitionPath(endless, { number: r.level })" class="text-blue-500 hover:text-white hover:bg-blue-500 py-1">
           {{ r.level }}
         </NuxtLink>
-        <NuxtLink :to="`/endless/${endless.alias}/${r.level}#submission-${r.id}`" class="font-bold py-1" :class="twMerge(getClass(r.moves, best.single, worst.single, r.unlimited), getResultClass(i))">
+        <NuxtLink :to="`${competitionPath(endless, { number: r.level })}#submission-${r.id}`" class="font-bold py-1" :class="twMerge(getClass(r.moves, best.single, worst.single, r.unlimited), getResultClass(i))">
           {{ formatResult(r.moves) }}
         </NuxtLink>
         <div class="py-1" :class="getClass(r.mo3, best.mo3, worst.mo3)" @mouseenter="enterCell(3, i)" @mouseleave="leaveCell">

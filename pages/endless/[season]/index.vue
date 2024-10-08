@@ -55,13 +55,13 @@ const expandLevels = computed<number[]>(() => {
     </ol>
     <div class="mt-4">
       <template v-if="myProgress">
-        <NuxtLink v-if="myProgress.next && myProgress.next.scramble" :to="`/endless/${endless.alias}/${myProgress.next.scramble.number}`" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+        <NuxtLink v-if="myProgress.next && myProgress.next.scramble" :to="competitionPath(endless, myProgress.next.scramble)" class="bg-indigo-500 text-white px-3 py-2 text-lg">
           {{ $t('endless.continue') }}
         </NuxtLink>
-        <NuxtLink v-else-if="myProgress.current" :to="`/endless/${endless.alias}/${myProgress.current.scramble.number}`" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+        <NuxtLink v-else-if="myProgress.current" :to="competitionPath(endless, myProgress.current.scramble)" class="bg-indigo-500 text-white px-3 py-2 text-lg">
           {{ $t('endless.continue') }}
         </NuxtLink>
-        <NuxtLink v-else :to="`/endless/${endless.alias}/1`" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+        <NuxtLink v-else :to="competitionPath(endless, { number: 1 })" class="bg-indigo-500 text-white px-3 py-2 text-lg">
           {{ $t('weekly.join') }}
         </NuxtLink>
       </template>
@@ -87,7 +87,7 @@ const expandLevels = computed<number[]>(() => {
         <div v-if="myLevel < level" class="flex items-center">
           {{ $t('endless.level', { level }) }}
         </div>
-        <NuxtLink v-else :to="`/endless/${endless.alias}/${level}`" class="text-indigo-500 flex items-center">
+        <NuxtLink v-else :to="competitionPath(endless, { number: level })" class="text-indigo-500 flex items-center">
           {{ $t('endless.level', { level }) }}
         </NuxtLink>
         <div class="flex items-center flex-wrap">

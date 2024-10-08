@@ -59,7 +59,7 @@ bus.on(fetchSubmissions)
       >
         <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
-        <WeeklyForm
+        <CompetitionForm
           v-if="isOnGoing"
           :scramble="scramble"
           :competition="competition"

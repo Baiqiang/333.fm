@@ -31,7 +31,7 @@ async function submit() {
     if (error.value)
       throw error.value
     router.push({
-      path: `/practice/${user.wcaId || user.id}/${data.value?.alias.split('-').reverse()[0]}`,
+      path: competitionPath(data.value!),
     })
   }
   catch (e: any) {

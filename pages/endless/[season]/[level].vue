@@ -63,7 +63,7 @@ async function updateData(submission: Submission) {
 
 <template>
   <div>
-    <NuxtLink :to="`/endless/${endless.alias}`" class="text-xs text-blue-500 float-right flex items-center">
+    <NuxtLink :to="competitionPath(endless)" class="text-xs text-blue-500 float-right flex items-center">
       <Icon name="heroicons:chevron-double-left-16-solid" />{{ $t('common.backTo', { to: endless.name }) }}
     </NuxtLink>
     <h2 class="font-bold mb-2 text-xl">
@@ -106,11 +106,11 @@ async function updateData(submission: Submission) {
       @submitted="updateData"
     />
     <div class="flex justify-between mt-4">
-      <NuxtLink v-if="level > 1" class="bg-indigo-500 text-white px-3 py-2" :to="`/endless/${endless.alias}/${level - 1}`">
+      <NuxtLink v-if="level > 1" class="bg-indigo-500 text-white px-3 py-2" :to="competitionPath(endless, { number: level - 1 })">
         {{ $t('endless.previous') }}
       </NuxtLink>
       <div v-else />
-      <NuxtLink v-if="myLevel > level && level < endless.levels.length" class="bg-indigo-500 text-white px-3 py-2" :to="`/endless/${endless.alias}/${level + 1}`">
+      <NuxtLink v-if="myLevel > level && level < endless.levels.length" class="bg-indigo-500 text-white px-3 py-2" :to="competitionPath(endless, { number: level + 1 })">
         {{ $t('endless.next') }}
       </NuxtLink>
       <div v-else class="bg-gray-500 text-white px-3 py-2 flex items-center">

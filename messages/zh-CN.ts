@@ -400,10 +400,11 @@ export default {
     },
     user: {
       title: '{name}的练习本',
+      index: '{name}的练习 {index}',
     },
     latest: '最新练习',
     mostAttended: '最多参加',
-    number: '练习 {number}',
+    index: '练习 {index}',
     previous: '上一个',
     next: '下一个',
   },

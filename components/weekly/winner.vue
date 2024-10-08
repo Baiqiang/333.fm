@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <div>
-    <NuxtLink :to="`/weekly/${competition.alias}`" class="text-blue-500 flex items-center">
+    <NuxtLink :to="competitionPath(competition)" class="text-blue-500 flex items-center">
       <h3 class="font-bold text-lg my-2">
         {{ competition.name }}
       </h3>
