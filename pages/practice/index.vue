@@ -24,41 +24,35 @@ useSeoMeta({
         <h2 class="my-2 font-bold text-lg">
           {{ $t('practice.latest') }}
         </h2>
-        <div>
-          <PracticeInfo
-            v-for="competition in latest"
-            :key="competition.id"
-            :competition="competition"
-          />
-        </div>
+        <PracticeInfo
+          v-for="competition in latest"
+          :key="competition.id"
+          :competition="competition"
+        />
       </div>
       <div class="col-span-12 md:col-span-6 lg:col-span-4">
         <h2 class="my-2 font-bold text-lg">
           {{ $t('practice.mostAttended') }}
         </h2>
-        <div>
-          <PracticeInfo
-            v-for="competition in mostAttended"
-            :key="competition.id"
-            :competition="competition"
-          />
-        </div>
+        <PracticeInfo
+          v-for="competition in mostAttended"
+          :key="competition.id"
+          :competition="competition"
+        />
       </div>
       <div class="col-span-12 md:col-span-6 lg:col-span-4">
         <h2 class="my-2 font-bold text-lg">
           {{ $t('practice.mostPractices') }}
         </h2>
-        <div>
-          <NuxtLink
-            v-for="user in mostPractices"
-            :key="user.id"
-            class="flex items-center gap-2 text-blue-500"
-            :to="`/practice/${user.wcaId || user.id}`"
-          >
-            <UserAvatarName :user="user" :link="false" />
-            {{ user.practices }}
-          </NuxtLink>
-        </div>
+        <NuxtLink
+          v-for="user in mostPractices"
+          :key="user.id"
+          class="flex items-center gap-2 text-blue-500 pt-2"
+          :to="`/practice/${user.wcaId || user.id}`"
+        >
+          <UserAvatarName :user="user" :link="false" />
+          {{ $t('practice.practices', { n: user.practices }) }}
+        </NuxtLink>
       </div>
     </div>
   </div>

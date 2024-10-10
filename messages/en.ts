@@ -407,6 +407,7 @@ export default {
     mostAttended: 'Most Attended',
     mostPractices: 'Most Practices',
     index: 'Practice #{index}',
+    practices: '1 Practice | {n} Practices',
     previous: 'Previous',
     next: 'Next',
   },

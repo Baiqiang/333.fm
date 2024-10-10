@@ -7,12 +7,12 @@ const index = computed(() => props.competition.alias.split('-').pop())
 
 <template>
   <div class="pt-2">
-    <NuxtLink :to="competitionPath(competition)" class="col-span-12 md:col-span-6 lg:col-span-4 flex items-center gap-2 text-blue-500">
-      <div>
+    <div class="col-span-12 md:col-span-6 lg:col-span-4 flex items-center gap-2">
+      <NuxtLink :to="competitionPath(competition)" class="text-blue-500">
         {{ $t('practice.index', { index }) }}
-      </div>
-      <UserAvatarName :user="competition.user" :link="false" />
-    </NuxtLink>
+      </NuxtLink>
+      <UserAvatarName :user="competition.user" />
+    </div>
     <div class="flex text-sm gap-2 mt-2">
       <div>
         {{ $t(`common.${CompetitionFormat[competition.format].toLowerCase()}`) }}

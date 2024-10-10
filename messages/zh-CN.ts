@@ -407,6 +407,7 @@ export default {
     mostAttended: '最多参加',
     mostPractices: '最多练习',
     index: '练习 {index}',
+    practices: '{n} 次练习',
     previous: '上一个',
     next: '下一个',
   },
