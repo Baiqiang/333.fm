@@ -212,6 +212,7 @@ export default {
     avatar: '头像',
     changeName: '修改名称',
     solutions: '我的解法',
+    practices: '我的练习',
   },
   admin: {
     title: '管理',
@@ -404,6 +405,7 @@ export default {
     },
     latest: '最新练习',
     mostAttended: '最多参加',
+    mostPractices: '最多练习',
     index: '练习 {index}',
     previous: '上一个',
     next: '下一个',

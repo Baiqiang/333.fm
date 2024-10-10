@@ -212,6 +212,7 @@ export default {
     avatar: 'Avatar',
     changeName: 'Change Name',
     solutions: 'My Solutions',
+    practices: 'My Practices',
   },
   admin: {
     title: 'Admin',
@@ -404,6 +405,7 @@ export default {
     },
     latest: 'Latest Practice',
     mostAttended: 'Most Attended',
+    mostPractices: 'Most Practices',
     index: 'Practice #{index}',
     previous: 'Previous',
     next: 'Next',

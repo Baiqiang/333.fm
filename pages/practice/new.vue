@@ -3,7 +3,6 @@ const { t } = useI18n()
 useSeoMeta({
   title: t('practice.new.title'),
 })
-const user = useUser()
 const router = useRouter()
 const form = useNewPracticeForm()
 const localForm = useLocalStorage('practice.new', form.$state)

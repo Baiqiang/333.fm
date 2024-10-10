@@ -6,6 +6,7 @@ export interface User {
   avatar: string
   avatarThumb: string
   roles: Role[]
+  practices: number
 }
 
 export interface AdminUser extends User {
