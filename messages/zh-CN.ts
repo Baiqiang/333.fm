@@ -361,6 +361,7 @@ export default {
       'JZP 练习塔，每个打乱的 JZP 已做好。',
     ],
     showAll: '显示全部',
+    ended: '以下挑战已结束，不再增加新关卡，仍可提交解法。',
   },
   result: {
     rank: '排名',

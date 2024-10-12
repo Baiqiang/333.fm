@@ -361,6 +361,7 @@ export default {
       'The JZP practice has JZP done in every scramble.',
     ],
     showAll: 'Show All',
+    ended: 'The following challenges have ended. No new level will be added. You can submit solutions to the existing levels.',
   },
   result: {
     rank: 'Rank',

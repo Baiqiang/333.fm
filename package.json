@@ -44,6 +44,6 @@
     "nuxt-icon": "^0.6.10",
     "pinia": "^2.2.4",
     "postcss-html": "^1.7.0",
-    "typescript": "^5.6.3"
+    "typescript": "5.5"
   }
 }
