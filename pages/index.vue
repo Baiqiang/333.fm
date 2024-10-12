@@ -53,19 +53,7 @@ const { data: endlesses } = await useApi<Endless[]>('/endless/on-going')
           <h2 class="font-bold text-xl">
             {{ $t('endless.title') }}
           </h2>
-          <p class="mb-2 mt-4">
-            {{ $t('endless.description') }}
-          </p>
-          <div class="flex flex-col gap-3">
-            <div v-for="endless in endlesses" :key="endless.id">
-              <div class="mb-2">
-                {{ $t(`endless.type.${endless.subType}`) }}
-              </div>
-              <NuxtLink :to="competitionPath(endless)" class="bg-indigo-500 text-white px-3 py-2">
-                {{ endless.name }} <Icon name="ic:round-keyboard-double-arrow-right" />
-              </NuxtLink>
-            </div>
-          </div>
+          <EndlessList />
         </div>
       </div>
     </div>
