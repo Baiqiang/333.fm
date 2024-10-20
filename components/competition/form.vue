@@ -305,7 +305,7 @@ function getTmpURL(file: File) {
           <div v-for="attachment in form.attachments" :key="attachment.id">
             <div class="flex items-center gap-2">
               <img :src="attachment.url" :alt="attachment.name" class="w-12 h-12 object-cover cursor-pointer">
-              <Icon name="mdi:close" size="24" class="cursor-pointer text-red-500" @click="removeAttachment(attachment)" />
+              <Icon name="mdi:delete" size="24" class="cursor-pointer text-gray-500" @click="removeAttachment(attachment)" />
             </div>
             <div class="text-xs text-gray-500 mt-1">
               {{ attachment.name }}
