@@ -197,7 +197,7 @@ function reset() {
 }
 async function uploadAttachments(event: Event) {
   const files = (event.target as HTMLInputElement)?.files
-  if (!files)
+  if (!files || files.length === 0)
     return
   let resolve = () => {}
   uploadingPromise.value = new Promise<void>(r => resolve = r)
