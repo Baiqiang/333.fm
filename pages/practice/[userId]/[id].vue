@@ -55,7 +55,7 @@ useSeoMeta({
     name: localeName(profile.value.name, locale.value),
   })}`),
 })
-// useIntervalFn(fetchData, 5000)
+useIntervalFn(fetchData, 5000)
 bus.on(fetchData)
 </script>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Algorithm, Cube, centerCycleTable } from 'insertionfinder'
+import { Algorithm, centerCycleTable, Cube } from 'insertionfinder'
 
 const { t } = useI18n()
 useSeoMeta({

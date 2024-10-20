@@ -235,6 +235,10 @@ export default {
     removeConfirm: 'Are you sure to remove this?',
     decline: 'Decline',
     incline: 'Incline',
+    working: {
+      label: 'Working Paper',
+      description: 'You can upload your working papers in image format.',
+    },
   },
   weekly: {
     title: 'Weekly Competition',

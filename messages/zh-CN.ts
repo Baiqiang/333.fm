@@ -235,6 +235,10 @@ export default {
     removeConfirm: '确认要删除这条记录吗？',
     decline: '弃疗',
     incline: '不放弃',
+    working: {
+      label: '草稿纸',
+      description: '可以上传图片格式的草稿纸。',
+    },
   },
   weekly: {
     title: '周赛',
@@ -267,7 +271,7 @@ export default {
     },
     unlimited: {
       label: '狂野',
-      description: '时间不限，可以多次提交。',
+      description: '时间不限，尽可能取得好解法。',
       invalid: '请提交更好的解法！',
     },
     confirmDNF: '确认要 DNF 掉吗？',
@@ -346,7 +350,7 @@ export default {
     openAt: '{time}开放。',
     kickedAt: '{time}破关。',
     mode: {
-      description: '仅标记一下是解法的模式。',
+      description: '仅标记一下解法的模式。',
     },
     unlimited: {
       description: '时间不限，尽可能取得好解法。',

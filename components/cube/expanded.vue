@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Algorithm, Cube } from 'insertionfinder'
-import Two from 'two.js'
 import type { Group } from 'two.js/src/group'
 import type { Rectangle } from 'two.js/src/shapes/rectangle'
+import { Algorithm, Cube } from 'insertionfinder'
+import Two from 'two.js'
 
 const props = defineProps<{
   moves?: string

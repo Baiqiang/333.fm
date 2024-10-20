@@ -16,6 +16,8 @@
     "tailwind-merge": "^2.5.3",
     "three": "^0.169.0",
     "two.js": "^0.8.14",
+    "v-viewer": "^3.0.20",
+    "viewerjs": "^1.11.6",
     "vue": "^3.5.11",
     "vue-router": "^4.4.5"
   },

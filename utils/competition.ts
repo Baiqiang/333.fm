@@ -53,6 +53,12 @@ export enum SubmissionPhase {
   INSERTIONS,
 }
 
+export interface Attachment {
+  id: number | string
+  url: string
+  name: string
+}
+
 export interface Submission extends Time {
   id: number
   solution: string
@@ -83,6 +89,8 @@ export interface Submission extends Time {
   continuances: number
   finishes: number
   best: number
+
+  attachments: Attachment[]
 }
 
 export enum CompetitionType {
@@ -175,6 +183,13 @@ export interface Practice extends Competition {
   ownerResult: Result
   prevIndex?: number
   nextIndex?: number
+}
+
+export interface SubmissionForm {
+  mode: number
+  solution: string
+  comment: string
+  attachments: Attachment[]
 }
 
 export const SYMBOL_ENDLESS = Symbol('endless')

@@ -13,5 +13,8 @@ export default antfu({
         max: 1,
       },
     }],
+    'ts/consistent-type-imports': 'off',
+    'regexp/no-super-linear-backtracking': 'off',
+    'unused-imports/no-unused-vars': 'warn',
   },
 })

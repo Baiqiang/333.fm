@@ -1,4 +1,4 @@
-import { Algorithm, Cube, centerCycleTable } from 'insertionfinder'
+import { Algorithm, centerCycleTable, Cube } from 'insertionfinder'
 import { SubmissionPhase } from '~/utils/competition'
 
 export interface ChainInsertion {
@@ -281,8 +281,9 @@ export function checkLastQuarterTurns(twists: readonly number[], inverseTwists: 
     penultimateInverse !== undefined
     && isSwapable(penultimateInverse, lastInverse)
     && [penultimateInverse, lastInverse].some(isHalfTurn)
-  )
+  ) {
     return false
+  }
 
   return true
 }

@@ -10,6 +10,7 @@ if (!data.value || error.value) {
     statusCode: 404,
   })
 }
+const user = useUser()
 const progress = reactive<Progress>(data.value)
 const endless = inject<Ref<Endless>>(SYMBOL_ENDLESS)!
 const myProgress = inject<Ref<UserProgress>>(SYMBOL_ENDLESS_PROGRESS)!
@@ -98,11 +99,14 @@ async function updateData(submission: Submission) {
     <Sequence v-if="progress.scramble.scramble" :sequence="progress.scramble.scramble" :source="progress.scramble.scramble" />
     <CubeExpanded v-if="progress.scramble.scramble" :moves="progress.scramble.scramble" :cubie-cube="progress.scramble.cubieCube" />
     <Cube3d v-else :cubie-cube="progress.scramble.cubieCube" />
-    <EndlessForm
+    <CompetitionForm
+      type="endless"
       :scramble="progress.scramble"
       :competition="endless"
-      :submission="progress.submission"
-      :level="level"
+      :submissions="submissions.filter(s => s.user.id === user.id)"
+      :mode-description="$t('endless.mode.description')"
+      :allow-dnf="false"
+      allow-change-mode
       @submitted="updateData"
     />
     <div class="flex justify-between mt-4">

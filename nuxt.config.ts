@@ -25,6 +25,7 @@ export default defineNuxtConfig({
     'nuxt-gtag',
     '@vite-pwa/nuxt',
   ],
+  css: ['viewerjs/dist/viewer.css'],
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
