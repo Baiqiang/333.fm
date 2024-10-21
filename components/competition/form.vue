@@ -304,7 +304,7 @@ function getTmpURL(file: File) {
         <div v-viewer class="flex flex-wrap gap-2">
           <div v-for="attachment in form.attachments" :key="attachment.id">
             <div class="flex items-center gap-2">
-              <img :src="attachment.url" :alt="attachment.name" class="w-12 h-12 object-cover cursor-pointer">
+              <SubmissionImg :src="attachment.url" :alt="attachment.name" />
               <Icon name="mdi:delete" size="24" class="cursor-pointer text-gray-500" @click="removeAttachment(attachment)" />
             </div>
             <div class="text-xs text-gray-500 mt-1">
@@ -313,7 +313,7 @@ function getTmpURL(file: File) {
           </div>
           <div v-for="file in uploadingAttachments" :key="file.name">
             <div class="flex items-center gap-2">
-              <img :src="getTmpURL(file)" :alt="file.name" class="w-12 h-12 object-cover cursor-pointer">
+              <SubmissionImg :src="getTmpURL(file)" :alt="file.name" />
               <Spinner class="w-4 h-4 text-green-500 border-[3px]" />
             </div>
             <div class="text-xs text-gray-500 mt-1">
