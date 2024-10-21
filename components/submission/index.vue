@@ -120,10 +120,10 @@ function copySolution() {
       <TransitionExpand>
         <div v-if="showComment" class="basis-full">
           <Sequence :sequence="submission.comment" class="bg-gray-200" />
+          <SubmissionAttachments :attachments="submission.attachments" />
         </div>
       </TransitionExpand>
       <SubmissionChainInfo v-if="isChain" :submission="submission" />
-      <SubmissionAttachments :attachments="submission.attachments" />
       <SubmissionMeta :submission="submission" />
     </template>
     <div v-if="!submission.user" class="text-xs text-gray-400">
