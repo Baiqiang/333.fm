@@ -17,6 +17,7 @@ const { locale } = useI18n()
 const el = ref<HTMLElement>()
 const showComment = ref(props.submission.competition !== undefined)
 const showOriginal = ref(!!props.chain)
+const showAttachment = ref(false)
 const solution = computed(() => {
   if (showOriginal.value)
     return props.submission.solution
@@ -62,6 +63,10 @@ function copySolution() {
   solution.push(`By ${user?.name}\n${dayjs(props.submission.createdAt).locale(locale.value).format('LLL')}`)
   copy(solution.join('\n\n'))
 }
+function expandAndShowAttachment() {
+  showComment.value = true
+  setTimeout(() => showAttachment.value = true, 100)
+}
 </script>
 
 <template>
@@ -97,6 +102,9 @@ function copySolution() {
           comment
         />
         <Sequence v-else :sequence="solution" />
+        <button v-if="submission.attachments?.length" class="text-indigo-500" @click="expandAndShowAttachment">
+          <Icon name="ion:image" size="20" />
+        </button>
         <button v-if="!isChain" class="text-indigo-500" @click="showOriginal = !showOriginal">
           <Icon
             :name="showOriginal ? 'ic:sharp-rotate-90-degrees-cw' : 'ic:sharp-rotate-90-degrees-ccw'"
@@ -120,7 +128,7 @@ function copySolution() {
       <TransitionExpand>
         <div v-if="showComment" class="basis-full">
           <Sequence :sequence="submission.comment" class="bg-gray-200" />
-          <SubmissionAttachments :attachments="submission.attachments" />
+          <SubmissionAttachments :attachments="submission.attachments" :show="showAttachment" @hide="showAttachment = false" />
         </div>
       </TransitionExpand>
       <SubmissionChainInfo v-if="isChain" :submission="submission" />
