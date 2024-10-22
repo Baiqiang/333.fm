@@ -120,8 +120,8 @@ async function submit() {
   loading.value = true
   await uploadingPromise.value
   try {
-    if ((form.mode === CompetitionMode.REGULAR && submissionsMap.value[CompetitionMode.REGULAR]) || props.allowChangeMode) {
-      const submission = submissionsMap.value[CompetitionMode.REGULAR] || props.submissions[0]
+    const submission = submissionsMap.value[CompetitionMode.REGULAR] || props.submissions[0]
+    if ((form.mode === CompetitionMode.REGULAR && submissionsMap.value[CompetitionMode.REGULAR]) || (props.allowChangeMode && submission)) {
       const { data, refresh } = await useApiPost<Submission>(`/${props.type}/${props.competition.alias}/${submission.id}`, {
         body: {
           mode: props.allowChangeMode ? form.mode : undefined,
