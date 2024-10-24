@@ -415,5 +415,7 @@ export default {
     practices: '{n} 次练习',
     previous: '上一个',
     next: '下一个',
+    created: '创建的练习',
+    joined: '参与的练习',
   },
 }

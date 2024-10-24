@@ -1,8 +1,13 @@
 <script setup lang="ts">
 const profile = inject(SYMBOL_USER)!
-const competitions = ref<Practice[]>([])
-const { data } = await useApi<Practice[]>(`/practice/${profile.value.id}/competitions`)
-competitions.value = data.value || []
+const created = ref<Practice[]>([])
+const joined = ref<Practice[]>([])
+const { data } = await useApi<{
+  created: Practice[]
+  joined: Practice[]
+}>(`/practice/${profile.value.id}/competitions`)
+created.value = data.value?.created || []
+joined.value = data.value?.joined || []
 </script>
 
 <template>
@@ -11,11 +16,29 @@ competitions.value = data.value || []
       <Icon name="ic:twotone-plus" />
       {{ $t('common.new') }}
     </NuxtLink>
-    <PracticeInfo
-      v-for="competition in competitions"
-      :key="competition.id"
-      :competition="competition"
-      class="col-span-12 md:col-span-6 lg:col-span-4"
-    />
+    <div class="grid md:grid-cols-2">
+      <div v-if="created.length > 0">
+        <div class="font-bold text-lg my-2">
+          {{ $t('practice.created') }}
+        </div>
+        <PracticeInfo
+          v-for="competition in created"
+          :key="competition.id"
+          :competition="competition"
+          class="col-span-12 md:col-span-6 lg:col-span-4"
+        />
+      </div>
+      <div v-if="joined.length > 0">
+        <div class="font-bold text-lg my-2">
+          {{ $t('practice.joined') }}
+        </div>
+        <PracticeInfo
+          v-for="competition in joined"
+          :key="competition.id"
+          :competition="competition"
+          class="col-span-12 md:col-span-6 lg:col-span-4"
+        />
+      </div>
+    </div>
   </div>
 </template>

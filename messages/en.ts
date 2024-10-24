@@ -415,5 +415,7 @@ export default {
     practices: '1 Practice | {n} Practices',
     previous: 'Previous',
     next: 'Next',
+    created: 'Created Practices',
+    joined: 'Joined Practices',
   },
 }
