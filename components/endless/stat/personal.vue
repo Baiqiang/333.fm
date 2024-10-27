@@ -150,7 +150,7 @@ const lineOptions = computed(() => {
     },
     xaxis: {
       categories: stats.value.results.map(r => r.level).reverse(),
-      range: 30,
+      range: Math.min(30, stats.value.results.length),
     },
     yaxis: {
       labels: {
