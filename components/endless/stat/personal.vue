@@ -150,7 +150,7 @@ const lineOptions = computed(() => {
     },
     xaxis: {
       categories: stats.value.results.map(r => r.level).reverse(),
-      range: Math.min(30, stats.value.results.length),
+      range: Math.min(30, stats.value.results.length - 1),
     },
     yaxis: {
       labels: {
@@ -210,6 +210,9 @@ const barOptions = computed(() => {
               // fontSize: '16px',
               // fontWeight: 600,
             },
+            formatter(value: number) {
+              return `${t('endless.stats.count')}: ${value}`
+            },
           },
         },
       },
@@ -237,8 +240,8 @@ const barOptions = computed(() => {
 const barSeries = computed(() => {
   return [
     {
-      name: t('endless.stats.count'),
-      data: stats.value.movesCount.map(m => m.count),
+      name: t('weekly.regular.label'),
+      data: stats.value.movesCount.map(m => m.count - m.unlimited),
     },
     {
       name: t('weekly.unlimited.label'),
