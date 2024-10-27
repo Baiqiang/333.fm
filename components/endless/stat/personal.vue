@@ -125,7 +125,6 @@ const currentCell = reactive({
 const lineOptions = computed(() => {
   return {
     chart: {
-      height: 350,
       type: 'line',
       events: {
         beforeZoom(ctx: any) {
@@ -194,7 +193,6 @@ const lineSeries = computed(() => {
 const barOptions = computed(() => {
   return {
     chart: {
-      height: 350,
       type: 'bar',
       stacked: true,
       zoom: {
@@ -370,7 +368,7 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
       </div>
     </div>
     <div>
-      <Chart :options="lineOptions" :series="lineSeries" />
+      <Chart height="480" :options="lineOptions" :series="lineSeries" />
     </div>
     <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center mt-4">
       <div class="grid grid-cols-subgrid col-span-3 font-bold bg-gray-200 py-1">
@@ -397,7 +395,7 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
       </div>
     </div>
     <div>
-      <Chart :options="barOptions" :series="barSeries" />
+      <Chart height="350" :options="barOptions" :series="barSeries" />
     </div>
   </div>
 </template>
