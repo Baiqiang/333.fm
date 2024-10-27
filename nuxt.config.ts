@@ -5,12 +5,14 @@ export default defineNuxtConfig({
       titleTemplate: '%s - Fewest Moves',
     },
   },
+
   runtimeConfig: {
     public: {
       mode: 'production',
       baseURL: 'https://api.333.fm/',
     },
   },
+
   modules: [
     // '@nuxtjs/eslint-module',
     '@nuxtjs/tailwindcss',
@@ -22,43 +24,47 @@ export default defineNuxtConfig({
     '@pinia-plugin-persistedstate/nuxt',
     '@freeloop/nuxt-transitions',
     'dayjs-nuxt',
-    'nuxt-gtag',
     '@vite-pwa/nuxt',
+    process.env.NODE_ENV === 'development'
+      ? ['@vite-pwa/nuxt', {
+          registerType: 'autoUpdate',
+          manifest: {
+            name: '333.fm',
+            short_name: '333.fm',
+            theme_color: '#6366f1',
+            display: 'standalone',
+            icons: [
+              {
+                src: 'logo.svg',
+                sizes: '72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512',
+                type: 'image/svg+xml',
+              },
+            ],
+          },
+          workbox: {
+            globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+          },
+          client: {
+            installPrompt: true,
+          },
+          devOptions: {
+            enabled: true,
+            suppressWarnings: true,
+            navigateFallbackAllowlist: [/^\/$/],
+            type: 'module',
+          },
+        }]
+      : undefined,
   ],
+
   css: ['viewerjs/dist/viewer.css'],
-  pwa: {
-    registerType: 'autoUpdate',
-    manifest: {
-      name: '333.fm',
-      short_name: '333.fm',
-      theme_color: '#6366f1',
-      display: 'standalone',
-      icons: [
-        {
-          src: 'logo.svg',
-          sizes: '72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512',
-          type: 'image/svg+xml',
-        },
-      ],
-    },
-    workbox: {
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-    },
-    client: {
-      installPrompt: true,
-    },
-    devOptions: {
-      enabled: true,
-      suppressWarnings: true,
-      navigateFallbackAllowlist: [/^\/$/],
-      type: 'module',
-    },
-  },
+
   dayjs: {
     locales: ['en', 'zh-cn'],
     defaultLocale: 'en',
     plugins: ['relativeTime', 'utc', 'timezone', 'advancedFormat', 'weekOfYear', 'localizedFormat'],
   },
+
   i18n: {
     strategy: 'no_prefix',
     detectBrowserLanguage: {
@@ -76,6 +82,7 @@ export default defineNuxtConfig({
       },
     ],
   },
+
   googleFonts: {
     download: true,
     families: {
@@ -83,15 +90,18 @@ export default defineNuxtConfig({
       Inter: [300, 400, 500, 600],
     },
   },
+
   gtag: {
     id: 'G-4DDRHC6TDB',
   },
+
   experimental: {
     asyncContext: true,
     headNext: true,
     // disable this to run in QQ browser for iOS
     appManifest: false,
   },
+
   $development: {
     vite: {
       server: {
@@ -102,10 +112,14 @@ export default defineNuxtConfig({
       },
     },
   },
+
   devtools: {
     enabled: true,
   },
+
   typescript: {
     shim: false,
   },
+
+  compatibilityDate: '2024-10-26',
 })

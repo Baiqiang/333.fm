@@ -346,6 +346,7 @@ export default {
       personal: '个人统计',
       moves: '步数',
       count: '次数',
+      level: '层数',
     },
     openAt: '{time}开放。',
     kickedAt: '{time}破关。',

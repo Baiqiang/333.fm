@@ -3,10 +3,6 @@ const { data } = await useApi<Endless[]>('/endless/on-going')
 const { data: data2 } = await useApi<Endless[]>('/endless/ended')
 const endlesses = ref<Endless[]>(data.value || [])
 const endedEndlesses = ref<Endless[]>(data2.value || [])
-const { t } = useI18n()
-useSeoMeta({
-  title: t('endless.title'),
-})
 </script>
 
 <template>

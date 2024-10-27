@@ -250,7 +250,7 @@ function getTmpURL(file: File) {
       <FormInput
         v-model="form.solution"
         type="textarea"
-        :rows="4"
+        :rows="6"
         :label="$t('weekly.solution.label') + (solutionSubmitted ? $t('weekly.submitted') : '')"
         :state="solutionState"
         :attrs="{ required: true, disabled: solutionDisabled }"

@@ -5,6 +5,8 @@ const props = defineProps<{
   endless: Endless
 }>()
 const { data } = await useApi<{ submissions: Submission[] }>(`/endless/${props.endless.alias}/user-stats`)
+const { t, locale } = useI18n()
+const user = useUser()
 
 interface PersonalResult {
   level: number
@@ -120,6 +122,130 @@ const currentCell = reactive({
   type: 0,
   index: -1,
 })
+const lineOptions = computed(() => {
+  return {
+    chart: {
+      height: 350,
+      type: 'line',
+      events: {
+        beforeZoom(ctx: any) {
+          ctx.w.config.xaxis.range = undefined
+        },
+      },
+    },
+    stroke: {
+      width: 2,
+    },
+    title: {
+      text: `${localeName(user.name, locale.value)} - ${props.endless.name}`,
+    },
+    tooltip: {
+      followCursor: true,
+    },
+    grid: {
+      row: {
+        colors: ['#f3f3f3', 'transparent'],
+        opacity: 0.5,
+      },
+    },
+    xaxis: {
+      categories: stats.value.results.map(r => r.level).reverse(),
+      range: 30,
+    },
+    yaxis: {
+      labels: {
+        formatter(value: number, { seriesIndex }: { seriesIndex: number }) {
+          if (seriesIndex === 0 || seriesIndex === undefined)
+            return value
+          return value?.toFixed(2)
+        },
+      },
+      min: Math.min(...stats.value.results.map(r => r.moves / 100)) - 1,
+      max: Math.max(...stats.value.results.map(r => r.moves / 100)) + 1,
+      stepSize: 1,
+    },
+  }
+})
+const lineSeries = computed(() => {
+  return [
+    {
+      name: t('endless.stats.moves'),
+      data: stats.value.results.map(r => formatResult(r.moves)).reverse(),
+    },
+    {
+      name: 'Mo3',
+      data: stats.value.results.map(r => Number.isNaN(r.mo3) ? null : formatResult(r.mo3, 2)).reverse(),
+    },
+    {
+      name: 'Ao5',
+      data: stats.value.results.map(r => Number.isNaN(r.ao5) ? null : formatResult(r.ao5, 2)).reverse(),
+    },
+    {
+      name: 'Ao12',
+      data: stats.value.results.map(r => Number.isNaN(r.ao12) ? null : formatResult(r.ao12, 2)).reverse(),
+    },
+    {
+      name: t('result.mean'),
+      data: stats.value.results.map(r => formatResult(r.mean, 2)).reverse(),
+    },
+  ]
+})
+
+const barOptions = computed(() => {
+  return {
+    chart: {
+      height: 350,
+      type: 'bar',
+      stacked: true,
+      zoom: {
+        enabled: false,
+      },
+    },
+    plotOptions: {
+      bar: {
+        dataLabels: {
+          total: {
+            enabled: true,
+            style: {
+              // fontSize: '16px',
+              // fontWeight: 600,
+            },
+          },
+        },
+      },
+    },
+    tooltip: {
+      shared: true,
+      intersect: false,
+      followCursor: true,
+    },
+    title: {
+      text: `${localeName(user.name, locale.value)} - ${props.endless.name}`,
+    },
+    xaxis: {
+      categories: stats.value.movesCount.map(m => formatResult(m.moves)),
+    },
+    yaxis: {
+      labels: {
+        formatter(value: number) {
+          return value.toFixed(0)
+        },
+      },
+    },
+  }
+})
+const barSeries = computed(() => {
+  return [
+    {
+      name: t('endless.stats.count'),
+      data: stats.value.movesCount.map(m => m.count),
+    },
+    {
+      name: t('weekly.unlimited.label'),
+      data: stats.value.movesCount.map(m => m.unlimited),
+    },
+  ]
+})
 
 function enterCell(type: number, index: number) {
   currentCell.type = type
@@ -196,7 +322,7 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
 <template>
   <div class="mt-4">
     <h4 class="font-bold mb-2">
-      {{ $t(`endless.stats.personal`) }}
+      {{ $t('endless.stats.personal') }}
     </h4>
     <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center">
       <div class="grid grid-cols-subgrid col-span-6 font-bold bg-gray-200 py-1">
@@ -240,6 +366,9 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
         </div>
       </div>
     </div>
+    <div>
+      <Chart :options="lineOptions" :series="lineSeries" />
+    </div>
     <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center mt-4">
       <div class="grid grid-cols-subgrid col-span-3 font-bold bg-gray-200 py-1">
         <div class="px-2">
@@ -263,6 +392,9 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
           {{ m.unlimited }}
         </div>
       </div>
+    </div>
+    <div>
+      <Chart :options="barOptions" :series="barSeries" />
     </div>
   </div>
 </template>

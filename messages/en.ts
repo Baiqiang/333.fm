@@ -346,6 +346,7 @@ export default {
       personal: 'Personal Stats',
       moves: 'Moves',
       count: 'Count',
+      level: 'Level',
     },
     openAt: 'Open at {time}.',
     kickedAt: 'Kicked at {time}.',
