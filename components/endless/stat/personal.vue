@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { react } from '@antfu/eslint-config'
 import { twMerge } from 'tailwind-merge'
 
 const props = defineProps<{
@@ -122,6 +123,10 @@ const currentCell = reactive({
   type: 0,
   index: -1,
 })
+const lineXaxis = reactive({
+  min: Math.max(0, stats.value.results.length - 30),
+  max: stats.value.results.length,
+})
 const lineOptions = computed(() => {
   return {
     chart: {
@@ -130,6 +135,9 @@ const lineOptions = computed(() => {
         beforeZoom(ctx: any) {
           ctx.w.config.xaxis.range = undefined
         },
+      },
+      zoom: {
+        enabled: false,
       },
     },
     stroke: {
@@ -149,20 +157,24 @@ const lineOptions = computed(() => {
     },
     xaxis: {
       categories: stats.value.results.map(r => r.level).reverse(),
-      range: Math.min(30, stats.value.results.length - 1),
+      min: lineXaxis.min,
+      max: lineXaxis.max,
     },
-    yaxis: {
-      labels: {
-        formatter(value: number, { seriesIndex }: { seriesIndex: number }) {
-          if (seriesIndex === 0 || seriesIndex === undefined)
+    yaxis: [
+      {
+        labels: {
+          formatter(value: number) {
             return value
-          return value?.toFixed(2)
+          },
         },
+        min: Math.min(...stats.value.results.map(r => r.moves / 100)) - 1,
+        max: Math.max(...stats.value.results.map(r => r.moves / 100)) + 1,
+        stepSize: 1,
       },
-      min: Math.min(...stats.value.results.map(r => r.moves / 100)) - 1,
-      max: Math.max(...stats.value.results.map(r => r.moves / 100)) + 1,
-      stepSize: 1,
-    },
+      {
+        opposite: true,
+      },
+    ],
   }
 })
 const lineSeries = computed(() => {
@@ -188,6 +200,37 @@ const lineSeries = computed(() => {
       data: stats.value.results.map(r => formatResult(r.mean, 2)).reverse(),
     },
   ]
+})
+const lineRef = ref()
+
+const areaOptions = computed(() => {
+  return {
+    chart: {
+      type: 'area',
+      brush: {
+        enabled: true,
+      },
+      selection: {
+        enabled: true,
+        xaxis: {
+          max: stats.value.results[0].level,
+          min: Math.max(0, stats.value.results[0].level - 30),
+        },
+      },
+    },
+    xaxis: {
+      categories: stats.value.results.map(r => r.level).reverse(),
+      tickAmount: Math.min(30, stats.value.results.length),
+    },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        xaxis: {
+          tickAmount: 5,
+        },
+      },
+    }],
+  }
 })
 
 const barOptions = computed(() => {
@@ -247,6 +290,17 @@ const barSeries = computed(() => {
     },
   ]
 })
+
+function onSelection(_: any, { xaxis }: { xaxis: { min: number, max: number } }) {
+  lineXaxis.min = xaxis.min
+  lineXaxis.max = xaxis.max
+  // lineRef.value?.updateOptions({
+  //   xaxis: {
+  //     min: xaxis.min,
+  //     max: xaxis.max,
+  //   },
+  // })
+}
 
 function enterCell(type: number, index: number) {
   currentCell.type = type
@@ -368,34 +422,37 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
       </div>
     </div>
     <div>
-      <Chart height="480" :options="lineOptions" :series="lineSeries" />
+      <Chart ref="lineRef" height="480" :options="lineOptions" :series="lineSeries" />
+      <Chart height="130" :options="areaOptions" :series="[lineSeries[0]]" @selection="onSelection" />
     </div>
-    <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center mt-4">
-      <div class="grid grid-cols-subgrid col-span-3 font-bold bg-gray-200 py-1">
-        <div class="px-2">
-          {{ $t('endless.stats.moves') }}
+    <div class="flex flex-col lg:flex-row mt-4">
+      <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center">
+        <div class="grid grid-cols-subgrid col-span-3 font-bold bg-gray-200 py-1">
+          <div class="px-2">
+            {{ $t('endless.stats.moves') }}
+          </div>
+          <div class="px-2">
+            {{ $t('endless.stats.count') }}
+          </div>
+          <div class="px-2">
+            {{ $t('weekly.unlimited.label') }}
+          </div>
         </div>
-        <div class="px-2">
-          {{ $t('endless.stats.count') }}
-        </div>
-        <div class="px-2">
-          {{ $t('weekly.unlimited.label') }}
+        <div v-for="m in movesCount" :key="m.moves" class="grid grid-cols-subgrid col-span-3 font-mono odd:bg-gray-200 items-center">
+          <div class="py-1">
+            {{ formatResult(m.moves) }}
+          </div>
+          <div>
+            {{ m.count }}
+          </div>
+          <div>
+            {{ m.unlimited }}
+          </div>
         </div>
       </div>
-      <div v-for="m in movesCount" :key="m.moves" class="grid grid-cols-subgrid col-span-3 font-mono odd:bg-gray-200 items-center">
-        <div class="py-1">
-          {{ formatResult(m.moves) }}
-        </div>
-        <div>
-          {{ m.count }}
-        </div>
-        <div>
-          {{ m.unlimited }}
-        </div>
+      <div class="flex-1">
+        <Chart height="350" :options="barOptions" :series="barSeries" />
       </div>
-    </div>
-    <div>
-      <Chart height="350" :options="barOptions" :series="barSeries" />
     </div>
   </div>
 </template>
