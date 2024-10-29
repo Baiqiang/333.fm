@@ -48,6 +48,7 @@ export default {
     bo1: '单次计最好',
     bo2: '两次计最好',
     mo3: '三次计平均',
+    saveAsImage: '保存为图片',
   },
   error: {
     400: '错误请求',

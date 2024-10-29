@@ -24,7 +24,9 @@ export default defineNuxtConfig({
     '@pinia-plugin-persistedstate/nuxt',
     '@freeloop/nuxt-transitions',
     'dayjs-nuxt',
+    'nuxt-gtag',
     '@vite-pwa/nuxt',
+    'nuxt-echarts',
     process.env.NODE_ENV === 'development'
       ? ['@vite-pwa/nuxt', {
           registerType: 'autoUpdate',
@@ -93,6 +95,23 @@ export default defineNuxtConfig({
 
   gtag: {
     id: 'G-4DDRHC6TDB',
+  },
+
+  echarts: {
+    charts: ['LineChart', 'BarChart'],
+    components: [
+      'GridComponent',
+      'TitleComponent',
+      'TooltipComponent',
+      'ToolboxComponent',
+      'LegendComponent',
+      'BrushComponent',
+      'MarkLineComponent',
+      'MarkPointComponent',
+      'DataZoomComponent',
+    ],
+    features: ['UniversalTransition'],
+    renderer: ['svg', 'canvas'],
   },
 
   experimental: {

@@ -123,184 +123,172 @@ const currentCell = reactive({
   type: 0,
   index: -1,
 })
-const lineXaxis = reactive({
-  min: Math.max(0, stats.value.results.length - 30),
-  max: stats.value.results.length,
-})
-const lineOptions = computed(() => {
+
+const lineOptions = computed<ECOption>(() => {
   return {
-    chart: {
-      type: 'line',
-      events: {
-        beforeZoom(ctx: any) {
-          ctx.w.config.xaxis.range = undefined
-        },
-      },
-      zoom: {
-        enabled: false,
-      },
-    },
-    stroke: {
-      width: 2,
-    },
     title: {
       text: `${localeName(user.name, locale.value)} - ${props.endless.name}`,
     },
     tooltip: {
-      followCursor: true,
+      trigger: 'axis',
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {
+          name: `${localeName(user.name, locale.value)}-${props.endless.name}.png`,
+          title: t('common.saveAsImage'),
+        },
+      },
+    },
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: [0],
+      },
+      {
+        type: 'slider',
+        xAxisIndex: [0],
+        bottom: '7%',
+      },
+    ],
+    xAxis: {
+      type: 'category',
+      data: stats.value.results.map(r => r.level).reverse(),
+      boundaryGap: true,
+      axisTick: {
+        alignWithLabel: true,
+      },
+    },
+    yAxis: {
+      type: 'value',
+      min: Math.min(...stats.value.results.map(r => r.moves / 100)) - 1,
+      max: Math.max(...stats.value.results.map(r => r.moves / 100)) + 1,
+      interval: 1,
+    },
+    legend: {
+      bottom: '0%',
     },
     grid: {
-      row: {
-        colors: ['#f3f3f3', 'transparent'],
-        opacity: 0.5,
-      },
+      left: '3%',
+      right: '3%',
+      containLabel: true,
     },
-    xaxis: {
-      categories: stats.value.results.map(r => r.level).reverse(),
-      min: lineXaxis.min,
-      max: lineXaxis.max,
-    },
-    yaxis: [
+    series: [
       {
-        labels: {
-          formatter(value: number) {
-            return value
-          },
+        name: t('endless.stats.moves'),
+        showSymbol: false,
+        type: 'line',
+        data: stats.value.results.map(r => formatResult(r.moves)).reverse(),
+        markPoint: {
+          data: [
+            {
+              name: 'Worst',
+              type: 'max',
+              itemStyle: {
+                color: 'red',
+              },
+            },
+            {
+              name: 'Best',
+              type: 'min',
+              itemStyle: {
+                color: 'green',
+              },
+            },
+          ],
         },
-        min: Math.min(...stats.value.results.map(r => r.moves / 100)) - 1,
-        max: Math.max(...stats.value.results.map(r => r.moves / 100)) + 1,
-        stepSize: 1,
       },
       {
-        opposite: true,
+        name: 'Mo3',
+        showSymbol: false,
+        type: 'line',
+        data: stats.value.results.map(r => Number.isNaN(r.mo3) ? null : formatResult(r.mo3, 2)).reverse(),
+      },
+      {
+        name: 'Ao5',
+        showSymbol: false,
+        type: 'line',
+        data: stats.value.results.map(r => Number.isNaN(r.ao5) ? null : formatResult(r.ao5, 2)).reverse(),
+      },
+      {
+        name: 'Ao12',
+        showSymbol: false,
+        type: 'line',
+        data: stats.value.results.map(r => Number.isNaN(r.ao12) ? null : formatResult(r.ao12, 2)).reverse(),
+      },
+      {
+        name: t('result.mean'),
+        showSymbol: false,
+        type: 'line',
+        data: stats.value.results.map(r => formatResult(r.mean, 2)).reverse(),
+      },
+      {
+        type: 'line',
+        data: [],
+        markLine: {
+          data: [
+            {
+              name: t('endless.stats.moves'),
+              yAxis: (stats.value.results[0]?.mean || 0) / 100,
+              lineStyle: {
+                color: 'rgb(99, 102, 241)',
+              },
+            },
+          ],
+        },
       },
     ],
   }
 })
-const lineSeries = computed(() => {
-  return [
-    {
-      name: t('endless.stats.moves'),
-      data: stats.value.results.map(r => formatResult(r.moves)).reverse(),
-    },
-    {
-      name: 'Mo3',
-      data: stats.value.results.map(r => Number.isNaN(r.mo3) ? null : formatResult(r.mo3, 2)).reverse(),
-    },
-    {
-      name: 'Ao5',
-      data: stats.value.results.map(r => Number.isNaN(r.ao5) ? null : formatResult(r.ao5, 2)).reverse(),
-    },
-    {
-      name: 'Ao12',
-      data: stats.value.results.map(r => Number.isNaN(r.ao12) ? null : formatResult(r.ao12, 2)).reverse(),
-    },
-    {
-      name: t('result.mean'),
-      data: stats.value.results.map(r => formatResult(r.mean, 2)).reverse(),
-    },
-  ]
-})
-const lineRef = ref()
 
-const areaOptions = computed(() => {
+const barOptions = computed<ECOption>(() => {
   return {
-    chart: {
-      type: 'area',
-      brush: {
-        enabled: true,
-      },
-      selection: {
-        enabled: true,
-        xaxis: {
-          max: stats.value.results[0].level,
-          min: Math.max(0, stats.value.results[0].level - 30),
-        },
-      },
-    },
-    xaxis: {
-      categories: stats.value.results.map(r => r.level).reverse(),
-      tickAmount: Math.min(30, stats.value.results.length),
-    },
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        xaxis: {
-          tickAmount: 5,
-        },
-      },
-    }],
-  }
-})
-
-const barOptions = computed(() => {
-  return {
-    chart: {
-      type: 'bar',
-      stacked: true,
-      zoom: {
-        enabled: false,
-      },
-    },
-    plotOptions: {
-      bar: {
-        dataLabels: {
-          total: {
-            enabled: true,
-            style: {
-              // fontSize: '16px',
-              // fontWeight: 600,
-            },
-            formatter(value: number) {
-              return `${t('endless.stats.count')}: ${value}`
-            },
-          },
-        },
-      },
-    },
-    tooltip: {
-      shared: true,
-      intersect: false,
-      followCursor: true,
-    },
     title: {
       text: `${localeName(user.name, locale.value)} - ${props.endless.name}`,
     },
-    xaxis: {
-      categories: stats.value.movesCount.map(m => formatResult(m.moves)),
+    tooltip: {
+      trigger: 'axis',
     },
-    yaxis: {
-      labels: {
-        formatter(value: number) {
-          return value.toFixed(0)
+    toolbox: {
+      feature: {
+        saveAsImage: {
+          name: `${localeName(user.name, locale.value)}-${props.endless.name}.png`,
+          title: t('common.saveAsImage'),
         },
       },
     },
+    legend: {
+      bottom: '0%',
+    },
+    grid: {
+      left: '3%',
+      right: '3%',
+      containLabel: true,
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+    },
+    xAxis: {
+      type: 'category',
+      data: stats.value.movesCount.map(m => formatResult(m.moves)),
+    },
+    series: [
+      {
+        name: t('weekly.regular.label'),
+        type: 'bar',
+        data: stats.value.movesCount.map(m => m.count - m.unlimited),
+        stack: 'Total',
+      },
+      {
+        name: t('weekly.unlimited.label'),
+        type: 'bar',
+        data: stats.value.movesCount.map(m => m.unlimited),
+        stack: 'Total',
+      },
+    ],
   }
 })
-const barSeries = computed(() => {
-  return [
-    {
-      name: t('weekly.regular.label'),
-      data: stats.value.movesCount.map(m => m.count - m.unlimited),
-    },
-    {
-      name: t('weekly.unlimited.label'),
-      data: stats.value.movesCount.map(m => m.unlimited),
-    },
-  ]
-})
-
-function onSelection(_: any, { xaxis }: { xaxis: { min: number, max: number } }) {
-  lineXaxis.min = xaxis.min
-  lineXaxis.max = xaxis.max
-  // lineRef.value?.updateOptions({
-  //   xaxis: {
-  //     min: xaxis.min,
-  //     max: xaxis.max,
-  //   },
-  // })
-}
 
 function enterCell(type: number, index: number) {
   currentCell.type = type
@@ -421,9 +409,8 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
         </div>
       </div>
     </div>
-    <div>
-      <Chart ref="lineRef" height="480" :options="lineOptions" :series="lineSeries" />
-      <Chart height="130" :options="areaOptions" :series="[lineSeries[0]]" @selection="onSelection" />
+    <div class="h-[480px]">
+      <VChart :option="lineOptions" autoresize />
     </div>
     <div class="flex flex-col lg:flex-row mt-4">
       <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center">
@@ -450,8 +437,8 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
           </div>
         </div>
       </div>
-      <div class="flex-1">
-        <Chart height="350" :options="barOptions" :series="barSeries" />
+      <div class="flex-1 h-[350px]">
+        <VChart :option="barOptions" autoresize />
       </div>
     </div>
   </div>

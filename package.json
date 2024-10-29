@@ -12,14 +12,12 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "apexcharts": "^3.54.1",
     "insertionfinder": "^0.5.0",
     "tailwind-merge": "^2.5.4",
     "three": "^0.169.0",
     "two.js": "^0.8.14",
     "v-viewer": "^3.0.20",
-    "viewerjs": "^1.11.6",
-    "vue3-apexcharts": "^1.7.0"
+    "viewerjs": "^1.11.6"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
@@ -42,6 +40,7 @@
     "eslint": "^9.13.0",
     "less": "^4.2.0",
     "nuxt": "^3.13.2",
+    "nuxt-echarts": "^0.2.3",
     "nuxt-gtag": "^3.0.1",
     "nuxt-icon": "^0.6.10",
     "pinia": "^2.2.4",

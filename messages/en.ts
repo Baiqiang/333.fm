@@ -48,6 +48,7 @@ export default {
     bo1: 'Best of 1',
     bo2: 'Best of 2',
     mo3: 'Mean of 3',
+    saveAsImage: 'Save as Image',
   },
   error: {
     400: 'Bad Request',
