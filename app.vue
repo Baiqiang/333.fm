@@ -37,6 +37,7 @@ useIntervalFn(checkAuth, 1000 * 60 * 5)
 </script>
 
 <template>
+  <NuxtLoadingIndicator />
   <NuxtLayout>
     <Link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <Meta name="theme-color" content="#6366f1" />

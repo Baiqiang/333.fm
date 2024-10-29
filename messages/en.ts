@@ -299,6 +299,8 @@ export default {
         ],
       },
     },
+    previous: 'Previous',
+    next: 'Next',
   },
   tutorial: {
     title: 'Tutorial',

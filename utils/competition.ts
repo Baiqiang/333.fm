@@ -17,6 +17,8 @@ export interface Competition {
   scrambles: Scramble[]
   status: CompetitionStatus
   user: User
+  prevCompetition?: Competition
+  nextCompetition?: Competition
 }
 
 export interface PastCompetition extends Competition {

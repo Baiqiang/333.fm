@@ -363,7 +363,7 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
 </script>
 
 <template>
-  <div class="mt-4">
+  <div v-if="stats.results.length" class="mt-4">
     <h4 class="font-bold mb-2">
       {{ $t('endless.stats.personal') }}
     </h4>

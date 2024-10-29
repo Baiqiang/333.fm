@@ -299,6 +299,8 @@ export default {
         ],
       },
     },
+    previous: '上一期',
+    next: '下一期',
   },
   tutorial: {
     title: '教程',
