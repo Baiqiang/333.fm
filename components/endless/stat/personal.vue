@@ -367,52 +367,55 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
     <h4 class="font-bold mb-2">
       {{ $t('endless.stats.personal') }}
     </h4>
-    <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center">
-      <div class="grid grid-cols-subgrid col-span-6 font-bold bg-gray-200 py-1">
-        <div class="px-2">
-          Level
-        </div>
-        <div class="px-2">
-          {{ $t('weekly.results') }}
-        </div>
-        <div class="px-2">
-          Mo3
-        </div>
-        <div class="px-2">
-          Ao5
-        </div>
-        <div class="px-2">
-          Ao12
-        </div>
-        <div class="px-2">
-          {{ $t('result.mean') }}
-        </div>
-      </div>
-      <div v-for="r, i in stats.results" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
-        <NuxtLink :to="competitionPath(endless, { number: r.level })" class="text-blue-500 hover:text-white hover:bg-blue-500 py-1">
-          {{ r.level }}
-        </NuxtLink>
-        <NuxtLink :to="`${competitionPath(endless, { number: r.level })}#submission-${r.id}`" class="font-bold py-1" :class="twMerge(getClass(r.moves, best.single, worst.single, r.unlimited), getResultClass(i))">
-          {{ formatResult(r.moves) }}
-        </NuxtLink>
-        <div class="py-1" :class="getClass(r.mo3, best.mo3, worst.mo3)" @mouseenter="enterCell(3, i)" @mouseleave="leaveCell">
-          {{ formatResult(r.mo3, 2) }}
-        </div>
-        <div class="py-1" :class="getClass(r.ao5, best.ao5, worst.ao5)" @mouseenter="enterCell(5, i)" @mouseleave="leaveCell">
-          {{ formatResult(r.ao5, 2) }}
-        </div>
-        <div class="py-1" :class="getClass(r.ao12, best.ao12, worst.ao12)" @mouseenter="enterCell(12, i)" @mouseleave="leaveCell">
-          {{ formatResult(r.ao12, 2) }}
-        </div>
-        <div :class="getClass(r.mean, best.mean, worst.mean)">
-          {{ formatResult(r.mean, 2) }}
-        </div>
-      </div>
-    </div>
     <div class="h-[480px]">
       <VChart :option="lineOptions" autoresize />
     </div>
-    <div class="flex flex-col lg:flex-row mt-4">
+    <div class="h-[350px]">
+      <VChart :option="barOptions" autoresize />
+    </div>
+    <div class="flex flex-col lg:flex-row lg:gap-4 mt-4 items-start">
+      <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center">
+        <div class="grid grid-cols-subgrid col-span-6 font-bold bg-gray-200 py-1">
+          <div class="px-2">
+            Level
+          </div>
+          <div class="px-2">
+            {{ $t('weekly.results') }}
+          </div>
+          <div class="px-2">
+            Mo3
+          </div>
+          <div class="px-2">
+            Ao5
+          </div>
+          <div class="px-2">
+            Ao12
+          </div>
+          <div class="px-2">
+            {{ $t('result.mean') }}
+          </div>
+        </div>
+        <div v-for="r, i in stats.results" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
+          <NuxtLink :to="competitionPath(endless, { number: r.level })" class="text-blue-500 hover:text-white hover:bg-blue-500 py-1">
+            {{ r.level }}
+          </NuxtLink>
+          <NuxtLink :to="`${competitionPath(endless, { number: r.level })}#submission-${r.id}`" class="font-bold py-1" :class="twMerge(getClass(r.moves, best.single, worst.single, r.unlimited), getResultClass(i))">
+            {{ formatResult(r.moves) }}
+          </NuxtLink>
+          <div class="py-1" :class="getClass(r.mo3, best.mo3, worst.mo3)" @mouseenter="enterCell(3, i)" @mouseleave="leaveCell">
+            {{ formatResult(r.mo3, 2) }}
+          </div>
+          <div class="py-1" :class="getClass(r.ao5, best.ao5, worst.ao5)" @mouseenter="enterCell(5, i)" @mouseleave="leaveCell">
+            {{ formatResult(r.ao5, 2) }}
+          </div>
+          <div class="py-1" :class="getClass(r.ao12, best.ao12, worst.ao12)" @mouseenter="enterCell(12, i)" @mouseleave="leaveCell">
+            {{ formatResult(r.ao12, 2) }}
+          </div>
+          <div :class="getClass(r.mean, best.mean, worst.mean)">
+            {{ formatResult(r.mean, 2) }}
+          </div>
+        </div>
+      </div>
       <div class="grid auto-cols-max gap-x-2 gap-y-0 text-center">
         <div class="grid grid-cols-subgrid col-span-3 font-bold bg-gray-200 py-1">
           <div class="px-2">
@@ -436,9 +439,6 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
             {{ m.unlimited }}
           </div>
         </div>
-      </div>
-      <div class="flex-1 h-[350px]">
-        <VChart :option="barOptions" autoresize />
       </div>
     </div>
   </div>
