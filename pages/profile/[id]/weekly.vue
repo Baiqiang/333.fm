@@ -3,11 +3,13 @@ const { t, locale } = useI18n()
 const user = inject(SYMBOL_USER)!
 const { data } = await useApi<Result[]>(`/profile/${user.value.id}/weekly`)
 const results = ref<Result[]>(data.value || [])
-const nonDNFMeanResults = results.value.filter(result => result.average !== DNF).reverse()
-const regularResults = nonDNFMeanResults.filter(result => result.mode === CompetitionMode.REGULAR)
-const unlimitedResults = nonDNFMeanResults.filter(result => result.mode === CompetitionMode.UNLIMITED)
-const unlimitedMap = Object.fromEntries(unlimitedResults.map(result => [result.competition.id, result]))
-const fullUnlimitedResults = regularResults.map(result => unlimitedMap[result.competition.id] || result)
+const nonDNFMeanResults = results.value.filter(result => result.average !== DNF)
+const regularResults = nonDNFMeanResults.filter(result => result.mode === CompetitionMode.REGULAR).reverse()
+const unlimitedMap: Record<number, Result> = {}
+for (const result of nonDNFMeanResults) {
+  unlimitedMap[result.competition.id] = result
+}
+const unlimitedResults = Object.values(unlimitedMap).sort((a, b) => a.competition.id - b.competition.id)
 const chartOption: ECOption = {
   title: {
     text: `${localeName(user.value.name, locale.value)} - ${t('weekly.title')}`,
@@ -37,12 +39,12 @@ const chartOption: ECOption = {
   ],
   xAxis: {
     type: 'category',
-    data: regularResults.map(r => r.competition.alias),
+    data: nonDNFMeanResults.map(r => r.competition.alias).sort(),
     boundaryGap: true,
   },
   yAxis: {
     type: 'value',
-    min: Math.min(...fullUnlimitedResults.map(r => r.average / 100)) - 2 / 3,
+    min: Math.min(...unlimitedResults.map(r => r.average / 100)) - 2 / 3,
     max: Math.max(...regularResults.map(r => r.average / 100)) + 2 / 3,
     interval: 1 / 3,
     axisLabel: {
@@ -66,7 +68,7 @@ const chartOption: ECOption = {
       name: t('weekly.regular.label'),
       showSymbol: false,
       type: 'line',
-      data: regularResults.map(r => formatResult(r.average, 2)),
+      data: regularResults.map(r => [r.competition.alias, formatResult(r.average, 2)]),
       color: '#6366f1',
       markPoint: {
         data: [
@@ -97,7 +99,7 @@ const chartOption: ECOption = {
       name: t('weekly.unlimited.label'),
       showSymbol: false,
       type: 'line',
-      data: fullUnlimitedResults.map(r => formatResult(r.average, 2)),
+      data: unlimitedResults.map(r => [r.competition.alias, formatResult(r.average, 2)]),
       color: '#f97316',
       markPoint: {
         data: [
