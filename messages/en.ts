@@ -377,6 +377,14 @@ export default {
     best: 'Best',
     mean: 'Mean',
     solves: 'Solves',
+    single: 'Single',
+    challenge: 'Challenge',
+    week: 'Week',
+    type: {
+      weekly: 'Weekly',
+      practice: 'Practice',
+      endless: 'Endless',
+    },
   },
   chain: {
     title: 'FMC Chain',
@@ -421,5 +429,9 @@ export default {
     next: 'Next',
     created: 'Created Practices',
     joined: 'Joined Practices',
+  },
+  profile: {
+    pr: 'Personal Records on 333.fm',
+    noRecord: 'No Record',
   },
 }

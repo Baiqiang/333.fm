@@ -48,7 +48,7 @@ useSeoMeta({
           v-for="user in mostPractices"
           :key="user.id"
           class="flex items-center gap-2 text-blue-500 pt-2"
-          :to="`/practice/${user.wcaId || user.id}`"
+          :to="`/practice/${userId(user)}`"
         >
           <UserAvatarName :user="user" :link="false" />
           {{ $t('practice.practices', { n: user.practices }) }}

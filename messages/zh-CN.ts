@@ -1,3 +1,5 @@
+import en from './en'
+
 export default {
   title: '最少步',
   header: {
@@ -377,6 +379,14 @@ export default {
     best: '单次',
     mean: '平均',
     solves: '成绩',
+    single: '单次',
+    challenge: '赛事',
+    week: '周',
+    type: {
+      weekly: '周赛',
+      practice: '练习',
+      endless: '爬塔',
+    },
   },
   chain: {
     title: '最少步链',
@@ -421,5 +431,9 @@ export default {
     next: '下一个',
     created: '创建的练习',
     joined: '参与的练习',
+  },
+  profile: {
+    pr: '333.fm 个人纪录',
+    noRecord: '暂无纪录',
   },
 }

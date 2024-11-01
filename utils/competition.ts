@@ -33,6 +33,8 @@ export interface Result {
   user: User
   mode: CompetitionMode
   rollingStart: number
+  competition: Competition
+  submissions: Submission[]
 }
 
 export interface Scramble extends Time {
@@ -187,6 +189,18 @@ export interface Practice extends Competition {
   nextIndex?: number
 }
 
+export interface CompetitionRecord {
+  single: number
+  mean: number
+  bestSingles: Result[]
+  bestMeans: Result[]
+}
+
+export interface EndlessRecord extends Omit<CompetitionRecord, 'bestSingles' | 'bestMeans'> {
+  competition: Competition
+  levels: number
+}
+
 export interface SubmissionForm {
   mode: number
   solution: string
@@ -206,7 +220,7 @@ export function formatResult(result: number, precision = 0) {
   if (Number.isNaN(result))
     return 'N/A'
 
-  if (result === 0)
+  if (!result)
     return ''
   if (result === DNF)
     return 'DNF'

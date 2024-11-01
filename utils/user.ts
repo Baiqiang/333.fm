@@ -30,4 +30,8 @@ export function localeName(name: string, locale: string): string {
   return locale === 'en' ? matches[1] : matches[2]
 }
 
+export function userId(user: User) {
+  return user.wcaId || user.id
+}
+
 export const SYMBOL_USER: InjectionKey<Ref<User>> = Symbol('user')
