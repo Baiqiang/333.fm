@@ -176,8 +176,8 @@ const lineOptions = computed<ECOption>(() => {
       bottom: '0%',
     },
     grid: {
-      left: '3%',
-      right: '3%',
+      left: '20px',
+      right: '40px',
       containLabel: true,
     },
     series: [
