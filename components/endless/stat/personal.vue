@@ -138,6 +138,7 @@ const lineOptions = computed<ECOption>(() => {
     },
     tooltip: {
       trigger: 'axis',
+      valueFormatter: (value: any) => value ? value.toString() : '-',
     },
     toolbox: {
       feature: {

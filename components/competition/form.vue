@@ -275,7 +275,7 @@ function getTmpURL(file: File) {
       <FormInput
         v-model="form.comment"
         type="textarea"
-        :rows="6"
+        :rows="10"
         :label="$t('weekly.comment.label')"
         :state="null"
         class="mt-4"
