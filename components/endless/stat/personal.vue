@@ -107,8 +107,6 @@ const stats = computed<{
     })
   }
 
-  results.reverse()
-
   return {
     results,
     movesCount: Object.values(movesCountMap).sort((a, b) => a.moves - b.moves),
@@ -116,6 +114,7 @@ const stats = computed<{
     worst,
   }
 })
+const reversedResults = computed(() => stats.value.results.slice().reverse())
 const best = computed(() => stats.value.best)
 const worst = computed(() => stats.value.worst)
 const movesCount = computed(() => stats.value.movesCount)
@@ -124,6 +123,14 @@ const currentCell = reactive({
   index: -1,
 })
 
+const dataRange = reactive({
+  start: 0,
+  end: stats.value.results.length - 1,
+})
+const currentMean = computed(() => {
+  const results = stats.value.results.slice(dataRange.start, dataRange.end + 1)
+  return formatResult(aoN(results.map(r => r.moves), 0, true), 2)
+})
 const lineOptions = computed<ECOption>(() => {
   return {
     title: {
@@ -153,7 +160,7 @@ const lineOptions = computed<ECOption>(() => {
     ],
     xAxis: {
       type: 'category',
-      data: stats.value.results.map(r => r.level).reverse(),
+      data: stats.value.results.map(r => r.level),
       boundaryGap: true,
       axisTick: {
         alignWithLabel: true,
@@ -178,7 +185,7 @@ const lineOptions = computed<ECOption>(() => {
         name: t('endless.stats.moves'),
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => formatResult(r.moves)).reverse(),
+        data: stats.value.results.map(r => formatResult(r.moves)),
         markPoint: {
           data: [
             {
@@ -202,25 +209,25 @@ const lineOptions = computed<ECOption>(() => {
         name: 'Mo3',
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => Number.isNaN(r.mo3) ? null : formatResult(r.mo3, 2)).reverse(),
+        data: stats.value.results.map(r => Number.isNaN(r.mo3) ? null : formatResult(r.mo3, 2)),
       },
       {
         name: 'Ao5',
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => Number.isNaN(r.ao5) ? null : formatResult(r.ao5, 2)).reverse(),
+        data: stats.value.results.map(r => Number.isNaN(r.ao5) ? null : formatResult(r.ao5, 2)),
       },
       {
         name: 'Ao12',
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => Number.isNaN(r.ao12) ? null : formatResult(r.ao12, 2)).reverse(),
+        data: stats.value.results.map(r => Number.isNaN(r.ao12) ? null : formatResult(r.ao12, 2)),
       },
       {
         name: t('result.mean'),
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => formatResult(r.mean, 2)).reverse(),
+        data: stats.value.results.map(r => formatResult(r.mean, 2)),
       },
       {
         type: 'line',
@@ -229,7 +236,7 @@ const lineOptions = computed<ECOption>(() => {
           data: [
             {
               name: t('endless.stats.moves'),
-              yAxis: (stats.value.results[0]?.mean || 0) / 100,
+              yAxis: currentMean.value,
               lineStyle: {
                 color: 'rgb(99, 102, 241)',
               },
@@ -360,6 +367,10 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
     cls.push('hover:bg-indigo-500')
   return cls.join(' ')
 }
+function setDataRange(event: { start: number, end: number }) {
+  dataRange.start = Math.floor(event.start / 100 * stats.value.results.length)
+  dataRange.end = Math.ceil(event.end / 100 * stats.value.results.length)
+}
 </script>
 
 <template>
@@ -368,7 +379,7 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
       {{ $t('endless.stats.personal') }}
     </h4>
     <div class="h-[480px]">
-      <VChart :option="lineOptions" autoresize />
+      <VChart :option="lineOptions" autoresize @datazoom="setDataRange" />
     </div>
     <div class="h-[350px]">
       <VChart :option="barOptions" autoresize />
@@ -395,7 +406,7 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
             {{ $t('result.mean') }}
           </div>
         </div>
-        <div v-for="r, i in stats.results" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
+        <div v-for="r, i in reversedResults" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
           <NuxtLink :to="competitionPath(endless, { number: r.level })" class="text-blue-500 hover:text-white hover:bg-blue-500 py-1">
             {{ r.level }}
           </NuxtLink>
