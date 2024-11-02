@@ -8,7 +8,7 @@ const { competition, submissions } = toRefs(props.result)
 <template>
   <div class="grid grid-cols-subgrid col-span-full border-b border-gray-300 pb-2">
     <slot name="competition">
-      <CompetitionName :competition="competition" />
+      <CompetitionName :competition="competition" class="pl-2" />
     </slot>
     <div class="text-right font-mono">
       <Icon v-if="result.rank === 1" name="openmoji:1st-place-medal" size="24" />

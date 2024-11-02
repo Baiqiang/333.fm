@@ -8,7 +8,7 @@ const props = defineProps<{
   <div>
     <div class="grid grid-cols-[max-content_4rem_2rem_2rem_2rem_2rem_1fr] gap-2">
       <div class="grid grid-cols-subgrid col-span-full font-bold pb-2 border-b border-gray-300">
-        <div class="pl-4">
+        <div class="pl-2">
           {{ $t('practice.title') }}
         </div>
         <div class="text-right">

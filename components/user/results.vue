@@ -32,7 +32,7 @@ const sortedResults = computed(() => filteredResults.value.slice().sort((a, b) =
     </div>
     <div class="grid grid-cols-[max-content_4rem_2rem_2rem_2rem_2rem_1fr] gap-2">
       <div class="grid grid-cols-subgrid col-span-full font-bold pb-2 border-b border-gray-300">
-        <div class="pl-4">
+        <div class="pl-2">
           {{ $t('result.week') }}
         </div>
         <div class="text-right">
@@ -52,6 +52,7 @@ const sortedResults = computed(() => filteredResults.value.slice().sort((a, b) =
         <template #competition>
           <NuxtLink
             :to="competitionPath(result.competition)"
+            class="pl-2"
             :class="{
               'text-blue-500': result.mode === CompetitionMode.REGULAR,
               'text-orange-500': result.mode === CompetitionMode.UNLIMITED,
