@@ -69,6 +69,7 @@ const meanChartOption: ECOption = {
       showSymbol: false,
       type: 'line',
       data: regularResults.map(r => [r.competition.alias, formatResult(r.average, 2)]),
+      zlevel: 10,
       color: '#6366f1',
       markPoint: {
         data: [
@@ -122,32 +123,34 @@ const meanChartOption: ECOption = {
     },
   ],
 }
-const regularSingles: [Date, number][] = []
-const unlimitedSingles: [Date, number][] = []
+const regularSingles: Record<number, [string, number][]> = {}
+const unlimitedSingles: Record<number, [string, number][]> = {}
 const regularMovesCountMap: Record<number, number> = {}
 const unlimitedMovesCountMap: Record<number, number> = {}
 for (const result of results.value) {
   if (result.mode === CompetitionMode.REGULAR) {
-    for (const { moves, createdAt } of result.submissions) {
+    for (const { moves, scramble } of result.submissions) {
       if (moves > 0 && moves !== DNF && moves !== DNS) {
         const m = moves / 100
-        regularSingles.push([new Date(createdAt), m])
+        regularSingles[scramble.number] = regularSingles[scramble.number] || []
+        regularSingles[scramble.number].push([result.competition.alias, m])
         regularMovesCountMap[m] = (regularMovesCountMap[m] || 0) + 1
       }
     }
   }
   else {
-    for (const { moves, createdAt } of result.submissions) {
+    for (const { moves, scramble } of result.submissions) {
       if (moves > 0 && moves !== DNF && moves !== DNS) {
         const m = moves / 100
-        unlimitedSingles.push([new Date(createdAt), m])
+        unlimitedSingles[scramble.number] = unlimitedSingles[scramble.number] || []
+        unlimitedSingles[scramble.number].push([result.competition.alias, m])
         unlimitedMovesCountMap[m] = (unlimitedMovesCountMap[m] || 0) + 1
       }
     }
   }
 }
-regularSingles.sort((a, b) => a[0].getTime() - b[0].getTime())
-unlimitedSingles.sort((a, b) => a[0].getTime() - b[0].getTime())
+Object.values(regularSingles).forEach(singles => singles.sort((a, b) => a[0].localeCompare(b[0])))
+Object.values(unlimitedSingles).forEach(singles => singles.sort((a, b) => a[0].localeCompare(b[0])))
 const regularMovesCount = Object.entries(regularMovesCountMap).map(([m, count]) => [Number(m), count])
 const unlimitedMovesCount = Object.entries(unlimitedMovesCountMap).map(([m, count]) => [Number(m), count])
 regularMovesCount.sort((a, b) => a[0] - b[0])
@@ -179,19 +182,27 @@ const singleChartOption: ECOption = {
     },
   ],
   xAxis: {
-    type: 'time',
+    type: 'category',
+    data: results.value.map(r => r.competition.alias).reverse(),
   },
   yAxis: {
     type: 'value',
-    min: Math.min(...regularSingles.map(s => s[1]), ...unlimitedSingles.map(s => s[1])) - 1,
-    max: Math.max(...regularSingles.map(s => s[1]), ...unlimitedSingles.map(s => s[1])) + 1,
+    min: Math.min(
+      Math.min(...Object.values(regularSingles).map(singles => Math.min(...singles.map(s => s[1])))),
+      Math.min(...Object.values(unlimitedSingles).map(singles => Math.min(...singles.map(s => s[1])))),
+    ) - 1,
+    max: Math.max(
+      Math.max(...Object.values(regularSingles).map(singles => Math.max(...singles.map(s => s[1])))),
+      Math.max(...Object.values(unlimitedSingles).map(singles => Math.max(...singles.map(s => s[1])))),
+    ) + 1,
     interval: 1,
   },
   legend: {
     bottom: '0%',
     selected: {
-      [t('weekly.regular.label')]: true,
-      [t('weekly.unlimited.label')]: false,
+      [`A1 (${t('weekly.unlimited.label')})`]: false,
+      [`A2 (${t('weekly.unlimited.label')})`]: false,
+      [`A3 (${t('weekly.unlimited.label')})`]: false,
     },
   },
   grid: {
@@ -201,48 +212,43 @@ const singleChartOption: ECOption = {
   },
   series: [
     {
-      name: t('weekly.regular.label'),
+      name: 'A1',
+      zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: regularSingles,
-      color: '#6366f1',
-      markPoint: {
-        data: [
-          {
-            name: 'Worst',
-            type: 'max',
-            itemStyle: {
-              color: 'red',
-            },
-          },
-          {
-            name: 'Best',
-            type: 'min',
-            itemStyle: {
-              color: 'green',
-            },
-          },
-        ],
-      },
+      data: regularSingles[1],
     },
     {
-      name: t('weekly.unlimited.label'),
+      name: 'A2',
+      zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: unlimitedSingles,
-      color: '#f97316',
-      markPoint: {
-        data: [
-          {
-            name: 'Worst',
-            type: 'max',
-          },
-          {
-            name: 'Best',
-            type: 'min',
-          },
-        ],
-      },
+      data: regularSingles[2],
+    },
+    {
+      name: 'A3',
+      zlevel: 10,
+      showSymbol: false,
+      type: 'line',
+      data: regularSingles[3],
+    },
+    {
+      name: `A1 (${t('weekly.unlimited.label')})`,
+      showSymbol: false,
+      type: 'line',
+      data: unlimitedSingles[1],
+    },
+    {
+      name: `A2 (${t('weekly.unlimited.label')})`,
+      showSymbol: false,
+      type: 'line',
+      data: unlimitedSingles[2],
+    },
+    {
+      name: `A3 (${t('weekly.unlimited.label')})`,
+      showSymbol: false,
+      type: 'line',
+      data: unlimitedSingles[3],
     },
   ],
 }
