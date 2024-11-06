@@ -198,6 +198,7 @@ const singleChartOption: ECOption = {
     interval: 1,
   },
   legend: {
+    type: 'scroll',
     bottom: '0%',
     selected: {
       [`A1 (${t('weekly.unlimited.label')})`]: false,
