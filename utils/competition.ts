@@ -229,7 +229,7 @@ export function formatResult(result: number, precision = 0) {
   return (result / 100).toFixed(precision)
 }
 
-export function aoN(results: number[], n: number, mean = false) {
+export function aoN(results: number[], n: number = 0, mean = false) {
   if (n === 0)
     n = results.length
   if (results.length < n)
@@ -243,7 +243,7 @@ export function aoN(results: number[], n: number, mean = false) {
     total -= best + worst
     n -= 2
   }
-  return total / n
+  return Number((total / n).toFixed(2))
 }
 
 export function competitionPath(competition: Competition, scramble?: { number: number }, submission?: Submission) {

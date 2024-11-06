@@ -2,7 +2,7 @@
 const props = defineProps<{
   result: Result
 }>()
-const { competition, submissions } = toRefs(props.result)
+const { competition } = toRefs(props.result)
 </script>
 
 <template>

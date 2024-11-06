@@ -30,6 +30,11 @@ const filters = computed(() => {
       type: 'endless',
     })
   }
+  if (user.value.wcaId) {
+    ret.push({
+      type: 'wca',
+    })
+  }
   return ret
 })
 useSeoMeta({
