@@ -313,7 +313,7 @@ function getResultClass(index: number) {
   const endIndex = currentCell.index + currentCell.type - 1
   if (index > endIndex || index < startIndex)
     return ''
-  const results = stats.value.results.slice(startIndex, endIndex + 1)
+  const results = reversedResults.value.slice(startIndex, endIndex + 1)
   const first = results[0]
   const key = {
     3: 'mo3',
@@ -329,8 +329,8 @@ function getResultClass(index: number) {
   else {
     const best = results.reduce((a, b) => a.moves < b.moves ? a : b)
     const worst = results.reduce((a, b) => a.moves > b.moves ? a : b)
-    const bestIndex = stats.value.results.findIndex(r => r === best)
-    const worstIndex = stats.value.results.findIndex(r => r === worst)
+    const bestIndex = reversedResults.value.findIndex(r => r === best)
+    const worstIndex = reversedResults.value.findIndex(r => r === worst)
 
     if (index === bestIndex)
       cls.push('bg-green-500')
