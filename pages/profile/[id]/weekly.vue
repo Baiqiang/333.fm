@@ -123,34 +123,48 @@ const meanChartOption: ECOption = {
     },
   ],
 }
-const regularSingles: Record<number, [string, number][]> = {}
-const unlimitedSingles: Record<number, [string, number][]> = {}
+const attemptsTimeMap: Record<string, Date> = {}
+const regularSinglesMap: Record<string, Submission> = {}
+const unlimitedSinglesMap: Record<string, Submission> = {}
 const regularMovesCountMap: Record<number, number> = {}
 const unlimitedMovesCountMap: Record<number, number> = {}
 for (const result of results.value) {
+  const { alias } = result.competition
   if (result.mode === CompetitionMode.REGULAR) {
-    for (const { moves, scramble } of result.submissions) {
+    for (const submission of result.submissions) {
+      submission.competition = result.competition
+      const { moves, scramble } = submission
+      const attempt = `${alias} A${scramble.number}`
+      if (!attemptsTimeMap[attempt]) {
+        attemptsTimeMap[attempt] = new Date(submission.createdAt)
+      }
       if (moves > 0 && moves !== DNF && moves !== DNS) {
         const m = moves / 100
-        regularSingles[scramble.number] = regularSingles[scramble.number] || []
-        regularSingles[scramble.number].push([result.competition.alias, m])
+        regularSinglesMap[attempt] = submission
         regularMovesCountMap[m] = (regularMovesCountMap[m] || 0) + 1
       }
     }
   }
   else {
-    for (const { moves, scramble } of result.submissions) {
+    for (const submission of result.submissions) {
+      submission.competition = result.competition
+      const { moves, scramble } = submission
+      const attempt = `${alias} A${scramble.number}`
+      if (!attemptsTimeMap[attempt]) {
+        attemptsTimeMap[attempt] = new Date(submission.createdAt)
+      }
       if (moves > 0 && moves !== DNF && moves !== DNS) {
         const m = moves / 100
-        unlimitedSingles[scramble.number] = unlimitedSingles[scramble.number] || []
-        unlimitedSingles[scramble.number].push([result.competition.alias, m])
+        unlimitedSinglesMap[attempt] = submission
         unlimitedMovesCountMap[m] = (unlimitedMovesCountMap[m] || 0) + 1
       }
     }
   }
 }
-Object.values(regularSingles).forEach(singles => singles.sort((a, b) => a[0].localeCompare(b[0])))
-Object.values(unlimitedSingles).forEach(singles => singles.sort((a, b) => a[0].localeCompare(b[0])))
+// sort singles by submission time
+const xAxis = Object.keys(attemptsTimeMap)
+  .sort((a, b) => attemptsTimeMap[a].getTime() - attemptsTimeMap[b].getTime())
+const regularSingles = Object.values(regularSinglesMap).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
 const regularMovesCount = Object.entries(regularMovesCountMap).map(([m, count]) => [Number(m), count])
 const unlimitedMovesCount = Object.entries(unlimitedMovesCountMap).map(([m, count]) => [Number(m), count])
 regularMovesCount.sort((a, b) => a[0] - b[0])
@@ -183,28 +197,24 @@ const singleChartOption: ECOption = {
   ],
   xAxis: {
     type: 'category',
-    data: results.value.map(r => r.competition.alias).reverse(),
+    data: xAxis,
+    // data: results.value.map(r => r.competition.alias).reverse(),
   },
   yAxis: {
     type: 'value',
     min: Math.min(
-      Math.min(...Object.values(regularSingles).map(singles => Math.min(...singles.map(s => s[1])))),
-      Math.min(...Object.values(unlimitedSingles).map(singles => Math.min(...singles.map(s => s[1])))),
+      ...Object.values(regularSingles).map(s => s.moves / 100),
+      Math.min(...Object.values(unlimitedSinglesMap).map(s => s.moves / 100)),
     ) - 1,
     max: Math.max(
-      Math.max(...Object.values(regularSingles).map(singles => Math.max(...singles.map(s => s[1])))),
-      Math.max(...Object.values(unlimitedSingles).map(singles => Math.max(...singles.map(s => s[1])))),
+      ...Object.values(regularSingles).map(s => s.moves / 100),
+      Math.max(...Object.values(unlimitedSinglesMap).map(s => s.moves / 100)),
     ) + 1,
     interval: 1,
   },
   legend: {
     type: 'scroll',
     bottom: '0%',
-    selected: {
-      [`A1 (${t('weekly.unlimited.label')})`]: false,
-      [`A2 (${t('weekly.unlimited.label')})`]: false,
-      [`A3 (${t('weekly.unlimited.label')})`]: false,
-    },
   },
   grid: {
     left: '20px',
@@ -213,43 +223,28 @@ const singleChartOption: ECOption = {
   },
   series: [
     {
-      name: 'A1',
+      name: t('weekly.regular.label'),
       zlevel: 10,
       showSymbol: false,
+      color: '#6366f1',
       type: 'line',
-      data: regularSingles[1],
+      data: regularSingles.map((s, i) => ({
+        name: `${s.competition.alias} A${s.scramble.number}`,
+        value: [`${s.competition.alias} A${s.scramble.number}`, s.moves / 100],
+      })),
     },
     {
-      name: 'A2',
+      name: t('weekly.unlimited.label'),
       zlevel: 10,
-      showSymbol: false,
-      type: 'line',
-      data: regularSingles[2],
-    },
-    {
-      name: 'A3',
-      zlevel: 10,
-      showSymbol: false,
-      type: 'line',
-      data: regularSingles[3],
-    },
-    {
-      name: `A1 (${t('weekly.unlimited.label')})`,
-      showSymbol: false,
-      type: 'line',
-      data: unlimitedSingles[1],
-    },
-    {
-      name: `A2 (${t('weekly.unlimited.label')})`,
-      showSymbol: false,
-      type: 'line',
-      data: unlimitedSingles[2],
-    },
-    {
-      name: `A3 (${t('weekly.unlimited.label')})`,
-      showSymbol: false,
-      type: 'line',
-      data: unlimitedSingles[3],
+      color: '#f97316',
+      type: 'scatter',
+      data: Object.values(unlimitedSinglesMap).map(s => ({
+        name: `${s.competition.alias} A${s.scramble.number}`,
+        value: [
+          `${s.competition.alias} A${s.scramble.number}`,
+          s.moves / 100,
+        ],
+      })),
     },
   ],
 }
