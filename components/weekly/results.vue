@@ -3,7 +3,7 @@ const props = defineProps<{
   results: Result[]
 }>()
 const showAverage = computed(() => props.results[0].values.length > 1)
-const bests = computed(() => [0, 1, 2].map(i => Math.min(...props.results.map(result => result.values[i]))))
+const bests = computed(() => [0, 1, 2].map(i => Math.min(...props.results.map(result => result.values[i]).filter(v => v > 0))))
 const gridTemplate = computed(() => {
   if (showAverage.value)
     return `grid-cols-[3rem_max-content_4rem_2rem_2rem_2rem_minmax(2rem,1fr)]`
