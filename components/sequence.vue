@@ -5,7 +5,7 @@ defineProps<{
   prefix?: string
   source?: string
 }>()
-const { copy, copied } = useClipboard()
+const { copy, copied } = useStatefulClipboard()
 </script>
 
 <template>

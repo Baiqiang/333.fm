@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
   chain: false,
 })
 const { hash } = useRoute()
-const { copy, copied } = useClipboard()
+const { copy, copied } = useStatefulClipboard()
 const dayjs = useDayjs()
 const { locale } = useI18n()
 const el = ref<HTMLElement>()
