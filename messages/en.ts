@@ -214,6 +214,7 @@ export default {
     changeName: 'Change Name',
     solutions: 'My Solutions',
     practices: 'My Practices',
+    token: 'Bot Token',
   },
   admin: {
     title: 'Admin',
@@ -398,6 +399,7 @@ export default {
       endless: 'Endless',
       wca: 'WCA',
     },
+    moveCount: 'Move Count',
   },
   chain: {
     title: 'FMC Chain',
@@ -446,5 +448,10 @@ export default {
   profile: {
     pr: 'Personal Records on 333.fm',
     noRecord: 'No Record',
+  },
+  bot: {
+    token: {
+      description: 'Bot Token is a one-time credential for binding user information on 333.fm with QQ groups.',
+    },
   },
 }

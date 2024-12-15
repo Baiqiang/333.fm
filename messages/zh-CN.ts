@@ -216,6 +216,7 @@ export default {
     changeName: '修改名称',
     solutions: '我的解法',
     practices: '我的练习',
+    token: '机器人 Token',
   },
   admin: {
     title: '管理',
@@ -400,6 +401,7 @@ export default {
       endless: '爬塔',
       wca: 'WCA',
     },
+    moveCount: '步数统计',
   },
   chain: {
     title: '最少步链',
@@ -448,5 +450,10 @@ export default {
   profile: {
     pr: '333.fm 个人纪录',
     noRecord: '暂无纪录',
+  },
+  bot: {
+    token: {
+      description: '机器人 Token 是用于 QQ 群绑定 333.fm 的用户信息的一次性凭证。',
+    },
   },
 }
