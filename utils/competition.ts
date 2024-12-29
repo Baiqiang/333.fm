@@ -103,6 +103,7 @@ export enum CompetitionType {
   ENDLESS,
   FMC_CHAIN,
   PERSONAL_PRACTICE,
+  DAILY,
 }
 
 export enum CompetitionSubType {
@@ -253,6 +254,10 @@ export function competitionPath(competition: Competition, scramble?: { number: n
       if (scramble)
         return `/weekly/${alias}#scramble-${scramble.number}`
       return `/weekly/${alias}`
+    case CompetitionType.DAILY:
+      if (scramble)
+        return `/daily/${alias}#scramble-${scramble.number}`
+      return `/daily/${alias}`
     case CompetitionType.ENDLESS:
       if (scramble)
         return `/endless/${alias}/${scramble.number}`
