@@ -24,7 +24,7 @@ const gridTemplate = computed(() => {
         <div v-if="showAverage" class="text-right">
           {{ $t('result.mean') }}
         </div>
-        <div :class="{ 'col-span-4': showAverage, 'col-span-5': !showAverage }">
+        <div class="col-span-4">
           {{ $t('result.solves') }}
         </div>
       </div>

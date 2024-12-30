@@ -13,6 +13,10 @@ const navs = computed(() => [
     path: '/weekly',
   },
   {
+    title: 'daily.title',
+    path: '/daily',
+  },
+  {
     title: 'endless.title',
     path: '/endless',
   },

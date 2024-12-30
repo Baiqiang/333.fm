@@ -12,6 +12,7 @@ export default {
     status: 'Status',
     yes: 'Yes',
     createdAt: 'Created At',
+    createdBy: 'Created By',
     signingInRequired: 'Sign in Required',
     signingToJoin: 'Sign in to join',
     signingIn: 'Signing in with WCA ...',
@@ -302,6 +303,12 @@ export default {
     },
     previous: 'Previous',
     next: 'Next',
+  },
+  daily: {
+    title: 'Daily Competition',
+    past: 'Past Competitions',
+    pending: 'Pending Creation',
+    creation: 'Every first BO1 practice created will be the daily competition. The creator should submit valid solution on his latest practice solution.',
   },
   tutorial: {
     title: 'Tutorial',

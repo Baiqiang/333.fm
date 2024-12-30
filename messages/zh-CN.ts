@@ -14,6 +14,7 @@ export default {
     status: '状态',
     yes: '是',
     createdAt: '创建于',
+    createdBy: '创建者',
     signingInRequired: '请登录',
     signingToJoin: '请登录后参加',
     signingIn: '正在使用 WCA 登录 ...',
@@ -304,6 +305,12 @@ export default {
     },
     previous: '上一期',
     next: '下一期',
+  },
+  daily: {
+    title: '日赛',
+    past: '往期日赛',
+    pending: '仍未创建今日赛事',
+    creation: '每日首个创建的 BO1 练习将成为当日日赛，创建者需有效提交他最新一次练习的解法。'
   },
   tutorial: {
     title: '教程',
