@@ -310,7 +310,7 @@ export default {
     title: '日赛',
     past: '往期日赛',
     pending: '仍未创建今日赛事',
-    creation: '每日首个创建的 BO1 练习将成为当日日赛，创建者需有效提交他最新一次练习的解法。'
+    creation: '每日首个创建的 BO1 练习将成为当日日赛，创建者需有效提交他最新一次练习的解法。',
   },
   tutorial: {
     title: '教程',
@@ -404,6 +404,7 @@ export default {
     week: '周',
     type: {
       weekly: '周赛',
+      daily: '日赛',
       practice: '练习',
       endless: '爬塔',
       wca: 'WCA',

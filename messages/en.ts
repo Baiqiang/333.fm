@@ -402,6 +402,7 @@ export default {
     week: 'Week',
     type: {
       weekly: 'Weekly',
+      daily: 'Daily',
       practice: 'Practice',
       endless: 'Endless',
       wca: 'WCA',
