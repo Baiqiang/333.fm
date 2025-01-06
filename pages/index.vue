@@ -7,8 +7,8 @@ useSeoMeta({
 const { data: finders } = await useApi<InsertionFinder[]>('/if/latest')
 if (!finders.value)
   finders.value = []
-const { data: competition } = await useApi<Competition>('/weekly/on-going')
-const { data: endlesses } = await useApi<Endless[]>('/endless/on-going')
+const { data: weekly } = await useApi<Competition>('/weekly/on-going')
+const { data: daily } = await useApi<Competition>('/daily/on-going')
 </script>
 
 <template>
@@ -43,11 +43,25 @@ const { data: endlesses } = await useApi<Endless[]>('/endless/on-going')
         </NuxtLink>
       </div>
       <div class="flex flex-col md:flex-row gap-2 mt-2">
-        <div v-if="competition" class="flex-1">
-          <h2 class="font-bold text-xl">
-            {{ competition.name }}
-          </h2>
-          <WeeklySummary :competition="competition" class="mt-4" />
+        <div class="flex-1">
+          <div v-if="weekly" class="mb-4">
+            <h2 class="font-bold text-xl">
+              {{ weekly.name }}
+            </h2>
+            <WeeklySummary :competition="weekly" class="mt-4" />
+          </div>
+          <div v-if="daily" class="mb-4">
+            <h2 class="font-bold text-xl">
+              {{ daily.name }}
+            </h2>
+            <WeeklySummary :competition="daily" class="mt-4" />
+          </div>
+          <div>
+            <hr class="mb-2">
+            <NuxtLink to="/chain" class="bg-indigo-500 text-white px-3 py-2">
+              {{ $t('chain.title') }}
+            </NuxtLink>
+          </div>
         </div>
         <div class="flex-1">
           <h2 class="font-bold text-xl">

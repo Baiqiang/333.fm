@@ -24,10 +24,10 @@ const navs = computed(() => [
     title: 'practice.title',
     path: '/practice',
   },
-  {
-    title: 'chain.title',
-    path: '/chain',
-  },
+  // {
+  //   title: 'chain.title',
+  //   path: '/chain',
+  // },
 ])
 const user = useUser()
 const showMenu = ref(false)
