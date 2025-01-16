@@ -11,7 +11,6 @@ const props = withDefaults(defineProps<{
   chain: false,
 })
 const { hash } = useRoute()
-const { copy, copied } = useStatefulClipboard()
 const dayjs = useDayjs()
 const { locale } = useI18n()
 const el = ref<HTMLElement>()
@@ -46,7 +45,7 @@ const match = hash.match(/^#submission-(\d+)$/)
 if (match && match[1] === props.submission.id.toString())
   showComment.value = true
 
-function copySolution() {
+const formattedSolution = computed<string>(() => {
   const solution = []
   const scramble = props.scramble || props.submission.scramble
   const competition = props.competition || props.submission.competition
@@ -61,8 +60,8 @@ function copySolution() {
   solution.push(`Solution:\n${props.submission.solution} (${formatResult(props.submission.moves)})`)
   solution.push(props.submission.comment)
   solution.push(`By ${user?.name}\n${dayjs(props.submission.createdAt).locale(locale.value).format('LLL')}`)
-  copy(solution.join('\n\n'))
-}
+  return solution.join('\n\n')
+})
 function expandAndShowAttachment() {
   showComment.value = true
   setTimeout(() => showAttachment.value = true, 100)
@@ -117,13 +116,10 @@ function expandAndShowAttachment() {
             size="20"
           />
         </button>
-        <div v-if="competition || submission.competition" :class="{ 'text-indigo-500': !copied, 'text-gray-400': copied }">
-          <Icon
-            name="ion:ios-copy"
-            class="cursor-pointer"
-            @click.stop.prevent="copySolution"
-          />
-        </div>
+        <CopyButton
+          v-if="competition || submission.competition"
+          :source="formattedSolution"
+        />
       </div>
       <TransitionExpand>
         <div v-if="showComment" class="basis-full">
