@@ -278,6 +278,18 @@ function reset() {
       >
         <CubeExpanded v-if="scrambleState && skeletonState" class="my-2" :moves="`${form.scramble}\n${form.skeleton}`" />
         <template #description>
+          <div>
+            STM: {{ algLength(form.skeleton, TurnMetric.STM) }}
+          </div>
+          <div>
+            ATM: {{ algLength(form.skeleton, TurnMetric.ATM) }}
+          </div>
+          <div>
+            QTM: {{ algLength(form.skeleton, TurnMetric.QTM) }}
+          </div>
+          <div>
+            HTM: {{ algLength(form.skeleton, TurnMetric.HTM) }}
+          </div>
           <div v-if="formatedCycleDetail" class="text-green-600">
             {{ $t('if.skeleton.to', { length: formattedSkeletonLength, detail: formatedCycleDetail }) }}
           </div>

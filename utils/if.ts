@@ -1,4 +1,3 @@
-import type { Cube } from 'insertionfinder'
 import { Algorithm } from 'insertionfinder'
 
 export enum IFType {
@@ -165,57 +164,8 @@ export function applyMark(alg: string, mark: MARKS) {
   }
 }
 
-export function replaceQuote(string: string): string {
-  return string.replace(/[‘’`]/g, '\'')
-}
-
-export function formatAlgorithm(string: string | string[], placement: number = 0) {
-  string = removeComment(string)
-  const algorithm = new Algorithm(string)
-  algorithm.clearFlags(placement)
-  algorithm.normalize()
-  return algorithm.toString()
-}
-
-export function formatAlgorithmToArray(string: string | string[]) {
-  return formatAlgorithm(string).split(' ').filter(a => a !== '')
-}
-
-export function removeComment(string: string | string[]) {
-  if (Array.isArray(string))
-    string = string.join(' ')
-
-  // remove comments
-  string = replaceQuote(string)
-  return string.split('\n').map(s => s.split('//')[0]).join('')
-}
-
-export function isSwappable(a: string, b: string) {
-  if (!a || !b)
-    return false
-
-  const alg = new Algorithm(`${a} ${b}`)
-  return alg.twists[0] >>> 3 === alg.twists[1] >>> 3
-}
-
-export function isSameFace(a: string, b: string): boolean {
-  if (!a || !b)
-    return false
-  return a.charAt(0) === b.charAt(0)
-}
-
-export function isRotation(a?: string): boolean {
-  if (!a)
-    return false
-  return 'xyz'.includes(a.charAt(0))
-}
-
 export function centerLength(centerCycles: number, placement: number): number {
   return centerCycles === 3 ? 6 : centerCycles === 2 ? 4 : [2, 8, 10].includes(placement) ? 4 : 6
-}
-
-export function algLength(alg: string) {
-  return alg.split(' ').filter(a => a !== '').length
 }
 
 export function getPagination(total: number, page: string | number) {
@@ -288,12 +238,4 @@ export function formatCycleDetail(cycleDetail: CycleDetail): string {
     detail.push(`${cycle.length}X`)
   })
   return detail.join('')
-}
-
-export function getCubieCube(cube: Cube) {
-  return {
-    corners: cube.getRawCorners(),
-    edges: cube.getRawEdges(),
-    placement: cube.placement,
-  }
 }
