@@ -39,6 +39,9 @@ bus.on(fetchSubmissions)
 
 <template>
   <div>
+    <NuxtLink to="/daily" class="text-xs text-blue-500 float-right flex items-center">
+      <Icon name="heroicons:chevron-double-left-16-solid" />{{ $t('common.backTo', { to: $t('daily.title') }) }}
+    </NuxtLink>
     <h1 class="font-bold text-xl md:text-3xl my-2">
       {{ competition.name }}
     </h1>

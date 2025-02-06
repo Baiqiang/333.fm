@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { data: weekly } = await useApi<Competition>('/weekly/on-going')
+const { data: daily } = await useApi<Competition>('/daily/on-going')
 const navs = computed(() => [
   {
     title: 'if.title',
@@ -10,11 +12,11 @@ const navs = computed(() => [
   },
   {
     title: 'weekly.title',
-    path: '/weekly',
+    path: weekly.value ? competitionPath(weekly.value) : '/weekly',
   },
   {
     title: 'daily.title',
-    path: '/daily',
+    path: daily.value ? competitionPath(daily.value) : '/daily',
   },
   {
     title: 'endless.title',
