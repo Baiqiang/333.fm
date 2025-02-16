@@ -1,6 +1,7 @@
 <script setup lang="ts">
-const { data: weekly } = await useApi<Competition>('/weekly/on-going')
 const { data: daily } = await useApi<Competition>('/daily/on-going')
+const { data: weekly } = await useApi<Competition>('/weekly/on-going')
+let lastUpdate = useDayjs()().format('YYYY-MM-DD')
 const navs = computed(() => [
   {
     title: 'if.title',
@@ -26,10 +27,6 @@ const navs = computed(() => [
     title: 'practice.title',
     path: '/practice',
   },
-  // {
-  //   title: 'chain.title',
-  //   path: '/chain',
-  // },
 ])
 const user = useUser()
 const showMenu = ref(false)
@@ -43,6 +40,14 @@ router.afterEach(() => {
 onMounted(() => {
   document.body.addEventListener('click', () => showUserMenu.value = false)
 })
+useIntervalFn(() => {
+  const now = useDayjs()().format('YYYY-MM-DD')
+  if (now !== lastUpdate) {
+    lastUpdate = now
+    useApi<Competition>('/daily/on-going').then(({ data }) => daily.value = data.value)
+    useApi<Competition>('/weekly/on-going').then(({ data }) => weekly.value = data.value)
+  }
+}, 5000)
 
 const langButton = ref()
 const { setLocale, setLocaleCookie, finalizePendingLocaleChange } = useI18n()
