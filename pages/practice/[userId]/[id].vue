@@ -108,19 +108,30 @@ bus.on(fetchData)
           <div v-if="!submissions[scramble.id]">
             {{ $t('weekly.noSolution') }}
           </div>
+          <Submissions
+            v-else-if="mySubmissions[scramble.id]?.length > 0"
+            :submissions="submissions[scramble.id]"
+            :competition="competition"
+            :scramble="scramble"
+          />
           <Spoiler
             v-else
             :spoiled="$t('weekly.solutions')"
-            :show="mySubmissions[scramble.id]?.length > 0"
+            :show="false"
           >
             <Submissions :submissions="submissions[scramble.id]" :competition="competition" :scramble="scramble" />
           </Spoiler>
         </div>
       </Tab>
       <Tab v-if="results.length > 0" :name="$t('weekly.results')" hash="results">
+        <WeeklyResults
+          v-if="competition.scrambles.every(scramble => mySubmissions[scramble.id]?.length > 0)"
+          :results="results"
+        />
         <Spoiler
+          v-else
           :spoiled="$t('weekly.results')"
-          :show="competition.scrambles.every(scramble => mySubmissions[scramble.id]?.length > 0)"
+          :show="false"
           class="my-2"
         >
           <WeeklyResults :results="results" />
