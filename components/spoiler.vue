@@ -6,13 +6,13 @@ const props = withDefaults(defineProps<{
   show: false,
 })
 
-const showSpoiler = ref(props.show)
+const showSpoiler = ref(false)
 </script>
 
 <template>
   <div class="relative">
     <div
-      v-if="!showSpoiler"
+      v-if="!showSpoiler && !show"
       class="absolute inset-0 z-50 bg-indigo-500 text-white flex flex-col items-center justify-center cursor-pointer"
       @click="showSpoiler = true"
     >
