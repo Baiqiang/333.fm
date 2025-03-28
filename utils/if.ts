@@ -166,7 +166,7 @@ export function applyMark(alg: string, mark: MARKS) {
 }
 
 export function replaceQuote(string: string): string {
-  return string.replace(/[‘’`]/g, '\'')
+  return string.replace(/[‘’`′]/g, '\'')
 }
 
 export function formatAlgorithm(string: string | string[], placement: number = 0) {
