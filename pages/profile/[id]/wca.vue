@@ -7,8 +7,13 @@ const fmResults = results.value.filter(r => r.event_id === '333fm')
 const nonDNFMeanResults = fmResults.filter(r => r.average > 0)
 const singles: Record<number, [string, number][]> = {}
 const movesCountMap: Record<number, number> = {}
+const meanscountMap: Record<number, number> = {}
 const allSingles: number[] = []
 for (const result of fmResults) {
+  const mean = result.average
+  if (mean > 0) {
+    meansCountMap[mean] = (meansCountMap[mean] || 0) + 1
+  }
   for (const [index, moves] of result.attempts.entries()) {
     if (moves > 0) {
       const scrambleNumer = index + 1
@@ -35,6 +40,9 @@ for (let i = 0; i < allSingles.length; i++) {
 }
 const movesCount = Object.entries(movesCountMap).map(([m, count]) => [Number(m), count])
 movesCount.sort((a, b) => a[0] - b[0])
+const meansCount = Object.entries(meansCountMap).map(([m, count]) => [Number(m), count])
+meansCount.sort((a, b) => a[0] - b[0])
+
 const meanChartOption: ECOption = {
   title: {
     text: `${localeName(user.value.name, locale.value)} - WCA`,
@@ -149,6 +157,45 @@ const movesCountOption: ECOption = {
     },
   ],
 }
+
+const meansCountOption: ECOption = {
+  title: {
+    text: `${localeName(user.value.name, locale.value)} - WCA`,
+  },
+  tooltip: {
+    trigger: 'axis',
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {
+        name: `${localeName(user.value.name, locale.value)}-WCA.png`,
+        title: t('common.saveAsImage'),
+      },
+    },
+  },
+  legend: {
+    bottom: '0%',
+  },
+  grid: {
+    left: '3%',
+    right: '3%',
+    containLabel: true,
+  },
+  yAxis: {
+    type: 'value',
+    minInterval: 1,
+  },
+  xAxis: {
+    type: 'category',
+  },
+  series: [
+    {
+      name: t('result.mean'),
+      type: 'bar',
+      data: meanCount,
+    },
+  ],
+}
 const mixedChartOption: ECOption = {
   title: {
     text: `${localeName(user.value.name, locale.value)} - WCA - mixed (DNF excluded)`,
@@ -254,6 +301,9 @@ const mixedChartOption: ECOption = {
     </div>
     <div class="h-[350px]">
       <VChart :option="movesCountOption" autoresize />
+    </div>
+    <div class="h-[350px]">
+      <VChart :option="meansCountOption" autoresize />
     </div>
     <div class="h-[480px]">
       <VChart :option="meanChartOption" autoresize />
