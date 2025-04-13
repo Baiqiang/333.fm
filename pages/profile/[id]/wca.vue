@@ -192,7 +192,7 @@ const meansCountOption: ECOption = {
     {
       name: t('result.mean'),
       type: 'bar',
-      data: meanCount,
+      data: meansCount,
     },
   ],
 }
