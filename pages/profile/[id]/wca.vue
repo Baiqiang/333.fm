@@ -7,7 +7,7 @@ const fmResults = results.value.filter(r => r.event_id === '333fm')
 const nonDNFMeanResults = fmResults.filter(r => r.average > 0)
 const singles: Record<number, [string, number][]> = {}
 const movesCountMap: Record<number, number> = {}
-const meanscountMap: Record<number, number> = {}
+const meansCountMap: Record<number, number> = {}
 const allSingles: number[] = []
 for (const result of fmResults) {
   const mean = result.average
