@@ -135,12 +135,27 @@ export interface Endless extends Competition {
   levels: Level[]
   challenges?: Challenge[]
 }
-export interface Challenge {
+
+export enum ChallengeType {
+  REGULAR,
+  BOSS,
+}
+export interface RegularChallenge {
   single: number
   team: [number, number]
+}
+
+export interface BossChallenge {
+  instantKill: number
+  minHitPoints: number
+  maxHitPoints: number
+}
+export interface Challenge {
+  type: ChallengeType
   startLevel?: number
   endLevel?: number
   levels?: number[]
+  challenge: RegularChallenge | BossChallenge
 }
 
 export interface EndlessStats {
