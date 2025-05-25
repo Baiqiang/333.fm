@@ -25,12 +25,12 @@ const links = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-wrap overflow-x-auto">
+  <div class="flex flex-nowrap overflow-x-auto">
     <NuxtLink
       v-for="link in links"
       :key="link.to"
       :to="link.to"
-      class="py-1 px-2 text-sm"
+      class="py-1 px-2 text-sm whitespace-nowrap"
       :class="{
         'text-blue-500 border-b border-gray-500': !route.path.includes(link.to),
         'border border-b-0 border-gray-500': route.path.includes(link.to),

@@ -58,18 +58,18 @@ export interface LeagueDuel {
   id: number
   competitionId: number
   tierId: number
-  player1Id: number
-  player2Id: number
-  player1Points: number
-  player2Points: number
+  user1Id: number
+  user2Id: number
+  user1Points: number
+  user2Points: number
   createdAt: Date
   updatedAt: Date
   competition: Competition
   tier: LeagueTier
-  player1?: LeaguePlayer
-  player2?: LeaguePlayer
-  player1Result?: Result
-  player2Result?: Result
+  user1?: User
+  user2?: User
+  user1Result?: Result
+  user2Result?: Result
   ended: boolean
 }
 
@@ -86,8 +86,6 @@ export interface LeaguePlayer {
   session: LeagueSession
   tier: LeagueTier
   user: User
-  duelsAsPlayer1: LeagueDuel[]
-  duelsAsPlayer2: LeagueDuel[]
   standings: LeagueStanding[]
 }
 
@@ -97,14 +95,14 @@ export function leagueWeek(competition: Competition) {
   return competition.alias.split('-')[2]
 }
 
-export function leagueWeekPoints(player1Points: number, player2Points: number) {
-  if (player1Points + player2Points === 0) {
+export function leagueWeekPoints(user1Points: number, user2Points: number) {
+  if (user1Points + user2Points === 0) {
     return '-'
   }
-  if (player1Points > player2Points) {
+  if (user1Points > user2Points) {
     return 2
   }
-  if (player1Points === player2Points) {
+  if (user1Points === user2Points) {
     return 1
   }
   return 0

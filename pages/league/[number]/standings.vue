@@ -45,7 +45,7 @@ useSeoMeta({
     <h3 class="text-lg font-bold my-2 w-full">
       Standings
     </h3>
-    <div class="grid grid-cols-[max-content_max-content_max-content_max-content_max-content_max-content_max-content]">
+    <div class="grid grid-cols-[max-content_max-content_max-content_max-content_max-content_max-content_max-content] overflow-x-auto">
       <template v-for="{ tier, standings } in tierStandings" :key="tier.id">
         <div class="grid grid-cols-subgrid col-span-full uppercase bg-gray-800 text-white mt-2">
           <div class="p-1">
@@ -74,7 +74,7 @@ useSeoMeta({
           <div class="text-right p-1 font-mono">
             No.{{ index + 1 }}
           </div>
-          <UserAvatarName :user="standing.user" class="p-1" />
+          <UserAvatarName :user="standing.user" class="p-1 border-l border-black" />
           <div class="p-1 border-l border-black text-center font-mono">
             {{ standing.points }}
           </div>
