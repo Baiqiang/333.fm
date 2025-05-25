@@ -62,7 +62,7 @@ function reset() {
       {{ $t('sf.title') }}
     </h1>
     <p class="mb-2" v-html="$t('sf.description')" />
-    <form class="pb-20" @submit="submit" @reset="reset">
+    <FormWrapper class="pb-20" @submit="submit" @reset="reset">
       <FormInput
         v-if="user.signedIn"
         v-model="form.name"
@@ -97,6 +97,6 @@ function reset() {
           {{ $t('form.reset') }}
         </button>
       </div>
-    </form>
+    </FormWrapper>
   </div>
 </template>

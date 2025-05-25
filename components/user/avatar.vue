@@ -8,11 +8,12 @@ const props = withDefaults(defineProps<{
   size: 6,
 })
 const cls = computed(() => `w-${props.size} h-${props.size}`)
+const imgSrc = computed(() => props.user.avatarThumb || '/images/default-avatar.png')
 </script>
 
 <template>
   <NuxtLink v-if="link" :to="`/profile/${userId(user)}`">
-    <img :src="user.avatarThumb" :class="cls" :title="user.name">
+    <img :src="imgSrc" :class="cls" :title="user.name">
   </NuxtLink>
-  <img v-else :src="user.avatarThumb" :class="cls" :title="user.name">
+  <img v-else :src="imgSrc" :class="cls" :title="user.name">
 </template>

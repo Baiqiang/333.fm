@@ -7,11 +7,11 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-2 md:grid-cols-12">
-    <span class="md:col-span-2 lg:col-span-1 font-bold md:py-3">
+  <div class="grid grid-cols-subgrid col-span-full">
+    <span class="font-bold">
       {{ label }}
     </span>
-    <div class="md:col-span-10">
+    <div class="">
       <slot />
     </div>
   </div>

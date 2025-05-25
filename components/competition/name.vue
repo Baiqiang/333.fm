@@ -26,5 +26,6 @@ const competitionName = computed(() => {
 <template>
   <NuxtLink :to="competitionLink" class="text-blue-500 hover:text-blue-300">
     {{ competitionName }}
+    <slot v-if="$slots.default" />
   </NuxtLink>
 </template>

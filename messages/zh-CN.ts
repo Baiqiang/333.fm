@@ -1,5 +1,3 @@
-import en from './en'
-
 export default {
   title: '最少步',
   header: {
@@ -463,5 +461,8 @@ export default {
     token: {
       description: '机器人 Token 是用于 QQ 群绑定 333.fm 的用户信息的一次性凭证。',
     },
+  },
+  league: {
+    title: '联赛',
   },
 }

@@ -229,7 +229,7 @@ function getTmpURL(file: File) {
 
 <template>
   <div class="mt-6">
-    <form class="relative" @submit="submit" @reset="reset">
+    <FormWrapper class="relative" @submit="submit" @reset="reset">
       <FormSignInRequired />
       <FormInput
         v-if="allowUnlimited"
@@ -345,7 +345,7 @@ function getTmpURL(file: File) {
           {{ $t('weekly.turnToUnlimited.label') }}
         </button>
       </div>
-    </form>
+    </FormWrapper>
   </div>
   <Teleport to="body">
     <Modal v-if="isRevealed" :cancel="cancel">

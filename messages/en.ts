@@ -462,4 +462,7 @@ export default {
       description: 'Bot Token is a one-time credential for binding user information on 333.fm with QQ groups.',
     },
   },
+  league: {
+    title: 'League',
+  },
 }

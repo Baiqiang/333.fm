@@ -26,6 +26,10 @@ const navs = computed(() => [
     title: 'practice.title',
     path: '/practice',
   },
+  {
+    title: 'league.title',
+    path: '/league',
+  },
   // {
   //   title: 'chain.title',
   //   path: '/chain',
