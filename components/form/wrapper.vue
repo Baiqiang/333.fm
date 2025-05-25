@@ -1,5 +1,5 @@
 <template>
-  <form class="grid grid-cols-[max-content_minmax(0,1fr)] gap-4">
+  <form class="grid md:grid-cols-[max-content_minmax(0,1fr)] gap-x-4">
     <slot />
   </form>
 </template>
