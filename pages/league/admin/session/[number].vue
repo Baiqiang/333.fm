@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Algorithm } from 'insertionfinder'
+import leagueS6 from '~/assets/league-s6.json'
 
 const accessToken = useAccessToken()
 const user = useUser()
@@ -51,6 +52,17 @@ function pickPlayer(tierId: number, index: number, user: User) {
   editingIndex.value = ''
   searchResults.value = []
   search.value = ''
+}
+
+async function importS6() {
+  if (!confirm('This will override current tier settings. Please confirm to import!')) {
+    return
+  }
+  for (const tier of session.value.tiers) {
+    const players = leagueS6.filter(s => s.level.toString() === tier.level).slice(0, weeks.value)
+    tierPlayers.value[tier.id] = players as any
+    await saveTierPlayers(tier.id)
+  }
 }
 
 async function searchWCAPerson() {
@@ -225,6 +237,9 @@ async function signInAs({ wcaId }: User) {
     <h3 class="text-lg font-bold my-2 w-full clear-both">
       Tiers
     </h3>
+    <button v-if="canEditTier" class="bg-indigo-500 text-white text-sm mb-2 px-2 py-1" @click="importS6">
+      Import S6 tier preset
+    </button>
     <div class="flex flex-wrap gap-3">
       <div v-for="tier, index in session.tiers" :key="tier.id" :class="tierBackgrounds[index]">
         <h4 class="font-bold p-2 border-b border-gray-500">
