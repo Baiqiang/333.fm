@@ -31,6 +31,7 @@ const tierStandings = computed(() => {
     if (tmp === 0) {
       tmp = b.bestMo3 - a.bestMo3
     }
+    // @todo tier breaker
     return -tmp
   }))
   return ret
@@ -38,6 +39,19 @@ const tierStandings = computed(() => {
 useSeoMeta({
   title: `Standings - ${session.value.title}`,
 })
+function getStandingClass(tierIndex: number, index: number) {
+  let ret = ''
+  if (index < 3) {
+    ret = 'bg-green-300'
+  }
+  if (index > tierStandings.value[0].standings.length - 4) {
+    ret = 'bg-red-300'
+    if (tierIndex === tierStandings.value.length - 1) {
+      ret = ''
+    }
+  }
+  return ret
+}
 </script>
 
 <template>
@@ -45,8 +59,8 @@ useSeoMeta({
     <h3 class="text-lg font-bold my-2 w-full">
       Standings
     </h3>
-    <div class="grid grid-cols-[max-content_max-content_max-content_max-content_max-content_max-content_max-content] overflow-x-auto">
-      <template v-for="{ tier, standings } in tierStandings" :key="tier.id">
+    <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content] overflow-x-auto">
+      <template v-for="{ tier, standings }, tierIndex in tierStandings" :key="tier.id">
         <div class="grid grid-cols-subgrid col-span-full uppercase bg-gray-800 text-white mt-2">
           <div class="p-1">
             {{ tier.name }}
@@ -57,20 +71,20 @@ useSeoMeta({
           <div class="border-l border-white p-1">
             PTS
           </div>
-          <div class="border-l border-white p-1">
-            Wins
+          <div class="border-l border-white p-1 text-center">
+            W
           </div>
-          <div class="border-l border-white p-1">
-            Draws
+          <div class="border-l border-white p-1 text-center">
+            D
           </div>
-          <div class="border-l border-white p-1">
-            Losses
+          <div class="border-l border-white p-1 text-center">
+            L
           </div>
           <div class="border-l border-white p-1">
             Best Mo3
           </div>
         </div>
-        <div v-for="(standing, index) in standings" :key="standing.id" class="grid grid-cols-subgrid col-span-full odd:bg-gray-300">
+        <div v-for="(standing, index) in standings" :key="standing.id" class="grid grid-cols-subgrid col-span-full border-t border-gray-700" :class="getStandingClass(tierIndex, index)">
           <div class="text-right p-1 font-mono">
             No.{{ index + 1 }}
           </div>

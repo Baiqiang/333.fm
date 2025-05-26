@@ -34,6 +34,6 @@ const grouppedSchedules = computed(() => {
       <div class="border-l border-black" />
     </div>
     <LeagueScheduleTitle />
-    <LeagueScheduleDuels :duels="duels" />
+    <LeagueScheduleDuels :duels="duels" :competition="competition" />
   </template>
 </template>
