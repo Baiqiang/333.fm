@@ -16,7 +16,8 @@ const tierStandings = computed(() => {
     }
     tmp[standing.tier.id].standings.push(standing)
   })
-  const ret = Object.values(tmp)
+  const ret = Object.values(tmp).sort((a, b) => a.tier.level.localeCompare(b.tier.level))
+  ret.forEach(t => t.standings.sort((a, b) => a.position - b.position))
   return ret
 })
 useSeoMeta({
