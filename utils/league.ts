@@ -46,12 +46,13 @@ export interface LeagueTier {
 export interface LeagueStanding {
   id: number
   tierId: number
-  playerId: number
+  userId: number
+  position: number
   points: number
   createdAt: Date
   updatedAt: Date
   tier: LeagueTier
-  player: LeaguePlayer
+  user: User
 }
 
 export interface LeagueDuel {

@@ -6,6 +6,10 @@ const route = useRoute()
 const links = computed(() => {
   const ret = [
     {
+      label: 'Tiers',
+      to: `/league/${props.session.number}/tiers`,
+    },
+    {
       label: 'Schedules',
       to: `/league/${props.session.number}/schedules`,
     },

@@ -42,6 +42,13 @@ useSeoMeta({
 function getStandingClass(tierIndex: number, index: number) {
   let ret = ''
   if (index < 3) {
+    if (tierIndex === 0) {
+      return [
+        'bg-[#d4af37]',
+        'bg-[#c0c0c0]',
+        'bg-[#c79b56]',
+      ][index]
+    }
     ret = 'bg-green-300'
   }
   if (index > tierStandings.value[0].standings.length - 4) {
@@ -86,7 +93,7 @@ function getStandingClass(tierIndex: number, index: number) {
         </div>
         <div v-for="(standing, index) in standings" :key="standing.id" class="grid grid-cols-subgrid col-span-full border-t border-gray-700" :class="getStandingClass(tierIndex, index)">
           <div class="text-right p-1 font-mono">
-            No.{{ index + 1 }}
+            No.{{ standing.position || index }}
           </div>
           <UserAvatarName :user="standing.user" class="p-1 border-l border-black" />
           <div class="p-1 border-l border-black text-center font-mono">

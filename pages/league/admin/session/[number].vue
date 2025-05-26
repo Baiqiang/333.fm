@@ -127,6 +127,7 @@ async function generateSchedules() {
   generating.value = true
   try {
     await useApiPost(`${baseURL}/schedules`)
+    await updateSchedules()
   }
   catch (error) {
     console.error(error)
@@ -330,7 +331,7 @@ async function signInAs({ wcaId }: User) {
     <h3 class="text-lg font-bold my-2 w-full">
       Schedules
     </h3>
-    <LeagueSchedules :tier-schedules="tierSchedules" />
+    <LeagueSchedules :tier-schedules="tierSchedules" :session="session" />
     <div class="flex flex-wrap gap-2 my-2">
       <button
         class="bg-indigo-500 text-white px-2 py-1 text-sm"
