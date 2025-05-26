@@ -16,24 +16,7 @@ const tierStandings = computed(() => {
     }
     tmp[standing.tier.id].standings.push(standing)
   })
-  const ret = Object.values(tmp).sort((a, b) => a.tier.level.localeCompare(b.tier.level))
-  ret.forEach(t => t.standings.sort((a, b) => {
-    let tmp = a.points - b.points
-    if (tmp === 0) {
-      tmp = a.wins - b.wins
-    }
-    if (tmp === 0) {
-      tmp = a.draws - b.draws
-    }
-    if (tmp === 0) {
-      tmp = b.losses - a.losses
-    }
-    if (tmp === 0) {
-      tmp = b.bestMo3 - a.bestMo3
-    }
-    // @todo tier breaker
-    return -tmp
-  }))
+  const ret = Object.values(tmp)
   return ret
 })
 useSeoMeta({
