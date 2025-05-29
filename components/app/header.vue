@@ -82,7 +82,7 @@ async function changeLocale(code: string) {
         </button>
       </div>
       <div
-        class="fixed inset-0 bg-indigo-500 md:static transition-all duration-300 z-10 flex flex-col md:flex-row md:gap-x-2 md:items-center md:w-full"
+        class="fixed inset-0 bg-indigo-500 md:static transition-all duration-300 z-50 flex flex-col md:flex-row md:gap-x-2 md:items-center md:w-full"
         :class="{
           'left-0': showMenu,
           'left-full': !showMenu,

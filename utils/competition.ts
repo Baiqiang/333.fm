@@ -188,8 +188,6 @@ export interface Kickoff extends Time {
 export interface Practice extends Competition {
   attendees: number
   ownerResult: Result
-  prevIndex?: number
-  nextIndex?: number
 }
 
 export interface CompetitionRecord {

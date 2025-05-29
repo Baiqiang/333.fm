@@ -91,16 +91,7 @@ bus.on(fetchData)
           type="practice"
           @submitted="fetchData"
         />
-        <div class="flex justify-between mt-4">
-          <NuxtLink v-if="competition.prevIndex" class="bg-indigo-500 text-white px-3 py-2" :to="`/practice/${profile.wcaId || profile.id}/${competition.prevIndex}`">
-            {{ $t('practice.previous') }}
-          </NuxtLink>
-          <div v-else />
-          <NuxtLink v-if="competition.nextIndex" class="bg-indigo-500 text-white px-3 py-2" :to="`/practice/${profile.wcaId || profile.id}/${competition.nextIndex}`">
-            {{ $t('practice.next') }}
-          </NuxtLink>
-          <div v-else />
-        </div>
+        <CompetitionSiblings :competition="competition" />
         <h2 class="text-lg font-semibold my-2">
           {{ $t('weekly.solutions') }}
         </h2>

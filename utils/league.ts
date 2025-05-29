@@ -34,7 +34,7 @@ export interface LeagueStanding {
 
 export interface LeagueTier {
   id: number
-  level: string
+  level: number
   name: string
   sessionId: number
   session: LeagueSession

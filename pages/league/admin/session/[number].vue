@@ -59,7 +59,7 @@ async function importS6() {
     return
   }
   for (const tier of session.value.tiers) {
-    const players = leagueS6.filter(s => s.level.toString() === tier.level).slice(0, weeks.value)
+    const players = leagueS6.filter(s => s.level === tier.level).slice(0, weeks.value)
     tierPlayers.value[tier.id] = players as any
     await saveTierPlayers(tier.id)
   }

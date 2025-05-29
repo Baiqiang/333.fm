@@ -47,16 +47,7 @@ bus.on(fetchSubmissions)
     </h1>
     <WeeklyStatus :competition="competition" />
     <WeeklyRules />
-    <div class="flex justify-between my-4 text-sm">
-      <NuxtLink v-if="competition.prevCompetition" class="bg-indigo-500 text-white px-3 py-2" :to="competitionPath(competition.prevCompetition)">
-        {{ $t('weekly.previous') }}
-      </NuxtLink>
-      <div v-else />
-      <NuxtLink v-if="competition.nextCompetition" class="bg-indigo-500 text-white px-3 py-2" :to="competitionPath(competition.nextCompetition)">
-        {{ $t('weekly.next') }}
-      </NuxtLink>
-      <div v-else />
-    </div>
+    <CompetitionSiblings :competition="competition" />
     <Tabs>
       <Tab v-if="!isOnGoing" :name="$t('weekly.results')" hash="results">
         <WeeklyResults :results="results!.regular" />
@@ -73,7 +64,7 @@ bus.on(fetchSubmissions)
         <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
         <CompetitionForm
-          v-if="isOnGoing"
+          v-if="isOnGoing || mySubmissions[scramble.id]?.length"
           :scramble="scramble"
           :competition="competition"
           :submissions="mySubmissions[scramble.id]"

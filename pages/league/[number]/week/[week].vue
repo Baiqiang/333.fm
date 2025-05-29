@@ -7,9 +7,9 @@ const session = inject(SYMBOL_LEAGUE_SESSION)!
 const baseURL = `/league/session/${session.value.number}/${week}`
 const { data } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
 const weekSchedules = ref<TierSchedule[]>(data.value || [])
-const canJoin = computed(() => session.value.standings.find(s => s.userId === user.id))
 const competition = ref<Competition>(session.value.competitions.find(c => c.alias.split('-')[2] === week)!)
 const isOnGoing = computed(() => competition.value.status === CompetitionStatus.ON_GOING)
+const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/league/session/${session.value.number}/${week}/results`)
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {
   const ret: Record<number, Submission[]> = {}
@@ -43,7 +43,14 @@ bus.on(fetchSubmissions)
       {{ competition.name }}
     </h1>
     <WeeklyStatus :competition="competition" />
+    <CompetitionSiblings :competition="competition" />
     <Tabs>
+      <Tab v-if="!isOnGoing && results?.regular.length" :name="$t('weekly.results')" hash="results">
+        <WeeklyResults :results="results!.regular" />
+      </Tab>
+      <Tab v-if="!isOnGoing && results?.unlimited.length" :name="$t('league.allResults')" hash="results-unlimited">
+        <WeeklyResults :results="results!.unlimited" />
+      </Tab>
       <Tab
         v-for="scramble in competition.scrambles"
         :key="scramble.id"
@@ -53,7 +60,7 @@ bus.on(fetchSubmissions)
         <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
         <CompetitionForm
-          v-if="isOnGoing && canJoin"
+          v-if="isOnGoing || mySubmissions[scramble.id]?.length"
           :scramble="scramble"
           :competition="competition"
           :submissions="mySubmissions[scramble.id]"

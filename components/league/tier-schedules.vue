@@ -23,15 +23,15 @@ const grouppedSchedules = computed(() => {
   </h4>
   <template v-for="{ competition, duels } of grouppedSchedules" :key="competition.id">
     <div class="col-span-5 col-start-5 grid grid-cols-subgrid mt-2">
-      <div class="col-span-4 flex items-center border border-r-0 border-black p-1">
-        <div class="font-medium mr-2">
+      <div class="col-span-4 flex items-center bg-indigo-50 border border-r-0 border-indigo-200 p-2 shadow-sm">
+        <div class="font-semibold text-indigo-700 mr-3">
           Week {{ leagueWeek(competition) }}
         </div>
-        <div class="text-sm">
+        <div class="text-sm text-indigo-600">
           {{ $dayjs(competition.startTime).format('MMM Do') }}-{{ $dayjs(competition.endTime).format('MMM Do') }}
         </div>
       </div>
-      <div class="border-l border-black" />
+      <div class="border-l border-indigo-200" />
     </div>
     <LeagueScheduleTitle />
     <LeagueScheduleDuels :duels="duels" :competition="competition" />

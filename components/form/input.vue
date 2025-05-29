@@ -5,7 +5,7 @@ const props = withDefaults(defineProps<{
   description?: string
   attrs?: Record<string, unknown>
   rows?: number
-  options?: { label: string, value: string | number, description?: string }[]
+  options?: { label: string, value: string | number, description?: string, disabled?: boolean }[]
   errorMessage?: string
   state?: boolean | null
 }>(), {
@@ -37,17 +37,19 @@ const inputClass = computed<string>(() => {
         v-for="option in options"
         :key="option.value"
         :value="option.value"
+        :disabled="option.disabled"
       >
         {{ option.label }}
       </option>
     </select>
     <div v-else-if="type === 'radio'" class="flex flex-wrap gap-2 md:mt-3 mb-2 px-2">
-      <label v-for="option in options" :key="option.value" class="flex items-center gap-2 cursor-pointer">
+      <label v-for="option in options" :key="option.value" class="flex items-center gap-2" :class="{ 'cursor-pointer': !option.disabled, 'cursor-not-allowed': option.disabled }">
         <input
           v-bind="attrs"
           v-model="value"
           :type="type"
           :value="option.value"
+          :disabled="option.disabled"
         >
         {{ option.label }}
       </label>

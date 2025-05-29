@@ -464,5 +464,23 @@ export default {
   },
   league: {
     title: '联赛',
+    description: '比赛以联赛形式进行，每位选手每周与其他选手进行一对一的比赛。',
+    nav: {
+      summary: '概览',
+      tiers: '分组',
+      schedules: '赛程',
+      standings: '排名',
+      week: '第 {week} 周',
+    },
+    standing: {
+      competitors: '选手',
+      sets: '小分',
+      pts: '积分',
+      wins: '胜',
+      draws: '平',
+      losses: '负',
+      bestMo3: '最佳 Mo3',
+    },
+    allResults: '成绩（所有）',
   },
 }

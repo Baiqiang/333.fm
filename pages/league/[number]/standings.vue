@@ -16,7 +16,7 @@ const tierStandings = computed(() => {
     }
     tmp[standing.tier.id].standings.push(standing)
   })
-  const ret = Object.values(tmp).sort((a, b) => a.tier.level.localeCompare(b.tier.level))
+  const ret = Object.values(tmp).sort((a, b) => a.tier.level - b.tier.level)
   ret.forEach(t => t.standings.sort((a, b) => a.position - b.position))
   return ret
 })
@@ -28,15 +28,15 @@ function getStandingClass(tierIndex: number, index: number) {
   if (index < 3) {
     if (tierIndex === 0) {
       return [
-        'bg-[#d4af37]',
-        'bg-[#c0c0c0]',
-        'bg-[#c79b56]',
+        'bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-white',
+        'bg-gradient-to-r from-[#c0c0c0] to-[#a8a8a8] text-white',
+        'bg-gradient-to-r from-[#cd7f32] to-[#c79b56] text-white',
       ][index]
     }
-    ret = 'bg-green-300'
+    ret = 'bg-gradient-to-r from-green-300 to-green-200'
   }
   if (index > tierStandings.value[0].standings.length - 4) {
-    ret = 'bg-red-300'
+    ret = 'bg-gradient-to-r from-red-300 to-red-200'
     if (tierIndex === tierStandings.value.length - 1) {
       ret = ''
     }
@@ -46,57 +46,64 @@ function getStandingClass(tierIndex: number, index: number) {
 </script>
 
 <template>
-  <div>
-    <h3 class="text-lg font-bold my-2 w-full">
-      Standings
+  <div class="max-w-7xl mx-auto px-2">
+    <h3 class="text-2xl font-bold my-4 text-gray-900">
+      {{ $t('league.nav.standings') }}
     </h3>
-    <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content] overflow-x-auto">
-      <template v-for="{ tier, standings }, tierIndex in tierStandings" :key="tier.id">
-        <div class="grid grid-cols-subgrid col-span-full uppercase bg-gray-800 text-white mt-2">
-          <div class="p-1">
-            {{ tier.name }}
+    <div class="shadow">
+      <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content] overflow-x-auto">
+        <template v-for="{ tier, standings }, tierIndex in tierStandings" :key="tier.id">
+          <div class="grid grid-cols-subgrid col-span-full bg-gradient-to-r from-indigo-600 to-indigo-500 text-white mt-1 first:mt-0">
+            <div class="p-2 font-semibold tracking-wide">
+              {{ tier.name }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 font-medium">
+              {{ $t('league.standing.competitors') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 font-medium">
+              {{ $t('league.standing.pts') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 text-center font-medium">
+              {{ $t('league.standing.wins') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 text-center font-medium">
+              {{ $t('league.standing.draws') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 text-center font-medium">
+              {{ $t('league.standing.losses') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 font-medium">
+              {{ $t('league.standing.bestMo3') }}
+            </div>
           </div>
-          <div class="border-l border-white p-1">
-            Competitors
+          <div
+            v-for="(standing, index) in standings"
+            :key="standing.id"
+            class="grid grid-cols-subgrid col-span-full border-t border-gray-200 hover:bg-gray-50 transition-colors"
+            :class="getStandingClass(tierIndex, index)"
+          >
+            <div class="text-right p-2 font-mono font-semibold">
+              No.{{ standing.position || index }}
+            </div>
+            <UserAvatarName :user="standing.user" class="p-2 border-l border-gray-200" />
+            <div class="p-2 border-l border-gray-200 text-center font-mono font-bold">
+              {{ standing.points }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ standing.wins }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ standing.draws }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ standing.losses }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ formatResult(standing.bestMo3, 2) }}
+            </div>
           </div>
-          <div class="border-l border-white p-1">
-            PTS
-          </div>
-          <div class="border-l border-white p-1 text-center">
-            W
-          </div>
-          <div class="border-l border-white p-1 text-center">
-            D
-          </div>
-          <div class="border-l border-white p-1 text-center">
-            L
-          </div>
-          <div class="border-l border-white p-1">
-            Best Mo3
-          </div>
-        </div>
-        <div v-for="(standing, index) in standings" :key="standing.id" class="grid grid-cols-subgrid col-span-full border-t border-gray-700" :class="getStandingClass(tierIndex, index)">
-          <div class="text-right p-1 font-mono">
-            No.{{ standing.position || index }}
-          </div>
-          <UserAvatarName :user="standing.user" class="p-1 border-l border-black" />
-          <div class="p-1 border-l border-black text-center font-mono">
-            {{ standing.points }}
-          </div>
-          <div class="p-1 border-l border-black text-center font-mono">
-            {{ standing.wins }}
-          </div>
-          <div class="p-1 border-l border-black text-center font-mono">
-            {{ standing.draws }}
-          </div>
-          <div class="p-1 border-l border-black text-center font-mono">
-            {{ standing.losses }}
-          </div>
-          <div class="p-1 border-l border-black text-center font-mono">
-            {{ formatResult(standing.bestMo3, 2) }}
-          </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </div>
   </div>
 </template>
