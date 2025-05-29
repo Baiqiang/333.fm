@@ -11,7 +11,7 @@ const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => su
 </script>
 
 <template>
-  <div class="p-2">
+  <div class="py-4">
     <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 text-white mb-6">
       <h1 class="text-3xl font-bold mb-3">
         {{ session.title }}

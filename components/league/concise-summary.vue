@@ -6,7 +6,7 @@ const onGoingWeek = computed(() => props.league?.competitions.find(c => c.status
 </script>
 
 <template>
-  <div v-if="league" class="bg-white shadow-md p-4 border-l-4 border-indigo-500 mb-4">
+  <div v-if="league" class="bg-white shadow-md p-2 md:p-4 border-l-2 md:border-l-4 border-indigo-500 mb-4">
     <h2 class="text-2xl font-bold mb-4">
       <NuxtLink :to="`/league/${league.number}`" class="flex items-center gap-2 hover:text-blue-500">
         <Icon name="mdi:trophy" />
