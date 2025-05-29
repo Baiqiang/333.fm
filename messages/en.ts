@@ -482,5 +482,13 @@ export default {
       bestMo3: 'Best Mo3',
     },
     allResults: 'Results (all)',
+    summary: {
+      players: 'Players',
+      weeks: 'Weeks',
+      tiers: 'Tiers',
+      ongoing: 'Ongoing',
+      past: 'Past',
+      upcoming: 'Upcoming',
+    },
   },
 }

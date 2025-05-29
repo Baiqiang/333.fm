@@ -6,30 +6,79 @@ const props = defineProps<{
 const currentWeek = computed(() => props.session.competitions.find(c => c.status === CompetitionStatus.ON_GOING))
 const pastWeeks = computed(() => props.session.competitions.filter(c => c.status === CompetitionStatus.ENDED))
 const futureWeeks = computed(() => props.session.competitions.filter(c => c.status === CompetitionStatus.NOT_STARTED))
+
+const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => sum + tier.players.length, 0))
 </script>
 
 <template>
-  <div class="">
-    <div v-if="currentWeek">
-      <h2 class="font-bold my-2">
-        Week {{ currentWeek?.alias.split('-')[2] }}
+  <div class="p-2">
+    <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 text-white mb-6">
+      <h1 class="text-3xl font-bold mb-3">
+        {{ session.title }}
+      </h1>
+      <div class="grid grid-cols-3 gap-2 md:gap-3">
+        <div class="text-center">
+          <div class="text-2xl font-bold">
+            {{ totalPlayers }}
+          </div>
+          <div class="text-sm opacity-80">
+            {{ $t('league.summary.players') }}
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold">
+            {{ session.competitions.length }}
+          </div>
+          <div class="text-sm opacity-80">
+            {{ $t('league.summary.weeks') }}
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold">
+            {{ session.tiers.length }}
+          </div>
+          <div class="text-sm opacity-80">
+            {{ $t('league.summary.tiers') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="currentWeek" class="bg-white shadow-lg p-4 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
+        <span class="w-3 h-3 bg-green-500 mr-2" />
+        {{ $t('league.summary.ongoing', { week: currentWeek?.alias.split('-')[2] }) }}
       </h2>
       <WeeklySummary :competition="currentWeek" />
     </div>
-    <div v-if="pastWeeks.length > 0">
-      <h2 class="font-bold my-2">
-        Past Weeks
+
+    <div v-if="pastWeeks.length > 0" class="bg-white shadow-lg p-4 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
+        <span class="w-3 h-3 bg-gray-500 mr-2" />
+        {{ $t('league.summary.past') }}
       </h2>
-      <div class="flex flex-col gap-2">
-        <CompetitionName v-for="week in pastWeeks" :key="week.id" :competition="week" />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <CompetitionName
+          v-for="week in pastWeeks"
+          :key="week.id"
+          :competition="week"
+          class="bg-gray-50 p-2 hover:bg-gray-100 transition-colors"
+        />
       </div>
     </div>
-    <div v-if="futureWeeks.length > 0">
-      <h2 class="font-bold my-2">
-        Future Weeks
+
+    <div v-if="futureWeeks.length > 0" class="bg-white shadow-lg p-4">
+      <h2 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
+        <span class="w-3 h-3 bg-yellow-500 mr-2" />
+        {{ $t('league.summary.upcoming') }}
       </h2>
-      <div class="flex flex-col gap-2">
-        <CompetitionName v-for="week in futureWeeks" :key="week.id" :competition="week" />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <CompetitionName
+          v-for="week in futureWeeks"
+          :key="week.id"
+          :competition="week"
+          class="bg-gray-50 p-2 hover:bg-gray-100 transition-colors"
+        />
       </div>
     </div>
   </div>

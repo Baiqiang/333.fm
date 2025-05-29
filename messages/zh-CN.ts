@@ -482,5 +482,13 @@ export default {
       bestMo3: '最佳 Mo3',
     },
     allResults: '成绩（所有）',
+    summary: {
+      players: '选手',
+      weeks: '周数',
+      tiers: '分组数',
+      ongoing: '进行中',
+      past: '已结束',
+      upcoming: '即将开始',
+    },
   },
 }

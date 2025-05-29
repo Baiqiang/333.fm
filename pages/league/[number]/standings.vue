@@ -83,7 +83,7 @@ function getStandingClass(tierIndex: number, index: number) {
             :class="getStandingClass(tierIndex, index)"
           >
             <div class="text-right p-2 font-mono font-semibold">
-              No.{{ standing.position || index }}
+              No.{{ standing.position || index + 1 }}
             </div>
             <UserAvatarName :user="standing.user" class="p-2 border-l border-gray-200" />
             <div class="p-2 border-l border-gray-200 text-center font-mono font-bold">
