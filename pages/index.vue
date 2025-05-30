@@ -64,7 +64,9 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
         </NuxtLink>
       </div>
 
-      <LeagueConciseSummary :league="league" class="lg:row-span-2" />
+      <div class="lg:row-span-2">
+        <LeagueConciseSummary :league="league" />
+      </div>
 
       <div>
         <div v-if="weekly" class="bg-white shadow-md border-l-2 md:border-l-4 border-blue-500 p-2 md:p-4">
