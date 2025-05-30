@@ -7,6 +7,7 @@ const props = withDefaults(defineProps<{
   competition?: Competition
   user?: User
   filterable?: boolean
+  filters?: { mode: CompetitionMode, label: string }[]
   sortable?: boolean
   chain?: boolean
 }>(), {
@@ -14,6 +15,7 @@ const props = withDefaults(defineProps<{
   sortable: false,
   chain: false,
 })
+const { t } = useI18n()
 const mode = ref<CompetitionMode | null>(null)
 const sortBy = ref<string>(props.chain ? 'continuances' : 'moves')
 const filteredSubmissions = computed(() => {
@@ -74,11 +76,21 @@ const counts = computed(() => {
           <option :value="null">
             {{ $t('common.all') }} ({{ counts.all }})
           </option>
-          <option :value="CompetitionMode.REGULAR">
-            {{ $t('weekly.regular.label') }} ({{ counts[CompetitionMode.REGULAR] }})
-          </option>
-          <option :value="CompetitionMode.UNLIMITED">
-            {{ $t('weekly.unlimited.label') }} ({{ counts[CompetitionMode.UNLIMITED] }})
+          <option
+            v-for="filter in filters || [
+              {
+                mode: CompetitionMode.REGULAR,
+                label: t('weekly.regular.label'),
+              },
+              {
+                mode: CompetitionMode.UNLIMITED,
+                label: t('weekly.unlimited.label'),
+              },
+            ]"
+            :key="filter.mode"
+            :value="filter.mode"
+          >
+            {{ filter.label }} ({{ counts[filter.mode] }})
           </option>
         </select>
       </div>

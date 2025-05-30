@@ -81,7 +81,22 @@ bus.on(fetchSubmissions)
             {{ $t('weekly.seeSolutions', { solutions: submissions[scramble.id].length }, submissions[scramble.id].length) }}
           </div>
           <template v-else>
-            <Submissions :submissions="submissions[scramble.id]" :competition="competition" :scramble="scramble" filterable />
+            <Submissions
+              :submissions="submissions[scramble.id]"
+              :competition="competition"
+              :scramble="scramble"
+              filterable
+              :filters="[
+                {
+                  mode: CompetitionMode.REGULAR,
+                  label: $t('league.mode.official'),
+                },
+                {
+                  mode: CompetitionMode.UNLIMITED,
+                  label: $t('league.mode.others'),
+                },
+              ]"
+            />
           </template>
         </div>
       </Tab>

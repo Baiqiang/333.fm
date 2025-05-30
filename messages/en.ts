@@ -490,5 +490,9 @@ export default {
       past: 'Past',
       upcoming: 'Upcoming',
     },
+    mode: {
+      official: 'Offcial',
+      others: 'Others',
+    },
   },
 }

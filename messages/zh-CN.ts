@@ -490,5 +490,9 @@ export default {
       past: '已结束',
       upcoming: '即将开始',
     },
+    mode: {
+      official: '官方',
+      others: '其他',
+    },
   },
 }

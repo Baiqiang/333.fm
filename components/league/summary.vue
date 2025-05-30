@@ -49,7 +49,7 @@ const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => su
         <span class="w-3 h-3 bg-green-500 mr-2" />
         {{ $t('league.summary.ongoing', { week: currentWeek?.alias.split('-')[2] }) }}
       </h2>
-      <WeeklySummary :competition="currentWeek" />
+      <WeeklySummary :competition="currentWeek" :show-cube="false" />
     </div>
 
     <div v-if="pastWeeks.length > 0" class="bg-white shadow-lg p-4 mb-6">
