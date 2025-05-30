@@ -79,7 +79,6 @@ bus.on(fetchSubmissions)
         <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
         <CompetitionForm
-          v-if="isOnGoing"
           :scramble="scramble"
           :competition="competition"
           :submissions="mySubmissions[scramble.id]"

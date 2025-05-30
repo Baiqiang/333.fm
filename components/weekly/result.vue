@@ -19,17 +19,12 @@ const showAverage = computed(() => props.result.values.length > 1)
     <div v-if="showAverage" class="text-right font-mono font-bold" :class="{ 'opacity-50': !finished }">
       {{ formatResult(result.average, 2) }}
     </div>
-    <div
+    <ColoredMoves
       v-for="value, index in result.values"
       :key="index"
       class="font-mono"
-      :class="{
-        'text-indigo-500 font-bold': value === bests[index],
-        'text-red-400': value === DNF,
-        'text-orange-400': value === DNS,
-      }"
-    >
-      {{ formatResult(value) }}
-    </div>
+      :value="value"
+      :is-best="value === bests[index]"
+    />
   </div>
 </template>

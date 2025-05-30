@@ -17,6 +17,9 @@ provide(SYMBOL_ADD_TAB, addTab)
 provide(SYMBOL_ACTIVE_INDEX, activeIndex)
 const route = useRoute()
 onMounted(() => {
+  if (tabs.length === 0) {
+    return
+  }
   const index = tabs.findIndex(tab => tab.hash === route.hash.replace('#', ''))
   if (index !== -1)
     selectTab(index)

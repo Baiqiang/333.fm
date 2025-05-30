@@ -153,7 +153,7 @@ async function decline() {
 
 <template>
   <div class="mt-6">
-    <form class="relative" @submit.prevent="submit" @reset="reset">
+    <FormWrapper class="relative" @submit.prevent="submit" @reset="reset">
       <FormSignInRequired />
       <FormInput
         v-if="canInsert"
@@ -249,6 +249,6 @@ async function decline() {
           </template>
         </button>
       </div>
-    </form>
+    </FormWrapper>
   </div>
 </template>

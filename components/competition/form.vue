@@ -77,6 +77,7 @@ const fileInputId = useId()
 const uploadingAttachments = ref<File[]>([])
 const uploadingPromise = ref<Promise<any>>()
 const { moves, isSolved } = useComputedState(props, form)
+const isOnGoing = computed(() => props.competition.status === CompetitionStatus.ON_GOING)
 const solutionState = computed<boolean | null>(() => {
   if (form.solution.length === 0)
     return null
@@ -90,14 +91,19 @@ const solutionSubmitted = computed<boolean>(() => {
   return submissionsMap.value[form.mode] !== undefined
 })
 const solutionDisabled = computed<boolean>(() => {
-  if (form.mode === CompetitionMode.UNLIMITED && !props.allowChangeMode)
+  if (form.mode === CompetitionMode.UNLIMITED
+    && !props.allowChangeMode
+    && props.allowUnlimited
+    && isOnGoing.value
+  ) {
     return false
+  }
   if (props.submissions.length === 0)
     return false
   return true
 })
 const unlimitedWorse = computed<boolean>(() => {
-  return form.mode === CompetitionMode.UNLIMITED && props.submissions.some(s => s.moves < moves.value * 100)
+  return props.allowUnlimited && form.mode === CompetitionMode.UNLIMITED && props.submissions.some(s => s.moves < moves.value * 100)
 })
 const formState = computed<boolean>(() => {
   if (!props.allowDnf && !solutionState.value)
@@ -111,6 +117,9 @@ const formState = computed<boolean>(() => {
   }
   if (unlimitedWorse.value)
     return false
+  if (!isOnGoing.value && !submissionsMap.value[form.mode]) {
+    return false
+  }
   return solutionState.value !== null
 })
 const { confirm, cancel, reveal, isRevealed } = useConfirmDialog()
@@ -229,7 +238,7 @@ function getTmpURL(file: File) {
 
 <template>
   <div class="mt-6">
-    <form class="relative" @submit="submit" @reset="reset">
+    <FormWrapper class="relative" @submit="submit" @reset="reset">
       <FormSignInRequired />
       <FormInput
         v-if="allowUnlimited"
@@ -239,8 +248,17 @@ function getTmpURL(file: File) {
         :state="null"
         :attrs="{ required: true }"
         :options="[
-          { label: $t('weekly.regular.label'), description: $t('weekly.regular.description'), value: CompetitionMode.REGULAR },
-          { label: $t('weekly.unlimited.label'), description: $t('weekly.unlimited.description'), value: CompetitionMode.UNLIMITED },
+          { label: $t('weekly.regular.label'),
+            description: $t('weekly.regular.description'),
+            value: CompetitionMode.REGULAR,
+            disabled: !isOnGoing && !submissionsMap[CompetitionMode.REGULAR],
+          },
+          {
+            label: $t('weekly.unlimited.label'),
+            description: $t('weekly.unlimited.description'),
+            value: CompetitionMode.UNLIMITED,
+            disabled: !isOnGoing && !submissionsMap[CompetitionMode.UNLIMITED],
+          },
         ]"
       >
         <template v-if="modeDescription" #description>
@@ -338,14 +356,14 @@ function getTmpURL(file: File) {
           {{ $t('form.reset') }}
         </button>
         <button
-          v-if="allowUnlimited && !allowChangeMode && form.mode === CompetitionMode.REGULAR && submissionsMap[CompetitionMode.REGULAR] && !submissionsMap[CompetitionMode.UNLIMITED]"
+          v-if="allowUnlimited && !allowChangeMode && form.mode === CompetitionMode.REGULAR && submissionsMap[CompetitionMode.REGULAR] && !submissionsMap[CompetitionMode.UNLIMITED] && isOnGoing"
           class="px-2 py-1 text-white bg-orange-500 focus:outline-none ml-2"
           @click.prevent="turnToUnlimited"
         >
           {{ $t('weekly.turnToUnlimited.label') }}
         </button>
       </div>
-    </form>
+    </FormWrapper>
   </div>
   <Teleport to="body">
     <Modal v-if="isRevealed" :cancel="cancel">

@@ -15,9 +15,9 @@ const endedEndlesses = ref<Endless[]>(data2.value || [])
         <div class="mb-2">
           {{ $t(`endless.type.${endless.subType}`) }}
         </div>
-        <NuxtLink :to="competitionPath(endless)" class="bg-indigo-500 text-white px-3 py-2">
-          {{ endless.name }} <Icon name="ic:round-keyboard-double-arrow-right" />
-        </NuxtLink>
+        <ButtonPrimary :to="competitionPath(endless)" icon="ic:round-keyboard-double-arrow-right">
+          {{ endless.name }}
+        </ButtonPrimary>
       </div>
       <div class="border-t my-2 pt-2">
         {{ $t('endless.ended') }}
@@ -26,9 +26,9 @@ const endedEndlesses = ref<Endless[]>(data2.value || [])
         <div class="mb-2">
           {{ $t(`endless.type.${endless.subType}`) }}
         </div>
-        <NuxtLink :to="competitionPath(endless)" class="bg-indigo-500 text-white px-3 py-2">
-          {{ endless.name }} <Icon name="ic:round-keyboard-double-arrow-right" />
-        </NuxtLink>
+        <ButtonPrimary :to="competitionPath(endless)" icon="ic:round-keyboard-double-arrow-right">
+          {{ endless.name }}
+        </ButtonPrimary>
       </div>
     </div>
   </div>

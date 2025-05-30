@@ -462,4 +462,37 @@ export default {
       description: 'Bot Token is a one-time credential for binding user information on 333.fm with QQ groups.',
     },
   },
+  league: {
+    title: 'League',
+    description: 'The competition is played in the form of a league, where each competitor plays every other competitor in the form of head-to-head matches (one per week).',
+    nav: {
+      summary: 'Summary',
+      tiers: 'Tiers',
+      schedules: 'Schedules',
+      standings: 'Standings',
+      week: 'Week {week}',
+    },
+    standing: {
+      competitors: 'Competitors',
+      sets: 'Sets',
+      pts: 'PTS',
+      wins: 'W',
+      draws: 'D',
+      losses: 'L',
+      bestMo3: 'Best Mo3',
+    },
+    allResults: 'Results (all)',
+    summary: {
+      players: 'Players',
+      weeks: 'Weeks',
+      tiers: 'Tiers',
+      ongoing: 'Ongoing',
+      past: 'Past',
+      upcoming: 'Upcoming',
+    },
+    mode: {
+      participants: 'Participants',
+      others: 'Others',
+    },
+  },
 }

@@ -19,6 +19,7 @@ export interface Competition {
   user: User
   prevCompetition?: Competition
   nextCompetition?: Competition
+  url: string
 }
 
 export interface PastCompetition extends Competition {
@@ -104,6 +105,7 @@ export enum CompetitionType {
   FMC_CHAIN,
   PERSONAL_PRACTICE,
   DAILY,
+  LEAGUE,
 }
 
 export enum CompetitionSubType {
@@ -186,8 +188,6 @@ export interface Kickoff extends Time {
 export interface Practice extends Competition {
   attendees: number
   ownerResult: Result
-  prevIndex?: number
-  nextIndex?: number
 }
 
 export interface CompetitionRecord {
@@ -274,6 +274,8 @@ export function competitionPath(competition: Competition, scramble?: { number: n
       if (scramble)
         return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}#scramble-${scramble.number}`
       return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}`
+    case CompetitionType.LEAGUE:
+      return competition.url
     default:
       return ''
   }

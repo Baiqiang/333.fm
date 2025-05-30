@@ -22,16 +22,11 @@ const { competition } = toRefs(props.result)
     <div class="text-right font-mono">
       {{ formatResult(result.best) }}
     </div>
-    <div
+    <ColoredMoves
       v-for="value, index in result.values"
       :key="index"
       class="font-mono"
-      :class="{
-        'text-red-400': value === DNF,
-        'text-orange-400': value === DNS,
-      }"
-    >
-      {{ formatResult(value) }}
-    </div>
+      :value="value"
+    />
   </div>
 </template>

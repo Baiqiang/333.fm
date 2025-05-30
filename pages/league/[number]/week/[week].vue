@@ -1,17 +1,15 @@
 <script setup lang="ts">
-const { t } = useI18n()
-const { params } = useRoute()
-const bus = useEventBus('submission')
 const user = useUser()
-const { data, error } = await useApi<Competition>(`/weekly/${params.week}`)
-if (!data.value || error.value) {
-  throw createError({
-    statusCode: 404,
-  })
-}
+const { week } = useRoute().params
+const bus = useEventBus('submission')
 
-const competition = ref<Competition>(data.value)
+const session = inject(SYMBOL_LEAGUE_SESSION)!
+const baseURL = `/league/session/${session.value.number}/${week}`
+const { data } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
+const weekSchedules = ref<TierSchedule[]>(data.value || [])
+const competition = ref<Competition>(session.value.competitions.find(c => c.alias.split('-')[2] === week)!)
 const isOnGoing = computed(() => competition.value.status === CompetitionStatus.ON_GOING)
+const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/league/session/${session.value.number}/${week}/results`)
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {
   const ret: Record<number, Submission[]> = {}
@@ -20,10 +18,9 @@ const mySubmissions = computed(() => {
 
   return ret
 })
-const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/weekly/${params.week}/results`)
 await fetchSubmissions()
 async function fetchSubmissions() {
-  const { data, refresh } = await useApi<Record<number, Submission[]>>(`/weekly/${params.week}/submissions`, {
+  const { data, refresh } = await useApi<Record<number, Submission[]>>(`${baseURL}/submissions`, {
     immediate: false,
   })
   await refresh()
@@ -31,7 +28,7 @@ async function fetchSubmissions() {
     Object.assign(submissions, data.value)
 }
 useSeoMeta({
-  title: `${competition.value.name} - ${t('weekly.title')}`,
+  title: `${competition.value.name}`,
 })
 useIntervalFn(fetchSubmissions, 5000)
 bus.on(fetchSubmissions)
@@ -39,20 +36,19 @@ bus.on(fetchSubmissions)
 
 <template>
   <div>
-    <NuxtLink to="/weekly" class="text-xs text-blue-500 float-right flex items-center">
-      <Icon name="heroicons:chevron-double-left-16-solid" />{{ $t('common.backTo', { to: $t('weekly.title') }) }}
+    <NuxtLink :to="`/league/${session.number}`" class="text-xs text-blue-500 float-right flex items-center">
+      <Icon name="heroicons:chevron-double-left-16-solid" />{{ $t('common.backTo', { to: session.title }) }}
     </NuxtLink>
     <h1 class="font-bold text-xl md:text-3xl my-2">
       {{ competition.name }}
     </h1>
     <WeeklyStatus :competition="competition" />
-    <WeeklyRules />
     <CompetitionSiblings :competition="competition" />
     <Tabs>
-      <Tab v-if="!isOnGoing" :name="$t('weekly.results')" hash="results">
+      <Tab v-if="!isOnGoing && results?.regular.length" :name="$t('weekly.results')" hash="results">
         <WeeklyResults :results="results!.regular" />
       </Tab>
-      <Tab v-if="!isOnGoing && results?.unlimited.length" :name="$t('weekly.unlimitedResults')" hash="results-unlimited">
+      <Tab v-if="!isOnGoing && results?.unlimited.length" :name="$t('league.allResults')" hash="results-unlimited">
         <WeeklyResults :results="results!.unlimited" />
       </Tab>
       <Tab
@@ -68,6 +64,8 @@ bus.on(fetchSubmissions)
           :scramble="scramble"
           :competition="competition"
           :submissions="mySubmissions[scramble.id]"
+          :allow-unlimited="false"
+          :type="`league/session/${session.number}`"
           @submitted="fetchSubmissions"
         />
         <h2 class="text-lg font-semibold my-2">
@@ -83,9 +81,27 @@ bus.on(fetchSubmissions)
             {{ $t('weekly.seeSolutions', { solutions: submissions[scramble.id].length }, submissions[scramble.id].length) }}
           </div>
           <template v-else>
-            <Submissions :submissions="submissions[scramble.id]" :competition="competition" :scramble="scramble" filterable />
+            <Submissions
+              :submissions="submissions[scramble.id]"
+              :competition="competition"
+              :scramble="scramble"
+              filterable
+              :filters="[
+                {
+                  mode: CompetitionMode.REGULAR,
+                  label: $t('league.mode.official'),
+                },
+                {
+                  mode: CompetitionMode.UNLIMITED,
+                  label: $t('league.mode.others'),
+                },
+              ]"
+            />
           </template>
         </div>
+      </Tab>
+      <Tab name="Schedules" hash="schedules">
+        <LeagueSchedules :tier-schedules="weekSchedules" />
       </Tab>
     </Tabs>
   </div>

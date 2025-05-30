@@ -1,5 +1,3 @@
-import en from './en'
-
 export default {
   title: '最少步',
   header: {
@@ -462,6 +460,39 @@ export default {
   bot: {
     token: {
       description: '机器人 Token 是用于 QQ 群绑定 333.fm 的用户信息的一次性凭证。',
+    },
+  },
+  league: {
+    title: '联赛',
+    description: '比赛以联赛形式进行，每位选手每周与其他选手进行一对一的比赛。',
+    nav: {
+      summary: '概览',
+      tiers: '分组',
+      schedules: '赛程',
+      standings: '排名',
+      week: '第 {week} 周',
+    },
+    standing: {
+      competitors: '选手',
+      sets: '小分',
+      pts: '积分',
+      wins: '胜',
+      draws: '平',
+      losses: '负',
+      bestMo3: '最佳 Mo3',
+    },
+    allResults: '成绩（所有）',
+    summary: {
+      players: '选手',
+      weeks: '周数',
+      tiers: '分组数',
+      ongoing: '进行中',
+      past: '已结束',
+      upcoming: '即将开始',
+    },
+    mode: {
+      participants: '选手',
+      others: '其他',
     },
   },
 }

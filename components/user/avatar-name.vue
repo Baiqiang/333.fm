@@ -12,8 +12,8 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <component :is="link ? NuxtLink : 'div'" :to="`/profile/${userId(user)}`" class="flex items-center">
-    <UserAvatar :user="user" class="mr-1" :size="size" :link="false" />
+  <component :is="link ? NuxtLink : 'div'" :to="`/profile/${userId(user)}`" class="flex items-center gap-1">
+    <UserAvatar :user="user" :size="size" :link="false" />
     <UserName :user="user" :class="{ 'text-blue-500': link }" />
     <slot />
   </component>
