@@ -56,7 +56,7 @@ regularMovesCount.sort((a, b) => a[0] - b[0])
 unlimitedMovesCount.sort((a, b) => a[0] - b[0])
 const singleChartOption: ECOption = {
   title: {
-    text: `${localeName(user.value.name, locale.value)} - ${t('weekly.title')} - ${t('result.single')}`,
+    text: `${localeName(user.value.name, locale.value)} - ${t('daily.title')} - ${t('result.single')}`,
   },
   tooltip: {
     trigger: 'axis',
@@ -64,7 +64,7 @@ const singleChartOption: ECOption = {
   toolbox: {
     feature: {
       saveAsImage: {
-        name: `${localeName(user.value.name, locale.value)}-${t('weekly.title')}-${t('result.single')}.png`,
+        name: `${localeName(user.value.name, locale.value)}-${t('daily.title')}-${t('result.single')}.png`,
         title: t('common.saveAsImage'),
       },
     },
@@ -135,7 +135,7 @@ const singleChartOption: ECOption = {
 }
 const movesCountOption: ECOption = {
   title: {
-    text: `${localeName(user.value.name, locale.value)} - ${t('weekly.title')}`,
+    text: `${localeName(user.value.name, locale.value)} - ${t('daily.title')}`,
   },
   tooltip: {
     trigger: 'axis',
@@ -143,7 +143,7 @@ const movesCountOption: ECOption = {
   toolbox: {
     feature: {
       saveAsImage: {
-        name: `${localeName(user.value.name, locale.value)}-${t('weekly.title')}.png`,
+        name: `${localeName(user.value.name, locale.value)}-${t('daily.title')}.png`,
         title: t('common.saveAsImage'),
       },
     },
