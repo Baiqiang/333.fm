@@ -491,7 +491,7 @@ export default {
       upcoming: 'Upcoming',
     },
     mode: {
-      official: 'Offcial',
+      participants: 'Participants',
       others: 'Others',
     },
   },

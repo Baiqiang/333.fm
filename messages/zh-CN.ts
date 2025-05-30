@@ -491,7 +491,7 @@ export default {
       upcoming: '即将开始',
     },
     mode: {
-      official: '官方',
+      participants: '选手',
       others: '其他',
     },
   },

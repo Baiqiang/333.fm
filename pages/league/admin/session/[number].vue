@@ -2,6 +2,7 @@
 import { Algorithm } from 'insertionfinder'
 import leagueS6 from '~/assets/league-s6.json'
 
+const config = useRuntimeConfig()
 const accessToken = useAccessToken()
 const user = useUser()
 const { number: sessionNumber } = useRoute().params
@@ -16,6 +17,7 @@ if (error.value || !data.value) {
 
 const baseURL = `/league/admin/session/${sessionNumber}`
 const session = ref(data.value)
+const isDev = config.public.mode !== 'production'
 
 async function updateSession() {
   try {
@@ -283,6 +285,7 @@ async function signInAs({ wcaId }: User) {
                 @click="editingIndex = `${tier.id}-${week}`"
               />
               <Icon
+                v-if="isDev"
                 name="material-symbols:person-alert"
                 class="cursor-pointer hover:text-red-500"
                 @click="signInAs(tierPlayers[tier.id][week - 1])"
@@ -320,10 +323,10 @@ async function signInAs({ wcaId }: User) {
         <button v-if="competition.status === CompetitionStatus.NOT_STARTED" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="importScrambles(competition)">
           Import Scrambles
         </button>
-        <button v-if="competition.status !== CompetitionStatus.ON_GOING" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="startCompetition(competition)">
+        <button v-if="competition.status !== CompetitionStatus.ON_GOING && isDev" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="startCompetition(competition)">
           Start
         </button>
-        <button v-if="competition.status === CompetitionStatus.ON_GOING" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="endCompetition(competition)">
+        <button v-if="competition.status === CompetitionStatus.ON_GOING && isDev" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="endCompetition(competition)">
           End
         </button>
       </div>
@@ -344,7 +347,7 @@ async function signInAs({ wcaId }: User) {
         {{ generating ? 'Generatring...' : 'Generate Schedules' }}
       </button>
     </div>
-    <button class="text-xs bg-red-500 text-white px-2 py-1 my-2" @click="deleteSession">
+    <button v-if="isDev" class="text-xs bg-red-500 text-white px-2 py-1 my-2" @click="deleteSession">
       <Icon name="heroicons:trash-16-solid" />
     </button>
     <Teleport to="body">

@@ -25,7 +25,10 @@ async function submit() {
   loading.value = true
   try {
     const { data, error, refresh } = await useApiPost<LeagueSession>('/league/admin/session', {
-      body: form.value,
+      body: {
+        ...form.value,
+        startTime: new Date(form.value.startTime).toISOString(),
+      },
       immediate: false,
     })
     await refresh()
@@ -64,8 +67,13 @@ async function submit() {
         label="Start Time"
         :state="null"
       >
-        <template v-if="form.startTime" #description>
-          <p>End at {{ $dayjs(form.startTime).add(form.weeks * 7, 'day').format('YYYY-MM-DD HH:mm:ss') }}</p>
+        <template #description>
+          <p class="text-black">
+            The time in your local timezone.
+          </p>
+          <p v-if="form.startTime" class="mt-1">
+            End at {{ $dayjs(form.startTime).add(form.weeks * 7, 'day').format('YYYY-MM-DD HH:mm:ss Z') }}
+          </p>
         </template>
       </FormInput>
       <FormInput
