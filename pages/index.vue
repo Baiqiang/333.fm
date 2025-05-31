@@ -71,7 +71,7 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
       <div>
         <div v-if="weekly" class="bg-white shadow-md border-l-2 md:border-l-4 border-blue-500 p-2 md:p-4">
           <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-            <NuxtLink :to="`/weekly/${weekly.id}`" class="flex items-center gap-2 hover:text-blue-500">
+            <NuxtLink :to="competitionPath(weekly)" class="flex items-center gap-2 hover:text-blue-500">
               <Icon name="mdi:calendar-week" />
               {{ weekly.name }}
             </NuxtLink>
@@ -88,7 +88,7 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
       <div>
         <div v-if="daily" class="bg-white shadow-md border-l-2 md:border-l-4 border-green-500 p-2 md:p-4">
           <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-            <NuxtLink :to="`/daily/${daily.id}`" class="flex items-center gap-2 hover:text-blue-500">
+            <NuxtLink :to="competitionPath(daily)" class="flex items-center gap-2 hover:text-blue-500">
               <Icon name="mdi:calendar-today" />
               {{ daily.name }}
             </NuxtLink>
