@@ -1,10 +1,11 @@
 <script setup lang="ts">
+const { t } = useI18n()
 const session = inject(SYMBOL_LEAGUE_SESSION)!
 const weeks = computed(() => session.value.competitions.length + 1)
 const user = useUser()
 const tierPlayers = ref<Record<number, User[]>>(Object.fromEntries(session.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)])))
 useSeoMeta({
-  title: `Tiers - ${session.value.title}`,
+  title: `${t('league.nav.tiers')} - ${session.value.title}`,
 })
 </script>
 

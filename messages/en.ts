@@ -471,6 +471,7 @@ export default {
       schedules: 'Schedules',
       standings: 'Standings',
       week: 'Week {week}',
+      rules: 'Rules',
     },
     standing: {
       competitors: 'Competitors',
@@ -493,6 +494,28 @@ export default {
     mode: {
       participants: 'Participants',
       others: 'Others',
+    },
+    rules: {
+      format: 'The competition is played in the form of a league, where each competitor plays every other competitor in the form of head-to-head matches (one per week).',
+      sets: 'Every match is decided by sets. Getting a better result on a scramble means winning the set (1-0) and drawing on a scramble means drawing a set (0.5-0.5).',
+      winner: 'The winner of a match is the player who gained more points from sets.',
+      ranking: 'Players are ranked in the table based on the sum of the points from all duels, with 2 points for a win, 1 point for a draw and 0 points for a loss.',
+      others: 'You aren\'t in the league. You can submit solutions for the scrambles without gaining points and see other results.',
+      basic: [
+        'You can only use the {notation} that is defined in WCA regulations.',
+        'You should finish the solve within 1 hour.',
+        'Any kind of cheating is not allowed.',
+        'Don\'t post any spoilers about current week\'s scrambles until it\'s over.',
+        'Comment should be submitted too. You can change it after submitting though.',
+      ],
+      criteria: 'Player classification criteria:',
+      tierBreakers: [
+        'Number of points',
+        'Head-to-head matchup (if more than one player: small table for those players only)',
+        'Number of wins',
+        'Best single mo3 of the entire tournament, ',
+        '2nd best mo3 and so on..',
+      ],
     },
   },
 }

@@ -29,6 +29,11 @@ const links = computed(() => {
       to: `/league/${props.session.number}/standings`,
       icon: 'mdi:trophy',
     },
+    {
+      label: t('league.nav.rules'),
+      to: `/league/${props.session.number}/rules`,
+      icon: 'mdi:book-open',
+    },
   ]
   props.session.competitions.forEach((c) => {
     ret.push({

@@ -5,6 +5,7 @@ const bus = useEventBus('submission')
 
 const session = inject(SYMBOL_LEAGUE_SESSION)!
 const baseURL = `/league/session/${session.value.number}/${week}`
+const isPlayer = computed(() => !!session.value.standings.find(s => s.userId === user.id))
 const { data } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
 const weekSchedules = ref<TierSchedule[]>(data.value || [])
 const competition = ref<Competition>(session.value.competitions.find(c => c.alias.split('-')[2] === week)!)
@@ -43,6 +44,7 @@ bus.on(fetchSubmissions)
       {{ competition.name }}
     </h1>
     <WeeklyStatus :competition="competition" />
+    <LeagueRules />
     <CompetitionSiblings :competition="competition" />
     <Tabs>
       <Tab v-if="!isOnGoing && results?.regular.length" :name="$t('weekly.results')" hash="results">
@@ -59,6 +61,9 @@ bus.on(fetchSubmissions)
       >
         <Sequence :sequence="scramble.scramble" :source="scramble.scramble" />
         <CubeExpanded :moves="scramble.scramble" />
+        <p v-if="!isPlayer" class="text-gray-600 text-sm italic my-2">
+          {{ $t('league.rules.others') }}
+        </p>
         <CompetitionForm
           v-if="isOnGoing || mySubmissions[scramble.id]?.length"
           :scramble="scramble"

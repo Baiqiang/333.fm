@@ -6,13 +6,13 @@ const props = defineProps<{
 const user = useUser()
 const user1Class = computed(() => {
   if (user.id === props.duel.user1?.id) {
-    return 'bg-orange-50'
+    return 'bg-orange-100'
   }
   return ''
 })
 const user2Class = computed(() => {
   if (user.id === props.duel.user2?.id) {
-    return 'bg-orange-50'
+    return 'bg-orange-100'
   }
   return ''
 })

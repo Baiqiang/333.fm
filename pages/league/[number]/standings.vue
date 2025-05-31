@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n()
 const session = inject(SYMBOL_LEAGUE_SESSION)!
 const { data } = await useApi<LeagueStanding[]>(`/league/session/${session.value.number}/standings`)
 const allStandings = ref<LeagueStanding[]>(data.value || [])
@@ -21,7 +22,7 @@ const tierStandings = computed(() => {
   return ret
 })
 useSeoMeta({
-  title: `Standings - ${session.value.title}`,
+  title: `${t('league.nav.standings')} - ${session.value.title}`,
 })
 function getStandingClass(tierIndex: number, index: number) {
   let ret = ''
@@ -46,7 +47,7 @@ function getStandingClass(tierIndex: number, index: number) {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-2">
+  <div class="px-2">
     <h3 class="text-2xl font-bold my-4 text-gray-900">
       {{ $t('league.nav.standings') }}
     </h3>
