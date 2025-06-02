@@ -2,7 +2,9 @@
 const { t } = useI18n()
 const session = inject(SYMBOL_LEAGUE_SESSION)!
 const { data } = await useApi<LeagueStanding[]>(`/league/session/${session.value.number}/standings`)
+const { data: data2 } = await useApi<LeagueResult[]>(`/league/session/${session.value.number}/results`)
 const allStandings = ref<LeagueStanding[]>(data.value || [])
+const allResults = ref<LeagueResult[]>(data2.value || [])
 const tierStandings = computed(() => {
   const tmp: Record<string, {
     tier: LeagueTier
@@ -19,6 +21,19 @@ const tierStandings = computed(() => {
   })
   const ret = Object.values(tmp).sort((a, b) => a.tier.level - b.tier.level)
   ret.forEach(t => t.standings.sort((a, b) => a.position - b.position))
+  return ret
+})
+const maxWeek = computed(() => {
+  return Math.max(...allResults.value.map(r => r.week))
+})
+const tierResults = computed(() => {
+  const ret: Record<string, Record<number, LeagueResult>> = {}
+  allResults.value.forEach((result) => {
+    if (!ret[result.userId]) {
+      ret[result.userId] = {}
+    }
+    ret[result.userId][result.week] = result
+  })
   return ret
 })
 useSeoMeta({
@@ -44,6 +59,16 @@ function getStandingClass(tierIndex: number, index: number) {
   }
   return ret
 }
+function getResultClass(points?: number) {
+  switch (points) {
+    case 2:
+      return 'bg-gradient-to-r from-green-500 to-green-400 text-white font-bold'
+    case 1:
+      return 'bg-gradient-to-r from-yellow-500 to-yellow-400 text-white font-bold'
+    default:
+      return 'bg-gradient-to-r from-red-500 to-red-400 text-white font-bold'
+  }
+}
 </script>
 
 <template>
@@ -52,7 +77,7 @@ function getStandingClass(tierIndex: number, index: number) {
       {{ $t('league.nav.standings') }}
     </h3>
     <div class="shadow">
-      <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content] overflow-x-auto">
+      <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content_1fr] overflow-x-auto">
         <template v-for="{ tier, standings }, tierIndex in tierStandings" :key="tier.id">
           <div class="grid grid-cols-subgrid col-span-full bg-gradient-to-r from-indigo-600 to-indigo-500 text-white mt-1 first:mt-0">
             <div class="p-2 font-semibold tracking-wide">
@@ -73,8 +98,13 @@ function getStandingClass(tierIndex: number, index: number) {
             <div class="border-l border-indigo-400 p-2 text-center font-medium">
               {{ $t('league.standing.losses') }}
             </div>
-            <div class="border-l border-indigo-400 p-2 font-medium">
+            <div class="border-l border-indigo-400 p-2 font-medium text-xs w-16 break-words leading-none text-center">
               {{ $t('league.standing.bestMo3') }}
+            </div>
+            <div class="font-medium">
+              <div v-for="week in maxWeek" :key="week" class="w-10 border-l border-indigo-400 text-center p-2">
+                W{{ week }}
+              </div>
             </div>
           </div>
           <div
@@ -101,6 +131,11 @@ function getStandingClass(tierIndex: number, index: number) {
             </div>
             <div class="p-2 border-l border-gray-200 text-center font-mono">
               {{ formatResult(standing.bestMo3, 2) }}
+            </div>
+            <div class="text-center font-mono">
+              <div v-for="week in maxWeek" :key="week" class="w-10 border-l border-gray-200 text-center p-2" :class="getResultClass(tierResults[standing.userId]?.[week]?.points)">
+                {{ tierResults[standing.userId]?.[week]?.points || 0 }}
+              </div>
             </div>
           </div>
         </template>

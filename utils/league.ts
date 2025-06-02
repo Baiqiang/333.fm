@@ -32,6 +32,15 @@ export interface LeagueStanding {
   user: User
 }
 
+export interface LeagueResult {
+  id: number
+  sessionId: number
+  competitionId: number
+  week: number
+  userId: number
+  points: number
+}
+
 export interface LeagueTier {
   id: number
   level: number
