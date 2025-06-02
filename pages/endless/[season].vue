@@ -26,9 +26,9 @@ provide<() => void>(SYMBOL_ENDLESS_UPDATE, updateEndless)
 
 <template>
   <div>
-    <h1 class="font-bold text-lg md:text-3xl my-2">
+    <Heading1>
       {{ endless.name }} - {{ $t('endless.title') }}
-    </h1>
+    </Heading1>
     <NuxtPage />
   </div>
 </template>

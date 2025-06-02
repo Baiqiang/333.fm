@@ -24,9 +24,9 @@ await fetchData()
 
 <template>
   <div>
-    <h1 class="text-xl font-semibold py-3">
+    <Heading1>
       {{ $t('admin.user.title') }}
-    </h1>
+    </Heading1>
     <div class="whitespace-nowrap overflow-x-auto">
       <div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-y-2">
         <div class="font-bold text-right pr-2 border-b-2 border-gray-300">

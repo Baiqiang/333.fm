@@ -10,10 +10,10 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="px-4 sm:px-6 lg:px-8">
-    <h3 class="text-3xl font-bold my-6 text-gray-900 border-b pb-4">
+  <div class="px-2">
+    <Heading1>
       {{ $t('league.nav.tiers') }}
-    </h3>
+    </Heading1>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
       <div
         v-for="tier, index in session.tiers"

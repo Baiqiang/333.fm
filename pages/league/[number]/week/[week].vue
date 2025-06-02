@@ -36,13 +36,11 @@ bus.on(fetchSubmissions)
 </script>
 
 <template>
-  <div>
-    <NuxtLink :to="`/league/${session.number}`" class="text-xs text-blue-500 float-right flex items-center">
-      <Icon name="heroicons:chevron-double-left-16-solid" />{{ $t('common.backTo', { to: session.title }) }}
-    </NuxtLink>
-    <h1 class="font-bold text-xl md:text-3xl my-2">
+  <div class="px-2">
+    <BackTo :to="`/league/${session.number}`" :label="session.title" />
+    <Heading1>
       {{ competition.name }}
-    </h1>
+    </Heading1>
     <WeeklyStatus :competition="competition" />
     <LeagueRules />
     <CompetitionSiblings :competition="competition" />

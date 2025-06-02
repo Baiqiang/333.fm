@@ -73,9 +73,9 @@ function getResultClass(points?: number) {
 
 <template>
   <div class="px-2">
-    <h3 class="text-2xl font-bold my-4 text-gray-900">
+    <Heading1>
       {{ $t('league.nav.standings') }}
-    </h3>
+    </Heading1>
     <div class="shadow">
       <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content_1fr] overflow-x-auto">
         <template v-for="{ tier, standings }, tierIndex in tierStandings" :key="tier.id">

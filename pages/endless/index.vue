@@ -7,9 +7,9 @@ useSeoMeta({
 
 <template>
   <div>
-    <h1 class="font-bold text-lg md:text-3xl my-2">
+    <Heading1>
       {{ $t('endless.title') }}
-    </h1>
+    </Heading1>
     <EndlessList />
   </div>
 </template>

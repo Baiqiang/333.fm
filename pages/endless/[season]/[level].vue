@@ -64,9 +64,7 @@ async function updateData(submission: Submission) {
 
 <template>
   <div>
-    <NuxtLink :to="competitionPath(endless)" class="text-xs text-blue-500 float-right flex items-center">
-      <Icon name="heroicons:chevron-double-left-16-solid" />{{ $t('common.backTo', { to: endless.name }) }}
-    </NuxtLink>
+    <BackTo :to="competitionPath(endless)" :label="endless.name" />
     <h2 class="font-bold mb-2 text-xl">
       {{ $t('endless.level', { level: params.level }) }}
     </h2>

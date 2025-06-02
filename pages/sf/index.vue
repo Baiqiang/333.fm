@@ -58,9 +58,9 @@ function reset() {
 
 <template>
   <div>
-    <h1 class="text-xl font-semibold py-3">
+    <Heading1>
       {{ $t('sf.title') }}
-    </h1>
+    </Heading1>
     <p class="mb-2" v-html="$t('sf.description')" />
     <FormWrapper class="pb-20" @submit="submit" @reset="reset">
       <FormInput

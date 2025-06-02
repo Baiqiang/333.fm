@@ -11,9 +11,9 @@ useSeoMeta({
 <template>
   <div class="grid grid-cols-12 gap-2">
     <div v-if="onGoing" class="col-span-12 md:col-span-9">
-      <h1 class="font-bold text-lg md:text-3xl my-2">
+      <Heading1>
         {{ onGoing.name }}
-      </h1>
+      </Heading1>
       <WeeklySummary :competition="onGoing" />
     </div>
     <div v-if="past!.items.length > 0" class="col-span-12 md:col-span-3">

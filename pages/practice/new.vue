@@ -45,9 +45,9 @@ async function submit() {
 
 <template>
   <div>
-    <h1 class="text-xl font-semibold py-3">
+    <Heading1>
       {{ $t('practice.new.title') }}
-    </h1>
+    </Heading1>
     <FormWrapper class="relative" @submit="submit">
       <FormSignInRequired />
       <FormInput

@@ -6,7 +6,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div>
+  <div class="px-2">
     <LeagueSummary :session="session" />
   </div>
 </template>

@@ -29,9 +29,9 @@ await fetchData()
 
 <template>
   <div>
-    <h1 class="text-xl font-semibold py-3">
+    <Heading1>
       {{ $t('admin.user.if', { name: user?.name ?? 'Unknown' }) }}
-    </h1>
+    </Heading1>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 sm:gap-x-2 md:gap-x-3 gap-y-1">
       <IfSummary v-for="userIF in userIFs" :key="userIF.hash" :finder="userIF" />
     </div>

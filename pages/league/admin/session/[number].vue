@@ -234,9 +234,9 @@ async function signInAs({ wcaId }: User) {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold my-2">
+    <Heading1>
       {{ session.title }}
-    </h1>
+    </Heading1>
     <h3 class="text-lg font-bold my-2 w-full clear-both">
       Tiers
     </h3>

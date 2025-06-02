@@ -18,11 +18,11 @@ useSeoMeta({
 
 <template>
   <div>
-    <h1 class="font-bold text-lg md:text-3xl my-2">
+    <Heading1>
       {{ $t('practice.user.title', {
         name: localeName(user.name, $i18n.locale),
       }) }}
-    </h1>
+    </Heading1>
     <NuxtPage />
   </div>
 </template>

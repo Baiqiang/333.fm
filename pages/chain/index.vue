@@ -14,9 +14,9 @@ useSeoMeta({
 
 <template>
   <div>
-    <h1 class="font-bold text-lg md:text-3xl my-2">
+    <Heading1>
       {{ $t('chain.title') }}
-    </h1>
+    </Heading1>
     <p class="mb-2">
       {{ $t('chain.description') }}
     </p>

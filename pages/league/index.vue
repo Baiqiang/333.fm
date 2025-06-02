@@ -13,10 +13,10 @@ useSeoMeta({
       Admin Panel
     </NuxtLink>
     <LeagueDescription />
-    <h1 v-if="nextSession" class="font-bold text-lg md:text-2xl my-2 flex items-center">
+    <Heading1 v-if="nextSession" class="flex items-center">
       {{ nextSession.title }}
       <Icon name="fxemoji:fire" />
-    </h1>
+    </Heading1>
     <LeagueSummary v-if="nextSession" :session="nextSession" />
   </div>
 </template>

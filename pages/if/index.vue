@@ -228,9 +228,9 @@ function reset() {
 
 <template>
   <div>
-    <h1 class="text-xl font-semibold py-3">
+    <Heading1>
       {{ $t('if.title') }}
-    </h1>
+    </Heading1>
     <p class="mb-2" v-html="$t('if.description')" />
     <FormWrapper class="pb-20" @submit="submit" @reset="reset">
       <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none" @click.prevent="reset">

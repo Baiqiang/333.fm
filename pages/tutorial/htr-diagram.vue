@@ -7,9 +7,9 @@ useSeoMeta({
 
 <template>
   <div>
-    <h1 class="text-xl font-semibold py-3">
+    <Heading1>
       {{ $t('tutorial.htrDiagram.title') }}
-    </h1>
+    </Heading1>
     <I18nT keypath="tutorial.htrDiagram.description" tag="p">
       <template #author>
         <a href="https://space.bilibili.com/266974547" target="_blank" class="text-blue-500">{{ $t('tutorial.htrDiagram.author') }}</a>

@@ -51,9 +51,9 @@ async function submit() {
 
 <template>
   <div>
-    <h1 class="text-xl font-bold my-3">
+    <Heading1>
       Create League Session
-    </h1>
+    </Heading1>
     <FormWrapper class="clear-both" @submit="submit">
       <FormInput
         v-model="form.number"

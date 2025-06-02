@@ -9,10 +9,10 @@ useSeoMeta({
 </script>
 
 <template>
-  <div>
-    <h3 class="text-lg font-bold my-2 w-full">
+  <div class="px-2">
+    <Heading1>
       {{ $t('league.nav.schedules') }}
-    </h3>
+    </Heading1>
     <LeagueSchedules :tier-schedules="tierSchedules" />
   </div>
 </template>

@@ -14,9 +14,9 @@ if (error.value)
 
 <template>
   <div>
-    <h1 class="text-xl font-semibold py-3">
+    <Heading1>
       {{ $t('user.token') }}
-    </h1>
+    </Heading1>
     <p>
       {{ $t('bot.token.description') }}
     </p>

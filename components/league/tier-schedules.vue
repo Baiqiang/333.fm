@@ -18,7 +18,7 @@ const grouppedSchedules = computed(() => {
 </script>
 
 <template>
-  <h4 v-if="schedules.length > 0" class="font-bold px-2 col-span-full text-lg">
+  <h4 v-if="schedules.length > 0" class="font-bold col-span-full text-lg">
     {{ tier.name }}
   </h4>
   <template v-for="{ competition, duels } of grouppedSchedules" :key="competition.id">

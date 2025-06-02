@@ -7,10 +7,10 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="md:px-4">
-    <h2 class="text-2xl font-bold text-gray-800 my-2">
+  <div class="px-2">
+    <Heading1>
       {{ $t('league.nav.rules') }}
-    </h2>
+    </Heading1>
 
     <ol class="space-y-2 mb-4 list-decimal list-inside marker:text-blue-500">
       <li class="text-gray-700 leading-relaxed">

@@ -65,11 +65,12 @@ bus.on(fetchData)
       <Icon name="ic:twotone-plus" />
       {{ $t('common.new') }}
     </NuxtLink>
-    <NuxtLink :to="`/practice/${profile.wcaId || profile.id}`" class="text-xs text-blue-500 float-right flex items-center">
-      <Icon name="heroicons:chevron-double-left-16-solid" />{{ $t('common.backTo', { to: $t('practice.user.title', {
+    <BackTo
+      :to="`/practice/${profile.wcaId || profile.id}`"
+      :label="$t('practice.user.title', {
         name: localeName(profile.name, locale),
-      }) }) }}
-    </NuxtLink>
+      })"
+    />
     <h2 class="font-semibold text-lg mt-2">
       {{ $t('practice.index', { index }) }}
     </h2>

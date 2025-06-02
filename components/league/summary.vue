@@ -17,14 +17,14 @@ const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => su
         {{ session.title }}
       </h1>
       <div class="grid grid-cols-3 gap-2 md:gap-3">
-        <div class="text-center">
+        <NuxtLink :to="`/league/${session.number}/standings`" class="text-center">
           <div class="text-2xl font-bold">
             {{ totalPlayers }}
           </div>
           <div class="text-sm opacity-80">
             {{ $t('league.summary.players') }}
           </div>
-        </div>
+        </NuxtLink>
         <div class="text-center">
           <div class="text-2xl font-bold">
             {{ session.competitions.length }}
@@ -33,14 +33,14 @@ const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => su
             {{ $t('league.summary.weeks') }}
           </div>
         </div>
-        <div class="text-center">
+        <NuxtLink :to="`/league/${session.number}/tiers`" class="text-center">
           <div class="text-2xl font-bold">
             {{ session.tiers.length }}
           </div>
           <div class="text-sm opacity-80">
             {{ $t('league.summary.tiers') }}
           </div>
-        </div>
+        </NuxtLink>
       </div>
     </div>
 
