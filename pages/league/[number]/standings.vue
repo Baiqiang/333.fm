@@ -101,7 +101,7 @@ function getResultClass(points?: number) {
             <div class="border-l border-indigo-400 p-2 font-medium text-xs w-16 break-words leading-none text-center">
               {{ $t('league.standing.bestMo3') }}
             </div>
-            <div class="font-medium">
+            <div v-if="maxWeek > 0" class="font-medium">
               <div v-for="week in maxWeek" :key="week" class="w-10 border-l border-indigo-400 text-center p-2">
                 W{{ week }}
               </div>
@@ -132,7 +132,7 @@ function getResultClass(points?: number) {
             <div class="p-2 border-l border-gray-200 text-center font-mono">
               {{ formatResult(standing.bestMo3, 2) }}
             </div>
-            <div class="text-center font-mono">
+            <div v-if="maxWeek > 0" class="text-center font-mono">
               <div v-for="week in maxWeek" :key="week" class="w-10 border-l border-gray-200 text-center p-2" :class="getResultClass(tierResults[standing.userId]?.[week]?.points)">
                 {{ tierResults[standing.userId]?.[week]?.points || 0 }}
               </div>
