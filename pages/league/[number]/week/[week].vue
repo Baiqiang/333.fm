@@ -99,6 +99,7 @@ bus.on(fetchSubmissions)
                   label: $t('league.mode.others'),
                 },
               ]"
+              sortable
             />
           </template>
         </div>
