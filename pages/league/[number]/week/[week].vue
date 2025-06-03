@@ -92,7 +92,7 @@ bus.on(fetchSubmissions)
               :filters="[
                 {
                   mode: CompetitionMode.REGULAR,
-                  label: $t('league.mode.official'),
+                  label: $t('league.mode.participants'),
                 },
                 {
                   mode: CompetitionMode.UNLIMITED,
