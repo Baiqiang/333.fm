@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{
   competition?: Competition
   user?: User
   filterable?: boolean
-  filters?: { mode: CompetitionMode, label: string }[]
+  filters?: { key: CompetitionMode | string, label: string, filter?: (submission: Submission) => boolean }[]
   sortable?: boolean
   chain?: boolean
 }>(), {
@@ -16,13 +16,18 @@ const props = withDefaults(defineProps<{
   chain: false,
 })
 const { t } = useI18n()
-const mode = ref<CompetitionMode | null>(null)
+const filterBy = ref<CompetitionMode | string | null>(null)
 const sortBy = ref<string>(props.chain ? 'continuances' : 'moves')
 const filteredSubmissions = computed(() => {
-  if (!props.filterable || mode.value === null)
+  if (!props.filterable || filterBy.value === null)
     return props.submissions || []
 
-  return props.submissions?.filter(submission => submission.mode === mode.value) || []
+  if (props.filters) {
+    const filter = props.filters.find(f => f.key === filterBy.value)
+    if (filter)
+      return props.submissions?.filter(filter.filter || (s => s.mode === filterBy.value)) || []
+  }
+  return props.submissions?.filter(submission => submission.mode === filterBy.value) || []
 })
 const filteredSortedSubmissions = computed(() => {
   if (!props.sortable)
@@ -53,52 +58,63 @@ const filteredSortedSubmissions = computed(() => {
   }
 })
 const counts = computed(() => {
-  const counts: Record<CompetitionMode | 'all', number> = {
+  const counts: Record<CompetitionMode | 'all' | string, number> = {
     all: props.submissions?.length || 0,
     [CompetitionMode.REGULAR]: 0,
     [CompetitionMode.UNLIMITED]: 0,
   }
   for (const { mode } of props.submissions || [])
     counts[mode]++
-
+  for (const { key, filter } of props.filters || []) {
+    if (filter) {
+      const filtered = props.submissions?.filter(filter) || []
+      counts[key] = filtered.length
+    }
+  }
   return counts
 })
 </script>
 
 <template>
   <div>
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2 text-sm">
       <div v-if="filterable" class="flex gap-2 items-center">
-        <div class="font-bold">
-          {{ $t('common.filterBy.label') }}
+        <div class="font-bold whitespace-nowrap flex items-center gap-1">
+          <Icon name="ic:baseline-filter-list" />
+          <div class="hidden md:block">
+            {{ $t('common.filterBy.label') }}
+          </div>
         </div>
-        <select v-model="mode">
+        <select v-model="filterBy" class="py-1 text-sm">
           <option :value="null">
             {{ $t('common.all') }} ({{ counts.all }})
           </option>
           <option
             v-for="filter in filters || [
               {
-                mode: CompetitionMode.REGULAR,
+                key: CompetitionMode.REGULAR,
                 label: t('weekly.regular.label'),
               },
               {
-                mode: CompetitionMode.UNLIMITED,
+                key: CompetitionMode.UNLIMITED,
                 label: t('weekly.unlimited.label'),
               },
             ]"
-            :key="filter.mode"
-            :value="filter.mode"
+            :key="filter.key"
+            :value="filter.key"
           >
-            {{ filter.label }} ({{ counts[filter.mode] }})
+            {{ filter.label }} ({{ counts[filter.key] }})
           </option>
         </select>
       </div>
       <div v-if="sortable" class="flex gap-2 items-center">
-        <div class="font-bold">
-          {{ $t('common.sortBy.label') }}
+        <div class="font-bold whitespace-nowrap flex items-center gap-1">
+          <Icon name="ic:baseline-sort" />
+          <div class="hidden md:block">
+            {{ $t('common.sortBy.label') }}
+          </div>
         </div>
-        <select v-model="sortBy">
+        <select v-model="sortBy" class="py-1 text-sm">
           <option v-if="chain" value="continuances">
             {{ $t('common.sortBy.mostContinuations') }}
           </option>
@@ -123,7 +139,11 @@ const counts = computed(() => {
         :competition="competition"
         :user="user"
         :chain="chain"
-      />
+      >
+        <template #extra>
+          <slot name="extra" v-bind="submission" />
+        </template>
+      </Submission>
     </div>
   </div>
 </template>

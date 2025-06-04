@@ -6,6 +6,16 @@ const bus = useEventBus('submission')
 const session = inject(SYMBOL_LEAGUE_SESSION)!
 const baseURL = `/league/session/${session.value.number}/${week}`
 const isPlayer = computed(() => !!session.value.standings.find(s => s.userId === user.id))
+const playerTiers = computed(() => {
+  const tierMap = session.value.tiers.reduce((acc, s) => {
+    acc[s.id] = s
+    return acc
+  }, {} as Record<number, LeagueTier>)
+  const ret: Record<number, LeagueTier> = {}
+  for (const s of session.value.standings)
+    ret[s.userId] = tierMap[s.tierId]
+  return ret
+})
 const { data } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
 const weekSchedules = ref<TierSchedule[]>(data.value || [])
 const competition = ref<Competition>(session.value.competitions.find(c => c.alias.split('-')[2] === week)!)
@@ -36,7 +46,7 @@ bus.on(fetchSubmissions)
 </script>
 
 <template>
-  <div class="px-2">
+  <div class="">
     <BackTo :to="`/league/${session.number}`" :label="session.title" />
     <Heading1>
       {{ competition.name }}
@@ -91,16 +101,27 @@ bus.on(fetchSubmissions)
               filterable
               :filters="[
                 {
-                  mode: CompetitionMode.REGULAR,
+                  key: CompetitionMode.REGULAR,
                   label: $t('league.mode.participants'),
                 },
+                ...session.tiers.map(tier => ({
+                  key: `tier-${tier.id}`,
+                  label: tier.name,
+                  filter: (submission: Submission) => submission.mode === CompetitionMode.REGULAR && playerTiers[submission.user.id]?.id === tier.id,
+                })),
                 {
-                  mode: CompetitionMode.UNLIMITED,
+                  key: CompetitionMode.UNLIMITED,
                   label: $t('league.mode.others'),
                 },
               ]"
               sortable
-            />
+            >
+              <template #extra="submission">
+                <div v-if="playerTiers[submission.user.id]" class="text-xs text-black px-1 rounded" :class="tierBackgrounds[playerTiers[submission.user.id].level - 1]">
+                  {{ playerTiers[submission.user.id].name }}
+                </div>
+              </template>
+            </Submissions>
           </template>
         </div>
       </Tab>

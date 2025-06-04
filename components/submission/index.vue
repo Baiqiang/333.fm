@@ -73,6 +73,7 @@ function expandAndShowAttachment() {
     <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
       <template #info>
         {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
+        <slot name="extra" v-bind="submission" />
       </template>
       <SubmissionMoves :submission="submission" class="text-lg" :chain="chain" />
     </UserAvatarInfo>

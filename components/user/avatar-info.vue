@@ -9,7 +9,7 @@ defineProps<{
     <UserAvatar :user="user" :size="8" :link="false" />
     <div class="w-full overflow-hidden">
       <UserName :user="user" class="text-blue-500 text-ellipsis overflow-hidden" />
-      <div v-if="$slots.info" class="text-gray-400 text-xs">
+      <div v-if="$slots.info" class="text-gray-400 text-xs flex items-center gap-1">
         <slot name="info" />
       </div>
     </div>
