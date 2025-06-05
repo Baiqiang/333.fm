@@ -306,6 +306,7 @@ export default {
   },
   daily: {
     title: 'Daily Competition',
+    shortTitle: 'Daily',
     past: 'Past Competitions',
     pending: 'Pending Creation',
     creation: 'Every first BO1 practice created will be the daily competition. The creator should submit valid solution on his latest practice solution.',
@@ -436,6 +437,7 @@ export default {
   },
   practice: {
     title: 'Practice Book',
+    shortTitle: 'Practice',
     new: {
       title: 'New Practice',
     },

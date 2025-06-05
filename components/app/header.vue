@@ -12,19 +12,19 @@ const navs = computed(() => [
     path: '/sf',
   },
   {
-    title: 'weekly.title',
+    title: 'weekly.shortTitle',
     path: weekly.value ? competitionPath(weekly.value) : '/weekly',
   },
   {
-    title: 'daily.title',
+    title: 'daily.shortTitle',
     path: daily.value ? competitionPath(daily.value) : '/daily',
   },
   {
-    title: 'endless.title',
+    title: 'endless.shortTitle',
     path: '/endless',
   },
   {
-    title: 'practice.title',
+    title: 'practice.shortTitle',
     path: '/practice',
   },
   {

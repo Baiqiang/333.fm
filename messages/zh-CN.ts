@@ -306,6 +306,7 @@ export default {
   },
   daily: {
     title: '日赛',
+    shortTitle: '日赛',
     past: '往期日赛',
     pending: '仍未创建今日赛事',
     creation: '每日首个创建的 BO1 练习将成为当日日赛，创建者需有效提交他最新一次练习的解法。',
@@ -436,6 +437,7 @@ export default {
   },
   practice: {
     title: '练习本',
+    shortTitle: '练习本',
     new: {
       title: '新建练习',
     },

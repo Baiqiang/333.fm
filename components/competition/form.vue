@@ -98,7 +98,7 @@ const solutionDisabled = computed<boolean>(() => {
   ) {
     return false
   }
-  if (props.submissions.length === 0)
+  if (props.submissions.length === 0 && isOnGoing.value)
     return false
   return true
 })
@@ -237,7 +237,7 @@ function getTmpURL(file: File) {
 </script>
 
 <template>
-  <div class="mt-6">
+  <div v-if="isOnGoing || submissions.length > 0" class="mt-6">
     <FormWrapper class="relative" @submit="submit" @reset="reset">
       <FormSignInRequired />
       <FormInput
@@ -297,6 +297,7 @@ function getTmpURL(file: File) {
         :label="$t('weekly.comment.label')"
         :state="null"
         class="mt-4"
+        :attrs="{ disabled: !isOnGoing && submissions.length === 0 }"
       >
         <template #description>
           <p class="py-1" v-html="$t('weekly.comment.description')" />
