@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
 const { t } = useI18n()
 const filterBy = ref<CompetitionMode | string | null>(null)
 const sortBy = ref<string>(props.chain ? 'continuances' : 'moves')
+const expanded = ref<boolean>(false)
 const filteredSubmissions = computed(() => {
   if (!props.filterable || filterBy.value === null)
     return props.submissions || []
@@ -77,7 +78,7 @@ const counts = computed(() => {
 
 <template>
   <div>
-    <div class="flex flex-wrap gap-2 text-sm">
+    <div class="flex items-center flex-wrap gap-2 text-sm">
       <div v-if="filterable" class="flex gap-2 items-center">
         <div class="font-bold whitespace-nowrap flex items-center gap-1">
           <Icon name="ic:baseline-filter-list" />
@@ -129,6 +130,10 @@ const counts = computed(() => {
           </option>
         </select>
       </div>
+      <div class="text-indigo-500 cursor-pointer text-lg">
+        <Icon v-if="!expanded" name="solar:alt-arrow-down-bold" @click="expanded = true" />
+        <Icon v-else name="solar:alt-arrow-up-bold" @click="expanded = false" />
+      </div>
     </div>
     <div>
       <Submission
@@ -139,6 +144,7 @@ const counts = computed(() => {
         :competition="competition"
         :user="user"
         :chain="chain"
+        :expanded="expanded"
       >
         <template #extra>
           <slot name="extra" v-bind="submission" />

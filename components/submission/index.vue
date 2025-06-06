@@ -7,6 +7,7 @@ const props = withDefaults(defineProps<{
   competition?: Competition
   user?: User
   chain?: boolean
+  expanded?: boolean
 }>(), {
   chain: false,
 })
@@ -14,7 +15,7 @@ const { hash } = useRoute()
 const dayjs = useDayjs()
 const { locale } = useI18n()
 const el = ref<HTMLElement>()
-const showComment = ref(props.submission.competition !== undefined)
+const showComment = ref(props.submission.competition !== undefined || props.expanded)
 const showOriginal = ref(!!props.chain)
 const showAttachment = ref(false)
 const solution = computed(() => {
@@ -66,6 +67,9 @@ function expandAndShowAttachment() {
   showComment.value = true
   setTimeout(() => showAttachment.value = true, 100)
 }
+watch(() => props.expanded, (expanded) => {
+  showComment.value = expanded
+})
 </script>
 
 <template>
