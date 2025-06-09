@@ -12,6 +12,7 @@ const props = withDefaults(defineProps<{
   chain: false,
 })
 const { hash } = useRoute()
+const location = useBrowserLocation()
 const dayjs = useDayjs()
 const { locale } = useI18n()
 const el = ref<HTMLElement>()
@@ -61,6 +62,8 @@ const formattedSolution = computed<string>(() => {
   solution.push(`Solution:\n${props.submission.solution} (${formatResult(props.submission.moves)})`)
   solution.push(props.submission.comment)
   solution.push(`By ${user?.name}\n${dayjs(props.submission.createdAt).locale(locale.value).format('LLL')}`)
+  if (location.value.href)
+    solution.push(location.value.href)
   return solution.join('\n\n')
 })
 function expandAndShowAttachment() {

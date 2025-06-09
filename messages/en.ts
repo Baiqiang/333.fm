@@ -50,6 +50,8 @@ export default {
     bo2: 'Best of 2',
     mo3: 'Mean of 3',
     saveAsImage: 'Save as Image',
+    expand: 'Expand',
+    collapse: 'Collapse',
   },
   error: {
     400: 'Bad Request',

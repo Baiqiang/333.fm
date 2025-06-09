@@ -130,9 +130,9 @@ const counts = computed(() => {
           </option>
         </select>
       </div>
-      <div class="text-indigo-500 cursor-pointer text-lg">
-        <Icon v-if="!expanded" name="solar:alt-arrow-down-bold" @click="expanded = true" />
-        <Icon v-else name="solar:alt-arrow-up-bold" @click="expanded = false" />
+      <div class="cursor-pointer items-center flex gap-1">
+        {{ expanded ? $t('common.collapse') : $t('common.expand') }}
+        <Icon class="text-indigo-500 text-lg" :name="!expanded ? 'solar:alt-arrow-down-bold' : 'solar:alt-arrow-up-bold'" @click="expanded = !expanded" />
       </div>
     </div>
     <div>

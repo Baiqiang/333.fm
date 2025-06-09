@@ -50,6 +50,8 @@ export default {
     bo2: '两次计最好',
     mo3: '三次计平均',
     saveAsImage: '保存为图片',
+    expand: '展开',
+    collapse: '收起',
   },
   error: {
     400: '错误请求',
