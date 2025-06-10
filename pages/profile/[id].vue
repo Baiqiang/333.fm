@@ -1,13 +1,20 @@
 <script setup lang="ts">
 interface PersonalRecords {
   competitionRecords: {
-    type: 'weekly' | 'practice'
+    type: 'weekly' | 'daily' | 'practice'
     record: CompetitionRecord
   }[]
   endlessRecords: EndlessRecord[]
+  submissionsCount: {
+    type: CompetitionType
+    count: string
+    competitionCount: string
+    scrambleCount: string
+  }[]
 }
 
 const route = useRoute()
+const { t } = useI18n()
 const { data, error } = await useApi<User>(`/profile/${route.params.id}`)
 if (error.value || !data.value) {
   throw createError({
@@ -19,20 +26,52 @@ const records = ref<PersonalRecords>(data2.value!)
 const user = ref<User>(data.value)
 provide(SYMBOL_USER, user)
 const filters = computed(() => {
-  const ret = []
+  const base = `/profile/${userId(user.value)}`
+  let total = 0
+  const countsMap = records.value.submissionsCount.reduce((acc, curr) => {
+    acc[curr.type] = curr
+    total += Number(curr.count)
+    return acc
+  }, {} as Record<CompetitionType, { count: string, competitionCount: string, scrambleCount: string }>)
+  const typesMap = {
+    weekly: CompetitionType.WEEKLY,
+    daily: CompetitionType.DAILY,
+    practice: CompetitionType.PERSONAL_PRACTICE,
+  }
+  const ret: { type: string, to: string, label: string, count: string }[] = [
+    {
+      type: 'all',
+      to: base,
+      label: t('common.all'),
+      count: total.toString(),
+    },
+  ]
   for (const { type } of records.value.competitionRecords) {
+    let count = countsMap[typesMap[type]]?.count
+    if (type === 'weekly') {
+      count += `/${countsMap[CompetitionType.WEEKLY]?.competitionCount}`
+    }
     ret.push({
       type,
+      to: `${base}/${type}`,
+      label: t(`result.type.${type}`),
+      count,
     })
   }
   if (records.value.endlessRecords.length) {
     ret.push({
       type: 'endless',
+      to: `${base}/endless`,
+      label: t('endless.title'),
+      count: countsMap[CompetitionType.ENDLESS]?.count,
     })
   }
   if (user.value.wcaId) {
     ret.push({
       type: 'wca',
+      to: `${base}/wca`,
+      label: 'WCA',
+      count: '',
     })
   }
   return ret
@@ -147,28 +186,21 @@ useSeoMeta({
         </div>
       </div>
     </div>
-    <div v-if="filters.length" class="flex flex-wrap gap-2 mt-2">
+    <div v-if="filters.length" class="flex flex-wrap gap-2 mt-2 text-xs md:text-base">
       <NuxtLink
-        :to="`/profile/${userId(user)}`"
-        class="px-2 py-2 text-white whitespace-nowrap"
-        :class="{
-          'bg-indigo-500': !$route.path.endsWith(`${userId(user)}`),
-          'bg-gray-500': $route.path.endsWith(`${userId(user)}`),
-        }"
-      >
-        {{ $t('common.all') }}
-      </NuxtLink>
-      <NuxtLink
-        v-for="{ type } in filters"
+        v-for="{ type, to, label, count } in filters"
         :key="type"
-        :to="`/profile/${user.wcaId || user.id}/${type}`"
+        :to="to"
         class="px-2 py-2 text-white whitespace-nowrap"
         :class="{
-          'bg-indigo-500': !$route.path.endsWith(type),
-          'bg-gray-500': $route.path.endsWith(type),
+          'bg-indigo-500': !$route.path.endsWith(to),
+          'bg-gray-500': $route.path.endsWith(to),
         }"
       >
-        {{ $t(`result.type.${type}`) }}
+        {{ label }}
+        <span v-if="count" class="text-xs">
+          ({{ count }})
+        </span>
       </NuxtLink>
     </div>
     <NuxtPage />
