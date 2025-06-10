@@ -6,7 +6,6 @@ const bus = useEventBus('submission')
 const session = inject(SYMBOL_LEAGUE_SESSION)!
 const baseURL = `/league/session/${session.value.number}/${week}`
 const { data: data1, error: error1 } = await useApi<Competition>(baseURL)
-console.log(data1.value, error1.value)
 if (error1.value || !data1.value) {
   throw createError({
     statusCode: 404,

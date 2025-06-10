@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const { data: onGoing } = await useApi<Competition>('/daily/on-going')
 const { data: past } = await useApi<Pagination<PastCompetition>>('/daily')
-console.log(past, onGoing)
 const { t } = useI18n()
 useSeoMeta({
   title: t('daily.title'),
