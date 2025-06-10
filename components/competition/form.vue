@@ -77,7 +77,7 @@ const fileInputId = useId()
 const uploadingAttachments = ref<File[]>([])
 const uploadingPromise = ref<Promise<any>>()
 const { moves, isSolved } = useComputedState(props, form)
-const isOnGoing = computed(() => props.competition.status === CompetitionStatus.ON_GOING)
+const isOnGoing = computed(() => isInStatus(props.competition, CompetitionStatus.ON_GOING))
 const solutionState = computed<boolean | null>(() => {
   if (form.solution.length === 0)
     return null

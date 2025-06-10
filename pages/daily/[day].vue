@@ -11,7 +11,7 @@ if (!data.value || error.value) {
 }
 
 const competition = ref<Competition>(data.value)
-const isOnGoing = computed(() => competition.value.status === CompetitionStatus.ON_GOING)
+const isOnGoing = computed(() => isInStatus(competition.value, CompetitionStatus.ON_GOING))
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {
   const ret: Record<number, Submission[]> = {}

@@ -2,7 +2,7 @@
 const props = defineProps<{
   league?: LeagueSession | null
 }>()
-const onGoingWeek = computed(() => props.league?.competitions.find(c => c.status === CompetitionStatus.ON_GOING))
+const onGoingWeek = computed(() => props.league?.competitions.find(c => isInStatus(c, CompetitionStatus.ON_GOING)))
 </script>
 
 <template>

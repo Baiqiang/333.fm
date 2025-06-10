@@ -4,8 +4,8 @@ const props = defineProps<{
 }>()
 const { locale } = useI18n()
 const dayjs = useDayjs()
-const isOnGoing = computed(() => props.competition.status === CompetitionStatus.ON_GOING)
-const hasEnded = computed(() => props.competition.status === CompetitionStatus.ENDED)
+const isOnGoing = computed(() => isInStatus(props.competition, CompetitionStatus.ON_GOING))
+const hasEnded = computed(() => isInStatus(props.competition, CompetitionStatus.ENDED))
 const startTime = computed(() => dayjs(props.competition.startTime).locale(locale.value).format('LLL'))
 const endTime = computed(() => dayjs(props.competition.endTime).locale(locale.value).format('LLL'))
 </script>

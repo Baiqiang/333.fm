@@ -39,7 +39,7 @@ const links = computed(() => {
     ret.push({
       label: t('league.nav.week', { week: leagueWeek(c) }),
       to: `/league/${props.session.number}/week/${leagueWeek(c)}`,
-      icon: c.status === CompetitionStatus.ON_GOING ? 'mdi:calendar-clock' : 'mdi:calendar-week',
+      icon: isInStatus(c, CompetitionStatus.ON_GOING) ? 'mdi:calendar-clock' : 'mdi:calendar-week',
     })
   })
   if (user.isLeagueAdmin) {

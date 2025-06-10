@@ -3,9 +3,9 @@ const props = defineProps<{
   session: LeagueSession
 }>()
 
-const currentWeek = computed(() => props.session.competitions.find(c => c.status === CompetitionStatus.ON_GOING))
-const pastWeeks = computed(() => props.session.competitions.filter(c => c.status === CompetitionStatus.ENDED))
-const futureWeeks = computed(() => props.session.competitions.filter(c => c.status === CompetitionStatus.NOT_STARTED))
+const currentWeek = computed(() => props.session.competitions.find(c => isInStatus(c, CompetitionStatus.ON_GOING)))
+const pastWeeks = computed(() => props.session.competitions.filter(c => isInStatus(c, CompetitionStatus.ENDED)))
+const futureWeeks = computed(() => props.session.competitions.filter(c => isInStatus(c, CompetitionStatus.NOT_STARTED)))
 
 const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => sum + tier.players.length, 0))
 </script>

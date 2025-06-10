@@ -5,6 +5,15 @@ const bus = useEventBus('submission')
 
 const session = inject(SYMBOL_LEAGUE_SESSION)!
 const baseURL = `/league/session/${session.value.number}/${week}`
+const { data: data1, error: error1 } = await useApi<Competition>(baseURL)
+console.log(data1.value, error1.value)
+if (error1.value || !data1.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Competition not found',
+  })
+}
+const competition = ref<Competition>(data1.value!)
 const isPlayer = computed(() => !!session.value.standings.find(s => s.userId === user.id))
 const playerTiers = computed(() => {
   const tierMap = session.value.tiers.reduce((acc, s) => {
@@ -16,10 +25,9 @@ const playerTiers = computed(() => {
     ret[s.userId] = tierMap[s.tierId]
   return ret
 })
-const { data } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
-const weekSchedules = ref<TierSchedule[]>(data.value || [])
-const competition = ref<Competition>(session.value.competitions.find(c => c.alias.split('-')[2] === week)!)
-const isOnGoing = computed(() => competition.value.status === CompetitionStatus.ON_GOING)
+const { data: data2 } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
+const weekSchedules = ref<TierSchedule[]>(data2.value || [])
+const isOnGoing = computed(() => isInStatus(competition.value, CompetitionStatus.ON_GOING))
 const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/league/session/${session.value.number}/${week}/results`)
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {

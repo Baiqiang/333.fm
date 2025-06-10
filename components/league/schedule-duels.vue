@@ -3,7 +3,7 @@ const props = defineProps<{
   duels: LeagueDuel[]
   competition: Competition
 }>()
-const ended = computed(() => props.competition.status === CompetitionStatus.ENDED)
+const ended = computed(() => isInStatus(props.competition, CompetitionStatus.ENDED))
 </script>
 
 <template>

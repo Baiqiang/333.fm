@@ -280,3 +280,19 @@ export function competitionPath(competition: Competition, scramble?: { number: n
       return ''
   }
 }
+
+export function isInStatus(competition: Competition, status: CompetitionStatus) {
+  const now = new Date()
+  const startTime = new Date(competition.startTime)
+  const endTime = new Date(competition.endTime)
+  switch (status) {
+    case CompetitionStatus.ON_GOING:
+      return (now >= startTime && now <= endTime) || competition.status === CompetitionStatus.ON_GOING
+    case CompetitionStatus.ENDED:
+      return now > endTime || competition.status === CompetitionStatus.ENDED
+    case CompetitionStatus.NOT_STARTED:
+      return now < startTime || competition.status === CompetitionStatus.NOT_STARTED
+    default:
+      return false
+  }
+}
