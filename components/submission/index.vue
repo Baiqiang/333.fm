@@ -108,7 +108,7 @@ watch(() => props.expanded, (expanded) => {
           :status="status"
           comment
         />
-        <Sequence v-else :sequence="solution" />
+        <Sequence v-else :sequence="solution" class="font-mono" />
         <button v-if="submission.attachments?.length" class="text-indigo-500" @click="expandAndShowAttachment">
           <Icon name="ion:image" size="20" />
         </button>
@@ -131,7 +131,7 @@ watch(() => props.expanded, (expanded) => {
       </div>
       <TransitionExpand>
         <div v-if="showComment" class="basis-full">
-          <Sequence :sequence="submission.comment" class="bg-gray-200" />
+          <Sequence :sequence="submission.comment" class="bg-gray-200 font-mono" />
           <SubmissionAttachments :attachments="submission.attachments" :show="showAttachment" @hide="showAttachment = false" />
         </div>
       </TransitionExpand>

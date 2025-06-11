@@ -57,8 +57,8 @@ const inputClass = computed<string>(() => {
         {{ options?.find(o => o.value === value)?.description }}
       </div>
     </div>
-    <textarea v-else-if="type === 'textarea'" v-model="value" v-bind="attrs" :class="inputClass" :rows="rows" />
-    <input v-else-if="type" v-model="value" v-bind="attrs" :class="inputClass" :type="type">
+    <textarea v-else-if="type === 'textarea'" v-model="value" v-bind="attrs" :class="inputClass" :rows="rows" class="font-mono" />
+    <input v-else-if="type" v-model="value" v-bind="attrs" :class="inputClass" :type="type" class="font-mono">
     <div v-if="state === false && errorMessage" class="text-red-600 text-sm px-2 py-1" v-html="errorMessage" />
     <slot />
     <div class="text-sm text-gray-500 px-2">
