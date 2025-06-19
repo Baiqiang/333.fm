@@ -16,24 +16,41 @@ const props = withDefaults(defineProps<{
   chain: false,
 })
 const { t } = useI18n()
-const filterBy = ref<CompetitionMode | string | null>(null)
-const sortBy = ref<string>(props.chain ? 'continuances' : 'moves')
-const expanded = ref<boolean>(false)
+const settings = useLocalStorage('submissions.settings', {
+  filterBy: null,
+  sortBy: props.chain ? 'continuances' : 'moves',
+  expanded: false,
+})
+const submissionFilters = computed(() => {
+  return props.filters || [
+    {
+      key: CompetitionMode.REGULAR,
+      label: t('weekly.regular.label'),
+    },
+    {
+      key: CompetitionMode.UNLIMITED,
+      label: t('weekly.unlimited.label'),
+    },
+  ]
+})
+onMounted(() => {
+  if (!submissionFilters.value.find(f => f.key === settings.value.filterBy)) {
+    settings.value.filterBy = null
+  }
+})
 const filteredSubmissions = computed(() => {
-  if (!props.filterable || filterBy.value === null)
+  if (!props.filterable || settings.value.filterBy === null)
     return props.submissions || []
 
-  if (props.filters) {
-    const filter = props.filters.find(f => f.key === filterBy.value)
-    if (filter)
-      return props.submissions?.filter(filter.filter || (s => s.mode === filterBy.value)) || []
-  }
-  return props.submissions?.filter(submission => submission.mode === filterBy.value) || []
+  const filter = submissionFilters.value.find(f => f.key === settings.value.filterBy)
+  if (filter)
+    return props.submissions?.filter(filter.filter || (s => s.mode === settings.value.filterBy)) || []
+  return props.submissions?.filter(submission => submission.mode === settings.value.filterBy) || []
 })
 const filteredSortedSubmissions = computed(() => {
   if (!props.sortable)
     return filteredSubmissions.value
-  switch (sortBy.value) {
+  switch (settings.value.sortBy) {
     case 'continuances':
       return filteredSubmissions.value.slice().sort((a, b) => {
         let tmp = b.continuances - a.continuances
@@ -66,7 +83,7 @@ const counts = computed(() => {
   }
   for (const { mode } of props.submissions || [])
     counts[mode]++
-  for (const { key, filter } of props.filters || []) {
+  for (const { key, filter } of submissionFilters.value) {
     if (filter) {
       const filtered = props.submissions?.filter(filter) || []
       counts[key] = filtered.length
@@ -86,21 +103,12 @@ const counts = computed(() => {
             {{ $t('common.filterBy.label') }}
           </div>
         </div>
-        <select v-model="filterBy" class="py-1 text-sm">
+        <select v-model="settings.filterBy" class="py-1 text-sm">
           <option :value="null">
             {{ $t('common.all') }} ({{ counts.all }})
           </option>
           <option
-            v-for="filter in filters || [
-              {
-                key: CompetitionMode.REGULAR,
-                label: t('weekly.regular.label'),
-              },
-              {
-                key: CompetitionMode.UNLIMITED,
-                label: t('weekly.unlimited.label'),
-              },
-            ]"
+            v-for="filter in submissionFilters"
             :key="filter.key"
             :value="filter.key"
           >
@@ -115,7 +123,7 @@ const counts = computed(() => {
             {{ $t('common.sortBy.label') }}
           </div>
         </div>
-        <select v-model="sortBy" class="py-1 text-sm">
+        <select v-model="settings.sortBy" class="py-1 text-sm">
           <option v-if="chain" value="continuances">
             {{ $t('common.sortBy.mostContinuations') }}
           </option>
@@ -130,9 +138,9 @@ const counts = computed(() => {
           </option>
         </select>
       </div>
-      <div class="cursor-pointer items-center flex gap-1">
-        {{ expanded ? $t('common.collapse') : $t('common.expand') }}
-        <Icon class="text-indigo-500 text-lg" :name="!expanded ? 'solar:alt-arrow-down-bold' : 'solar:alt-arrow-up-bold'" @click="expanded = !expanded" />
+      <div class="cursor-pointer items-center flex gap-1" @click="settings.expanded = !settings.expanded">
+        {{ settings.expanded ? $t('common.collapse') : $t('common.expand') }}
+        <Icon class="text-indigo-500 text-lg" :name="!settings.expanded ? 'solar:alt-arrow-down-bold' : 'solar:alt-arrow-up-bold'" />
       </div>
     </div>
     <div>
@@ -144,7 +152,7 @@ const counts = computed(() => {
         :competition="competition"
         :user="user"
         :chain="chain"
-        :expanded="expanded"
+        :expanded="settings.expanded"
       >
         <template #extra>
           <slot name="extra" v-bind="submission" />
