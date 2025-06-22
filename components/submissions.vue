@@ -20,6 +20,8 @@ const settings = useLocalStorage('submissions.settings', {
   filterBy: null,
   sortBy: props.chain ? 'continuances' : 'moves',
   expanded: false,
+}, {
+  initOnMounted: true,
 })
 const submissionFilters = computed(() => {
   return props.filters || [
