@@ -68,22 +68,13 @@ bus.on(fetchSubmissions)
           :submissions="mySubmissions[scramble.id]"
           @submitted="fetchSubmissions"
         />
-        <h2 class="text-lg font-semibold my-2">
-          {{ $t('weekly.solutions') }}
-        </h2>
-        <div>
-          <div v-if="!submissions[scramble.id]">
-            {{ $t('weekly.noSolution') }}
-          </div>
-          <div
-            v-else-if="mySubmissions[scramble.id]?.length === 0 && isOnGoing"
-          >
-            {{ $t('weekly.seeSolutions', { solutions: submissions[scramble.id].length }, submissions[scramble.id].length) }}
-          </div>
-          <template v-else>
-            <Submissions :submissions="submissions[scramble.id]" :competition="competition" :scramble="scramble" filterable sortable />
-          </template>
-        </div>
+        <MaybeSubmissions
+          :competition="competition"
+          :scramble="scramble"
+          :submissions="submissions[scramble.id] || []"
+          filterable
+          sortable
+        />
       </Tab>
     </Tabs>
   </div>

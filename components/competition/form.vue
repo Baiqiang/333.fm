@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<{
   allowUnlimited?: boolean
   allowChangeMode?: boolean
   allowAttachment?: boolean
+  allowSubmit?: boolean
   modeDescription?: string
 }>(), {
   type: 'weekly',
@@ -15,6 +16,7 @@ const props = withDefaults(defineProps<{
   allowUnlimited: true,
   allowChangeMode: false,
   allowAttachment: true,
+  allowSubmit: false,
 })
 const emit = defineEmits<{
   submitted: [Submission]
@@ -78,6 +80,7 @@ const uploadingAttachments = ref<File[]>([])
 const uploadingPromise = ref<Promise<any>>()
 const { moves, isSolved } = useComputedState(props, form)
 const isOnGoing = computed(() => isInStatus(props.competition, CompetitionStatus.ON_GOING))
+const canSubmit = computed(() => props.allowSubmit || isOnGoing.value)
 const solutionState = computed<boolean | null>(() => {
   if (form.solution.length === 0)
     return null
@@ -94,11 +97,11 @@ const solutionDisabled = computed<boolean>(() => {
   if (form.mode === CompetitionMode.UNLIMITED
     && !props.allowChangeMode
     && props.allowUnlimited
-    && isOnGoing.value
+    && canSubmit.value
   ) {
     return false
   }
-  if (props.submissions.length === 0 && isOnGoing.value)
+  if (props.submissions.length === 0 && canSubmit.value)
     return false
   return true
 })
@@ -117,7 +120,7 @@ const formState = computed<boolean>(() => {
   }
   if (unlimitedWorse.value)
     return false
-  if (!isOnGoing.value && !submissionsMap.value[form.mode]) {
+  if (!canSubmit.value && !submissionsMap.value[form.mode]) {
     return false
   }
   return solutionState.value !== null
@@ -237,7 +240,7 @@ function getTmpURL(file: File) {
 </script>
 
 <template>
-  <div v-if="isOnGoing || submissions.length > 0" class="mt-6">
+  <div v-if="canSubmit || submissions.length > 0" class="mt-6">
     <FormWrapper class="relative" @submit="submit" @reset="reset">
       <FormSignInRequired />
       <FormInput
@@ -251,13 +254,13 @@ function getTmpURL(file: File) {
           { label: $t('weekly.regular.label'),
             description: $t('weekly.regular.description'),
             value: CompetitionMode.REGULAR,
-            disabled: !isOnGoing && !submissionsMap[CompetitionMode.REGULAR],
+            disabled: !canSubmit && !submissionsMap[CompetitionMode.REGULAR],
           },
           {
             label: $t('weekly.unlimited.label'),
             description: $t('weekly.unlimited.description'),
             value: CompetitionMode.UNLIMITED,
-            disabled: !isOnGoing && !submissionsMap[CompetitionMode.UNLIMITED],
+            disabled: !canSubmit && !submissionsMap[CompetitionMode.UNLIMITED],
           },
         ]"
       >
@@ -297,7 +300,7 @@ function getTmpURL(file: File) {
         :label="$t('weekly.comment.label')"
         :state="null"
         class="mt-4"
-        :attrs="{ disabled: !isOnGoing && submissions.length === 0 }"
+        :attrs="{ disabled: !canSubmit && submissions.length === 0 }"
       >
         <template #description>
           <p class="py-1" v-html="$t('weekly.comment.description')" />

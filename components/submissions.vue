@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{
   competition?: Competition
   user?: User
   filterable?: boolean
-  filters?: { key: CompetitionMode | string, label: string, filter?: (submission: Submission) => boolean }[]
+  filters?: SubmissionFilter[]
   sortable?: boolean
   chain?: boolean
 }>(), {

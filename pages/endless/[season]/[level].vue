@@ -104,6 +104,7 @@ async function updateData(submission: Submission) {
       :submissions="submissions.filter(s => s.user.id === user.id)"
       :mode-description="$t('endless.mode.description')"
       :allow-dnf="false"
+      allow-submit
       allow-change-mode
       @submitted="updateData"
     />

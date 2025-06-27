@@ -88,49 +88,28 @@ bus.on(fetchSubmissions)
           :type="`league/session/${session.number}`"
           @submitted="fetchSubmissions"
         />
-        <h2 class="text-lg font-semibold my-2">
-          {{ $t('weekly.solutions') }}
-        </h2>
-        <div>
-          <div v-if="!submissions[scramble.id]">
-            {{ $t('weekly.noSolution') }}
-          </div>
-          <div
-            v-else-if="mySubmissions[scramble.id]?.length === 0 && isOnGoing"
-          >
-            {{ $t('weekly.seeSolutions', { solutions: submissions[scramble.id].length }, submissions[scramble.id].length) }}
-          </div>
-          <template v-else>
-            <Submissions
-              :submissions="submissions[scramble.id]"
-              :competition="competition"
-              :scramble="scramble"
-              filterable
-              :filters="[
-                {
-                  key: CompetitionMode.REGULAR,
-                  label: $t('league.mode.participants'),
-                },
-                ...session.tiers.map(tier => ({
-                  key: `tier-${tier.id}`,
-                  label: tier.name,
-                  filter: (submission: Submission) => submission.mode === CompetitionMode.REGULAR && playerTiers[submission.user.id]?.id === tier.id,
-                })),
-                {
-                  key: CompetitionMode.UNLIMITED,
-                  label: $t('league.mode.others'),
-                },
-              ]"
-              sortable
-            >
-              <template #extra="submission">
-                <div v-if="playerTiers[submission.user.id]" class="text-xs text-black px-1 rounded" :class="tierBackgrounds[playerTiers[submission.user.id].level - 1]">
-                  {{ playerTiers[submission.user.id].name }}
-                </div>
-              </template>
-            </Submissions>
-          </template>
-        </div>
+        <MaybeSubmissions
+          :competition="competition"
+          :scramble="scramble"
+          :submissions="submissions[scramble.id] || []"
+          filterable
+          sortable
+          :filters="[
+            {
+              key: CompetitionMode.REGULAR,
+              label: $t('league.mode.participants'),
+            },
+            ...session.tiers.map(tier => ({
+              key: `tier-${tier.id}`,
+              label: tier.name,
+              filter: (submission: Submission) => submission.mode === CompetitionMode.REGULAR && playerTiers[submission.user.id]?.id === tier.id,
+            })),
+            {
+              key: CompetitionMode.UNLIMITED,
+              label: $t('league.mode.others'),
+            },
+          ]"
+        />
       </Tab>
       <Tab name="Schedules" hash="schedules">
         <LeagueSchedules :tier-schedules="weekSchedules" />

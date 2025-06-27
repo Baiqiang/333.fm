@@ -98,6 +98,12 @@ export interface Submission extends Time {
   attachments: Attachment[]
 }
 
+export interface SubmissionFilter {
+  key: CompetitionMode | string
+  label: string
+  filter?: (submission: Submission) => boolean
+}
+
 export enum CompetitionType {
   WEEKLY,
   RANDOM,
