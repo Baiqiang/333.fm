@@ -109,7 +109,13 @@ bus.on(fetchSubmissions)
               label: $t('league.mode.others'),
             },
           ]"
-        />
+        >
+          <template #extra="submission">
+            <div v-if="playerTiers[submission.user.id]" class="text-xs text-black px-1 rounded" :class="tierBackgrounds[playerTiers[submission.user.id].level - 1]">
+              {{ playerTiers[submission.user.id].name }}
+            </div>
+          </template>
+        </MaybeSubmissions>
       </Tab>
       <Tab name="Schedules" hash="schedules">
         <LeagueSchedules :tier-schedules="weekSchedules" />
