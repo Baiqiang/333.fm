@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   results: Result[]
+  type: 'weekly' | 'daily'
 }>()
 const includesUnlimited = ref(true)
 const filteredResults = computed(() => {
@@ -33,7 +34,7 @@ const sortedResults = computed(() => filteredResults.value.slice().sort((a, b) =
     <div class="grid grid-cols-[max-content_4rem_2rem_2rem_2rem_2rem_1fr] gap-2">
       <div class="grid grid-cols-subgrid col-span-full font-bold pb-2 border-b border-gray-300">
         <div class="pl-2">
-          {{ $t('result.week') }}
+          {{ $t(`result.type.${props.type}`) }}
         </div>
         <div class="text-right">
           {{ $t('result.rank') }}

@@ -188,6 +188,6 @@ const movesCountOption: ECOption = {
     <div class="h-[350px]">
       <VChart :option="movesCountOption" autoresize />
     </div>
-    <UserResults :results="results" />
+    <UserResults :results="results" type="daily" />
   </div>
 </template>
