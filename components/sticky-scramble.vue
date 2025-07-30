@@ -5,5 +5,5 @@ defineProps<{
 </script>
 
 <template>
-  <Sequence :sequence="scramble" :source="scramble" class="sticky top-0 z-50 bg-gray-50" />
+  <Sequence :sequence="scramble" :source="scramble" class="sticky top-0 z-40 bg-gray-50" />
 </template>
