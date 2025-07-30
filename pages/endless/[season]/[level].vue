@@ -94,7 +94,7 @@ async function updateData(submission: Submission) {
     <div class="font-bold text-lg">
       {{ $t('if.scramble.label') }}
     </div>
-    <Sequence v-if="progress.scramble.scramble" :sequence="progress.scramble.scramble" :source="progress.scramble.scramble" />
+    <StickyScramble v-if="progress.scramble.scramble" :scramble="progress.scramble.scramble" />
     <CubeExpanded v-if="progress.scramble.scramble" :moves="progress.scramble.scramble" :cubie-cube="progress.scramble.cubieCube" />
     <Cube3d v-else :cubie-cube="progress.scramble.cubieCube" />
     <CompetitionForm
