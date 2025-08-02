@@ -199,6 +199,23 @@ async function endCompetition(competition: Competition) {
   }
 }
 
+// participants
+const { data: participants } = await useApi<{ user: User }[]>(`${baseURL}/participants`)
+const groupedParticipants = computed(() => {
+  const userTierMap: Record<number, number> = {}
+  for (const tier of session.value.tiers) {
+    for (const player of tier.players) {
+      userTierMap[player.userId] = tier.id
+    }
+  }
+  const ret: Record<number, User[]> = {}
+  for (const participant of participants.value || []) {
+    const tierId = userTierMap[participant.user.id] || 0
+    ret[tierId] = [...(ret[tierId] || []), participant.user]
+  }
+  return ret
+})
+
 // test functions
 async function deleteSession() {
   if (!confirm('Are you sure you want to delete this session?')) {
@@ -329,6 +346,19 @@ async function signInAs({ wcaId }: User) {
         <button v-if="competition.status === CompetitionStatus.ON_GOING && isDev" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="endCompetition(competition)">
           End
         </button>
+      </div>
+    </div>
+    <h3 class="text-lg font-bold my-2 w-full">
+      Participants
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      <div v-for="tier, index in [...session.tiers, { id: 0, name: 'Unassigned' }]" :key="tier.id" :class="tierBackgrounds[index]">
+        <h4 class="font-bold p-2 border-b border-gray-500">
+          {{ tier.name }}
+        </h4>
+        <div class="flex flex-col gap-1 p-2">
+          <UserAvatarName v-for="participant in groupedParticipants[tier.id]" :key="participant.id" :user="participant" />
+        </div>
       </div>
     </div>
     <h3 class="text-lg font-bold my-2 w-full">

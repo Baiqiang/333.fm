@@ -521,5 +521,10 @@ export default {
         '次佳 mo3，以此类推',
       ],
     },
+    participate: {
+      description: '如果你不确定是否能坚持整个赛季，可以不报名，而是参加每周的联赛。报名了再中途退出会打乱竞争节奏，影响分组积分。',
+      label: '参加下个赛季',
+      unparticipate: '退出下个赛季',
+    },
   },
 }

@@ -61,6 +61,7 @@ bus.on(fetchSubmissions)
     <WeeklyStatus :competition="competition" />
     <LeagueRules />
     <CompetitionSiblings :competition="competition" />
+    <LeagueParticipate v-if="isOnGoing" :session="session" />
     <Tabs>
       <Tab v-if="!isOnGoing && results?.regular.length" :name="$t('weekly.results')" hash="results">
         <WeeklyResults :results="results!.regular" />

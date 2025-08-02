@@ -521,5 +521,10 @@ export default {
         '2nd best mo3 and so on..',
       ],
     },
+    participate: {
+      description: 'If you aren\'t sure you will be able to commit to a full season, consider not signing up and treating league as a weekly. Dropping out mid season disturbs the process of rivalisation and collecting points within a tier.',
+      label: 'Join next session',
+      unparticipate: 'Quit next session',
+    },
   },
 }
