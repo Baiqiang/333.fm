@@ -22,6 +22,9 @@ async function unparticipate() {
 
 <template>
   <div class="flex flex-col items-center justify-center bg-white shadow-md p-6 my-6">
+    <h3 class="text-2xl font-extrabold my-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 drop-shadow-md tracking-wide uppercase">
+      {{ $t('league.participate.signUp', { number: session.number + 1 }) }}
+    </h3>
     <Button
       v-if="!participated"
       class="px-6 py-2 text-lg font-semibold bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow hover:from-blue-500 hover:to-blue-700 transition"
@@ -36,7 +39,7 @@ async function unparticipate() {
     >
       {{ $t('league.participate.unparticipate') }}
     </Button>
-    <p class="text-gray-700 text-center text-base leading-relaxed w-full md:px-12">
+    <p class="text-gray-700 text-center text-base leading-relaxed w-full md:px-12 mt-2">
       {{ $t('league.participate.description') }}
     </p>
   </div>
