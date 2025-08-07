@@ -64,7 +64,7 @@ function toggleMobileMenu() {
 
 <template>
   <button
-    class="md:hidden fixed bottom-4 left-4 z-20 p-2 bg-indigo-500 text-white shadow-lg"
+    class="md:hidden fixed bottom-4 left-4 z-50 p-2 bg-indigo-500 text-white shadow-lg"
     @click.prevent="toggleMobileMenu"
   >
     <Icon
@@ -74,7 +74,7 @@ function toggleMobileMenu() {
   </button>
   <div class="relative">
     <nav
-      class="fixed md:sticky top-0 left-0 h-screen w-full bg-gray-50 md:border-r-2 transform transition-transform duration-300 ease-in-out z-10"
+      class="fixed md:sticky top-0 left-0 h-screen w-full bg-gray-50 md:border-r-2 transform transition-transform duration-300 ease-in-out z-40"
       :class="{
         '-translate-x-full md:translate-x-0': !isMobileMenuOpen,
         'translate-x-0': isMobileMenuOpen,
