@@ -30,6 +30,11 @@ const links = computed(() => {
       icon: 'mdi:trophy',
     },
     {
+      label: t('league.nav.statistics'),
+      to: `/league/${props.session.number}/statistics`,
+      icon: 'mdi:chart-box-outline',
+    },
+    {
       label: t('league.nav.rules'),
       to: `/league/${props.session.number}/rules`,
       icon: 'mdi:book-open',

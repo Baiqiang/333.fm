@@ -352,7 +352,7 @@ async function signInAs({ wcaId }: User) {
       Participants
     </h3>
     <div class="flex flex-wrap gap-3">
-      <div v-for="tier, index in [...session.tiers, { id: 0, name: 'Unassigned' }]" :key="tier.id" :class="tierBackgrounds[index]">
+      <div v-for="tier, index in [...session.tiers, unassignedTier]" :key="tier.id" :class="tierBackgrounds[index]">
         <h4 class="font-bold p-2 border-b border-gray-500">
           {{ tier.name }}
         </h4>

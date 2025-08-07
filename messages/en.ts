@@ -476,6 +476,7 @@ export default {
       standings: 'Standings',
       week: 'Week {week}',
       rules: 'Rules',
+      statistics: 'Statistics',
     },
     standing: {
       competitors: 'Competitors',
@@ -526,6 +527,9 @@ export default {
       label: 'Join next session',
       unparticipate: 'Quit next session',
       signUp: 'Session {number} Sign-Up',
+    },
+    statistics: {
+      tier: 'Tier',
     },
   },
 }

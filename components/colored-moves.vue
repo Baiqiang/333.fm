@@ -2,12 +2,14 @@
 withDefaults(defineProps<{
   value?: number
   isBest?: boolean
+  isMean?: boolean
   is?: any
   placeholder?: string
   dns?: boolean
 }>(), {
   value: 0,
   isBest: false,
+  isMean: false,
   is: 'div',
   placeholder: '',
   dns: false,
@@ -24,6 +26,6 @@ withDefaults(defineProps<{
       'text-orange-400': value === DNS || dns,
     }"
   >
-    {{ formatResult(value || (dns ? DNS : 0)) || placeholder }}
+    {{ formatResult(value || (dns ? DNS : 0), isMean ? 2 : undefined) || placeholder }}
   </component>
 </template>

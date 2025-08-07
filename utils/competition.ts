@@ -31,9 +31,11 @@ export interface Result {
   values: number[]
   best: number
   average: number
+  userId: number
   user: User
   mode: CompetitionMode
   rollingStart: number
+  competitionId: number
   competition: Competition
   submissions: Submission[]
 }

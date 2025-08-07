@@ -476,6 +476,7 @@ export default {
       standings: '排名',
       week: '第 {week} 周',
       rules: '规则',
+      statistics: '统计',
     },
     standing: {
       competitors: '选手',
@@ -526,6 +527,9 @@ export default {
       label: '参加下个赛季',
       unparticipate: '退出下个赛季',
       signUp: '赛季 {number} 报名',
+    },
+    statistics: {
+      tier: '分组',
     },
   },
 }

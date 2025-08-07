@@ -125,3 +125,8 @@ export const tierBackgrounds = [
   'bg-purple-200',
   'bg-yellow-200',
 ]
+
+export const unassignedTier = {
+  id: 0,
+  name: '-',
+} satisfies Partial<LeagueTier>
