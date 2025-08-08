@@ -1,11 +1,11 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const session = inject(SYMBOL_LEAGUE_SESSION)!
-const weeks = computed(() => session.value.competitions.length + 1)
+const season = inject(SYMBOL_LEAGUE_SEASON)!
+const weeks = computed(() => season.value.competitions.length + 1)
 const user = useUser()
-const tierPlayers = ref<Record<number, User[]>>(Object.fromEntries(session.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)])))
+const tierPlayers = ref<Record<number, User[]>>(Object.fromEntries(season.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)])))
 useSeoMeta({
-  title: `${t('league.nav.tiers')} - ${session.value.title}`,
+  title: `${t('league.nav.tiers')} - ${season.value.title}`,
 })
 </script>
 
@@ -16,7 +16,7 @@ useSeoMeta({
     </Heading1>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
       <div
-        v-for="tier, index in session.tiers"
+        v-for="tier, index in season.tiers"
         :key="tier.id"
         class="bg-white shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
       >

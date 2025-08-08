@@ -1,10 +1,10 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const session = inject(SYMBOL_LEAGUE_SESSION)!
-const { data } = await useApi<TierSchedule[]>(`/league/session/${session.value.number}/schedules`)
+const season = inject(SYMBOL_LEAGUE_SEASON)!
+const { data } = await useApi<TierSchedule[]>(`/league/season/${season.value.number}/schedules`)
 const tierSchedules = ref<TierSchedule[]>(data.value || [])
 useSeoMeta({
-  title: `${t('league.nav.schedules')} - ${session.value.title}`,
+  title: `${t('league.nav.schedules')} - ${season.value.title}`,
 })
 </script>
 

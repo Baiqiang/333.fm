@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  league?: LeagueSession | null
+  league?: LeagueSeason | null
 }>()
 const onGoingWeek = computed(() => props.league?.competitions.find(c => isInStatus(c, CompetitionStatus.ON_GOING)))
 </script>

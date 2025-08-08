@@ -1,23 +1,23 @@
 <script setup lang="ts">
 const props = defineProps<{
-  session: LeagueSession
+  season: LeagueSeason
 }>()
 
-const currentWeek = computed(() => props.session.competitions.find(c => isInStatus(c, CompetitionStatus.ON_GOING)))
-const pastWeeks = computed(() => props.session.competitions.filter(c => isInStatus(c, CompetitionStatus.ENDED)))
-const futureWeeks = computed(() => props.session.competitions.filter(c => isInStatus(c, CompetitionStatus.NOT_STARTED)))
+const currentWeek = computed(() => props.season.competitions.find(c => isInStatus(c, CompetitionStatus.ON_GOING)))
+const pastWeeks = computed(() => props.season.competitions.filter(c => isInStatus(c, CompetitionStatus.ENDED)))
+const futureWeeks = computed(() => props.season.competitions.filter(c => isInStatus(c, CompetitionStatus.NOT_STARTED)))
 
-const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => sum + tier.players.length, 0))
+const totalPlayers = computed(() => props.season.tiers.reduce((sum, tier) => sum + tier.players.length, 0))
 </script>
 
 <template>
   <div class="py-4">
     <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 text-white mb-6">
       <h1 class="text-3xl font-bold mb-3">
-        {{ session.title }}
+        {{ season.title }}
       </h1>
       <div class="grid grid-cols-3 gap-2 md:gap-3">
-        <NuxtLink :to="`/league/${session.number}/standings`" class="text-center">
+        <NuxtLink :to="`/league/${season.number}/standings`" class="text-center">
           <div class="text-2xl font-bold">
             {{ totalPlayers }}
           </div>
@@ -27,15 +27,15 @@ const totalPlayers = computed(() => props.session.tiers.reduce((sum, tier) => su
         </NuxtLink>
         <div class="text-center">
           <div class="text-2xl font-bold">
-            {{ session.competitions.length }}
+            {{ season.competitions.length }}
           </div>
           <div class="text-sm opacity-80">
             {{ $t('league.summary.weeks') }}
           </div>
         </div>
-        <NuxtLink :to="`/league/${session.number}/tiers`" class="text-center">
+        <NuxtLink :to="`/league/${season.number}/tiers`" class="text-center">
           <div class="text-2xl font-bold">
-            {{ session.tiers.length }}
+            {{ season.tiers.length }}
           </div>
           <div class="text-sm opacity-80">
             {{ $t('league.summary.tiers') }}

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-const session = inject(SYMBOL_LEAGUE_SESSION)!
+const season = inject(SYMBOL_LEAGUE_SEASON)!
 useSeoMeta({
-  title: session.value.title,
+  title: season.value.title,
 })
 </script>
 
 <template>
   <div class="px-2">
-    <LeagueSummary :session="session" />
+    <LeagueSummary :season="season" />
   </div>
 </template>

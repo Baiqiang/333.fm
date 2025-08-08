@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const session = inject(SYMBOL_LEAGUE_SESSION)!
+const season = inject(SYMBOL_LEAGUE_SEASON)!
 useSeoMeta({
-  title: `${t('league.nav.rules')} - ${session.value.title}`,
+  title: `${t('league.nav.rules')} - ${season.value.title}`,
 })
 </script>
 

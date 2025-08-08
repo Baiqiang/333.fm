@@ -1,18 +1,18 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const session = inject(SYMBOL_LEAGUE_SESSION)!
-const { data } = await useApi<Result[]>(`/league/session/${session.value.number}/solves`)
+const season = inject(SYMBOL_LEAGUE_SEASON)!
+const { data } = await useApi<Result[]>(`/league/season/${season.value.number}/solves`)
 const allSolves = ref<Result[]>(data.value || [])
 const competitionWeeks = computed(() => {
   const ret: Record<number, string> = {}
-  session.value.competitions.forEach((competition) => {
+  season.value.competitions.forEach((competition) => {
     ret[competition.id] = leagueWeek(competition)
   })
   return ret
 })
 const tierPlayers = computed(() => {
   const allPlayerIds: Record<number, boolean> = {}
-  const ret = session.value.tiers.map((tier) => {
+  const ret = season.value.tiers.map((tier) => {
     return {
       id: tier.id,
       name: tier.name,
@@ -46,10 +46,10 @@ const mappedSolves = computed(() => {
   return ret
 })
 const maxWeek = computed(() => {
-  return session.value.competitions.filter(c => isInStatus(c, CompetitionStatus.ENDED)).length
+  return season.value.competitions.filter(c => isInStatus(c, CompetitionStatus.ENDED)).length
 })
 useSeoMeta({
-  title: `${t('league.nav.statistics')} - ${session.value.title}`,
+  title: `${t('league.nav.statistics')} - ${season.value.title}`,
 })
 </script>
 

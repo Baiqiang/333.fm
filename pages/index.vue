@@ -9,7 +9,7 @@ if (!finders.value)
   finders.value = []
 const { data: weekly } = await useApi<Competition>('/weekly/on-going')
 const { data: daily } = await useApi<Competition>('/daily/on-going')
-const { data: league } = await useApi<LeagueSession>('/league/session/next')
+const { data: league } = await useApi<LeagueSeason>('/league/season/next')
 const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
 </script>
 

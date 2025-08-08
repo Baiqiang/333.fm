@@ -1,16 +1,16 @@
-export enum LeagueSessionStatus {
+export enum LeagueSeasonStatus {
   NOT_STARTED,
   ON_GOING,
   ENDED,
 }
 
-export interface LeagueSession {
+export interface LeagueSeason {
   id: number
   number: number
   title: string
   startTime: Date
   endTime: Date
-  status: LeagueSessionStatus
+  status: LeagueSeasonStatus
   tiers: LeagueTier[]
   competitions: Competition[]
   standings: LeagueStanding[]
@@ -19,7 +19,7 @@ export interface LeagueSession {
 
 export interface LeagueStanding {
   id: number
-  sessionId: number
+  seasonId: number
   tierId: number
   userId: number
   points: number
@@ -27,14 +27,14 @@ export interface LeagueStanding {
   losses: number
   draws: number
   bestMo3: number
-  session: LeagueSession
+  season: LeagueSeason
   tier: LeagueTier
   user: User
 }
 
 export interface LeagueResult {
   id: number
-  sessionId: number
+  seasonId: number
   competitionId: number
   week: number
   userId: number
@@ -45,8 +45,8 @@ export interface LeagueTier {
   id: number
   level: number
   name: string
-  sessionId: number
-  session: LeagueSession
+  seasonId: number
+  season: LeagueSeason
   players: LeaguePlayer[]
   duels: LeagueDuel[]
   standings: LeagueStanding[]
@@ -90,16 +90,16 @@ export interface TierSchedule {
 
 export interface LeaguePlayer {
   id: number
-  sessionId: number
+  seasonId: number
   tierId: number
   userId: number
-  session: LeagueSession
+  season: LeagueSeason
   tier: LeagueTier
   user: User
   standings: LeagueStanding[]
 }
 
-export const SYMBOL_LEAGUE_SESSION: InjectionKey<Ref<LeagueSession>> = Symbol('leagueSession')
+export const SYMBOL_LEAGUE_SEASON: InjectionKey<Ref<LeagueSeason>> = Symbol('leagueSeason')
 
 export function leagueWeek(competition: Competition) {
   return competition.alias.split('-')[2]

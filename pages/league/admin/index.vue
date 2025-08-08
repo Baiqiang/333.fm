@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const { data, error, refresh } = await useApi<LeagueSession[]>('/league/admin/sessions')
+const { data, error, refresh } = await useApi<LeagueSeason[]>('/league/admin/seasons')
 </script>
 
 <template>
@@ -14,11 +14,11 @@ const { data, error, refresh } = await useApi<LeagueSession[]>('/league/admin/se
     </NuxtLink>
     <div>
       <h3 class="text-lg font-bold my-2">
-        Sessions
+        Seasons
       </h3>
-      <div v-for="session in data" :key="session.id">
-        <NuxtLink :to="`/league/admin/session/${session.number}`" class="text-indigo-500">
-          {{ session.title }}
+      <div v-for="season in data" :key="season.id">
+        <NuxtLink :to="`/league/admin/season/${season.number}`" class="text-indigo-500">
+          {{ season.title }}
         </NuxtLink>
       </div>
     </div>

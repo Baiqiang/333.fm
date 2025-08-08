@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const user = useUser()
-const { data: nextSession } = await useApi<LeagueSession>('/league/session/next')
+const { data: nextSeason } = await useApi<LeagueSeason>('/league/season/next')
 useSeoMeta({
   title: t('league.title'),
 })
@@ -13,10 +13,10 @@ useSeoMeta({
       Admin Panel
     </NuxtLink>
     <LeagueDescription />
-    <Heading1 v-if="nextSession" class="flex items-center">
-      {{ nextSession.title }}
+    <Heading1 v-if="nextSeason" class="flex items-center">
+      {{ nextSeason.title }}
       <Icon name="fxemoji:fire" />
     </Heading1>
-    <LeagueSummary v-if="nextSession" :session="nextSession" />
+    <LeagueSummary v-if="nextSeason" :season="nextSeason" />
   </div>
 </template>

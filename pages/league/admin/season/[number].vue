@@ -5,25 +5,25 @@ import leagueS6 from '~/assets/league-s6.json'
 const config = useRuntimeConfig()
 const accessToken = useAccessToken()
 const user = useUser()
-const { number: sessionNumber } = useRoute().params
+const { number: seasonNumber } = useRoute().params
 const router = useRouter()
-const { data, error } = await useApi<LeagueSession>(`/league/admin/session/${sessionNumber}`)
+const { data, error } = await useApi<LeagueSeason>(`/league/admin/season/${seasonNumber}`)
 if (error.value || !data.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: 'Session not found',
+    statusMessage: 'Season not found',
   })
 }
 
-const baseURL = `/league/admin/session/${sessionNumber}`
-const session = ref(data.value)
+const baseURL = `/league/admin/season/${seasonNumber}`
+const season = ref(data.value)
 const isDev = config.public.mode !== 'production'
 
-async function updateSession() {
+async function updateSeason() {
   try {
-    const { data } = await useApi<LeagueSession>(`/league/admin/session/${sessionNumber}`)
+    const { data } = await useApi<LeagueSeason>(`/league/admin/season/${seasonNumber}`)
     if (data.value) {
-      session.value = data.value
+      season.value = data.value
     }
   }
   catch {
@@ -32,10 +32,10 @@ async function updateSession() {
 }
 
 // tiers
-const weeks = computed(() => session.value.competitions.length + 1)
-const canEditTier = computed(() => session.value.status === LeagueSessionStatus.NOT_STARTED && session.value.competitions.every(c => c.status === CompetitionStatus.NOT_STARTED))
-const tierPlayers = ref<Record<number, User[]>>(Object.fromEntries(session.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)])))
-const tierEdited = ref<Record<number, boolean>>(Object.fromEntries(session.value.tiers.map(tier => [tier.id, false])))
+const weeks = computed(() => season.value.competitions.length + 1)
+const canEditTier = computed(() => season.value.status === LeagueSeasonStatus.NOT_STARTED && season.value.competitions.every(c => c.status === CompetitionStatus.NOT_STARTED))
+const tierPlayers = ref<Record<number, User[]>>(Object.fromEntries(season.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)])))
+const tierEdited = ref<Record<number, boolean>>(Object.fromEntries(season.value.tiers.map(tier => [tier.id, false])))
 const editingIndex = ref<string>('')
 const search = ref('')
 const searchInput = ref<HTMLInputElement[]>([])
@@ -60,7 +60,7 @@ async function importS6() {
   if (!confirm('This will override current tier settings. Please confirm to import!')) {
     return
   }
-  for (const tier of session.value.tiers) {
+  for (const tier of season.value.tiers) {
     const players = leagueS6.filter(s => s.level === tier.level).slice(0, weeks.value)
     tierPlayers.value[tier.id] = players as any
     await saveTierPlayers(tier.id)
@@ -92,8 +92,8 @@ async function saveTierPlayers(tierId: number) {
     })
     tierEdited.value[tierId] = false
     editingIndex.value = ''
-    await updateSession()
-    tierPlayers.value = Object.fromEntries(session.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)]))
+    await updateSeason()
+    tierPlayers.value = Object.fromEntries(season.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)]))
   }
   catch (error) {
     console.error(error)
@@ -158,7 +158,7 @@ const scramblesValid = computed(() => {
 async function generateScrambles(competition: Competition) {
   try {
     await useApiPost(`${baseURL}/${leagueWeek(competition)}/generate-scrambles`)
-    await updateSession()
+    await updateSeason()
   }
   catch {
   }
@@ -175,7 +175,7 @@ async function importScrambles(competition: Competition) {
         scrambles: scramblesString.value.trim().split('\n'),
       },
     })
-    await updateSession()
+    await updateSeason()
   }
   catch {
   }
@@ -184,7 +184,7 @@ async function importScrambles(competition: Competition) {
 async function startCompetition(competition: Competition) {
   try {
     await useApiPost(`${baseURL}/${leagueWeek(competition)}/start`)
-    await updateSession()
+    await updateSeason()
   }
   catch {
   }
@@ -193,7 +193,7 @@ async function startCompetition(competition: Competition) {
 async function endCompetition(competition: Competition) {
   try {
     await useApiPost(`${baseURL}/${leagueWeek(competition)}/end`)
-    await updateSession()
+    await updateSeason()
   }
   catch {
   }
@@ -203,7 +203,7 @@ async function endCompetition(competition: Competition) {
 const { data: participants } = await useApi<{ user: User }[]>(`${baseURL}/participants`)
 const groupedParticipants = computed(() => {
   const userTierMap: Record<number, number> = {}
-  for (const tier of session.value.tiers) {
+  for (const tier of season.value.tiers) {
     for (const player of tier.players) {
       userTierMap[player.userId] = tier.id
     }
@@ -217,12 +217,12 @@ const groupedParticipants = computed(() => {
 })
 
 // test functions
-async function deleteSession() {
-  if (!confirm('Are you sure you want to delete this session?')) {
+async function deleteSeason() {
+  if (!confirm('Are you sure you want to delete this season?')) {
     return
   }
   try {
-    await useApiDelete(`/league/admin/session/${sessionNumber}`)
+    await useApiDelete(`/league/admin/season/${seasonNumber}`)
     router.push('/league/admin')
   }
   catch {
@@ -252,7 +252,7 @@ async function signInAs({ wcaId }: User) {
 <template>
   <div>
     <Heading1>
-      {{ session.title }}
+      {{ season.title }}
     </Heading1>
     <h3 class="text-lg font-bold my-2 w-full clear-both">
       Tiers
@@ -261,7 +261,7 @@ async function signInAs({ wcaId }: User) {
       Import S6 tier preset
     </button>
     <div class="flex flex-wrap gap-3">
-      <div v-for="tier, index in session.tiers" :key="tier.id" :class="tierBackgrounds[index]">
+      <div v-for="tier, index in season.tiers" :key="tier.id" :class="tierBackgrounds[index]">
         <h4 class="font-bold p-2 border-b border-gray-500">
           {{ tier.name }}
         </h4>
@@ -323,7 +323,7 @@ async function signInAs({ wcaId }: User) {
     <h3 class="text-lg font-bold my-2 w-full">
       Weeks
     </h3>
-    <div v-for="competition in session.competitions" :key="competition.id" class="py-2 border-t border-gray-300">
+    <div v-for="competition in season.competitions" :key="competition.id" class="py-2 border-t border-gray-300">
       <div class="flex gap-2 items-center">
         <div class="font-bold">
           Week {{ competition.alias.split('-')[2] }}
@@ -352,7 +352,7 @@ async function signInAs({ wcaId }: User) {
       Participants
     </h3>
     <div class="flex flex-wrap gap-3">
-      <div v-for="tier, index in [...session.tiers, unassignedTier]" :key="tier.id" :class="tierBackgrounds[index]">
+      <div v-for="tier, index in [...season.tiers, unassignedTier]" :key="tier.id" :class="tierBackgrounds[index]">
         <h4 class="font-bold p-2 border-b border-gray-500">
           {{ tier.name }}
         </h4>
@@ -364,7 +364,7 @@ async function signInAs({ wcaId }: User) {
     <h3 class="text-lg font-bold my-2 w-full">
       Schedules
     </h3>
-    <LeagueSchedules :tier-schedules="tierSchedules" :session="session" />
+    <LeagueSchedules :tier-schedules="tierSchedules" :season="season" />
     <div class="flex flex-wrap gap-2 my-2">
       <button
         class="bg-indigo-500 text-white px-2 py-1 text-sm"
@@ -377,7 +377,7 @@ async function signInAs({ wcaId }: User) {
         {{ generating ? 'Generatring...' : 'Generate Schedules' }}
       </button>
     </div>
-    <button v-if="isDev" class="text-xs bg-red-500 text-white px-2 py-1 my-2" @click="deleteSession">
+    <button v-if="isDev" class="text-xs bg-red-500 text-white px-2 py-1 my-2" @click="deleteSeason">
       <Icon name="heroicons:trash-16-solid" />
     </button>
     <Teleport to="body">

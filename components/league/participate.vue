@@ -1,18 +1,18 @@
 <script setup lang="ts">
 const props = defineProps<{
-  session: LeagueSession
+  season: LeagueSeason
 }>()
 const user = useUser()
-const { data: participated } = await useApi<boolean>(`/league/session/${props.session.number}/participated`)
+const { data: participated } = await useApi<boolean>(`/league/season/${props.season.number}/participated`)
 async function participate() {
-  const { data, error } = await useApiPost<boolean>(`/league/session/${props.session.number}/participate`)
+  const { data, error } = await useApiPost<boolean>(`/league/season/${props.season.number}/participate`)
   if (error.value)
     throw error.value
   if (data.value)
     participated.value = true
 }
 async function unparticipate() {
-  const { data, error } = await useApiPost<boolean>(`/league/session/${props.session.number}/unparticipate`)
+  const { data, error } = await useApiPost<boolean>(`/league/season/${props.season.number}/unparticipate`)
   if (error.value)
     throw error.value
   if (data.value)
@@ -23,7 +23,7 @@ async function unparticipate() {
 <template>
   <div class="flex flex-col items-center justify-center bg-white shadow-md p-6 my-6">
     <h3 class="text-2xl font-extrabold my-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 drop-shadow-md tracking-wide uppercase">
-      {{ $t('league.participate.signUp', { number: session.number + 1 }) }}
+      {{ $t('league.participate.signUp', { number: season.number + 1 }) }}
     </h3>
     <Button
       v-if="!participated"

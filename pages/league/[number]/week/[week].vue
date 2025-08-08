@@ -3,8 +3,8 @@ const user = useUser()
 const { week } = useRoute().params
 const bus = useEventBus('submission')
 
-const session = inject(SYMBOL_LEAGUE_SESSION)!
-const baseURL = `/league/session/${session.value.number}/${week}`
+const season = inject(SYMBOL_LEAGUE_SEASON)!
+const baseURL = `/league/season/${season.value.number}/${week}`
 const { data: data1, error: error1 } = await useApi<Competition>(baseURL)
 if (error1.value || !data1.value) {
   throw createError({
@@ -13,21 +13,21 @@ if (error1.value || !data1.value) {
   })
 }
 const competition = ref<Competition>(data1.value!)
-const isPlayer = computed(() => !!session.value.standings.find(s => s.userId === user.id))
+const isPlayer = computed(() => !!season.value.standings.find(s => s.userId === user.id))
 const playerTiers = computed(() => {
-  const tierMap = session.value.tiers.reduce((acc, s) => {
+  const tierMap = season.value.tiers.reduce((acc, s) => {
     acc[s.id] = s
     return acc
   }, {} as Record<number, LeagueTier>)
   const ret: Record<number, LeagueTier> = {}
-  for (const s of session.value.standings)
+  for (const s of season.value.standings)
     ret[s.userId] = tierMap[s.tierId]
   return ret
 })
 const { data: data2 } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
 const weekSchedules = ref<TierSchedule[]>(data2.value || [])
 const isOnGoing = computed(() => isInStatus(competition.value, CompetitionStatus.ON_GOING))
-const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/league/session/${session.value.number}/${week}/results`)
+const { data: results } = await useApi<{ regular: Result[], unlimited: Result[] }>(`/league/season/${season.value.number}/${week}/results`)
 const submissions = reactive<Record<number, Submission[]>>({})
 const mySubmissions = computed(() => {
   const ret: Record<number, Submission[]> = {}
@@ -54,14 +54,14 @@ bus.on(fetchSubmissions)
 
 <template>
   <div class="">
-    <BackTo :to="`/league/${session.number}`" :label="session.title" />
+    <BackTo :to="`/league/${season.number}`" :label="season.title" />
     <Heading1>
       {{ competition.name }}
     </Heading1>
     <WeeklyStatus :competition="competition" />
     <LeagueRules />
     <CompetitionSiblings :competition="competition" />
-    <LeagueParticipate v-if="isOnGoing" :session="session" />
+    <LeagueParticipate v-if="isOnGoing" :season="season" />
     <Tabs>
       <Tab v-if="!isOnGoing && results?.regular.length" :name="$t('weekly.results')" hash="results">
         <WeeklyResults :results="results!.regular" />
@@ -86,7 +86,7 @@ bus.on(fetchSubmissions)
           :competition="competition"
           :submissions="mySubmissions[scramble.id]"
           :allow-unlimited="false"
-          :type="`league/session/${session.number}`"
+          :type="`league/season/${season.number}`"
           @submitted="fetchSubmissions"
         />
         <MaybeSubmissions
@@ -100,7 +100,7 @@ bus.on(fetchSubmissions)
               key: CompetitionMode.REGULAR,
               label: $t('league.mode.participants'),
             },
-            ...session.tiers.map(tier => ({
+            ...season.tiers.map(tier => ({
               key: `tier-${tier.id}`,
               label: tier.name,
               filter: (submission: Submission) => submission.mode === CompetitionMode.REGULAR && playerTiers[submission.user.id]?.id === tier.id,

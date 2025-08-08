@@ -24,7 +24,7 @@ async function submit() {
     return
   loading.value = true
   try {
-    const { data, error, refresh } = await useApiPost<LeagueSession>('/league/admin/session', {
+    const { data, error, refresh } = await useApiPost<LeagueSeason>('/league/admin/season', {
       body: {
         ...form.value,
         startTime: new Date(form.value.startTime).toISOString(),
@@ -35,7 +35,7 @@ async function submit() {
     if (error.value || !data.value)
       throw error.value
     router.push({
-      path: `/league/admin/session/${data.value.number}`,
+      path: `/league/admin/season/${data.value.number}`,
     })
   }
   catch (e: any) {
@@ -52,13 +52,13 @@ async function submit() {
 <template>
   <div>
     <Heading1>
-      Create League Session
+      Create League Season
     </Heading1>
     <FormWrapper class="clear-both" @submit="submit">
       <FormInput
         v-model="form.number"
         type="number"
-        label="Session Number"
+        label="Season Number"
         :state="null"
       />
       <FormInput

@@ -1,22 +1,22 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const { number } = useRoute().params
-const { data, error } = await useApi<LeagueSession>(`/league/session/${number}`)
+const { data, error } = await useApi<LeagueSeason>(`/league/season/${number}`)
 if (error.value || !data.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: t('league.error.session_not_found'),
+    statusMessage: t('league.error.season_not_found'),
   })
 }
 
-const session = ref(data.value)
-provide(SYMBOL_LEAGUE_SESSION, session)
+const season = ref(data.value)
+provide(SYMBOL_LEAGUE_SEASON, season)
 </script>
 
 <template>
   <div class="md:grid md:grid-cols-[12rem_1fr] md:gap-2">
     <!-- 左侧导航 -->
-    <LeagueNav :session="session" />
+    <LeagueNav :season="season" />
 
     <!-- 主要内容区域 -->
     <NuxtPage />

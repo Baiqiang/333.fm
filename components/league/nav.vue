@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  session: LeagueSession
+  season: LeagueSeason
 }>()
 const user = useUser()
 const route = useRoute()
@@ -11,39 +11,39 @@ const links = computed(() => {
   const ret = [
     {
       label: t('league.nav.summary'),
-      to: `/league/${props.session.number}`,
+      to: `/league/${props.season.number}`,
       icon: 'mdi:home',
     },
     {
       label: t('league.nav.tiers'),
-      to: `/league/${props.session.number}/tiers`,
+      to: `/league/${props.season.number}/tiers`,
       icon: 'mdi:account-group',
     },
     {
       label: t('league.nav.schedules'),
-      to: `/league/${props.session.number}/schedules`,
+      to: `/league/${props.season.number}/schedules`,
       icon: 'mdi:calendar',
     },
     {
       label: t('league.nav.standings'),
-      to: `/league/${props.session.number}/standings`,
+      to: `/league/${props.season.number}/standings`,
       icon: 'mdi:trophy',
     },
     {
       label: t('league.nav.statistics'),
-      to: `/league/${props.session.number}/statistics`,
+      to: `/league/${props.season.number}/statistics`,
       icon: 'mdi:chart-box-outline',
     },
     {
       label: t('league.nav.rules'),
-      to: `/league/${props.session.number}/rules`,
+      to: `/league/${props.season.number}/rules`,
       icon: 'mdi:book-open',
     },
   ]
-  props.session.competitions.forEach((c) => {
+  props.season.competitions.forEach((c) => {
     ret.push({
       label: t('league.nav.week', { week: leagueWeek(c) }),
-      to: `/league/${props.session.number}/week/${leagueWeek(c)}`,
+      to: `/league/${props.season.number}/week/${leagueWeek(c)}`,
       icon: isInStatus(c, CompetitionStatus.ON_GOING) ? 'mdi:calendar-clock' : 'mdi:calendar-week',
     })
   })
