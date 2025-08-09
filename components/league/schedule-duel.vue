@@ -31,7 +31,7 @@ const user2Class = computed(() => {
       :key="i"
       class="p-2 border-l border-indigo-100"
       :class="user1Class"
-      :value="ended ? duel.user1Result?.values[i - 1] : 0"
+      :value="duel.user1Result?.values[i - 1] || 0"
       :dns="ended"
       placeholder="-"
     />
@@ -52,7 +52,7 @@ const user2Class = computed(() => {
       :key="i"
       class="p-2 border-l border-indigo-100"
       :class="user2Class"
-      :value="ended ? duel.user2Result?.values[i - 1] : 0"
+      :value="duel.user2Result?.values[i - 1] || 0"
       :dns="ended"
       placeholder="-"
     />

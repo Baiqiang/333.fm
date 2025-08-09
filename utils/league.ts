@@ -106,7 +106,7 @@ export function leagueWeek(competition: Competition) {
 }
 
 export function leagueWeekPoints(user1Points: number, user2Points: number) {
-  if (user1Points + user2Points === 0) {
+  if (user1Points + user2Points === 0 || user1Points + user2Points !== 3) {
     return '-'
   }
   if (user1Points > user2Points) {
