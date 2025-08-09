@@ -61,7 +61,7 @@ bus.on(fetchSubmissions)
     <WeeklyStatus :competition="competition" />
     <LeagueRules />
     <CompetitionSiblings :competition="competition" />
-    <LeagueParticipate v-if="isOnGoing" :season="season" />
+    <LeagueParticipate v-if="Date.now() < new Date(season.endTime).getTime() + 86400 * 3 * 1000" :season="season" />
     <Tabs>
       <Tab v-if="!isOnGoing && results?.regular.length" :name="$t('weekly.results')" hash="results">
         <WeeklyResults :results="results!.regular" />
