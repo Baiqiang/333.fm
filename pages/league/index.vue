@@ -30,7 +30,7 @@ useSeoMeta({
         <ul class="">
           <li v-for="season in pastSeasons" :key="season.id">
             <NuxtLink
-              :to="`/league/${season.id}`"
+              :to="`/league/${season.number}`"
               class="text-blue-500"
             >
               {{ season.title }}
