@@ -2,8 +2,11 @@
 const props = defineProps<{
   season: LeagueSeason
 }>()
-const user = useUser()
 const { data: participated } = await useApi<boolean>(`/league/season/${props.season.number}/participated`)
+const show = computed(() => {
+  const now = Date.now()
+  return now < new Date(props.season.endTime).getTime() + 86400 * 3 * 1000 && now >= new Date(props.season.competitions[6].startTime).getTime()
+})
 async function participate() {
   const { data, error } = await useApiPost<boolean>(`/league/season/${props.season.number}/participate`)
   if (error.value)
@@ -21,7 +24,7 @@ async function unparticipate() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center bg-white shadow-md p-6 my-6">
+  <div v-if="show" class="flex flex-col items-center justify-center bg-white shadow-md p-6 my-6">
     <h3 class="text-2xl font-extrabold my-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 drop-shadow-md tracking-wide uppercase">
       {{ $t('league.participate.signUp', { number: season.number + 1 }) }}
     </h3>
