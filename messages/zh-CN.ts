@@ -531,5 +531,6 @@ export default {
     statistics: {
       tier: '分组',
     },
+    pastSeasons: '往期赛季',
   },
 }

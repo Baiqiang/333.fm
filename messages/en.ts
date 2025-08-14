@@ -531,5 +531,6 @@ export default {
     statistics: {
       tier: 'Tier',
     },
+    pastSeasons: 'Past Seasons',
   },
 }
