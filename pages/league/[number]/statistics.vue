@@ -28,10 +28,12 @@ const tierPlayers = computed(() => {
       unassignedPlayers[user.id] = user
     }
   }
-  ret.push({
-    ...unassignedTier,
-    players: Object.values(unassignedPlayers),
-  })
+  if (Object.keys(unassignedPlayers).length > 0) {
+    ret.push({
+      ...unassignedTier,
+      players: Object.values(unassignedPlayers),
+    })
+  }
   return ret
 })
 const mappedSolves = computed(() => {

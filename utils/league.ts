@@ -124,6 +124,7 @@ export const tierBackgrounds = [
   'bg-green-200',
   'bg-purple-200',
   'bg-yellow-200',
+  'bg-orange-200',
 ]
 
 export const unassignedTier = {
