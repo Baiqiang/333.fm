@@ -93,11 +93,16 @@ const expandLevels = computed<number[]>(() => {
         <div class="flex items-center flex-wrap">
           <Icon v-if="myLevel <= level" name="material-symbols:lock-outline-sharp" />
           <UserAvatarName v-else-if="kickedOffs.length === 1" :user="kickedOffs[0].user">
-            ({{ formatResult(kickedOffs[0].submission.moves) }})
+            <template v-if="kickedOffs[0].submission.moves > 0">
+              ({{ formatResult(kickedOffs[0].submission.moves) }})
+            </template>
           </UserAvatarName>
           <template v-else-if="kickedOffs.length > 1">
             <div v-for="{ user, submission } in kickedOffs" :key="user.id" class="flex">
-              <UserAvatar :user="user" /> ({{ formatResult(submission.moves) }})
+              <UserAvatar :user="user" />
+              <template v-if="submission.moves > 0">
+                ({{ formatResult(submission.moves) }})
+              </template>
             </div>
           </template>
         </div>
