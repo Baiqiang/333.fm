@@ -533,4 +533,11 @@ export default {
     },
     pastSeasons: 'Past Seasons',
   },
+  tools: {
+    title: 'Tools',
+    drCaseRecognizer: {
+      title: 'DR Recognizer',
+      description: 'It\'s a useful tool to recognize the DR case for 3x3x3 Fewest Moves.',
+    },
+  },
 }

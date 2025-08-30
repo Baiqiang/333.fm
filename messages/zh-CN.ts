@@ -533,4 +533,11 @@ export default {
     },
     pastSeasons: '往期赛季',
   },
+  tools: {
+    title: '工具',
+    drCaseRecognizer: {
+      title: 'DR 识别',
+      description: '用于识别 3x3x3 最少步解法中的 DR 形态。',
+    },
+  },
 }

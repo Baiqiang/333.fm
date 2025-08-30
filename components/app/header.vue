@@ -1,35 +1,45 @@
 <script setup lang="ts">
 const { data: daily } = await useApi<Competition>('/daily/on-going')
 const { data: weekly } = await useApi<Competition>('/weekly/on-going')
+const { setLocale, setLocaleCookie, finalizePendingLocaleChange, t } = useI18n()
 let lastUpdate = useDayjs()().format('YYYY-MM-DD')
 const navs = computed(() => [
   {
-    title: 'if.title',
-    path: '/if',
-  },
-  {
-    title: 'sf.title',
-    path: '/sf',
-  },
-  {
-    title: 'weekly.shortTitle',
+    title: t('weekly.shortTitle'),
     path: weekly.value ? competitionPath(weekly.value) : '/weekly',
   },
   {
-    title: 'daily.shortTitle',
+    title: t('daily.shortTitle'),
     path: daily.value ? competitionPath(daily.value) : '/daily',
   },
   {
-    title: 'endless.shortTitle',
+    title: t('endless.shortTitle'),
     path: '/endless',
   },
   {
-    title: 'practice.shortTitle',
+    title: t('practice.shortTitle'),
     path: '/practice',
   },
   {
-    title: 'league.title',
+    title: t('league.title'),
     path: '/league',
+  },
+  {
+    title: t('tools.title'),
+    children: [
+      {
+        title: t('if.title'),
+        path: '/if',
+      },
+      {
+        title: t('sf.title'),
+        path: '/sf',
+      },
+      {
+        title: t('tools.drCaseRecognizer.title'),
+        path: '/tools/dr-case-recognizer',
+      },
+    ],
   },
   // {
   //   title: 'chain.title',
@@ -58,7 +68,6 @@ useIntervalFn(() => {
 }, 5000)
 
 const langButton = ref()
-const { setLocale, setLocaleCookie, finalizePendingLocaleChange } = useI18n()
 const locales = [
   { code: 'en', label: 'English' },
   { code: 'zh-CN', label: '简体中文' },
@@ -107,9 +116,7 @@ async function changeLocale(code: string) {
             <Icon name="mdi:close" size="24" />
           </button>
         </div>
-        <NuxtLink v-for="{ title, path } in navs" :key="path" :to="path" class="nav">
-          {{ $t(title) }}
-        </NuxtLink>
+        <Nav v-for="nav, index in navs" :key="index" v-bind="nav" />
         <div class="md:ml-auto flex flex-col md:flex-row md:items-center md:gap-3">
           <div class="relative">
             <a ref="langButton" class="nav" @click="dropdowns.lang = !dropdowns.lang">
@@ -184,13 +191,3 @@ async function changeLocale(code: string) {
     </div>
   </header>
 </template>
-
-<style lang="less">
-.nav {
-  @apply text-gray-300 hover:text-white whitespace-nowrap block px-4 py-2 md:p-0;
-
-  &.router-link-active {
-    @apply text-white;
-  }
-}
-</style>
