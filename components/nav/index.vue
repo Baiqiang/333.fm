@@ -18,7 +18,13 @@ onClickOutside(navRef, () => showChildren.value = false)
   >
     {{ title }}
   </NuxtLink>
-  <div v-else class="relative group" @mouseenter="showChildren = true" @mouseleave="showChildren = false">
+  <div
+    v-else
+    ref="navRef"
+    class="relative group"
+    @mouseenter="showChildren = true"
+    @mouseleave="showChildren = false"
+  >
     <a class="nav cursor-pointer" @click="showChildren = !showChildren">
       {{ title }}
       <Icon
@@ -33,7 +39,6 @@ onClickOutside(navRef, () => showChildren.value = false)
     <TransitionExpand>
       <div
         v-if="showChildren"
-        ref="navRef"
         class="z-10 min-w-[10rem] overflow-hidden md:absolute md:left-0 bg-indigo-500"
       >
         <NuxtLink
