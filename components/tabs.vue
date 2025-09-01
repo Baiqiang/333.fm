@@ -3,7 +3,9 @@ const emit = defineEmits<{
   tabActived: [tab: number]
 }>()
 const tabs: Tab[] = reactive<Tab[]>([])
-const activeIndex = ref(0)
+const activeIndex = defineModel<number>('activeIndex', {
+  default: 0,
+})
 function selectTab(index: number) {
   tabs[activeIndex.value].active = false
   activeIndex.value = index
@@ -24,7 +26,7 @@ onMounted(() => {
   if (index !== -1)
     selectTab(index)
   else
-    selectTab(0)
+    selectTab(activeIndex.value)
 })
 </script>
 
