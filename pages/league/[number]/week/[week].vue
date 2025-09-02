@@ -118,8 +118,8 @@ bus.on(fetchSubmissions)
           </template>
         </MaybeSubmissions>
       </Tab>
-      <Tab name="Schedules" hash="schedules">
-        <LeagueSchedules :tier-schedules="weekSchedules" />
+      <Tab :name="$t('league.nav.schedules')" hash="schedules">
+        <LeagueSchedules :tier-schedules="weekSchedules" :tab="false" />
       </Tab>
     </Tabs>
   </div>

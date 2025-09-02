@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   tierSchedules: TierSchedule[]
+  tab: boolean
 }>()
 const season = inject(SYMBOL_LEAGUE_SEASON)!
 const user = useUser()
@@ -12,7 +13,7 @@ if (activeIndex.value === -1) {
 </script>
 
 <template>
-  <Tabs v-model:active-index="activeIndex">
+  <Tabs v-if="tab" v-model:active-index="activeIndex">
     <Tab
       v-for="{ tier, schedules } in tierSchedules"
       :key="tier.id"
@@ -24,4 +25,14 @@ if (activeIndex.value === -1) {
       </LeagueScheduleWrapper>
     </Tab>
   </Tabs>
+  <div v-else>
+    <LeagueScheduleWrapper>
+      <LeagueTierSchedules
+        v-for="{ tier, schedules } in tierSchedules"
+        :key="tier.id"
+        :tier="tier"
+        :schedules="schedules"
+      />
+    </LeagueScheduleWrapper>
+  </div>
 </template>

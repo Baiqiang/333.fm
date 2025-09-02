@@ -14,9 +14,42 @@ index.value = addTab({
 </script>
 
 <template>
-  <TransitionSlide>
-    <div v-show="activeIndex === index">
+  <Transition
+    name="tab-transition"
+    mode="out-in"
+    appear
+  >
+    <div
+      v-show="activeIndex === index"
+      :key="index"
+      class="tab-panel"
+    >
       <slot />
     </div>
-  </TransitionSlide>
+  </Transition>
 </template>
+
+<style scoped>
+.tab-panel {
+  @apply w-full;
+  min-height: 6.25rem;
+}
+
+.tab-transition-enter-active,
+.tab-transition-leave-active {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.tab-transition-enter-from {
+  @apply opacity-0 transform translate-x-2.5;
+}
+
+.tab-transition-leave-to {
+  @apply opacity-0 transform -translate-x-2.5;
+}
+
+.tab-transition-enter-to,
+.tab-transition-leave-from {
+  @apply opacity-100 transform translate-x-0;
+}
+</style>

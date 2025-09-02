@@ -9,7 +9,14 @@ const activeIndex = defineModel<number>('activeIndex', {
 function selectTab(index: number) {
   tabs[activeIndex.value].active = false
   activeIndex.value = index
-  tabs[activeIndex.value].active = true
+  tabs[index].active = true
+
+  // Update URL hash if tab has a hash
+  const hash = tabs[index].hash
+  if (hash) {
+    window.location.hash = hash
+  }
+
   emit('tabActived', index)
 }
 function addTab(tab: Tab) {
@@ -28,26 +35,86 @@ onMounted(() => {
   else
     selectTab(activeIndex.value)
 })
+
+// Listen for hash changes
+watch(() => route.hash, (newHash) => {
+  if (tabs.length === 0)
+    return
+
+  const hash = newHash.replace('#', '')
+  const index = tabs.findIndex(tab => tab.hash === hash)
+  if (index !== -1 && index !== activeIndex.value) {
+    selectTab(index)
+  }
+})
 </script>
 
 <template>
-  <div>
-    <div v-if="tabs.length > 1" class="overflow-x-auto">
-      <div class="flex text-xs md:text-sm whitespace-nowrap">
-        <a
+  <div class="tabs-container">
+    <div v-if="tabs.length > 1" class="tabs-header">
+      <div class="tabs-nav">
+        <button
           v-for="{ name, hash }, index in tabs"
           :id="hash"
           :key="index"
-          class="cursor-pointer py-1 px-2 border-gray-500"
-          :class="{ 'border-b text-blue-500': index !== activeIndex, 'border border-b-0': index === activeIndex }"
-          :href="hash ? `#${hash}` : undefined"
+          type="button"
+          class="tab-button"
+          :class="{ 'tab-button--active': index === activeIndex }"
           @click="selectTab(index)"
         >
           {{ name }}
-        </a>
-        <div class="flex-1 border-b border-gray-500" />
+        </button>
+        <div class="tabs-indicator" />
       </div>
     </div>
-    <slot />
+    <div class="tabs-content">
+      <slot />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.tabs-container {
+  @apply w-full;
+}
+
+.tabs-header {
+  @apply border-b border-gray-200 bg-white sticky top-0 z-10;
+}
+
+.tabs-nav {
+  @apply flex relative overflow-x-auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-button {
+  @apply flex-shrink-0 px-2.5 py-2 text-xs md:px-3 md:py-2.5 md:text-sm lg:px-4 lg:py-3 lg:text-sm font-medium text-gray-500 bg-transparent border-none cursor-pointer relative whitespace-nowrap text-center transition-all duration-200 ease-in-out;
+}
+
+.tab-button:hover {
+  @apply text-gray-700 bg-gray-50;
+}
+
+.tab-button--active {
+  @apply text-blue-600 bg-white;
+}
+
+.tab-button--active::after {
+  content: '';
+  @apply absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 transition-all duration-200 ease-in-out;
+  bottom: -1px;
+}
+
+.tabs-indicator {
+  @apply flex-1 border-b border-gray-200;
+}
+
+.tabs-content {
+  @apply py-2 md:py-3 lg:py-4;
+}
+</style>
