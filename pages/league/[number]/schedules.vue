@@ -13,6 +13,6 @@ useSeoMeta({
     <Heading1>
       {{ $t('league.nav.schedules') }}
     </Heading1>
-    <LeagueSchedules :tier-schedules="tierSchedules" />
+    <LeagueSchedules :tier-schedules="tierSchedules" tab />
   </div>
 </template>
