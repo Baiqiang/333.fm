@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface PersonalRecords {
   competitionRecords: {
-    type: 'weekly' | 'daily' | 'practice'
+    type: 'weekly' | 'daily' | 'practice' | 'league'
     record: CompetitionRecord
   }[]
   endlessRecords: EndlessRecord[]
@@ -37,6 +37,7 @@ const filters = computed(() => {
     weekly: CompetitionType.WEEKLY,
     daily: CompetitionType.DAILY,
     practice: CompetitionType.PERSONAL_PRACTICE,
+    league: CompetitionType.LEAGUE,
   }
   const ret: { type: string, to: string, label: string, count: string }[] = [
     {

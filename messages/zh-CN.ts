@@ -406,6 +406,7 @@ export default {
     type: {
       weekly: '周赛',
       daily: '日赛',
+      league: '联赛',
       practice: '练习',
       endless: '爬塔',
       wca: 'WCA',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   results: Result[]
-  type: 'weekly' | 'daily'
+  type: 'weekly' | 'daily' | 'league'
 }>()
 const includesUnlimited = ref(true)
 const filteredResults = computed(() => {
@@ -21,6 +21,7 @@ const sortedResults = computed(() => filteredResults.value.slice().sort((a, b) =
   <div>
     <div class="mb-4">
       <label
+        v-if="type !== 'league'"
         class="py-2 px-4 text-white cursor-pointer transition-colors duration-500 inline-flex items-center gap-1"
         :class="{
           'bg-indigo-500': includesUnlimited, 'bg-gray-500': !includesUnlimited }"
@@ -51,16 +52,14 @@ const sortedResults = computed(() => filteredResults.value.slice().sort((a, b) =
       </div>
       <UserResult v-for="result in sortedResults" :key="result.id" :result="result">
         <template #competition>
-          <NuxtLink
-            :to="competitionPath(result.competition)"
+          <CompetitionName
+            :competition="result.competition"
             class="pl-2"
             :class="{
               'text-blue-500': result.mode === CompetitionMode.REGULAR,
               'text-orange-500': result.mode === CompetitionMode.UNLIMITED,
             }"
-          >
-            {{ result.competition.alias }}
-          </NuxtLink>
+          />
         </template>
       </UserResult>
     </div>

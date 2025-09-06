@@ -15,6 +15,10 @@ const competitionName = computed(() => {
   switch (competition.type) {
     case CompetitionType.WEEKLY:
       return `${t('weekly.title')} ${competition.alias}`
+    case CompetitionType.DAILY:
+      return `${t('daily.title')} ${competition.alias}`
+    case CompetitionType.LEAGUE:
+      return leagueWeekName(competition)
     case CompetitionType.PERSONAL_PRACTICE:
       return t('practice.user.index', { name: localeName(competition.user.name, locale.value), index: competitionIndex.value })
     default:

@@ -105,6 +105,10 @@ export function leagueWeek(competition: Competition) {
   return competition.alias.split('-')[2]
 }
 
+export function leagueWeekName(competition: Competition) {
+  return competition.alias.replace(/league-(\d+)-(\d+)/, 'S$1 W$2')
+}
+
 export function leagueWeekPoints(user1Points: number, user2Points: number) {
   if (user1Points + user2Points === 0 || user1Points + user2Points !== 3) {
     return '-'

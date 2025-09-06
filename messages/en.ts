@@ -406,6 +406,7 @@ export default {
     type: {
       weekly: 'Weekly',
       daily: 'Daily',
+      league: 'League',
       practice: 'Practice',
       endless: 'Endless',
       wca: 'WCA',
