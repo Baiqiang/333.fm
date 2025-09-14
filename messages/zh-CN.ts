@@ -316,9 +316,16 @@ export default {
   tutorial: {
     title: '教程',
     htrDiagram: {
-      title: 'HTR 迷宫图',
-      description: 'HTR 迷宫图由{author}倾情创作。',
-      author: '天方魔',
+      title: 'HTR 线路图&迷宫图',
+      description: 'HTR {picture}由{author}倾情创作。',
+      author: {
+        peng: '天方魔',
+        jian: '简教',
+      },
+      picture: {
+        routine: '线路图',
+        maze: '迷宫图',
+      },
     },
   },
   endless: {

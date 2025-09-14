@@ -316,9 +316,16 @@ export default {
   tutorial: {
     title: 'Tutorial',
     htrDiagram: {
-      title: 'HTR Diagram',
-      description: 'The amazing HTR Diagram is created by {author}.',
-      author: '2013PENG02',
+      title: 'HTR Routine & Maze',
+      description: 'The amazing HTR {picture} is created by {author}.',
+      author: {
+        peng: '2013PENG02',
+        jian: '2011JIAN07',
+      },
+      picture: {
+        routine: 'Routine',
+        maze: 'Maze',
+      },
     },
   },
   endless: {
