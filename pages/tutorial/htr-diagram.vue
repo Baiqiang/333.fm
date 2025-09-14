@@ -26,7 +26,7 @@ useSeoMeta({
     </a>
     <I18nT keypath="tutorial.htrDiagram.description" tag="p" class="mt-4">
       <template #author>
-        <a href="https://space.bilibili.com/266974547" target="_blank" class="text-blue-500">{{ $t('tutorial.htrDiagram.author.jian') }}</a>
+        <a href="https://space.bilibili.com/8095785" target="_blank" class="text-blue-500">{{ $t('tutorial.htrDiagram.author.jian') }}</a>
       </template>
       <template #picture>
         {{ $t('tutorial.htrDiagram.picture.maze') }}
