@@ -538,6 +538,7 @@ export default {
     },
     statistics: {
       tier: 'Tier',
+      avgRank: 'Avg Rank',
     },
     pastSeasons: 'Past Seasons',
   },

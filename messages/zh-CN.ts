@@ -538,6 +538,7 @@ export default {
     },
     statistics: {
       tier: '分组',
+      avgRank: '平均排名',
     },
     pastSeasons: '往期赛季',
   },

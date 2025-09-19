@@ -134,4 +134,5 @@ export const tierBackgrounds = [
 export const unassignedTier = {
   id: 0,
   name: '-',
+  level: 9999,
 } satisfies Partial<LeagueTier>
