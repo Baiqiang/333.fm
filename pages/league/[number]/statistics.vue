@@ -211,7 +211,7 @@ useSeoMeta({
           </div>
           <div v-if="maxWeek > 0" class="text-center font-mono flex">
             <template v-for="week in maxWeek" :key="week">
-              <div class="text-center p-2 w-14 bg-gray-100">
+              <div class="text-center p-2 w-14 bg-gray-100 border-l">
                 {{ weeksResults[week]?.rank || '-' }}
               </div>
               <ColoredMoves
