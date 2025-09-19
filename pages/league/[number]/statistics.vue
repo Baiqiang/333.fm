@@ -82,7 +82,9 @@ const mappedSolves = computed(() => {
   })
   for (const solves of Object.values(tmp)) {
     const nonDNFSolves = Object.values(solves.weeksResults).map(r => r.values).flat().filter(v => v > 0 && v < DNF)
-    solves.mean = aoN(nonDNFSolves, 0, true)
+    if (nonDNFSolves.length >= 3) {
+      solves.mean = aoN(nonDNFSolves, 0, true)
+    }
     solves.avgRank = aoN(Object.entries(maxRanks).map(([week, rank]) => solves.weeksResults[week]?.rank || rank), 0, true)
   }
   const ret = Object.values(tmp)
