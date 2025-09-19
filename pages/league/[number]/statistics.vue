@@ -99,24 +99,17 @@ const mappedSolves = computed(() => {
       }
       return tierA.level - tierB.level
     }
-    else if (sortingField === 'bestMo3') {
-      return a.bestMo3 - b.bestMo3
-    }
-    else if (sortingField === 'avgRank') {
-      return a.avgRank - b.avgRank
-    }
-    else if (sortingField.startsWith('week.')) {
-      const tmpA = getValue<number>(a.weeksResults, sortingField.slice(5))
-      const tmpB = getValue<number>(b.weeksResults, sortingField.slice(5))
-      if (tmpA === undefined) {
+    else {
+      const tmpA = getValue<number>(a, sortingField)
+      const tmpB = getValue<number>(b, sortingField)
+      if (!tmpA) {
         return 1
       }
-      if (tmpB === undefined) {
+      if (!tmpB) {
         return -1
       }
       return tmpA - tmpB
     }
-    return 0
   })
   if (direction.value === 'desc') {
     ret.reverse()
@@ -171,19 +164,19 @@ useSeoMeta({
               <div class="flex">
                 <SortingField
                   class="border-indigo-400 p-2 text-sm w-16"
-                  :name="`week.${week}.average`"
+                  :name="`weeksResults.${week}.average`"
                   :label="$t('result.mean')"
                 />
                 <SortingField
                   class="border-l border-indigo-400 p-2 text-sm w-14"
-                  :name="`week.${week}.rank`"
+                  :name="`weeksResults.${week}.rank`"
                   :label="$t('result.rank')"
                 />
                 <SortingField
                   v-for="i in 3"
                   :key="i"
                   class="border-l border-indigo-400 p-2 w-14 text-sm"
-                  :name="`week.${week}.values.${i - 1}`"
+                  :name="`weeksResults.${week}.values.${i - 1}`"
                   :label="`A${i}`"
                 />
               </div>
