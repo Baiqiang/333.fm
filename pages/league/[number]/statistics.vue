@@ -165,7 +165,7 @@ useSeoMeta({
               </div>
               <div class="flex">
                 <SortingField
-                  class="border-l border-indigo-400 p-2 text-sm w-14"
+                  class="border-indigo-400 p-2 text-sm w-14"
                   :name="`weeksResults.${week}.rank`"
                   :label="$t('result.rank')"
                 />
@@ -177,7 +177,7 @@ useSeoMeta({
                   :label="`A${i}`"
                 />
                 <SortingField
-                  class="border-indigo-400 p-2 text-sm w-16"
+                  class="border-l border-indigo-400 p-2 text-sm w-16"
                   :name="`weeksResults.${week}.average`"
                   :label="$t('result.mean')"
                 />
@@ -211,7 +211,7 @@ useSeoMeta({
           </div>
           <div v-if="maxWeek > 0" class="text-center font-mono flex">
             <template v-for="week in maxWeek" :key="week">
-              <div class="border-l text-center p-2 w-14 bg-gray-100">
+              <div class="text-center p-2 w-14 bg-gray-100">
                 {{ weeksResults[week]?.rank || '-' }}
               </div>
               <ColoredMoves
@@ -222,7 +222,7 @@ useSeoMeta({
                 placeholder="-"
               />
               <ColoredMoves
-                class="w-16 text-center py-2 bg-gray-200"
+                class="w-16 border-l text-center py-2 bg-gray-200"
                 :value="weeksResults[week]?.average"
                 placeholder="-"
                 is-mean
