@@ -46,6 +46,7 @@ const isChain = computed(() => props.chain || props.submission.competition?.type
 const match = hash.match(/^#submission-(\d+)$/)
 if (match && match[1] === props.submission.id.toString())
   showComment.value = true
+const { confirm, cancel, reveal, isRevealed } = useConfirmDialog()
 
 const formattedSolution = computed<string>(() => {
   const solution = []
@@ -76,7 +77,11 @@ watch(() => props.expanded, (expanded) => {
 </script>
 
 <template>
-  <div :id="`submission-${submission.id}`" ref="el" class="border-t first:border-t-0 border-gray-300 pt-2 mt-2">
+  <div
+    :id="`submission-${submission.id}`"
+    ref="el"
+    class="border-t first:border-t-0 border-gray-300 pt-2 mt-2"
+  >
     <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
       <template #info>
         {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
@@ -109,6 +114,9 @@ watch(() => props.expanded, (expanded) => {
           comment
         />
         <Sequence v-else :sequence="solution" class="font-mono" />
+        <div v-if="!submission.verified" class="cursor-pointer" @click="reveal">
+          <Icon name="mdi:alert-circle" size="16" class="text-yellow-500" />
+        </div>
         <button v-if="submission.attachments?.length" class="text-indigo-500" @click="expandAndShowAttachment">
           <Icon name="ion:image" size="20" />
         </button>
@@ -142,4 +150,16 @@ watch(() => props.expanded, (expanded) => {
       {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
     </div>
   </div>
+  <Teleport to="body">
+    <Modal v-if="isRevealed" :cancel="cancel">
+      <div class="mb-5">
+        Either this solution is not a valid one or the moves is incorrect.
+      </div>
+      <div class="flex gap-2 justify-end">
+        <button class="bg-indigo-500 hover:bg-opacity-90 text-white cursor-pointer px-2 py-1" @click="cancel">
+          {{ $t('form.confirm') }}
+        </button>
+      </div>
+    </Modal>
+  </Teleport>
 </template>

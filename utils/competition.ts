@@ -98,6 +98,8 @@ export interface Submission extends Time {
   best: number
 
   attachments: Attachment[]
+
+  verified: boolean
 }
 
 export interface SubmissionFilter {
