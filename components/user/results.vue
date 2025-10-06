@@ -12,6 +12,8 @@ const filteredResults = computed(() => {
 const sortedResults = computed(() => filteredResults.value.slice().sort((a, b) => {
   let tmp = b.competition.id - a.competition.id
   if (tmp === 0)
+    tmp = new Date(b.competition.startTime).getTime() - new Date(a.competition.startTime).getTime()
+  if (tmp === 0)
     tmp = a.mode - b.mode
   return tmp
 }))
