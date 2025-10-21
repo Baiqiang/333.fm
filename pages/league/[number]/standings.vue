@@ -49,10 +49,11 @@ function getStandingClass(tierIndex: number, index: number) {
       'bg-gradient-to-r from-[#cd7f32] to-[#c79b56] text-white',
     ][index]
   }
-  if (index < (season.value.number < 6 ? 2 : 3)) {
+  const promotions = season.value.number < 6 ? 2 : 3
+  if (index < promotions) {
     ret = 'bg-gradient-to-r from-green-300 to-green-200'
   }
-  if (index > tierStandings.value[0].standings.length - 4) {
+  if (index > tierStandings.value[0].standings.length - promotions - 1) {
     ret = 'bg-gradient-to-r from-red-300 to-red-200'
     if (tierIndex === tierStandings.value.length - 1) {
       ret = ''
