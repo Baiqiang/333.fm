@@ -41,14 +41,15 @@ useSeoMeta({
 })
 function getStandingClass(tierIndex: number, index: number) {
   let ret = ''
+  // winner in tier 1
+  if (tierIndex === 0 && index < 3) {
+    return [
+      'bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-white',
+      'bg-gradient-to-r from-[#c0c0c0] to-[#a8a8a8] text-white',
+      'bg-gradient-to-r from-[#cd7f32] to-[#c79b56] text-white',
+    ][index]
+  }
   if (index < (season.value.number < 6 ? 2 : 3)) {
-    if (tierIndex === 0) {
-      return [
-        'bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-white',
-        'bg-gradient-to-r from-[#c0c0c0] to-[#a8a8a8] text-white',
-        'bg-gradient-to-r from-[#cd7f32] to-[#c79b56] text-white',
-      ][index]
-    }
     ret = 'bg-gradient-to-r from-green-300 to-green-200'
   }
   if (index > tierStandings.value[0].standings.length - 4) {
