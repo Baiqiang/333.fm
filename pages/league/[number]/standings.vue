@@ -41,7 +41,7 @@ useSeoMeta({
 })
 function getStandingClass(tierIndex: number, index: number) {
   let ret = ''
-  if (index < 3) {
+  if (index < (season.value.number < 6 ? 2 : 3)) {
     if (tierIndex === 0) {
       return [
         'bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-white',
