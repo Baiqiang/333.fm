@@ -364,7 +364,7 @@ async function signInAs({ wcaId }: User) {
     <h3 class="text-lg font-bold my-2 w-full">
       Schedules
     </h3>
-    <LeagueSchedules :tier-schedules="tierSchedules" :season="season" />
+    <LeagueSchedules :tier-schedules="tierSchedules" :tab="false" />
     <div class="flex flex-wrap gap-2 my-2">
       <button
         class="bg-indigo-500 text-white px-2 py-1 text-sm"

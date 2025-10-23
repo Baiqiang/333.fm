@@ -6,14 +6,14 @@ const tabs: Tab[] = reactive<Tab[]>([])
 const activeIndex = defineModel<number>('activeIndex', {
   default: 0,
 })
-function selectTab(index: number) {
+function selectTab(index: number, updateHash = false) {
   tabs[activeIndex.value].active = false
   activeIndex.value = index
   tabs[index].active = true
 
   // Update URL hash if tab has a hash
   const hash = tabs[index].hash
-  if (hash) {
+  if (hash && updateHash) {
     window.location.hash = hash
   }
 
@@ -60,7 +60,7 @@ watch(() => route.hash, (newHash) => {
           type="button"
           class="tab-button"
           :class="{ 'tab-button--active': index === activeIndex }"
-          @click="selectTab(index)"
+          @click="selectTab(index, true)"
         >
           {{ name }}
         </button>

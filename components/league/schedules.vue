@@ -5,7 +5,7 @@ const props = defineProps<{
 }>()
 const season = inject(SYMBOL_LEAGUE_SEASON)!
 const user = useUser()
-const currentTier = season.value.tiers.find(({ players }) => players.find(p => p.userId === user.id))
+const currentTier = season?.value.tiers.find(({ players }) => players.find(p => p.userId === user.id))
 const activeIndex = ref(props.tierSchedules.findIndex(t => t.tier.id === currentTier?.id))
 if (activeIndex.value === -1) {
   activeIndex.value = 0
