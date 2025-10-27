@@ -10,6 +10,9 @@ export default defineNuxtConfig({
     public: {
       mode: 'production',
       baseURL: 'https://api.333.fm/',
+      wca: {
+        apiBaseURL: 'https://www.worldcubeassociation.org/api/v0',
+      },
     },
   },
 
@@ -18,15 +21,16 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/i18n',
     '@nuxtjs/google-fonts',
+    '@nuxtjs/mdc',
+    '@nuxtjs/apollo',
     'nuxt-icon',
-    '@pinia/nuxt',
+    'nuxt-gtag',
+    'nuxt-echarts',
     '@vueuse/nuxt',
+    '@pinia/nuxt',
     '@pinia-plugin-persistedstate/nuxt',
     '@freeloop/nuxt-transitions',
     'dayjs-nuxt',
-    'nuxt-gtag',
-    '@vite-pwa/nuxt',
-    'nuxt-echarts',
     process.env.NODE_ENV === 'development'
       ? ['@vite-pwa/nuxt', {
           registerType: 'autoUpdate',
@@ -112,6 +116,42 @@ export default defineNuxtConfig({
     ],
     features: ['UniversalTransition'],
     renderer: ['svg', 'canvas'],
+  },
+
+  apollo: {
+    clients: {
+      default: {
+        httpEndpoint: 'https://live.worldcubeassociation.org/api',
+        inMemoryCacheOptions: {
+          typePolicies: {
+            Country: {
+              keyFields: ['iso2'],
+            },
+            CompetitionBrief: {
+              keyFields: ['wcaId'],
+            },
+            Competition: {
+              fields: {
+                access: {
+                  merge: (existing, incoming) => {
+                    return { ...existing, ...incoming }
+                  },
+                },
+              },
+            },
+            Result: {
+              fields: {
+                attempts: {
+                  merge: (existing, incoming) => {
+                    return incoming
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 
   experimental: {

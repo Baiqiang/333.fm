@@ -5,7 +5,7 @@ const { data, error } = await useApi<LeagueSeason>(`/league/season/${number}`)
 if (error.value || !data.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: t('league.error.season_not_found'),
+    statusMessage: t('error.league.seasonNotFound'),
   })
 }
 

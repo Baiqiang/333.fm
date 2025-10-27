@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@nuxtjs/apollo": "^5.0.0-alpha.15",
     "insertionfinder": "^0.5.0",
     "tailwind-merge": "^2.5.4",
     "three": "^0.169.0",
@@ -27,6 +28,7 @@
     "@nuxtjs/eslint-module": "^4.1.0",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/i18n": "^8.5.5",
+    "@nuxtjs/mdc": "0.18.0",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia-plugin-persistedstate/nuxt": "^1.2.1",
     "@pinia/nuxt": "^0.5.5",

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
 const user = inject(SYMBOL_USER)!
-const { data } = await useFetch<WCAResult[]>(`https://www.worldcubeassociation.org/api/v0/persons/${user.value.wcaId}/results`)
+const config = useRuntimeConfig().public
+const { data } = await useFetch<WCAResult[]>(`${config.wca.apiBaseURL}/persons/${user.value.wcaId}/results`)
 const results = ref<WCAResult[]>(data.value || [])
 const fmResults = results.value.filter(r => r.event_id === '333fm')
 const nonDNFMeanResults = fmResults.filter(r => r.average > 0)

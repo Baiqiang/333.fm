@@ -58,6 +58,12 @@ export default {
     403: '没有权限',
     404: '页面未找到',
     other: '发生了一个错误',
+    league: {
+      seasonNotFound: '联赛未找到',
+    },
+    wca: {
+      competitionNotFound: '比赛未找到',
+    },
   },
   loading: '加载中...',
   description: {
@@ -485,6 +491,7 @@ export default {
       week: '第 {week} 周',
       rules: '规则',
       statistics: '统计',
+      elos: 'ELO',
     },
     standing: {
       competitors: '选手',
@@ -548,5 +555,8 @@ export default {
       title: 'DR 识别',
       description: '用于识别 3x3x3 最少步解法中的 DR 形态。',
     },
+  },
+  wca: {
+    competitions: 'WCA 比赛',
   },
 }

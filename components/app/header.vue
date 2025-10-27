@@ -39,6 +39,10 @@ const navs = computed(() => [
         title: t('tools.drCaseRecognizer.title'),
         path: '/tools/dr-case-recognizer',
       },
+      {
+        title: t('wca.competitions'),
+        path: '/wca/competitions',
+      },
     ],
   },
   // {

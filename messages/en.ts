@@ -58,6 +58,12 @@ export default {
     403: 'Forbidden',
     404: 'Page not found',
     other: 'An error occurred',
+    league: {
+      seasonNotFound: 'Season not found',
+    },
+    wca: {
+      competitionNotFound: 'Competition not found',
+    },
   },
   loading: 'Loading...',
   description: {
@@ -485,6 +491,7 @@ export default {
       week: 'Week {week}',
       rules: 'Rules',
       statistics: 'Statistics',
+      elos: 'ELO',
     },
     standing: {
       competitors: 'Competitors',
@@ -548,5 +555,8 @@ export default {
       title: 'DR Recognizer',
       description: 'It\'s a useful tool to recognize the DR case for 3x3x3 Fewest Moves.',
     },
+  },
+  wca: {
+    competitions: 'WCA Competitions',
   },
 }
