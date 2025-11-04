@@ -507,7 +507,7 @@ export default {
       players: '选手',
       weeks: '周数',
       tiers: '分组数',
-      ongoing: '进行中',
+      ongoing: '进行中 - 第 {week} 周',
       past: '已结束',
       upcoming: '即将开始',
     },

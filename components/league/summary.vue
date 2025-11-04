@@ -47,7 +47,7 @@ const totalPlayers = computed(() => props.season.tiers.reduce((sum, tier) => sum
     <div v-if="currentWeek" class="bg-white shadow-lg p-4 mb-6">
       <h2 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
         <span class="w-3 h-3 bg-green-500 mr-2" />
-        {{ $t('league.summary.ongoing', { week: currentWeek?.alias.split('-')[2] }) }}
+        {{ $t('league.summary.ongoing', { week: leagueWeek(currentWeek) }) }}
       </h2>
       <WeeklySummary :competition="currentWeek" :show-cube="false" />
     </div>

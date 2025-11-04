@@ -82,27 +82,22 @@ useSeoMeta({
       </div>
     </div>
     <Loading v-if="loading" />
-    <div v-else class="space-y-6">
-      <div v-for="competition in competitions" :key="competition.id" class="p-4 border shadow-sm bg-white flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <div class="font-semibold text-lg">
-            <NuxtLink :to="`/wca/competition/${competition.id}`" class="hover:underline text-blue-700">
-              {{ competition.name }}
-            </NuxtLink>
+    <div v-else class="space-y-2">
+      <div v-for="competition in competitions" :key="competition.id" class="p-4 border shadow-sm bg-white">
+        <h3 class="font-semibold text-lg">
+          <NuxtLink :to="`/wca/competition/${competition.id}`" class="hover:underline text-blue-700">
+            {{ competition.name }}
+          </NuxtLink>
+        </h3>
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <div class="text-gray-600 text-sm">
+              {{ competition.city }}, {{ competition.country_iso2 }}
+            </div>
+            <div class="text-gray-500 text-xs mt-1">
+              {{ dayjs(competition.start_date).format('MMM D, YYYY') }} - {{ dayjs(competition.end_date).format('MMM D, YYYY') }}
+            </div>
           </div>
-          <div class="text-gray-600 text-sm">
-            {{ competition.city }}, {{ competition.country_iso2 }}
-            <span v-if="competition.venue">
-              {{ competition.venue }}
-              — <MDC :value="competition.venue" tag="span" />
-
-            </span>
-          </div>
-          <div class="text-gray-500 text-xs mt-1">
-            {{ dayjs(competition.start_date).format('MMM D, YYYY') }} - {{ dayjs(competition.end_date).format('MMM D, YYYY') }}
-          </div>
-        </div>
-        <div class="mt-2 md:mt-0 flex-shrink-0">
           <NuxtLink
             :to="`https://www.worldcubeassociation.org/competitions/${competition.id}`"
             target="_blank"

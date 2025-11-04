@@ -507,7 +507,7 @@ export default {
       players: 'Players',
       weeks: 'Weeks',
       tiers: 'Tiers',
-      ongoing: 'Ongoing',
+      ongoing: 'Ongoing - Week {week}',
       past: 'Past',
       upcoming: 'Upcoming',
     },

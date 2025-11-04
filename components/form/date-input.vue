@@ -5,7 +5,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', modelValue: Date): void
 }>()
-console.log(props.modelValue)
 const dayjs = useDayjs()
 const value = ref(props.modelValue ? dayjs(props.modelValue).format('YYYY-MM-DD') : '')
 watch(value, (newVal) => {
