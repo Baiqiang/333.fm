@@ -111,7 +111,7 @@ watch(() => route.hash, (newHash) => {
 }
 
 .tabs-indicator {
-  @apply flex-1 border-b border-gray-200;
+  @apply flex-1;
 }
 
 .tabs-content {
