@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { Algorithm } from 'insertionfinder'
+import { Algorithm, Cube } from 'insertionfinder'
 import leagueS6 from '~/assets/league-s6.json'
+import { DNF, formatResult } from '~/utils/competition'
+import { formatAlgorithm, replaceQuote } from '~/utils/if'
 
 const config = useRuntimeConfig()
 const accessToken = useAccessToken()
 const user = useUser()
+const { t } = useI18n()
 const { number: seasonNumber } = useRoute().params
 const router = useRouter()
 const { data, error } = await useApi<LeagueSeason>(`/league/admin/season/${seasonNumber}`)
@@ -199,6 +202,117 @@ async function endCompetition(competition: Competition) {
   }
 }
 
+// add submission
+const addSubmissionModal = ref(false)
+const addSubmissionWeek = ref<string>('')
+const addSubmissionScrambleId = ref<number | ''>('')
+const addSubmissionUserId = ref<number | ''>('')
+const addSubmissionSolution = ref('')
+const addSubmissionComment = ref('')
+const addSubmissionSubmitting = ref(false)
+
+const weekOptions = computed(() =>
+  season.value.competitions.map(c => ({
+    week: c.alias.split('-')[2],
+    label: `Week ${c.alias.split('-')[2]}`,
+  })),
+)
+const scramblesForSelectedWeek = computed(() => {
+  if (!addSubmissionWeek.value)
+    return []
+  const comp = season.value.competitions.find(c => c.alias.split('-')[2] === addSubmissionWeek.value)
+  return comp?.scrambles ?? []
+})
+const selectedScramble = computed(() => {
+  if (addSubmissionScrambleId.value === '')
+    return null
+  for (const c of season.value.competitions) {
+    const s = c.scrambles.find(sc => sc.id === addSubmissionScrambleId.value)
+    if (s)
+      return s
+  }
+  return null
+})
+
+watch(addSubmissionWeek, () => {
+  addSubmissionScrambleId.value = ''
+})
+// watch(addSubmissionModal, (v) => {
+//   if (v) {
+//     addSubmissionWeek.value = ''
+//     addSubmissionScrambleId.value = ''
+//     addSubmissionUserId.value = ''
+//     addSubmissionSolution.value = ''
+//     addSubmissionComment.value = ''
+//   }
+// })
+
+const addSubmissionValidation = computed(() => {
+  const scramble = selectedScramble.value
+  const solution = addSubmissionSolution.value.trim()
+  if (!scramble || !solution)
+    return { moves: DNF, isSolved: false, formattedSolution: '' }
+  let solutionAlg: Algorithm | null = null
+  try {
+    if (solution.includes('NISS') || solution.includes('('))
+      return { moves: DNF, isSolved: false, formattedSolution: '' }
+    solutionAlg = new Algorithm(replaceQuote(solution))
+  }
+  catch {
+    return { moves: DNF, isSolved: false, formattedSolution: '' }
+  }
+  let cube = scramble.cubieCube
+    ? Cube.fromCubieCube(scramble.cubieCube.corners, scramble.cubieCube.edges, scramble.cubieCube.placement)
+    : (() => { const c = new Cube(); c.twist(new Algorithm(scramble.scramble)); return c })()
+  cube = cube.clone()
+  cube.twist(solutionAlg)
+  const isSolved = cube.getBestPlacement().isSolved()
+  const moves = isSolved && solutionAlg.length <= 80 ? solutionAlg.length : DNF
+  const formattedSolution = solutionAlg ? formatAlgorithm(solution) : ''
+  return { moves, isSolved: moves !== DNF, formattedSolution }
+})
+
+const canSubmitAddSubmission = computed(() =>
+  addSubmissionScrambleId.value !== ''
+  && addSubmissionUserId.value !== ''
+  && addSubmissionSolution.value.trim() !== '',
+)
+async function submitAddSubmission() {
+  if (!canSubmitAddSubmission.value || addSubmissionSubmitting.value)
+    return
+  if (addSubmissionValidation.value.moves === DNF && !confirm(t('weekly.confirmDNF')))
+    return
+  addSubmissionSubmitting.value = true
+  try {
+    const { data, error } = await useApiPost<boolean>(`${baseURL}/add-submission`, {
+      body: {
+        scrambleId: addSubmissionScrambleId.value,
+        userId: addSubmissionUserId.value,
+        solution: addSubmissionSolution.value.trim(),
+        comment: addSubmissionComment.value.trim(),
+      },
+    })
+    if (error.value) {
+      alert(error.value.data?.message || error.value.message)
+    }
+    else if (data.value) {
+      addSubmissionModal.value = false
+      addSubmissionWeek.value = ''
+      addSubmissionScrambleId.value = ''
+      addSubmissionUserId.value = ''
+      addSubmissionSolution.value = ''
+      addSubmissionComment.value = ''
+    }
+  }
+  catch (e) {
+    console.error(e)
+    alert(e.message)
+  }
+  finally {
+    addSubmissionSubmitting.value = false
+  }
+}
+
 // participants
 const { data: participants } = await useApi<{ user: User }[]>(`${baseURL}/participants`)
 const groupedParticipants = computed(() => {
@@ -349,6 +463,12 @@ async function signInAs({ wcaId }: User) {
       </div>
     </div>
     <h3 class="text-lg font-bold my-2 w-full">
+      Add Submission
+    </h3>
+    <button class="bg-indigo-500 text-white text-sm px-2 py-1 mb-2" @click="addSubmissionModal = true">
+      Add Submission
+    </button>
+    <h3 class="text-lg font-bold my-2 w-full">
       Participants
     </h3>
     <div class="flex flex-wrap gap-3">
@@ -405,6 +525,77 @@ async function signInAs({ wcaId }: User) {
             {{ $t('form.submit') }}
           </button>
           <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="editDialog.cancel">
+            {{ $t('form.cancel') }}
+          </button>
+        </div>
+      </Modal>
+      <Modal v-if="addSubmissionModal" :cancel="() => addSubmissionModal = false">
+        <div class="mb-4 space-y-3 min-w-80">
+          <div>
+            <label class="block text-sm font-medium mb-1">Step 1: Week</label>
+            <select v-model="addSubmissionWeek" class="w-full border border-gray-300 px-2 py-1">
+              <option value="">
+                Select week
+              </option>
+              <option v-for="opt in weekOptions" :key="opt.week" :value="opt.week">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+          <div v-if="addSubmissionWeek">
+            <label class="block text-sm font-medium mb-1">Step 2: Scramble</label>
+            <select v-model="addSubmissionScrambleId" class="w-full border border-gray-300 px-2 py-1">
+              <option value="">
+                Select scramble
+              </option>
+              <option v-for="s in scramblesForSelectedWeek" :key="s.id" :value="s.id">
+                No.{{ s.number }}
+              </option>
+            </select>
+            <p v-if="selectedScramble" class="mt-1 text-sm text-gray-600 font-mono break-all">
+              {{ selectedScramble.scramble }}
+            </p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">User</label>
+            <select v-model="addSubmissionUserId" class="w-full border border-gray-300 px-2 py-1">
+              <option value="">
+                Select user
+              </option>
+              <optgroup v-for="tier in season.tiers" :key="tier.id" :label="tier.name">
+                <option v-for="p in tier.players" :key="p.user.id" :value="p.user.id">
+                  {{ p.user.name }} ({{ p.user.wcaId }})
+                </option>
+              </optgroup>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Solution</label>
+            <textarea v-model="addSubmissionSolution" class="w-full border border-gray-300 px-2 py-1" rows="4" placeholder="Solution" />
+            <div v-if="addSubmissionSolution.trim() && selectedScramble" class="mt-1 text-sm">
+              <span :class="addSubmissionValidation.isSolved ? 'text-green-600' : 'text-red-600'">
+                {{ addSubmissionValidation.isSolved ? $t('common.moves', { moves: addSubmissionValidation.moves }) : formatResult(addSubmissionValidation.moves) }}
+              </span>
+              <p v-if="addSubmissionValidation.formattedSolution" class="font-mono text-gray-700 mt-0.5">
+                {{ addSubmissionValidation.formattedSolution }}
+              </p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Comment</label>
+            <textarea v-model="addSubmissionComment" class="w-full border border-gray-300 px-2 py-1" rows="4" placeholder="Comment" />
+          </div>
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button
+            class="bg-indigo-500 text-white px-2 py-1"
+            :class="{ 'cursor-not-allowed bg-opacity-80': !canSubmitAddSubmission || addSubmissionSubmitting }"
+            :disabled="!canSubmitAddSubmission || addSubmissionSubmitting"
+            @click="submitAddSubmission"
+          >
+            {{ addSubmissionSubmitting ? '...' : $t('form.submit') }}
+          </button>
+          <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="addSubmissionModal = false">
             {{ $t('form.cancel') }}
           </button>
         </div>
