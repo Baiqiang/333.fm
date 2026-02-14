@@ -29,6 +29,15 @@ const links = computed(() => {
       to: `/league/${props.season.number}/standings`,
       icon: 'mdi:trophy',
     },
+  ]
+  if (props.season.eloHistories.length > 0) {
+    ret.push({
+      label: t('league.nav.elos'),
+      to: `/league/${props.season.number}/elos`,
+      icon: 'mdi:chart-box-outline',
+    })
+  }
+  ret.push(...[
     {
       label: t('league.nav.statistics'),
       to: `/league/${props.season.number}/statistics`,
@@ -39,7 +48,7 @@ const links = computed(() => {
       to: `/league/${props.season.number}/rules`,
       icon: 'mdi:book-open',
     },
-  ]
+  ])
   props.season.competitions.forEach((c) => {
     ret.push({
       label: t('league.nav.week', { week: leagueWeek(c) }),

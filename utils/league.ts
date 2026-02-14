@@ -14,7 +14,21 @@ export interface LeagueSeason {
   tiers: LeagueTier[]
   competitions: Competition[]
   standings: LeagueStanding[]
-  players: LeaguePlayer[]
+  // players: LeaguePlayer[]
+  eloHistories: LeagueEloHistory[]
+  elos: Record<number, number>
+}
+
+export interface LeagueEloHistory {
+  id: number
+  seasonId: number
+  competitionId: number
+  week: number
+  userId: number
+
+  points: number
+  delta: number
+  createdAt: Date
 }
 
 export interface LeagueStanding {
