@@ -285,10 +285,23 @@ export function competitionPath(competition: Competition, scramble?: { number: n
         return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}#scramble-${scramble.number}`
       return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}`
     case CompetitionType.LEAGUE:
+      if (scramble)
+        return `${competition.url}#scramble-${scramble.number}`
       return competition.url
     default:
       return ''
   }
+}
+
+export function submissionLink(competition: Competition, scramble?: { number: number }, submission?: Submission) {
+  const path = competitionPath(competition, scramble, submission)
+  if (!submission)
+    return path
+  const sid = `sid=${submission.id}`
+  const hashIndex = path.indexOf('#')
+  if (hashIndex >= 0)
+    return `${path.substring(0, hashIndex)}?${sid}${path.substring(hashIndex)}`
+  return `${path}?${sid}`
 }
 
 export function isInStatus(competition: Competition, status: CompetitionStatus) {

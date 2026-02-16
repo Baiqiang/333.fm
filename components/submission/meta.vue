@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const props = defineProps<{
   submission: Submission
+  commentCount?: number
+}>()
+const emit = defineEmits<{
+  toggleComments: []
 }>()
 const bus = useEventBus('submission')
 async function act(action: 'like' | 'favorite') {
@@ -37,6 +41,12 @@ async function act(action: 'like' | 'favorite') {
         <Icon v-if="!submission.favorited" name="heroicons:star" />
         <Icon v-if="submission.favorited" name="heroicons:star-solid" class="text-yellow-500" />
         {{ submission.favorites }}
+      </div>
+    </div>
+    <div class="flex-1 md:flex-none flex gap-1 items-center w-20">
+      <div class="cursor-pointer" @click="emit('toggleComments')">
+        <Icon name="heroicons:chat-bubble-left" />
+        {{ commentCount || 0 }}
       </div>
     </div>
   </div>

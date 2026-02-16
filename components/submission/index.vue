@@ -11,7 +11,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   chain: false,
 })
-const { hash } = useRoute()
+const route = useRoute()
+const { hash } = route
 const location = useBrowserLocation()
 const dayjs = useDayjs()
 const { locale } = useI18n()
@@ -19,6 +20,8 @@ const el = ref<HTMLElement>()
 const showComment = ref(props.submission.competition !== undefined || props.expanded)
 const showOriginal = ref(!!props.chain)
 const showAttachment = ref(false)
+const showCommentSection = ref(false)
+const commentCount = ref(0)
 const solution = computed(() => {
   if (showOriginal.value)
     return props.submission.solution
@@ -43,10 +46,35 @@ const status = computed(() => {
   return getStatus(cube, props.submission.phase)
 })
 const isChain = computed(() => props.chain || props.submission.competition?.type === CompetitionType.FMC_CHAIN)
-const match = hash.match(/^#submission-(\d+)$/)
-if (match && match[1] === props.submission.id.toString())
+const isTargeted = ref(false)
+const hashMatch = hash.match(/^#submission-(\d+)$/)
+if (hashMatch && hashMatch[1] === props.submission.id.toString())
   showComment.value = true
+// support ?sid= query param from notification links
+if (route.query.sid && route.query.sid === props.submission.id.toString()) {
+  showComment.value = true
+  showCommentSection.value = true
+  isTargeted.value = true
+}
 const { confirm, cancel, reveal, isRevealed } = useConfirmDialog()
+
+// scroll to targeted submission after tab switch settles
+if (isTargeted.value) {
+  onMounted(() => {
+    const tryScroll = (attempts = 0) => {
+      if (!el.value || attempts > 10)
+        return
+      const rect = el.value.getBoundingClientRect()
+      if (rect.height === 0) {
+        setTimeout(() => tryScroll(attempts + 1), 200)
+        return
+      }
+      el.value.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // setTimeout(() => isTargeted.value = false, 3000)
+    }
+    setTimeout(() => tryScroll(), 500)
+  })
+}
 
 const formattedSolution = computed<string>(() => {
   const solution = []
@@ -80,7 +108,8 @@ watch(() => props.expanded, (expanded) => {
   <div
     :id="`submission-${submission.id}`"
     ref="el"
-    class="border-t first:border-t-0 border-gray-300 pt-2 mt-2"
+    class="border-t first:border-t-0 border-gray-300 pt-2 px-2 mt-2 transition-colors duration-1000"
+    :class="{ 'border border-indigo-300': isTargeted }"
   >
     <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
       <template #info>
@@ -144,7 +173,18 @@ watch(() => props.expanded, (expanded) => {
         </div>
       </TransitionExpand>
       <SubmissionChainInfo v-if="isChain" :submission="submission" />
-      <SubmissionMeta :submission="submission" />
+      <SubmissionMeta
+        :submission="submission"
+        :comment-count="commentCount"
+        @toggle-comments="showCommentSection = !showCommentSection"
+      />
+      <CommentSection
+        :submission-id="submission.id"
+        :visible="showComment"
+        :open="showCommentSection"
+        @count-loaded="commentCount = $event"
+        @request-open="showCommentSection = true"
+      />
     </template>
     <div v-if="!submission.user" class="text-xs text-gray-400">
       {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}

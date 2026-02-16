@@ -139,6 +139,7 @@ async function changeLocale(code: string) {
             </TransitionSlide>
           </div>
 
+          <NotificationBell />
           <NuxtLink v-if="!user.signedIn" to="/sign-in" class="nav">
             {{ $t('header.signIn') }}
           </NuxtLink>
@@ -171,6 +172,9 @@ async function changeLocale(code: string) {
                 </NuxtLink>
                 <NuxtLink to="/user/favorites" :class="menuClass">
                   {{ $t('user.favorites') }}
+                </NuxtLink>
+                <NuxtLink to="/user/notifications" :class="menuClass">
+                  {{ $t('notification.title') }}
                 </NuxtLink>
                 <template v-if="user.isAdmin">
                   <hr>

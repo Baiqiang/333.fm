@@ -559,4 +559,27 @@ export default {
   wca: {
     competitions: 'WCA Competitions',
   },
+  comment: {
+    title: 'Comments',
+    reply: 'Reply',
+    delete: 'Delete',
+    placeholder: 'Write a comment...',
+    replyingTo: 'Replying to',
+    mentionTip: 'Type {\'@\'} to mention someone · Ctrl+Enter to submit',
+    submit: 'Submit',
+    viewAll: 'View all {count} comments',
+  },
+  notification: {
+    title: 'Notifications',
+    markAllRead: 'Mark all as read',
+    empty: 'No notifications',
+    viewAll: 'View all notifications',
+    commented: 'commented on your submission',
+    replied: 'replied to your comment',
+    mentioned: 'mentioned you in a comment',
+    liked: 'liked your submission',
+    favorited: 'favorited your submission',
+    prev: 'Previous',
+    next: 'Next',
+  },
 }

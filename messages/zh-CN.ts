@@ -559,4 +559,27 @@ export default {
   wca: {
     competitions: 'WCA 比赛',
   },
+  comment: {
+    title: '评论',
+    reply: '回复',
+    delete: '删除',
+    placeholder: '写一条评论...',
+    replyingTo: '回复',
+    mentionTip: '输入 {\'@\'} 可以提及某人 · Ctrl+Enter 提交',
+    submit: '提交',
+    viewAll: '查看全部 {count} 条评论',
+  },
+  notification: {
+    title: '通知',
+    markAllRead: '全部标为已读',
+    empty: '暂无通知',
+    viewAll: '查看全部通知',
+    commented: '评论了你的提交',
+    replied: '回复了你的评论',
+    mentioned: '在评论中提及了你',
+    liked: '赞了你的提交',
+    favorited: '收藏了你的提交',
+    prev: '上一页',
+    next: '下一页',
+  },
 }
