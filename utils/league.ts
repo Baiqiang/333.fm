@@ -80,6 +80,7 @@ export interface LeagueStanding {
 
 export interface LeagueDuel {
   id: number
+  seasonId: number
   competitionId: number
   tierId: number
   user1Id: number
@@ -88,6 +89,7 @@ export interface LeagueDuel {
   user2Points: number
   createdAt: Date
   updatedAt: Date
+  season?: LeagueSeason
   competition: Competition
   tier: LeagueTier
   user1?: User
