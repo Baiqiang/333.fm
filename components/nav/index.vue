@@ -7,6 +7,18 @@ defineProps<{
 const showChildren = ref(false)
 const navRef = useTemplateRef('navRef')
 onClickOutside(navRef, () => showChildren.value = false)
+
+const isMobile = ref(false)
+function checkMobile() {
+  isMobile.value = window.innerWidth < 768
+}
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
+})
 </script>
 
 <template>
@@ -22,8 +34,8 @@ onClickOutside(navRef, () => showChildren.value = false)
     v-else
     ref="navRef"
     class="relative group"
-    @mouseenter="showChildren = true"
-    @mouseleave="showChildren = false"
+    @mouseenter="!isMobile && (showChildren = true)"
+    @mouseleave="!isMobile && (showChildren = false)"
   >
     <a class="nav cursor-pointer" @click="showChildren = !showChildren">
       {{ title }}

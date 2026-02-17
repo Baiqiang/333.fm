@@ -98,7 +98,8 @@ async function changeLocale(code: string) {
           <LogoText class="ml-2 w-20 text-white transition-colors duration-300 hover:text-red-500" />
         </NuxtLink>
       </h1>
-      <div class="md:hidden ml-auto">
+      <div class="md:hidden ml-auto flex items-center gap-2">
+        <NotificationBell />
         <button @click="showMenu = !showMenu">
           <Icon name="mdi:menu" size="24" />
         </button>
@@ -139,7 +140,7 @@ async function changeLocale(code: string) {
             </TransitionSlide>
           </div>
 
-          <NotificationBell />
+          <NotificationBell class="hidden md:block" />
           <NuxtLink v-if="!user.signedIn" to="/sign-in" class="nav">
             {{ $t('header.signIn') }}
           </NuxtLink>
