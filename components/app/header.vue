@@ -43,6 +43,10 @@ const navs = computed(() => [
         title: t('wca.competitions'),
         path: '/wca/competitions',
       },
+      {
+        title: t('stats.title'),
+        path: '/stats',
+      },
     ],
   },
   // {

@@ -11,7 +11,7 @@ const competitionLink = computed(() => {
   return competitionPath(competition, scramble, submission)
 })
 const competitionName = computed(() => {
-  const { competition } = props
+  const { competition, scramble } = props
   switch (competition.type) {
     case CompetitionType.WEEKLY:
       return `${t('weekly.title')} ${competition.alias}`
@@ -21,6 +21,10 @@ const competitionName = computed(() => {
       return `${t('league.title')} ${leagueWeekName(competition)}`
     case CompetitionType.PERSONAL_PRACTICE:
       return t('practice.user.index', { name: localeName(competition.user.name, locale.value), index: competitionIndex.value })
+    case CompetitionType.ENDLESS:
+      if (scramble)
+        return `${competition.name} ${t('endless.level', { level: scramble.number })}`
+      return `${competition.name}`
     default:
       return competition.name
   }
