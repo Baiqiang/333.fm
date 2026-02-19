@@ -65,6 +65,20 @@ const bestSeason = computed(() => {
   })
 })
 
+// --- Duel lookup by "S{number} W{week}" for ELO tooltip ---
+const duelByWeekKey = computed(() => {
+  const map: Record<string, LeagueDuel> = {}
+  for (const duel of stats.value.duels) {
+    if (!duel.competition) continue
+    const weekNum = leagueWeek(duel.competition)
+    const seasonNum = duel.season?.number ?? duel.competition.alias.match(/league-(\d+)/)?.[1]
+    if (seasonNum) {
+      map[`S${seasonNum} W${weekNum}`] = duel
+    }
+  }
+  return map
+})
+
 // --- ELO chart ---
 const eloChartOption = computed<ECOption>(() => {
   const histories = stats.value.eloHistories
@@ -73,6 +87,8 @@ const eloChartOption = computed<ECOption>(() => {
   const xData = histories.map(h => `S${h.season.number} W${h.week}`)
   const eloData = histories.map(h => h.points)
   const deltaData = histories.map(h => h.delta)
+  const duelMap = duelByWeekKey.value
+  const uid = user.value.id
 
   return {
     title: {
@@ -82,9 +98,27 @@ const eloChartOption = computed<ECOption>(() => {
       trigger: 'axis',
       formatter: (params: any) => {
         const p = params[0]
-        const delta = deltaData[p.dataIndex]
+        const idx = p.dataIndex
+        const key = xData[idx]
+        const delta = deltaData[idx]
         const sign = delta > 0 ? '+' : ''
-        return `${p.name}<br/>ELO: <b>${p.value}</b> (${sign}${delta})`
+        const deltaColor = delta > 0 ? '#22c55e' : delta < 0 ? '#ef4444' : '#9ca3af'
+        let html = `<b>${key}</b><br/>ELO: <b>${p.value}</b> <span style="color:${deltaColor};font-weight:bold">(${sign}${delta})</span>`
+
+        const duel = duelMap[key]
+        if (duel) {
+          const opponent = getOpponent(duel, uid)
+          const result = getDuelResult(duel, uid)
+          const myPts = getUserSetPoints(duel, uid)
+          const oppPts = getOpponentSetPoints(duel, uid)
+          const resultColorMap = { win: '#22c55e', draw: '#eab308', loss: '#ef4444' }
+          const resultColor = result ? resultColorMap[result] : '#9ca3af'
+          const resultText = result ? resultLabel(result) : '-'
+          const opponentName = opponent ? localeName(opponent.name, locale.value) : 'BYE'
+          html += `<br/><span style="color:#666">vs</span> <b>${opponentName}</b>`
+          html += `<br/>${myPts} - ${oppPts} <span style="color:${resultColor};font-weight:bold">${resultText}</span>`
+        }
+        return html
       },
     },
     toolbox: {
@@ -125,7 +159,10 @@ const eloChartOption = computed<ECOption>(() => {
         areaStyle: {
           color: {
             type: 'linear',
-            x: 0, y: 0, x2: 0, y2: 1,
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
             colorStops: [
               { offset: 0, color: 'rgba(99,102,241,0.3)' },
               { offset: 1, color: 'rgba(99,102,241,0.05)' },
