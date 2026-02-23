@@ -18,7 +18,8 @@
     "three": "^0.169.0",
     "two.js": "^0.8.14",
     "v-viewer": "^3.0.20",
-    "viewerjs": "^1.11.6"
+    "viewerjs": "^1.11.6",
+    "vue-draggable-plus": "^0.6.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",

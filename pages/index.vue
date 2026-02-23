@@ -4,9 +4,17 @@ useSeoMeta({
   title: `${t('title')} - 333.fm`,
   titleTemplate: null,
 })
+interface Tutorial {
+  id: number
+  title: string
+  url: string
+  category: string
+  language: string
+}
 const { data: finders } = await useApi<InsertionFinder[]>('/if/latest')
 if (!finders.value)
   finders.value = []
+const { data: tutorials } = await useApi<Tutorial[]>('/tutorial')
 const { data: weekly } = await useApi<Competition>('/weekly/on-going')
 const { data: daily } = await useApi<Competition>('/daily/on-going')
 const { data: league } = await useApi<LeagueSeason>('/league/season/next')
@@ -53,15 +61,31 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
         </div>
       </div>
 
-      <div class="bg-white shadow-md p-4 mb-4 lg:col-span-2">
-        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-          <Icon name="mdi:book-open-variant" />
-          {{ $t('tutorial.title') }}
+      <div class="bg-white shadow-md border-l-2 md:border-l-4 border-indigo-500 p-2 md:p-4 mb-4 lg:col-span-2">
+        <h2 class="text-2xl font-bold mb-3 flex items-center gap-2">
+          <NuxtLink to="/tutorial" class="flex items-center gap-2 hover:text-blue-500">
+            <Icon name="mdi:book-open-variant" />
+            {{ $t('tutorial.title') }}
+          </NuxtLink>
         </h2>
-        <NuxtLink to="/tutorial/htr-diagram" class="flex items-center gap-3 text-xl text-blue-500 hover:text-blue-600 transition-colors">
-          <Icon name="game-icons:maze" size="32" />
-          <span>{{ $t('tutorial.htrDiagram.title') }}</span>
-        </NuxtLink>
+        <div v-if="tutorials?.length" class="grid md:grid-cols-2 gap-x-4 gap-y-1.5">
+          <a
+            v-for="item in [...tutorials.slice(0, 5), { id: 0, title: $t('tutorial.htrDiagram.title'), url: '/tutorial/htr-diagram', category: 'HTR' }]"
+            :key="item.id"
+            :href="item.url"
+            target="_blank"
+            class="flex items-center gap-2 text-sm text-blue-500 hover:text-blue-700 truncate"
+          >
+            <span class="text-gray-300">·</span>
+            {{ item.title }}
+            <span v-if="item.category" class="text-xs text-gray-400 shrink-0">{{ item.category }}</span>
+          </a>
+        </div>
+        <div class="mt-3">
+          <ButtonPrimary to="/tutorial" icon="ic:round-keyboard-double-arrow-right">
+            {{ $t('common.more') }}
+          </ButtonPrimary>
+        </div>
       </div>
 
       <div class="lg:row-span-2">

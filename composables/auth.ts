@@ -34,6 +34,9 @@ export const useUser = defineStore('user', {
     isLeagueAdmin(): boolean {
       return this.roles.some(role => role.name === 'league_admin')
     },
+    isTutorialAdmin(): boolean {
+      return this.isAdmin || this.roles.some(role => role.name === 'tutorial_admin')
+    },
     signedIn(): boolean {
       return useAccessToken().value !== ''
     },

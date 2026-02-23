@@ -25,6 +25,10 @@ const navs = computed(() => [
     path: '/league',
   },
   {
+    title: t('tutorial.title'),
+    path: '/tutorial',
+  },
+  {
     title: t('tools.title'),
     children: [
       {

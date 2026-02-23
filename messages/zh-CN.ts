@@ -9,6 +9,7 @@ export default {
     wcaId: 'WCA ID',
     email: '邮箱',
     home: '首页',
+    more: '更多',
     status: '状态',
     yes: '是',
     createdAt: '创建于',
@@ -235,6 +236,18 @@ export default {
     if: {
       title: '插入',
     },
+    tutorial: {
+      title: '教程管理',
+      add: '添加教程',
+      edit: '编辑教程',
+      unsaved: '排序已变更，请保存。',
+      form: {
+        title: '标题',
+        url: '链接',
+        category: '分类',
+        language: '语言',
+      },
+    },
   },
   form: {
     submit: '提交',
@@ -244,6 +257,8 @@ export default {
     cancel: '取消',
     remove: '删除',
     removeConfirm: '确认要删除这条记录吗？',
+    edit: '编辑',
+    delete: '删除',
     decline: '弃疗',
     incline: '不放弃',
     working: {
@@ -321,6 +336,10 @@ export default {
   },
   tutorial: {
     title: '教程',
+    resources: {
+      description: 'FMC 教程和资源合集。',
+      empty: '暂无教程。',
+    },
     htrDiagram: {
       title: 'HTR 线路图&迷宫图',
       description: 'HTR {picture}由{author}倾情创作。',

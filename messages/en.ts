@@ -9,6 +9,7 @@ export default {
     wcaId: 'WCA ID',
     email: 'Email',
     home: 'Home',
+    more: 'More',
     status: 'Status',
     yes: 'Yes',
     createdAt: 'Created At',
@@ -235,6 +236,18 @@ export default {
     if: {
       title: 'IF',
     },
+    tutorial: {
+      title: 'Tutorial Management',
+      add: 'Add Tutorial',
+      edit: 'Edit Tutorial',
+      unsaved: 'Sort order changed. Save to apply.',
+      form: {
+        title: 'Title',
+        url: 'URL',
+        category: 'Category',
+        language: 'Language',
+      },
+    },
   },
   form: {
     submit: 'Submit',
@@ -244,6 +257,8 @@ export default {
     cancel: 'Cancel',
     remove: 'Remove',
     removeConfirm: 'Are you sure to remove this?',
+    edit: 'Edit',
+    delete: 'Delete',
     decline: 'Decline',
     incline: 'Incline',
     working: {
@@ -321,6 +336,10 @@ export default {
   },
   tutorial: {
     title: 'Tutorial',
+    resources: {
+      description: 'A curated collection of FMC tutorials and resources.',
+      empty: 'No tutorials yet.',
+    },
     htrDiagram: {
       title: 'HTR Routine & Maze',
       description: 'The amazing HTR {picture} is created by {author}.',
