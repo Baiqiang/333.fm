@@ -25,10 +25,6 @@ const navs = computed(() => [
     path: '/league',
   },
   {
-    title: t('tutorial.title'),
-    path: '/tutorial',
-  },
-  {
     title: t('tools.title'),
     children: [
       {
@@ -51,6 +47,10 @@ const navs = computed(() => [
         title: t('stats.title'),
         path: '/stats',
       },
+      {
+        title: t('tutorial.title'),
+        path: '/tutorial',
+      },
     ],
   },
   // {
@@ -60,15 +60,9 @@ const navs = computed(() => [
 ])
 const user = useUser()
 const showMenu = ref(false)
-const showUserMenu = ref(false)
-const menuClass = 'hover:bg-gray-200 cursor-pointer px-3 py-1'
 const router = useRouter()
 router.afterEach(() => {
   showMenu.value = false
-  showUserMenu.value = false
-})
-onMounted(() => {
-  document.body.addEventListener('click', () => showUserMenu.value = false)
 })
 useIntervalFn(() => {
   const now = useDayjs()().format('YYYY-MM-DD')
@@ -108,6 +102,10 @@ async function changeLocale(code: string) {
       </h1>
       <div class="md:hidden ml-auto flex items-center gap-2">
         <NotificationBell />
+        <AppUserDropdown v-if="user.signedIn" arrow />
+        <NuxtLink v-else to="/sign-in">
+          <Icon name="mdi:account" size="24" />
+        </NuxtLink>
         <button @click="showMenu = !showMenu">
           <Icon name="mdi:menu" size="24" />
         </button>
@@ -149,60 +147,10 @@ async function changeLocale(code: string) {
           </div>
 
           <NotificationBell class="hidden md:block" />
-          <NuxtLink v-if="!user.signedIn" to="/sign-in" class="nav">
+          <NuxtLink v-if="!user.signedIn" to="/sign-in" class="nav hidden md:block">
             {{ $t('header.signIn') }}
           </NuxtLink>
-          <div v-else class="relative">
-            <div class="flex items-center cursor-pointer px-4 md:px-0" @click.stop="showUserMenu = !showUserMenu">
-              <div class="w-8 h-8 overflow-hidden">
-                <img class="w-8" :src="user.avatarThumb">
-              </div>
-              <Icon name="solar:alt-arrow-down-bold" size="20" />
-            </div>
-            <TransitionSlide>
-              <div v-if="showUserMenu" class="md:absolute right-0 bg-white text-black border border-gray-200 whitespace-nowrap py-1 flex flex-col items-stretch">
-                <div class="text-gray-400 px-3 py-1 text-sm">
-                  {{ $i18n.locale === 'en' ? user.englishName : user.localName }}
-                </div>
-                <NuxtLink to="/user/if" :class="menuClass">
-                  {{ $t('user.if') }}
-                </NuxtLink>
-                <NuxtLink :to="`/profile/${userId(user as any)}`" :class="menuClass">
-                  {{ $t('user.solutions') }}
-                </NuxtLink>
-                <NuxtLink :to="`/practice/${userId(user as any)}`" :class="menuClass">
-                  {{ $t('user.practices') }}
-                </NuxtLink>
-                <NuxtLink to="/user/bot-token" :class="menuClass">
-                  {{ $t('user.token') }}
-                </NuxtLink>
-                <NuxtLink to="/user/likes" :class="menuClass">
-                  {{ $t('user.likes') }}
-                </NuxtLink>
-                <NuxtLink to="/user/favorites" :class="menuClass">
-                  {{ $t('user.favorites') }}
-                </NuxtLink>
-                <NuxtLink to="/user/notifications" :class="menuClass">
-                  {{ $t('notification.title') }}
-                </NuxtLink>
-                <template v-if="user.isAdmin">
-                  <hr>
-                  <div class="text-gray-400 px-3 py-1 text-sm">
-                    {{ $t('admin.title') }}
-                  </div>
-                  <NuxtLink to="/admin/if" :class="menuClass">
-                    {{ $t('admin.if.title') }}
-                  </NuxtLink>
-                  <NuxtLink to="/admin/user" :class="menuClass">
-                    {{ $t('admin.user.title') }}
-                  </NuxtLink>
-                </template>
-                <div :class="menuClass" @click="user.signOut">
-                  {{ $t('header.signOut') }}
-                </div>
-              </div>
-            </TransitionSlide>
-          </div>
+          <AppUserDropdown v-else class="hidden md:block" arrow />
         </div>
       </div>
     </div>

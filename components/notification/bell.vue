@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { AppNotification, NotificationListResponse } from '~/utils/notification'
 import { renderMentions } from '~/utils/comment'
+import type { AppNotification, NotificationListResponse } from '~/utils/notification'
 
 const user = useUser()
 const unreadCount = ref(0)
@@ -104,8 +104,8 @@ if (user.signedIn) {
 </script>
 
 <template>
-  <div v-if="user.signedIn" ref="bellRef" class="relative">
-    <button class="nav relative" @click="toggleDropdown">
+  <div v-if="user.signedIn" ref="bellRef" class="md:relative">
+    <button class="nav !px-1 relative" @click="toggleDropdown">
       <Icon name="mdi:bell-outline" size="20" />
       <span
         v-if="unreadCount > 0"
