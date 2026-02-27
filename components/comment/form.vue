@@ -2,7 +2,7 @@
 import type { SubmissionComment } from '~/utils/comment'
 
 const props = defineProps<{
-  submissionId: number
+  submissionId?: number
   replyTo?: SubmissionComment | null
 }>()
 const emit = defineEmits<{

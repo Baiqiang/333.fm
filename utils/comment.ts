@@ -1,9 +1,9 @@
-import { type User, localeName } from './user'
+import { localeName, type User } from './user'
 
 export interface SubmissionComment {
   id: number
   content: string
-  submissionId: number
+  submissionId: number | null
   userId: number
   replyToId: number | null
   createdAt: string
@@ -22,7 +22,7 @@ export function renderMentions(content: string, mentions?: User[], locale?: stri
   if (!mentions?.length)
     return content
   return content.replace(/@\[(\d+)\]/g, (_match, id) => {
-    const user = mentions.find(u => u.id === parseInt(id, 10))
+    const user = mentions.find(u => u.id === Number.parseInt(id, 10))
     if (!user)
       return _match
     const name = locale ? localeName(user.name, locale) : user.name
@@ -49,7 +49,7 @@ export function parseContentSegments(content: string, mentions?: User[]): Mentio
     if (match.index > lastIndex)
       segments.push({ type: 'text', text: content.substring(lastIndex, match.index) })
 
-    const user = mentions.find(u => u.id === parseInt(match![1], 10))
+    const user = mentions.find(u => u.id === Number.parseInt(match![1], 10))
     if (user)
       segments.push({ type: 'mention', text: user.name, user })
     else

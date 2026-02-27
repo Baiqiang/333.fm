@@ -2,9 +2,10 @@
 import type { CommentListResponse, SubmissionComment } from '~/utils/comment'
 
 const props = defineProps<{
-  submissionId: number
+  submissionId?: number
   visible: boolean
   open: boolean
+  initialCount?: number
 }>()
 
 const emit = defineEmits<{
@@ -16,17 +17,25 @@ const INITIAL_LIMIT = 3
 
 const comments = ref<SubmissionComment[]>([])
 const previewComment = ref<SubmissionComment | null>(null)
-const total = ref(0)
+const total = ref(props.initialCount ?? 0)
 const commentsLoaded = ref(false)
 const loadingMore = ref(false)
 const expanded = ref(false)
 const replyTo = ref<SubmissionComment | null>(null)
 const { t } = useI18n()
 
+const apiPath = computed(() => {
+  if (props.submissionId)
+    return `/comments/submission/${props.submissionId}`
+  return ''
+})
+
 async function loadCountAndPreview() {
+  if (!apiPath.value)
+    return
   try {
     const data = await useClientApi<CommentListResponse>(
-      `/comments/submission/${props.submissionId}?limit=1&offset=0`,
+      `${apiPath.value}?limit=1&offset=0`,
     )
     if (data) {
       total.value = data.total
@@ -39,9 +48,11 @@ async function loadCountAndPreview() {
 }
 
 async function loadComments(limit: number, offset: number) {
+  if (!apiPath.value)
+    return
   try {
     const data = await useClientApi<CommentListResponse>(
-      `/comments/submission/${props.submissionId}?limit=${limit}&offset=${offset}`,
+      `${apiPath.value}?limit=${limit}&offset=${offset}`,
     )
     if (data) {
       if (offset === 0) {
@@ -98,8 +109,14 @@ function onReply(comment: SubmissionComment) {
   replyTo.value = comment
 }
 
-// always load count + preview on mount
-loadCountAndPreview()
+if (props.initialCount == null)
+  loadCountAndPreview()
+
+// load preview when section becomes visible and has comments
+watch(() => props.visible, (isVisible) => {
+  if (isVisible && !previewComment.value && total.value > 0 && !commentsLoaded.value)
+    loadCountAndPreview()
+}, { immediate: true })
 
 // load full comments when opened
 watch(() => props.open, (isOpen) => {

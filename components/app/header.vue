@@ -44,6 +44,10 @@ const navs = computed(() => [
         path: '/wca/competitions',
       },
       {
+        title: t('wca.recon.title'),
+        path: '/wca/reconstruction',
+      },
+      {
         title: t('stats.title'),
         path: '/stats',
       },

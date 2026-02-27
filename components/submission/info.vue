@@ -16,7 +16,7 @@ const { competition, scramble } = toRefs(props.submission)
     </div>
   </div>
   <template v-if="scramble.scramble">
-    <div class="text-sm text-gray-600">
+    <div class="text-sm text-gray-400">
       {{ $t('if.scramble.label') }}
     </div>
     <Sequence :sequence="scramble.scramble" />

@@ -47,6 +47,9 @@ useRouter().afterEach(() => {
         <NuxtLink to="/user/favorites" :class="menuClass">
           {{ $t('user.favorites') }}
         </NuxtLink>
+        <NuxtLink :to="`/profile/${userId(user as any)}/reconstruction`" :class="menuClass">
+          {{ $t('wca.recon.myRecons') }}
+        </NuxtLink>
         <NuxtLink to="/user/notifications" :class="menuClass">
           {{ $t('notification.title') }}
         </NuxtLink>

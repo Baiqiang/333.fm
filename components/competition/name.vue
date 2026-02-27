@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   competition: Competition
-  scramble?: { number: number }
+  scramble?: { number: number, roundNumber?: number }
   submission?: Submission
 }>()
 const { t, locale } = useI18n()
@@ -24,6 +24,10 @@ const competitionName = computed(() => {
     case CompetitionType.ENDLESS:
       if (scramble)
         return `${competition.name} ${t('endless.level', { level: scramble.number })}`
+      return `${competition.name}`
+    case CompetitionType.WCA_RECONSTRUCTION:
+      if (scramble)
+        return `${competition.name} R${scramble.roundNumber}-A${scramble.number}`
       return `${competition.name}`
     default:
       return competition.name

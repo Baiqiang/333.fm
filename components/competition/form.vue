@@ -75,8 +75,6 @@ watch(() => form.mode, (mode) => {
   if (mode === CompetitionMode.REGULAR && submissionsMap.value[CompetitionMode.UNLIMITED] && !submissionsMap.value[CompetitionMode.REGULAR])
     form.solution = t('weekly.regular.unlimitedSubmitted')
 })
-const fileInputId = useId()
-const uploadingAttachments = ref<File[]>([])
 const uploadingPromise = ref<Promise<any>>()
 const { moves, isSolved } = useComputedState(props, form)
 const isOnGoing = computed(() => isInStatus(props.competition, CompetitionStatus.ON_GOING))
@@ -207,36 +205,6 @@ function reset() {
   form.comment = ''
   form.attachments = []
 }
-async function uploadAttachments(event: Event) {
-  const files = (event.target as HTMLInputElement)?.files
-  if (!files || files.length === 0)
-    return
-  let resolve = () => {}
-  uploadingPromise.value = new Promise<void>(r => resolve = r)
-  const formData = new FormData()
-  for (const file of files) {
-    formData.append('attachments', file)
-  }
-  uploadingAttachments.value = [...files]
-  const { data, error, refresh } = await useApiPost<Attachment[]>('attachment', {
-    body: formData,
-    immediate: false,
-  })
-  await refresh()
-  if (error.value) {
-    alert(error.value.data?.message || error.value.message)
-    return
-  }
-  form.attachments = (form.attachments || []).concat(data.value || [])
-  uploadingAttachments.value = []
-  resolve()
-}
-function removeAttachment(attachment: Attachment) {
-  form.attachments = form.attachments.filter(a => a.id !== attachment.id)
-}
-function getTmpURL(file: File) {
-  return URL.createObjectURL(file)
-}
 </script>
 
 <template>
@@ -306,44 +274,11 @@ function getTmpURL(file: File) {
           <p class="py-1" v-html="$t('weekly.comment.description')" />
         </template>
       </FormInput>
-      <FormInput
+      <FormAttachments
         v-if="allowAttachment"
-        type="file"
-        :label="$t('form.working.label')"
-        :state="null"
-        :attrs="{
-          id: fileInputId,
-          multiple: true,
-          accept: 'image/*',
-          onChange: uploadAttachments,
-          class: 'appearance-none hidden',
-        }"
-        class="mt-4"
-      >
-        <label :for="fileInputId" class="inline-block my-2 cursor-pointer">
-          <Icon name="mdi:image-plus-outline" size="36" />
-        </label>
-        <div v-viewer class="flex flex-wrap gap-2">
-          <div v-for="attachment in form.attachments" :key="attachment.id">
-            <div class="flex items-center gap-2">
-              <SubmissionImg :src="attachment.url" :name="attachment.name" />
-              <Icon name="mdi:delete" size="24" class="cursor-pointer text-gray-500" @click="removeAttachment(attachment)" />
-            </div>
-            <div class="text-xs text-gray-500 mt-1">
-              {{ attachment.name }}
-            </div>
-          </div>
-          <div v-for="file in uploadingAttachments" :key="file.name">
-            <div class="flex items-center gap-2">
-              <SubmissionImg :src="getTmpURL(file)" :name="file.name" />
-              <Spinner class="w-4 h-4 text-green-500 border-[3px]" />
-            </div>
-            <div class="text-xs text-gray-500 mt-1">
-              {{ file.name }}
-            </div>
-          </div>
-        </div>
-      </FormInput>
+        v-model="form.attachments"
+        v-model:uploading="uploadingPromise"
+      />
       <div class="mt-4">
         <button
           class="px-2 py-1 text-white bg-blue-500 focus:outline-none"

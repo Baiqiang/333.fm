@@ -157,6 +157,60 @@ export interface WCALiveRound {
 }
 
 export const SYMBOL_WCA_LIVE_COMPETITION: InjectionKey<Ref<WCALiveCompetition | undefined>> = Symbol('wcaLiveCompetition')
+export const SYMBOL_WCA_COMPETITION_ID: InjectionKey<Ref<string>> = Symbol('wcaCompetitionId')
+
+export interface WcaReconstruction {
+  id: number
+  competitionId: number
+  userId: number
+  description: string | null
+  isParticipant: boolean
+  user: {
+    id: number
+    name: string
+    wcaId: string
+    avatar: string
+    avatarThumb: string
+  }
+}
+
+export interface WcaReconFeedItem {
+  id: number
+  user: {
+    id: number
+    name: string
+    wcaId: string
+    avatar: string
+    avatarThumb: string
+  }
+  wcaCompetitionId: string
+  competitionName: string
+  description: string | null
+  isParticipant: boolean
+  submissionCount: number
+  updatedAt: string
+}
+
+export interface WcaReconUserData {
+  recon: WcaReconstruction
+  submissions: Submission[]
+  competition: Competition | null
+}
+
+export interface WcaReconstructionCompetitionData {
+  recons: WcaReconstruction[]
+  scrambles: Scramble[]
+  competition: Competition | null
+  submissions: Submission[]
+  isPublished: boolean
+  hasOfficialScrambles: boolean
+  currentUser: {
+    isParticipant: boolean
+    attempts: Record<string, number>
+  } | null
+}
+
+export const SYMBOL_WCA_COMPETITION: InjectionKey<Ref<WCACompetition>> = Symbol('wcaCompetition')
 
 export const WCA_LIVE_RECORD_LIST_RECORD_FRAGMENT = gql`
   fragment records on Record {

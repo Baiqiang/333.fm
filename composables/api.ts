@@ -10,7 +10,7 @@ export async function useApi<DataT>(url: string, options?: UseFetchOptions<DataT
 
   const res = await useFetch<DataT>(url, {
     baseURL: config.public.baseURL,
-    credentials: 'include',
+    // credentials: 'include',
     ...options as any,
     headers: {
       ...options?.headers,

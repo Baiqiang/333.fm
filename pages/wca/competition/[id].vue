@@ -6,7 +6,6 @@ const { t } = useI18n()
 const wcaCompetitionsCache = useWCACompetitionsCache()
 const wcaCompetition = ref<WCACompetition | null>(wcaCompetitionsCache.competitions[route.params.id as string] ?? null)
 if (!wcaCompetition.value) {
-  // fetch from WCA
   const { data, error } = await useApi<WCACompetition>(`${config.wca.apiBaseURL}/competitions/${route.params.id}`)
   if (error.value || !data.value) {
     throw createError({
@@ -17,28 +16,32 @@ if (!wcaCompetition.value) {
   wcaCompetition.value = data.value
 }
 
-const { data: liveData, error, refresh } = await useAsyncQuery<{ competitions: { id: string, name: string }[] }>(WCA_LIVE_COMPETITIONS_QUERY, {
+provide(SYMBOL_WCA_COMPETITION, computed(() => wcaCompetition.value!))
+
+const { data: liveData, refresh } = await useAsyncQuery<{ competitions: { id: string, name: string }[] }>(WCA_LIVE_COMPETITIONS_QUERY, {
   filter: wcaCompetition.value.name,
 })
 
 await refresh()
 
-if (error.value || !liveData.value || liveData.value.competitions.length === 0) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: t('error.wca.competitionNotFound'),
+const hasLiveData = computed(() => !!liveData.value?.competitions?.length)
+
+let liveCompetition: Ref<WCALiveCompetition | undefined>
+if (hasLiveData.value) {
+  const { result } = useQuery<{
+    competition: WCALiveCompetition
+  }>(WCA_LIVE_COMPETITION_QUERY, {
+    id: liveData.value!.competitions[0].id,
   })
+  liveCompetition = computed(() => result.value?.competition)
+}
+else {
+  liveCompetition = ref(undefined)
 }
 
-const { result } = useQuery<{
-  competition: WCALiveCompetition
-}>(WCA_LIVE_COMPETITION_QUERY, {
-  id: liveData.value.competitions[0].id,
-})
-const liveCompetition = computed(() => result.value?.competition)
 provide(SYMBOL_WCA_LIVE_COMPETITION, liveCompetition)
 useSeoMeta({
-  title: computed(() => `${liveCompetition.value?.name} - WCA Live`),
+  title: computed(() => `${liveCompetition.value?.name ?? wcaCompetition.value?.name} - WCA`),
 })
 </script>
 

@@ -22,7 +22,7 @@ function updatePage(page: number) {
 </script>
 
 <template>
-  <div class="flex items-center justify-center gap-2 my-5 text-lg">
+  <div v-if="meta.totalPages > 1" class="flex items-center justify-center gap-2 my-5 text-lg">
     <Pager v-if="meta.currentPage > 4" :page="1" @update="updatePage" />
     <span v-if="meta.currentPage > 4" class="pb-1">...</span>
     <Pager v-for="p in pages" :key="p" :page="p" :is-current="p === meta.currentPage" @update="updatePage" />

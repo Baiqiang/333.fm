@@ -263,7 +263,11 @@ const addSubmissionValidation = computed(() => {
   }
   let cube = scramble.cubieCube
     ? Cube.fromCubieCube(scramble.cubieCube.corners, scramble.cubieCube.edges, scramble.cubieCube.placement)
-    : (() => { const c = new Cube(); c.twist(new Algorithm(scramble.scramble)); return c })()
+    : (() => {
+        const c = new Cube()
+        c.twist(new Algorithm(scramble.scramble))
+        return c
+      })()
   cube = cube.clone()
   cube.twist(solutionAlg)
   const isSolved = cube.getBestPlacement().isSolved()
@@ -306,7 +310,7 @@ async function submitAddSubmission() {
   }
   catch (e) {
     console.error(e)
-    alert(e.message)
+    alert((e as Error).message)
   }
   finally {
     addSubmissionSubmitting.value = false

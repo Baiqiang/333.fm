@@ -26,13 +26,17 @@ const unlimitedResults = Object.values(unlimitedMap).sort((a, b) => a.competitio
 const endedDuels = computed(() => stats.value.duels.filter(d => d.ended))
 
 function getDuelResult(duel: LeagueDuel, userId: number): 'win' | 'draw' | 'loss' | null {
-  if (!duel.ended) return null
+  if (!duel.ended)
+    return null
   const userPoints = duel.user1Id === userId ? duel.user1Points : duel.user2Points
   const opponentPoints = duel.user1Id === userId ? duel.user2Points : duel.user1Points
   const wp = leagueWeekPoints(userPoints, opponentPoints)
-  if (wp === 2) return 'win'
-  if (wp === 1) return 'draw'
-  if (wp === 0) return 'loss'
+  if (wp === 2)
+    return 'win'
+  if (wp === 1)
+    return 'draw'
+  if (wp === 0)
+    return 'loss'
   return null
 }
 
@@ -53,14 +57,17 @@ const totalDraws = computed(() => endedDuels.value.filter(d => getDuelResult(d, 
 const totalLosses = computed(() => endedDuels.value.filter(d => getDuelResult(d, user.value.id) === 'loss').length)
 const winRate = computed(() => {
   const total = totalWins.value + totalDraws.value + totalLosses.value
-  if (total === 0) return '0%'
+  if (total === 0)
+    return '0%'
   return `${(totalWins.value / total * 100).toFixed(1)}%`
 })
 
 const bestSeason = computed(() => {
-  if (stats.value.standings.length === 0) return null
+  if (stats.value.standings.length === 0)
+    return null
   return stats.value.standings.reduce((best, s) => {
-    if (s.points > best.points) return s
+    if (s.points > best.points)
+      return s
     return best
   })
 })
@@ -69,7 +76,8 @@ const bestSeason = computed(() => {
 const duelByWeekKey = computed(() => {
   const map: Record<string, LeagueDuel> = {}
   for (const duel of stats.value.duels) {
-    if (!duel.competition) continue
+    if (!duel.competition)
+      continue
     const weekNum = leagueWeek(duel.competition)
     const seasonNum = duel.season?.number ?? duel.competition.alias.match(/league-(\d+)/)?.[1]
     if (seasonNum) {
@@ -82,7 +90,8 @@ const duelByWeekKey = computed(() => {
 // --- ELO chart ---
 const eloChartOption = computed<ECOption>(() => {
   const histories = stats.value.eloHistories
-  if (histories.length === 0) return {}
+  if (histories.length === 0)
+    return {}
 
   const xData = histories.map(h => `S${h.season.number} W${h.week}`)
   const eloData = histories.map(h => h.points)
@@ -183,7 +192,8 @@ const eloChartOption = computed<ECOption>(() => {
 // --- Points per week (W/D/L timeline) ---
 const pointsTimeline = computed(() => {
   const lr = stats.value.leagueResults
-  if (lr.length === 0) return []
+  if (lr.length === 0)
+    return []
 
   const seasonMap: Record<number, { seasonNumber: number, weeks: { week: number, points: number }[] }> = {}
   for (const r of lr) {
@@ -226,10 +236,12 @@ function pointsLabel(points: number) {
 const onGoingSeasonIds = computed(() => {
   const ids = new Set<number>()
   for (const s of stats.value.standings) {
-    if (s.season?.status === LeagueSeasonStatus.ON_GOING) ids.add(s.seasonId)
+    if (s.season?.status === LeagueSeasonStatus.ON_GOING)
+      ids.add(s.seasonId)
   }
   for (const d of stats.value.duels) {
-    if (d.season?.status === LeagueSeasonStatus.ON_GOING) ids.add(d.seasonId)
+    if (d.season?.status === LeagueSeasonStatus.ON_GOING)
+      ids.add(d.seasonId)
   }
   return ids
 })
@@ -244,7 +256,8 @@ const standingsDesc = computed(() => {
 })
 
 function tierBgClass(tier?: LeagueTier) {
-  if (!tier) return ''
+  if (!tier)
+    return ''
   return tierBackgrounds[tier.level] ?? ''
 }
 

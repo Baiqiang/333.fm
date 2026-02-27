@@ -49,6 +49,10 @@ export interface Scramble extends Time {
     edges: number[]
     placement: number
   }
+  roundNumber?: number
+  verified?: boolean
+  submittedById?: number | null
+  competitionId?: number
 }
 export enum SubmissionPhase {
   FINISHED,
@@ -68,6 +72,7 @@ export interface Attachment {
 
 export interface Submission extends Time {
   id: number
+  userId: number
   solution: string
   insertions: ChainInsertion[]
   inverse: boolean
@@ -84,6 +89,7 @@ export interface Submission extends Time {
   liked: boolean
   favorites: number
   favorited: boolean
+  commentCount: number
 
   viewed: boolean
   declined: boolean
@@ -100,6 +106,9 @@ export interface Submission extends Time {
   attachments: Attachment[]
 
   verified: boolean
+
+  wcaMoves?: number | null
+  scrambleId?: number
 }
 
 export interface SubmissionFilter {
@@ -116,6 +125,7 @@ export enum CompetitionType {
   PERSONAL_PRACTICE,
   DAILY,
   LEAGUE,
+  WCA_RECONSTRUCTION,
 }
 
 export enum CompetitionSubType {
@@ -257,7 +267,7 @@ export function aoN(results: number[], n: number = 0, mean = false) {
   return Number((total / n).toFixed(2))
 }
 
-export function competitionPath(competition: Competition, scramble?: { number: number }, submission?: Submission) {
+export function competitionPath(competition: Competition, scramble?: { number: number, roundNumber?: number }, submission?: Submission) {
   const { alias, type, user } = competition
   switch (type) {
     case CompetitionType.WEEKLY:
@@ -288,8 +298,12 @@ export function competitionPath(competition: Competition, scramble?: { number: n
       if (scramble)
         return `${competition.url}#scramble-${scramble.number}`
       return competition.url
+    case CompetitionType.WCA_RECONSTRUCTION:
+      if (scramble)
+        return `${competition.url}#r${scramble.roundNumber}-a${scramble.number}`
+      return competition.url
     default:
-      return ''
+      return competition.url
   }
 }
 

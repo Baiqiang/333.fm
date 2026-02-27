@@ -4,7 +4,7 @@ import { renderMentions } from '~/utils/comment'
 
 const props = defineProps<{
   comment: SubmissionComment
-  submissionId: number
+  submissionId?: number
 }>()
 const emit = defineEmits<{
   reply: [comment: SubmissionComment]

@@ -75,6 +75,12 @@ const filters = computed(() => {
       count: '',
     })
   }
+  ret.push({
+    type: 'reconstruction',
+    to: `${base}/reconstruction`,
+    label: t('wca.recon.title'),
+    count: '',
+  })
   return ret
 })
 useSeoMeta({

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Algorithm, Cube } from 'insertionfinder'
-
 const { t } = useI18n()
 useSeoMeta({
   title: t('tools.drCaseRecognizer.title'),

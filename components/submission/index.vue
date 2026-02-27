@@ -8,8 +8,10 @@ const props = withDefaults(defineProps<{
   user?: User
   chain?: boolean
   expanded?: boolean
+  alwaysExpanded?: boolean
 }>(), {
   chain: false,
+  alwaysExpanded: false,
 })
 const route = useRoute()
 const { hash } = route
@@ -17,11 +19,11 @@ const location = useBrowserLocation()
 const dayjs = useDayjs()
 const { locale } = useI18n()
 const el = ref<HTMLElement>()
-const showComment = ref(props.submission.competition !== undefined || props.expanded)
+const showComment = ref(props.alwaysExpanded || props.submission.competition !== undefined || props.expanded)
 const showOriginal = ref(!!props.chain)
 const showAttachment = ref(false)
 const showCommentSection = ref(false)
-const commentCount = ref(0)
+const commentCount = ref(props.submission.commentCount ?? 0)
 const solution = computed(() => {
   if (showOriginal.value)
     return props.submission.solution
@@ -46,6 +48,12 @@ const status = computed(() => {
   return getStatus(cube, props.submission.phase)
 })
 const isChain = computed(() => props.chain || props.submission.competition?.type === CompetitionType.FMC_CHAIN)
+const isOfficialDNF = computed(() => props.submission.wcaMoves != null && props.submission.wcaMoves >= DNF)
+const hasWcaMovesMatch = computed(() => {
+  if (props.submission.wcaMoves == null || props.submission.wcaMoves >= DNF || props.submission.moves >= DNF)
+    return null
+  return props.submission.moves === props.submission.wcaMoves
+})
 const isTargeted = ref(false)
 const hashMatch = hash.match(/^#submission-(\d+)$/)
 if (hashMatch && hashMatch[1] === props.submission.id.toString())
@@ -100,7 +108,8 @@ function expandAndShowAttachment() {
   setTimeout(() => showAttachment.value = true, 100)
 }
 watch(() => props.expanded, (expanded) => {
-  showComment.value = expanded
+  if (!props.alwaysExpanded)
+    showComment.value = expanded
 })
 </script>
 
@@ -108,7 +117,7 @@ watch(() => props.expanded, (expanded) => {
   <div
     :id="`submission-${submission.id}`"
     ref="el"
-    class="border-t first:border-t-0 border-gray-300 pt-2 px-2 mt-2 transition-colors duration-1000"
+    class="border-t first:border-t-0 border-gray-300 pt-2 mt-2 transition-colors duration-1000"
     :class="{ 'border border-indigo-300': isTargeted }"
   >
     <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
@@ -124,12 +133,12 @@ watch(() => props.expanded, (expanded) => {
     />
     <template v-if="!submission.hideSolution">
       <template v-if="!submission.user">
-        <div class="text-sm text-gray-600 basis-full">
+        <div class="text-sm text-gray-400 basis-full">
           {{ $t('weekly.results') }}
         </div>
         <SubmissionMoves :submission="submission" :chain="chain" />
       </template>
-      <div v-if="submission.competition" class="text-sm text-gray-600 basis-full">
+      <div v-if="submission.competition" class="text-sm text-gray-400 basis-full">
         {{ $t('weekly.solution.label') }}
       </div>
       <div
@@ -155,7 +164,7 @@ watch(() => props.expanded, (expanded) => {
             size="20"
           />
         </button>
-        <button class="text-indigo-500" @click="showComment = !showComment">
+        <button v-if="!alwaysExpanded" class="text-indigo-500" @click="showComment = !showComment">
           <Icon
             :name="showComment ? 'solar:alt-arrow-up-bold' : 'solar:alt-arrow-down-bold'"
             size="20"
@@ -166,12 +175,29 @@ watch(() => props.expanded, (expanded) => {
           :source="formattedSolution"
         />
       </div>
-      <TransitionExpand>
+      <template v-if="alwaysExpanded">
+        <Sequence v-if="submission.comment" :sequence="submission.comment" class="bg-gray-200 font-mono" />
+        <SubmissionAttachments :attachments="submission.attachments" :show="showAttachment" @hide="showAttachment = false" />
+      </template>
+      <TransitionExpand v-else>
         <div v-if="showComment" class="basis-full">
           <Sequence :sequence="submission.comment" class="bg-gray-200 font-mono" />
           <SubmissionAttachments :attachments="submission.attachments" :show="showAttachment" @hide="showAttachment = false" />
         </div>
       </TransitionExpand>
+      <div v-if="isOfficialDNF && submission.moves < DNF" class="text-xs text-orange-500 mt-0.5">
+        <Icon name="heroicons:arrow-path-16-solid" class="text-orange-500" />
+        WCA: DNF
+      </div>
+      <div v-else-if="hasWcaMovesMatch !== null" class="text-xs text-gray-400 mt-0.5">
+        <template v-if="hasWcaMovesMatch">
+          <Icon name="heroicons:check-circle-16-solid" class="text-green-500" />
+        </template>
+        <template v-else>
+          <Icon name="heroicons:exclamation-triangle-16-solid" class="text-yellow-500" />
+          WCA: {{ formatResult(submission.wcaMoves!) }}
+        </template>
+      </div>
       <SubmissionChainInfo v-if="isChain" :submission="submission" />
       <SubmissionMeta
         :submission="submission"
@@ -180,8 +206,9 @@ watch(() => props.expanded, (expanded) => {
       />
       <CommentSection
         :submission-id="submission.id"
-        :visible="showComment"
+        :visible="showComment || alwaysExpanded"
         :open="showCommentSection"
+        :initial-count="submission.commentCount"
         @count-loaded="commentCount = $event"
         @request-open="showCommentSection = true"
       />

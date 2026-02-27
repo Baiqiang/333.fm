@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { react } from '@antfu/eslint-config'
 import { twMerge } from 'tailwind-merge'
 
 const props = defineProps<{

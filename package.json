@@ -2,6 +2,7 @@
   "name": "333.fm",
   "type": "module",
   "private": true,
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@nuxtjs/apollo": "^5.0.0-alpha.15",
     "insertionfinder": "^0.5.0",
+    "md-editor-v3": "^6.3.1",
     "tailwind-merge": "^2.5.4",
     "three": "^0.169.0",
     "two.js": "^0.8.14",
@@ -49,6 +51,5 @@
     "pinia": "^2.2.4",
     "postcss-html": "^1.7.0",
     "typescript": "5.5"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }
