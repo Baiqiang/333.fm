@@ -25,6 +25,10 @@ const navs = computed(() => [
     path: '/league',
   },
   {
+    title: t('wca.recon.title'),
+    path: '/wca/reconstruction',
+  },
+  {
     title: t('tools.title'),
     children: [
       {
@@ -42,10 +46,6 @@ const navs = computed(() => [
       {
         title: t('wca.competitions'),
         path: '/wca/competitions',
-      },
-      {
-        title: t('wca.recon.title'),
-        path: '/wca/reconstruction',
       },
       {
         title: t('stats.title'),
