@@ -67,6 +67,14 @@ const filters = computed(() => {
       count: countsMap[CompetitionType.ENDLESS]?.count,
     })
   }
+  if (countsMap[CompetitionType.WCA_RECONSTRUCTION]?.count) {
+    ret.push({
+      type: 'reconstruction',
+      to: `${base}/reconstruction`,
+      label: t('wca.recon.title'),
+      count: countsMap[CompetitionType.WCA_RECONSTRUCTION]?.count,
+    })
+  }
   if (user.value.wcaId) {
     ret.push({
       type: 'wca',
@@ -75,12 +83,6 @@ const filters = computed(() => {
       count: '',
     })
   }
-  ret.push({
-    type: 'reconstruction',
-    to: `${base}/reconstruction`,
-    label: t('wca.recon.title'),
-    count: '',
-  })
   return ret
 })
 useSeoMeta({

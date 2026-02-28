@@ -30,14 +30,13 @@ const sortedResults = computed(() => props.results.slice().reverse())
       </div>
       <WcaResult v-for="result, index in sortedResults" :key="result.id" :result="result">
         <template #competition>
-          <a
+          <NuxtLink
             v-if="result.competition_id !== sortedResults[index - 1]?.competition_id"
-            :href="`https://www.worldcubeassociation.org/competitions/${result.competition_id}`"
+            :to="`/wca/reconstruction/${result.competition_id}`"
             class="pl-2 text-blue-500"
-            target="_blank"
           >
             {{ result.competition_id }}
-          </a>
+          </NuxtLink>
           <div v-else />
         </template>
       </WcaResult>
