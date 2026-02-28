@@ -191,10 +191,22 @@ export interface WcaReconFeedItem {
   updatedAt: string
 }
 
+export interface WcaOfficialRoundResult {
+  roundNumber: number
+  roundTypeId: string
+  pos: number
+  best: number
+  average: number
+  attempts: number[]
+  regionalSingleRecord: string | null
+  regionalAverageRecord: string | null
+}
+
 export interface WcaReconUserData {
   recon: WcaReconstruction
   submissions: Submission[]
   competition: Competition | null
+  officialResults: WcaOfficialRoundResult[]
 }
 
 export interface WcaReconstructionCompetitionData {

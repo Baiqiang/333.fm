@@ -12,25 +12,42 @@ bus.on(() => refresh())
 
 const recon = computed(() => data.value?.recon ?? null)
 const competition = computed(() => data.value?.competition ?? undefined)
+const officialResults = computed(() => data.value?.officialResults ?? [])
 
-const sortedSubmissions = computed(() => {
+const officialByRound = computed(() => {
+  const map: Record<number, WcaOfficialRoundResult> = {}
+  for (const r of officialResults.value) map[r.roundNumber] = r
+  return map
+})
+
+interface RoundGroup {
+  roundNumber: number
+  official: WcaOfficialRoundResult | null
+  submissions: Submission[]
+}
+
+const rounds = computed<RoundGroup[]>(() => {
   if (!data.value)
     return []
-  return [...data.value.submissions].sort((a, b) => {
-    const ra = a.scramble?.roundNumber ?? 0
-    const rb = b.scramble?.roundNumber ?? 0
-    if (ra !== rb)
-      return ra - rb
-    return (a.scramble?.number ?? 0) - (b.scramble?.number ?? 0)
-  })
+  const subs = data.value.submissions
+  const roundNums = new Set<number>()
+  for (const s of subs) roundNums.add(s.scramble?.roundNumber ?? 1)
+  for (const r of officialResults.value) roundNums.add(r.roundNumber)
+
+  return [...roundNums].sort((a, b) => a - b).map(rn => ({
+    roundNumber: rn,
+    official: officialByRound.value[rn] ?? null,
+    submissions: subs
+      .filter(s => (s.scramble?.roundNumber ?? 1) === rn)
+      .sort((a, b) => (a.scramble?.number ?? 0) - (b.scramble?.number ?? 0)),
+  }))
 })
 
 const displayName = computed(() => wcaCompetition?.value?.name ?? wcaCompetitionId.value)
 
 function attemptLabel(sub: Submission): string {
-  const rn = sub.scramble?.roundNumber ?? 1
   const sn = sub.scramble?.number ?? 1
-  return `R${rn}-A${sn}`
+  return t('wca.recon.attempt', { n: sn })
 }
 
 useSeoMeta({
@@ -89,34 +106,72 @@ useSeoMeta({
         </ClientOnly>
       </div>
 
-      <div
-        v-for="(sub, idx) in sortedSubmissions"
-        :key="sub.id"
-        class="py-4"
-        :class="{ 'border-t-2 border-gray-200': idx > 0 }"
-      >
-        <div class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
-          {{ attemptLabel(sub) }}
-          <template v-if="sub.scramble?.verified">
-            <Icon name="heroicons:shield-check-16-solid" class="text-green-500" size="14" />
-          </template>
-        </div>
-
-        <div v-if="sub.scramble" class="mb-2">
-          <div class="text-xs text-gray-400 mb-0.5">
-            {{ t('wca.recon.scramble') }}
+      <div v-for="round in rounds" :key="round.roundNumber" class="mb-6">
+        <div v-if="round.official" class="mb-3">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-base font-semibold text-gray-800">{{ t(`result.roundType.${round.official.roundTypeId}`) }}</span>
+            <span v-if="round.official.regionalSingleRecord" class="text-xs font-bold px-1.5 py-0.5 rounded" :class="round.official.regionalSingleRecord === 'WR' ? 'bg-red-500 text-white' : round.official.regionalSingleRecord === 'CR' ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white'">
+              {{ round.official.regionalSingleRecord }}
+            </span>
+            <span v-if="round.official.regionalAverageRecord" class="text-xs font-bold px-1.5 py-0.5 rounded" :class="round.official.regionalAverageRecord === 'WR' ? 'bg-red-500 text-white' : round.official.regionalAverageRecord === 'CR' ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white'">
+              {{ round.official.regionalAverageRecord }} Mo3
+            </span>
           </div>
-          <Sequence :sequence="sub.scramble.scramble" :source="sub.scramble.scramble" class="font-mono" />
+          <div class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-sm">
+            <div>
+              <span class="text-gray-400 text-xs">{{ t('result.rank') }}</span>
+              <span class="ml-1 font-mono font-semibold text-gray-700">#{{ round.official.pos }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 text-xs">{{ t('result.mean') }}</span>
+              <span class="ml-1 font-mono font-bold" :class="round.official.average === WCA_DNF ? 'text-red-500' : 'text-gray-800'">{{ formatWCAResult(round.official.average, 2, 100) }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 text-xs">{{ t('result.single') }}</span>
+              <span class="ml-1 font-mono" :class="round.official.best === WCA_DNF ? 'text-red-500' : 'text-gray-700'">{{ formatWCAResult(round.official.best) }}</span>
+            </div>
+            <div class="text-gray-400 font-mono text-xs">
+              {{ round.official.attempts.filter(v => v !== 0).map(v => formatWCAResult(v)).join(' / ') }}
+            </div>
+          </div>
+        </div>
+        <div v-else-if="rounds.length > 1" class="text-base font-semibold text-gray-800 mb-3">
+          Round {{ round.roundNumber }}
         </div>
 
-        <Submission
-          :submission="sub"
-          :competition="competition"
-          always-expanded
-        />
+        <div
+          v-for="(sub, idx) in round.submissions"
+          :key="sub.id"
+          class="py-4"
+          :class="{ 'border-t-2 border-gray-200': idx > 0 }"
+        >
+          <div class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
+            {{ attemptLabel(sub) }}
+            <template v-if="sub.scramble?.verified">
+              <Icon name="heroicons:shield-check-16-solid" class="text-green-500" size="14" />
+            </template>
+          </div>
+
+          <div v-if="sub.scramble" class="mb-2">
+            <div class="text-xs text-gray-400 mb-0.5">
+              {{ t('wca.recon.scramble') }}
+            </div>
+            <Sequence :sequence="sub.scramble.scramble" :source="sub.scramble.scramble" class="font-mono" />
+          </div>
+
+          <Submission
+            :submission="sub"
+            :competition="competition"
+            always-expanded
+          />
+        </div>
+
+        <div v-if="round.submissions.length === 0" class="text-sm text-gray-400 italic py-2">
+          {{ t('wca.recon.noSolutions') }}
+        </div>
       </div>
 
-      <div v-if="sortedSubmissions.length === 0" class="text-sm text-gray-400 italic py-4">
+      <div v-if="rounds.length === 0" class="text-sm text-gray-400 italic py-4">
         {{ t('wca.recon.noSolutions') }}
       </div>
     </div>
