@@ -213,7 +213,7 @@ export interface WcaReconstructionCompetitionData {
   recons: WcaReconstruction[]
   scrambles: Scramble[]
   competition: Competition | null
-  submissions: Submission[]
+  submissions: Record<number, Submission[]>
   isPublished: boolean
   hasOfficialScrambles: boolean
   currentUser: {

@@ -28,6 +28,14 @@ const reconByUserId = computed(() => {
   return map
 })
 
+const mySubmissions = computed(() => {
+  const ret: Record<number, Submission[]> = {}
+  for (const { id } of reconData.value?.scrambles ?? [])
+    ret[id] = reconData.value?.submissions[id]?.filter(submission => submission.user.id === user.id) ?? []
+
+  return ret
+})
+
 interface ScrambleTab {
   roundNumber: number
   scrambleNumber: number
@@ -72,24 +80,9 @@ const scrambleTabs = computed<ScrambleTab[]>(() => {
   return tabs.sort((a, b) => a.roundNumber - b.roundNumber || a.scrambleNumber - b.scrambleNumber)
 })
 
-function getSubmissionsForScramble(scrambleId: number) {
-  if (!reconData.value)
-    return []
-  return reconData.value.submissions
-    .filter(s => s.scrambleId === scrambleId)
-    .sort((a, b) => a.moves - b.moves)
-}
-
 function getIsParticipant(userId: number): boolean {
   return reconByUserId.value[userId]?.isParticipant ?? false
 }
-
-function getMyExistingSubmission(scrambleId: number) {
-  if (!reconData.value)
-    return undefined
-  return reconData.value.submissions.find(s => s.scrambleId === scrambleId && s.userId === user.id)
-}
-
 function getUserAttemptMoves(roundNumber: number, scrambleNumber: number): number | null {
   return reconData.value?.currentUser?.attempts[`${roundNumber}-${scrambleNumber}`] ?? null
 }
@@ -181,14 +174,14 @@ function getUserAttemptMoves(roundNumber: number, scrambleNumber: number): numbe
             :scramble-number="tab.scrambleNumber"
             :existing-scramble="tab.scramble?.scramble"
             :scramble-disabled="reconData.hasOfficialScrambles && !!tab.scramble"
-            :existing-solution="tab.scramble ? getMyExistingSubmission(tab.scramble.id) : undefined"
+            :existing-solution="tab.scramble ? mySubmissions[tab.scramble.id]?.[0] : undefined"
             :user-attempt-moves="getUserAttemptMoves(tab.roundNumber, tab.scrambleNumber)"
             @submitted="refreshReconData()"
           />
 
           <div v-if="tab.scramble">
             <Submissions
-              :submissions="getSubmissionsForScramble(tab.scramble.id)"
+              :submissions="reconData.submissions[tab.scramble.id] ?? []"
               :competition="reconData.competition ?? undefined"
               sortable
             >
@@ -197,7 +190,7 @@ function getUserAttemptMoves(roundNumber: number, scrambleNumber: number): numbe
                 <span v-else class="bg-gray-400 text-white px-1 rounded text-xs">{{ t('wca.recon.unofficial') }}</span>
               </template>
             </Submissions>
-            <div v-if="getSubmissionsForScramble(tab.scramble.id).length === 0" class="text-sm text-gray-400 italic py-4">
+            <div v-if="reconData.submissions[tab.scramble.id]?.length === 0" class="text-sm text-gray-400 italic py-4">
               {{ t('wca.recon.noRecons') }}
             </div>
           </div>
