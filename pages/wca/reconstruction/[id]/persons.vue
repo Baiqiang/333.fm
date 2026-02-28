@@ -10,8 +10,10 @@ const displayName = computed(() => wcaCompetition?.value?.name ?? wcaCompetition
 
 const submissionCountByUser = computed(() => {
   const map: Record<number, number> = {}
-  for (const s of reconData.value?.submissions ?? []) {
-    map[s.userId] = (map[s.userId] ?? 0) + 1
+  for (const submissions of Object.values(reconData.value?.submissions ?? {})) {
+    for (const s of submissions) {
+      map[s.userId] = (map[s.userId] ?? 0) + 1
+    }
   }
   return map
 })
