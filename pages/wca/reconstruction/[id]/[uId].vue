@@ -110,12 +110,7 @@ useSeoMeta({
         <div v-if="round.official" class="mb-3">
           <div class="flex items-center gap-2 mb-1.5">
             <span class="text-base font-semibold text-gray-800">{{ t(`result.roundType.${round.official.roundTypeId}`) }}</span>
-            <span v-if="round.official.regionalSingleRecord" class="text-xs font-bold px-1.5 py-0.5 rounded" :class="round.official.regionalSingleRecord === 'WR' ? 'bg-red-500 text-white' : round.official.regionalSingleRecord === 'CR' ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white'">
-              {{ round.official.regionalSingleRecord }}
-            </span>
-            <span v-if="round.official.regionalAverageRecord" class="text-xs font-bold px-1.5 py-0.5 rounded" :class="round.official.regionalAverageRecord === 'WR' ? 'bg-red-500 text-white' : round.official.regionalAverageRecord === 'CR' ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white'">
-              {{ round.official.regionalAverageRecord }} Mo3
-            </span>
+            <WcaRecordBadges :single="round.official.regionalSingleRecord" :average="round.official.regionalAverageRecord" />
           </div>
           <div class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-sm">
             <div>

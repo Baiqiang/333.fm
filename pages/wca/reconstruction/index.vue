@@ -20,6 +20,10 @@ async function fetchData() {
   meta.value = data.value!.meta
 }
 
+function sortedResults(item: WcaReconFeedItem) {
+  return (item.wcaData?.officialResults ?? []).slice().sort((a, b) => a.roundNumber - b.roundNumber)
+}
+
 useSeoMeta({
   title: computed(() => t('wca.recon.latestRecons')),
 })
@@ -48,7 +52,7 @@ useSeoMeta({
         v-for="item in items"
         :key="item.id"
         :to="`/wca/reconstruction/${item.wcaCompetitionId}/${item.user.wcaId || item.user.id}`"
-        class="block border-t first:border-t-0 border-gray-300 py-2 px-2 hover:bg-gray-50"
+        class="block border-t first:border-t-0 border-gray-300 py-3 px-2 hover:bg-gray-50"
       >
         <div class="flex items-center gap-2">
           <img :src="item.user.avatarThumb || '/images/default-avatar.png'" class="w-7 h-7 shrink-0">
@@ -59,6 +63,15 @@ useSeoMeta({
         <div class="mt-0.5 text-xs text-gray-500 truncate pl-9">
           {{ item.competitionName }}
           <span class="text-gray-400 ml-1">· {{ t('wca.recon.submissions', { count: item.submissionCount }) }}</span>
+        </div>
+        <div v-if="sortedResults(item).length > 0" class="mt-1 pl-9 flex flex-wrap gap-x-4 gap-y-0.5">
+          <div v-for="r in sortedResults(item)" :key="r.roundTypeId" class="flex items-center gap-1.5 text-xs">
+            <span class="text-gray-400">{{ t(`result.roundType.${r.roundTypeId}`) }}</span>
+            <span class="font-mono text-gray-600">#{{ r.pos }}</span>
+            <span class="font-mono font-bold" :class="r.average === WCA_DNF ? 'text-red-500' : 'text-gray-700'">{{ formatWCAResult(r.average, 2, 100) }}</span>
+            <span class="font-mono text-gray-400">({{ r.attempts.filter(v => v !== 0).map(v => formatWCAResult(v)).join(' ') }})</span>
+            <WcaRecordBadges :single="r.regionalSingleRecord" :average="r.regionalAverageRecord" />
+          </div>
         </div>
         <div v-if="item.description" class="mt-0.5 text-xs text-gray-400 truncate pl-9">
           {{ item.description }}

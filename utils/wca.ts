@@ -174,6 +174,10 @@ export interface WcaReconstruction {
   }
 }
 
+export interface WcaReconData {
+  officialResults?: WcaOfficialRoundResult[]
+}
+
 export interface WcaReconFeedItem {
   id: number
   user: {
@@ -189,6 +193,7 @@ export interface WcaReconFeedItem {
   isParticipant: boolean
   submissionCount: number
   updatedAt: string
+  wcaData: WcaReconData | null
 }
 
 export interface WcaOfficialRoundResult {
