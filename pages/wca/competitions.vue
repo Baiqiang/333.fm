@@ -31,8 +31,8 @@ async function fetchCompetitions(query: WCACompetitionsQuery) {
       query: {
         'event_ids[]': '333fm',
         ...query,
-        'start': query.start ? dayjs(query.start).format('YYYY-MM-DD') : undefined,
-        'end': query.end ? dayjs(query.end).format('YYYY-MM-DD') : undefined,
+        'start': query.start && !query.q?.trim() ? dayjs(query.start).format('YYYY-MM-DD') : undefined,
+        'end': query.end && !query.q?.trim() ? dayjs(query.end).format('YYYY-MM-DD') : undefined,
       },
     })
     loading.value = false
