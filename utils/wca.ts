@@ -165,6 +165,7 @@ export interface WcaReconstruction {
   userId: number
   description: string | null
   isParticipant: boolean
+  wcaData: WcaReconData | null
   user: {
     id: number
     name: string
@@ -194,6 +195,7 @@ export interface WcaReconFeedItem {
   submissionCount: number
   updatedAt: string
   wcaData: WcaReconData | null
+  startTime: string | null
 }
 
 export interface WcaOfficialRoundResult {

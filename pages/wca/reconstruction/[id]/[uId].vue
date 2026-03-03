@@ -64,6 +64,9 @@ useSeoMeta({
       <h1 class="text-3xl font-bold my-2">
         {{ displayName }}
       </h1>
+      <div v-if="wcaCompetition" class="text-sm text-gray-400 mb-2">
+        {{ wcaCompetition.start_date }} ~ {{ wcaCompetition.end_date }}
+      </div>
 
       <div class="flex items-center gap-3 my-3 text-sm">
         <NuxtLink
@@ -108,26 +111,24 @@ useSeoMeta({
 
       <div v-for="round in rounds" :key="round.roundNumber" class="mb-6">
         <div v-if="round.official" class="mb-3">
-          <div class="flex items-center gap-2 mb-1.5">
-            <span class="text-base font-semibold text-gray-800">{{ t(`result.roundType.${round.official.roundTypeId}`) }}</span>
-            <WcaRecordBadges :single="round.official.regionalSingleRecord" :average="round.official.regionalAverageRecord" />
+          <div class="text-base font-semibold text-gray-800 mb-1.5">
+            {{ t(`result.roundType.${round.official.roundTypeId}`) }}
           </div>
-          <div class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-sm">
-            <div>
-              <span class="text-gray-400 text-xs">{{ t('result.rank') }}</span>
-              <span class="ml-1 font-mono font-semibold text-gray-700">#{{ round.official.pos }}</span>
-            </div>
-            <div>
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+            <span class="font-mono font-semibold text-gray-700">#{{ round.official.pos }}</span>
+            <span class="inline-flex items-center gap-1">
               <span class="text-gray-400 text-xs">{{ t('result.mean') }}</span>
-              <span class="ml-1 font-mono font-bold" :class="round.official.average === WCA_DNF ? 'text-red-500' : 'text-gray-800'">{{ formatWCAResult(round.official.average, 2, 100) }}</span>
-            </div>
-            <div>
+              <span class="font-mono font-bold" :class="round.official.average === WCA_DNF ? 'text-red-500' : 'text-gray-800'">{{ formatWCAResult(round.official.average, 2, 100) }}</span>
+              <WcaRecordBadge :record="round.official.regionalAverageRecord" />
+            </span>
+            <span class="inline-flex items-center gap-1">
               <span class="text-gray-400 text-xs">{{ t('result.single') }}</span>
-              <span class="ml-1 font-mono" :class="round.official.best === WCA_DNF ? 'text-red-500' : 'text-gray-700'">{{ formatWCAResult(round.official.best) }}</span>
-            </div>
-            <div class="text-gray-400 font-mono text-xs">
-              {{ round.official.attempts.filter(v => v !== 0).map(v => formatWCAResult(v)).join(' / ') }}
-            </div>
+              <span class="font-mono" :class="round.official.best === WCA_DNF ? 'text-red-500' : 'text-gray-700'">{{ formatWCAResult(round.official.best) }}</span>
+              <WcaRecordBadge :record="round.official.regionalSingleRecord" />
+            </span>
+            <span class="text-gray-400 font-mono text-xs">
+              ({{ round.official.attempts.filter(v => v !== 0).map(v => formatWCAResult(v)).join(' / ') }})
+            </span>
           </div>
         </div>
         <div v-else-if="rounds.length > 1" class="text-base font-semibold text-gray-800 mb-3">
@@ -145,6 +146,7 @@ useSeoMeta({
             <template v-if="sub.scramble?.verified">
               <Icon name="heroicons:shield-check-16-solid" class="text-green-500" size="14" />
             </template>
+            <WcaRecordBadge v-if="round.official && sub.moves === round.official.best" :record="round.official.regionalSingleRecord" />
           </div>
 
           <div v-if="sub.scramble" class="mb-2">

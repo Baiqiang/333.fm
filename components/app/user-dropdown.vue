@@ -26,46 +26,59 @@ useRouter().afterEach(() => {
     </div>
     <TransitionSlide>
       <div v-if="open" class="absolute right-0 top-10 bg-white text-black border border-gray-200 whitespace-nowrap py-1 flex flex-col items-stretch shadow-md z-50">
-        <div class="text-gray-400 px-3 py-1 text-sm">
+        <div class="text-gray-400 px-3 py-1 text-sm flex items-center gap-2">
+          <Icon name="mdi:account-circle" class="opacity-60" size="18" />
           {{ $i18n.locale === 'en' ? user.englishName : user.localName }}
         </div>
-        <NuxtLink to="/user/if" :class="menuClass">
-          {{ $t('user.if') }}
-        </NuxtLink>
         <NuxtLink :to="`/profile/${userId(user as any)}`" :class="menuClass">
-          {{ $t('user.solutions') }}
+          <Icon name="mdi:account" size="18" class="mr-2 text-gray-400" />
+          {{ $t('user.profile') }}
         </NuxtLink>
         <NuxtLink :to="`/practice/${userId(user as any)}`" :class="menuClass">
+          <Icon name="mdi:book-open-variant" size="18" class="mr-2 text-gray-400" />
           {{ $t('user.practices') }}
         </NuxtLink>
+        <NuxtLink :to="`/profile/${userId(user as any)}/reconstruction`" :class="menuClass">
+          <Icon name="mdi:cube" size="18" class="mr-2 text-gray-400" />
+          {{ $t('wca.recon.myRecons') }}
+        </NuxtLink>
+        <NuxtLink to="/user/if" :class="menuClass">
+          <Icon name="mdi:wave-arrow-up" size="18" class="mr-2 text-gray-400" />
+          {{ $t('user.if') }}
+        </NuxtLink>
         <NuxtLink to="/user/bot-token" :class="menuClass">
+          <Icon name="mdi:robot" size="18" class="mr-2 text-gray-400" />
           {{ $t('user.token') }}
         </NuxtLink>
         <NuxtLink to="/user/likes" :class="menuClass">
+          <Icon name="mdi:thumb-up-outline" size="18" class="mr-2 text-gray-400" />
           {{ $t('user.likes') }}
         </NuxtLink>
         <NuxtLink to="/user/favorites" :class="menuClass">
+          <Icon name="mdi:star-outline" size="18" class="mr-2 text-gray-400" />
           {{ $t('user.favorites') }}
         </NuxtLink>
-        <NuxtLink :to="`/profile/${userId(user as any)}/reconstruction`" :class="menuClass">
-          {{ $t('wca.recon.myRecons') }}
-        </NuxtLink>
         <NuxtLink to="/user/notifications" :class="menuClass">
+          <Icon name="mdi:bell-outline" size="18" class="mr-2 text-gray-400" />
           {{ $t('notification.title') }}
         </NuxtLink>
         <template v-if="user.isAdmin">
           <hr>
-          <div class="text-gray-400 px-3 py-1 text-sm">
+          <div class="text-gray-400 px-3 py-1 text-sm flex items-center gap-2">
+            <Icon name="mdi:shield-account" class="opacity-60" size="18" />
             {{ $t('admin.title') }}
           </div>
           <NuxtLink to="/admin/if" :class="menuClass">
+            <Icon name="mdi:invoice-text-arrow-left-outline" size="18" class="mr-2 text-gray-400" />
             {{ $t('admin.if.title') }}
           </NuxtLink>
           <NuxtLink to="/admin/user" :class="menuClass">
+            <Icon name="mdi:account-multiple-outline" size="18" class="mr-2 text-gray-400" />
             {{ $t('admin.user.title') }}
           </NuxtLink>
         </template>
         <div :class="menuClass" @click="user.signOut">
+          <Icon name="mdi:logout" size="18" class="mr-2 text-gray-400" />
           {{ $t('header.signOut') }}
         </div>
       </div>

@@ -86,6 +86,13 @@ function getIsParticipant(userId: number): boolean {
 function getUserAttemptMoves(roundNumber: number, scrambleNumber: number): number | null {
   return reconData.value?.currentUser?.attempts[`${roundNumber}-${scrambleNumber}`] ?? null
 }
+function getSingleRecord(userId: number, roundNumber: number, moves: number): string | null {
+  const recon = reconByUserId.value[userId]
+  const result = recon?.wcaData?.officialResults?.find(r => r.roundNumber === roundNumber)
+  if (result && result.regionalSingleRecord && moves / 100 === result.best)
+    return result.regionalSingleRecord
+  return null
+}
 </script>
 
 <template>
@@ -93,6 +100,9 @@ function getUserAttemptMoves(roundNumber: number, scrambleNumber: number): numbe
     <h1 class="text-3xl font-bold my-2">
       {{ displayName }}
     </h1>
+    <div v-if="wcaCompetition" class="text-sm text-gray-400 mb-2">
+      {{ wcaCompetition.start_date }} ~ {{ wcaCompetition.end_date }}
+    </div>
 
     <div v-if="reconData">
       <div v-if="reconData.isPublished" class="flex items-center gap-1.5 text-sm text-green-700 bg-green-50 p-2 border-l-4 border-green-500 mb-2">
@@ -188,6 +198,7 @@ function getUserAttemptMoves(roundNumber: number, scrambleNumber: number): numbe
               <template #extra="submission">
                 <span v-if="getIsParticipant(submission.userId)" class="bg-green-500 text-white px-1 rounded text-xs">{{ t('wca.recon.participant') }}</span>
                 <span v-else class="bg-gray-400 text-white px-1 rounded text-xs">{{ t('wca.recon.unofficial') }}</span>
+                <WcaRecordBadge :record="getSingleRecord(submission.userId, tab.roundNumber, submission.moves)" />
               </template>
             </Submissions>
             <div v-if="reconData.submissions[tab.scramble.id]?.length === 0" class="text-sm text-gray-400 italic py-4">

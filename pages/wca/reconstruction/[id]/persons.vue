@@ -28,6 +28,10 @@ const sortedRecons = computed(() => {
   })
 })
 
+function sortedResults(recon: WcaReconstruction) {
+  return (recon.wcaData?.officialResults ?? []).slice().sort((a, b) => a.roundNumber - b.roundNumber)
+}
+
 useSeoMeta({
   title: computed(() => `${t('wca.recon.viewByPerson')} - ${t('wca.recon.title')} - ${displayName.value}`),
 })
@@ -38,6 +42,9 @@ useSeoMeta({
     <h1 class="text-3xl font-bold my-2">
       {{ displayName }}
     </h1>
+    <div v-if="wcaCompetition" class="text-sm text-gray-400 mb-2">
+      {{ wcaCompetition.start_date }} ~ {{ wcaCompetition.end_date }}
+    </div>
 
     <div class="flex items-center gap-2 my-3">
       <div class="inline-flex rounded-lg bg-gray-100 p-0.5 text-sm">
@@ -63,22 +70,28 @@ useSeoMeta({
         v-for="recon in sortedRecons"
         :key="recon.id"
         :to="`/wca/reconstruction/${wcaCompetitionId}/${recon.user.wcaId || recon.user.id}`"
-        class="border-t first:border-t-0 border-gray-300 pt-2 px-2 mt-2 flex gap-2 items-center hover:bg-gray-50"
+        class="block border-t first:border-t-0 border-gray-300 py-3 px-2 hover:bg-gray-50"
       >
-        <img :src="recon.user.avatarThumb || '/images/default-avatar.png'" class="w-8 h-8" :title="recon.user.name">
-        <div class="flex-1 overflow-hidden">
-          <div class="text-blue-500 text-ellipsis overflow-hidden whitespace-nowrap font-medium">
-            {{ recon.user.name }}
-          </div>
-          <div class="text-gray-400 text-xs flex items-center gap-2">
-            <span>{{ t('wca.recon.reconCount', { count: submissionCountByUser[recon.userId] ?? 0 }) }}</span>
-            <span v-if="!recon.isParticipant" class="text-gray-400">{{ t('wca.recon.unofficial') }}</span>
+        <div class="flex items-center gap-2">
+          <img :src="recon.user.avatarThumb || '/images/default-avatar.png'" class="w-8 h-8 shrink-0" :title="recon.user.name">
+          <span class="text-blue-500 font-medium truncate">{{ recon.user.name }}</span>
+          <span v-if="!recon.isParticipant" class="shrink-0 text-gray-400 bg-gray-100 px-1 rounded text-xs">{{ t('wca.recon.unofficial') }}</span>
+          <span class="ml-auto shrink-0 text-xs text-gray-400">{{ t('wca.recon.reconCount', { count: submissionCountByUser[recon.userId] ?? 0 }) }}</span>
+        </div>
+        <div v-if="sortedResults(recon).length > 0" class="mt-1 pl-10 flex flex-wrap gap-x-4 gap-y-0.5">
+          <div v-for="r in sortedResults(recon)" :key="r.roundTypeId" class="flex items-center gap-1.5 text-xs">
+            <span class="text-gray-400">{{ t(`result.roundType.${r.roundTypeId}`) }}</span>
+            <span class="font-mono text-gray-600">#{{ r.pos }}</span>
+            <span class="font-mono font-bold" :class="r.average === WCA_DNF ? 'text-red-500' : 'text-gray-700'">{{ formatWCAResult(r.average, 2, 100) }}</span>
+            <WcaRecordBadge :record="r.regionalAverageRecord" />
+            <span class="font-mono" :class="r.best === WCA_DNF ? 'text-red-500' : 'text-gray-500'">{{ formatWCAResult(r.best) }}</span>
+            <WcaRecordBadge :record="r.regionalSingleRecord" />
+            <span class="font-mono text-gray-400">({{ r.attempts.filter(v => v !== 0).map(v => formatWCAResult(v)).join(' ') }})</span>
           </div>
         </div>
-        <div v-if="recon.description" class="hidden md:block text-xs text-gray-400 max-w-xs truncate">
+        <div v-if="recon.description" class="mt-0.5 text-xs text-gray-400 truncate pl-10">
           {{ recon.description }}
         </div>
-        <Icon name="heroicons:chevron-right-16-solid" class="text-gray-300" />
       </NuxtLink>
     </div>
   </div>

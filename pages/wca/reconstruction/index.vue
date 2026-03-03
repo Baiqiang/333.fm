@@ -4,6 +4,7 @@ const dayjs = useDayjs()
 const { locale } = useI18n()
 const route = useRoute()
 
+const sort = ref((route.query.sort as string) || 'latest')
 const items = ref<WcaReconFeedItem[]>([])
 const meta = usePaginationMeta()
 
@@ -14,6 +15,7 @@ async function fetchData() {
     params: {
       page: route.query.page,
       limit: 100,
+      sort: sort.value,
     },
   })
   items.value = data.value?.items ?? []
@@ -22,6 +24,12 @@ async function fetchData() {
 
 function sortedResults(item: WcaReconFeedItem) {
   return (item.wcaData?.officialResults ?? []).slice().sort((a, b) => a.roundNumber - b.roundNumber)
+}
+
+function changeSort(value: string) {
+  sort.value = value
+  navigateTo({ query: { ...route.query, sort: value, page: undefined } })
+  fetchData()
 }
 
 useSeoMeta({
@@ -44,6 +52,23 @@ useSeoMeta({
       </NuxtLink>
     </div>
 
+    <div class="inline-flex rounded-lg bg-gray-100 p-0.5 text-sm mb-3">
+      <button
+        class="px-3 py-1 rounded-md transition-colors"
+        :class="sort === 'latest' ? 'bg-indigo-500 text-white font-medium' : 'text-gray-600 hover:text-gray-900'"
+        @click="changeSort('latest')"
+      >
+        {{ t('wca.recon.sortByLatest') }}
+      </button>
+      <button
+        class="px-3 py-1 rounded-md transition-colors"
+        :class="sort === 'compDate' ? 'bg-indigo-500 text-white font-medium' : 'text-gray-600 hover:text-gray-900'"
+        @click="changeSort('compDate')"
+      >
+        {{ t('wca.recon.sortByCompDate') }}
+      </button>
+    </div>
+
     <div v-if="items.length === 0" class="text-sm text-gray-400 italic py-4">
       {{ t('wca.recon.noRecons') }}
     </div>
@@ -62,6 +87,7 @@ useSeoMeta({
         </div>
         <div class="mt-0.5 text-xs text-gray-500 truncate pl-9">
           {{ item.competitionName }}
+          <span v-if="item.startTime" class="text-gray-400 ml-1">· {{ dayjs(item.startTime).format('YYYY-MM-DD') }}</span>
           <span class="text-gray-400 ml-1">· {{ t('wca.recon.submissions', { count: item.submissionCount }) }}</span>
         </div>
         <div v-if="sortedResults(item).length > 0" class="mt-1 pl-9 flex flex-wrap gap-x-4 gap-y-0.5">
@@ -69,8 +95,10 @@ useSeoMeta({
             <span class="text-gray-400">{{ t(`result.roundType.${r.roundTypeId}`) }}</span>
             <span class="font-mono text-gray-600">#{{ r.pos }}</span>
             <span class="font-mono font-bold" :class="r.average === WCA_DNF ? 'text-red-500' : 'text-gray-700'">{{ formatWCAResult(r.average, 2, 100) }}</span>
+            <WcaRecordBadge :record="r.regionalAverageRecord" />
+            <span class="font-mono" :class="r.best === WCA_DNF ? 'text-red-500' : 'text-gray-500'">{{ formatWCAResult(r.best) }}</span>
+            <WcaRecordBadge :record="r.regionalSingleRecord" />
             <span class="font-mono text-gray-400">({{ r.attempts.filter(v => v !== 0).map(v => formatWCAResult(v)).join(' ') }})</span>
-            <WcaRecordBadges :single="r.regionalSingleRecord" :average="r.regionalAverageRecord" />
           </div>
         </div>
         <div v-if="item.description" class="mt-0.5 text-xs text-gray-400 truncate pl-9">
