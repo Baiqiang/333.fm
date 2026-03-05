@@ -307,6 +307,31 @@ export function competitionPath(competition: Competition, scramble?: { number: n
   }
 }
 
+export function competitionName(competition: Competition, scramble?: { number: number, roundNumber?: number }) {
+  const { t, locale } = useI18n()
+  const competitionIndex = competition.alias.split('-').pop()
+  switch (competition.type) {
+    case CompetitionType.WEEKLY:
+      return `${t('weekly.title')} ${competition.alias}`
+    case CompetitionType.DAILY:
+      return `${t('daily.title')} ${competition.alias}`
+    case CompetitionType.LEAGUE:
+      return `${t('league.title')} ${leagueWeekName(competition)}`
+    case CompetitionType.PERSONAL_PRACTICE:
+      return t('practice.user.index', { name: localeName(competition.user.name, locale.value), index: competitionIndex })
+    case CompetitionType.ENDLESS:
+      if (scramble)
+        return `${competition.name} ${t('endless.level', { level: scramble.number })}`
+      return `${competition.name}`
+    case CompetitionType.WCA_RECONSTRUCTION:
+      if (scramble)
+        return `${competition.name} R${scramble.roundNumber}-A${scramble.number}`
+      return `${competition.name}`
+    default:
+      return competition.name
+  }
+}
+
 export function submissionLink(competition: Competition, scramble?: { number: number }, submission?: Submission) {
   const path = competitionPath(competition, scramble, submission)
   if (!submission)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  show: boolean
+  show?: boolean
   spoiled: string
 }>(), {
   show: false,

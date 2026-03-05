@@ -137,6 +137,10 @@ async function changeLocale(code: string) {
         </div>
         <Nav v-for="nav, index in navs" :key="index" v-bind="nav" />
         <div class="md:ml-auto flex flex-col md:flex-row md:items-center md:gap-3">
+          <NuxtLink to="/search" class="nav">
+            <Icon name="heroicons:magnifying-glass" size="20" />
+            <span class="md:hidden ml-2">{{ $t('search.title') }}</span>
+          </NuxtLink>
           <div class="relative">
             <a ref="langButton" class="nav" @click="dropdowns.lang = !dropdowns.lang">
               <Icon name="ic:round-translate" size="20" />

@@ -5,39 +5,19 @@ const props = defineProps<{
   submission?: Submission
 }>()
 const { t, locale } = useI18n()
-const competitionIndex = computed(() => props.competition.alias.split('-').pop())
 const competitionLink = computed(() => {
   const { competition, scramble, submission } = props
   return competitionPath(competition, scramble, submission)
 })
-const competitionName = computed(() => {
+const name = computed(() => {
   const { competition, scramble } = props
-  switch (competition.type) {
-    case CompetitionType.WEEKLY:
-      return `${t('weekly.title')} ${competition.alias}`
-    case CompetitionType.DAILY:
-      return `${t('daily.title')} ${competition.alias}`
-    case CompetitionType.LEAGUE:
-      return `${t('league.title')} ${leagueWeekName(competition)}`
-    case CompetitionType.PERSONAL_PRACTICE:
-      return t('practice.user.index', { name: localeName(competition.user.name, locale.value), index: competitionIndex.value })
-    case CompetitionType.ENDLESS:
-      if (scramble)
-        return `${competition.name} ${t('endless.level', { level: scramble.number })}`
-      return `${competition.name}`
-    case CompetitionType.WCA_RECONSTRUCTION:
-      if (scramble)
-        return `${competition.name} R${scramble.roundNumber}-A${scramble.number}`
-      return `${competition.name}`
-    default:
-      return competition.name
-  }
+  return competitionName(competition, scramble)
 })
 </script>
 
 <template>
   <NuxtLink :to="competitionLink" class="text-blue-500 hover:text-blue-300">
-    {{ competitionName }}
+    {{ name }}
     <slot v-if="$slots.default" />
   </NuxtLink>
 </template>
