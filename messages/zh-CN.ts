@@ -732,6 +732,12 @@ export default {
     competitions: '比赛',
     noResults: '未找到结果。',
     viewMore: '查看更多',
+    totalResults: '共 {total} 条结果',
+    sort: '排序',
+    sortByMoves: '按步数',
+    sortByDate: '按日期',
+    sortAsc: '升序',
+    sortDesc: '降序',
     filters: {
       moves: '步数',
       minMoves: '最少步数',

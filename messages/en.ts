@@ -732,6 +732,12 @@ export default {
     competitions: 'Competitions',
     noResults: 'No results found.',
     viewMore: 'View more',
+    totalResults: '{total} results',
+    sort: 'Sort',
+    sortByMoves: 'By moves',
+    sortByDate: 'By date',
+    sortAsc: 'Ascending',
+    sortDesc: 'Descending',
     filters: {
       moves: 'Moves',
       minMoves: 'Min moves',

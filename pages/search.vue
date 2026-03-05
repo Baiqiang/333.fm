@@ -34,6 +34,8 @@ const maxMoves = ref<number | undefined>(route.query.maxMoves ? Number(route.que
 const startDate = ref((route.query.startDate as string) || '')
 const endDate = ref((route.query.endDate as string) || '')
 const competitionType = ref<number | undefined>(route.query.type !== undefined ? Number(route.query.type) : undefined)
+const sortBy = ref<'moves' | 'createdAt'>((route.query.sortBy as any) === 'moves' ? 'moves' : 'createdAt')
+const sortOrder = ref<'ASC' | 'DESC'>((route.query.sortOrder as any) === 'ASC' ? 'ASC' : 'DESC')
 
 const competitionTypes = [
   { value: undefined, label: t('common.all') },
@@ -61,6 +63,10 @@ function buildQuery(extra: Record<string, any> = {}) {
         q.minMoves = String(minMoves.value)
       if (maxMoves.value !== undefined && maxMoves.value !== null)
         q.maxMoves = String(maxMoves.value)
+      if (sortBy.value !== 'createdAt')
+        q.sortBy = sortBy.value
+      if (sortOrder.value !== 'DESC')
+        q.sortOrder = sortOrder.value
     }
     if (advancedTab.value === 'competitions' && competitionType.value !== undefined)
       q.type = String(competitionType.value)
@@ -104,6 +110,8 @@ async function doAdvancedSubmissionSearch(page = 1) {
       params.startDate = startDate.value
     if (endDate.value)
       params.endDate = endDate.value
+    params.sortBy = sortBy.value
+    params.sortOrder = sortOrder.value
 
     const { data } = await useApi<Pagination<Submission>>('/search/submissions', { params })
     if (data.value) {
@@ -197,6 +205,12 @@ function setMode(m: 'simple' | 'advanced') {
 function setAdvancedTab(tab: 'submissions' | 'scrambles' | 'competitions') {
   advancedTab.value = tab
   doAdvancedSearch()
+}
+
+function setSort(by: 'moves' | 'createdAt', order: 'ASC' | 'DESC') {
+  sortBy.value = by
+  sortOrder.value = order
+  doAdvancedSubmissionSearch()
 }
 
 const hasSimpleResults = computed(() => {
@@ -456,6 +470,25 @@ useSeoMeta({ title: t('search.title') })
       </div>
       <template v-else>
         <template v-if="advancedTab === 'submissions'">
+          <div v-if="advSubmissionsMeta.totalItems > 0" class="flex items-center justify-between mb-3">
+            <span class="text-sm text-gray-500">{{ $t('search.totalResults', { total: advSubmissionsMeta.totalItems }) }}</span>
+            <div class="flex items-center gap-2">
+              <button
+                class="px-2 py-1 text-xs font-medium transition-colors duration-200"
+                :class="sortBy === 'moves' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                @click="setSort('moves', sortBy === 'moves' && sortOrder === 'ASC' ? 'DESC' : 'ASC')"
+              >
+                {{ $t('search.sortByMoves') }} {{ sortBy === 'moves' ? (sortOrder === 'ASC' ? '↑' : '↓') : '' }}
+              </button>
+              <button
+                class="px-2 py-1 text-xs font-medium transition-colors duration-200"
+                :class="sortBy === 'createdAt' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                @click="setSort('createdAt', sortBy === 'createdAt' && sortOrder === 'DESC' ? 'ASC' : 'DESC')"
+              >
+                {{ $t('search.sortByDate') }} {{ sortBy === 'createdAt' ? (sortOrder === 'DESC' ? '↓' : '↑') : '' }}
+              </button>
+            </div>
+          </div>
           <div v-if="advSubmissions.length > 0">
             <template v-for="s in advSubmissions" :key="s.id">
               <Submission
@@ -477,6 +510,9 @@ useSeoMeta({ title: t('search.title') })
           <Pagination :meta="advSubmissionsMeta" @update="doAdvancedSubmissionSearch" />
         </template>
         <template v-if="advancedTab === 'scrambles'">
+          <div v-if="advScramblesMeta.totalItems > 0" class="mb-3">
+            <span class="text-sm text-gray-500">{{ $t('search.totalResults', { total: advScramblesMeta.totalItems }) }}</span>
+          </div>
           <div v-if="advScrambles.length > 0" class="grid gap-2">
             <SearchScrambleItem v-for="sc in advScrambles" :key="sc.id" :scramble="sc" />
           </div>
@@ -486,6 +522,9 @@ useSeoMeta({ title: t('search.title') })
           <Pagination :meta="advScramblesMeta" @update="doAdvancedScrambleSearch" />
         </template>
         <template v-if="advancedTab === 'competitions'">
+          <div v-if="advCompetitionsMeta.totalItems > 0" class="mb-3">
+            <span class="text-sm text-gray-500">{{ $t('search.totalResults', { total: advCompetitionsMeta.totalItems }) }}</span>
+          </div>
           <div v-if="advCompetitions.length > 0" class="grid gap-2">
             <SearchCompetitionItem v-for="c in advCompetitions" :key="c.id" :competition="c" />
           </div>
