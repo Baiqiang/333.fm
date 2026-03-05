@@ -45,10 +45,21 @@ async function fetchSubmissions() {
   if (data.value)
     Object.assign(submissions, data.value)
 }
+async function fetchSchedules() {
+  const { data, refresh } = await useApi<TierSchedule[]>(`${baseURL}/schedules`, {
+    immediate: false,
+  })
+  await refresh()
+  if (data.value)
+    weekSchedules.value = data.value
+}
+async function updateData() {
+  await Promise.all([fetchSubmissions(), fetchSchedules()])
+}
 useSeoMeta({
   title: `${competition.value.name}`,
 })
-useIntervalFn(fetchSubmissions, 5000)
+useIntervalFn(updateData, 5000)
 bus.on(fetchSubmissions)
 </script>
 
@@ -87,7 +98,7 @@ bus.on(fetchSubmissions)
           :submissions="mySubmissions[scramble.id]"
           :allow-unlimited="false"
           :type="`league/season/${season.number}`"
-          @submitted="fetchSubmissions"
+          @submitted="updateData"
         />
         <MaybeSubmissions
           :competition="competition"
