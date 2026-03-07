@@ -7,19 +7,26 @@ const route = useRoute()
 const sort = ref((route.query.sort as string) || 'latest')
 const items = ref<WcaReconFeedItem[]>([])
 const meta = usePaginationMeta()
+const loading = ref(false)
 
 await fetchData()
 
 async function fetchData() {
-  const { data } = await useApi<Pagination<WcaReconFeedItem>>('wca/reconstruction', {
-    params: {
-      page: route.query.page,
-      limit: 100,
-      sort: sort.value,
-    },
-  })
-  items.value = data.value?.items ?? []
-  meta.value = data.value!.meta
+  loading.value = true
+  try {
+    const { data } = await useApi<Pagination<WcaReconFeedItem>>('wca/reconstruction', {
+      params: {
+        page: route.query.page,
+        limit: 100,
+        sort: sort.value,
+      },
+    })
+    items.value = data.value?.items ?? []
+    meta.value = data.value!.meta
+  }
+  finally {
+    loading.value = false
+  }
 }
 
 function sortedResults(item: WcaReconFeedItem) {
@@ -69,7 +76,11 @@ useSeoMeta({
       </button>
     </div>
 
-    <div v-if="items.length === 0" class="text-sm text-gray-400 italic py-4">
+    <div v-if="loading" class="flex items-center justify-center py-12 text-gray-400">
+      <Icon name="heroicons:arrow-path-20-solid" class="w-5 h-5 animate-spin mr-2" />
+      {{ t('common.loading') }}
+    </div>
+    <div v-else-if="items.length === 0" class="text-sm text-gray-400 italic py-4">
       {{ t('wca.recon.noRecons') }}
     </div>
     <div v-else>
@@ -83,7 +94,7 @@ useSeoMeta({
           <img :src="item.user.avatarThumb || '/images/default-avatar.png'" class="w-7 h-7 shrink-0">
           <span class="text-blue-500 font-medium truncate">{{ item.user.name }}</span>
           <span v-if="!item.isParticipant" class="shrink-0 text-gray-400 bg-gray-100 px-1 rounded text-xs">{{ t('wca.recon.unofficial') }}</span>
-          <span class="ml-auto shrink-0 text-xs text-gray-400">{{ dayjs(item.updatedAt).locale(locale).fromNow() }}</span>
+          <span class="ml-auto shrink-0 text-xs text-gray-400">{{ dayjs(item.createdAt).locale(locale).fromNow() }}</span>
         </div>
         <div class="mt-0.5 text-xs text-gray-500 truncate pl-9">
           {{ item.competitionName }}

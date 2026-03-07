@@ -193,6 +193,7 @@ export interface WcaReconFeedItem {
   description: string | null
   isParticipant: boolean
   submissionCount: number
+  createdAt: string
   updatedAt: string
   wcaData: WcaReconData | null
   startTime: string | null
