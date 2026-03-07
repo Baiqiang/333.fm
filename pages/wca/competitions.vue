@@ -2,14 +2,16 @@
 const config = useRuntimeConfig().public
 const dayjs = useDayjs()
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
+const defaultStart = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000)
 const query = reactive<WCACompetitionsQuery>({
-  q: '',
-  // default to 31 days ago
-  start: new Date(Date.now() - 31 * 24 * 60 * 60 * 1000),
-  end: new Date(),
+  q: (route.query.q as string) || '',
+  start: route.query.start ? new Date(route.query.start as string) : defaultStart,
+  end: route.query.end ? new Date(route.query.end as string) : new Date(),
   sort: '-end_date,-start_date,name',
-  page: 1,
+  page: Number(route.query.page) || 1,
 })
 
 const competitions = ref<WCACompetition[]>([])
@@ -21,6 +23,14 @@ onMounted(async () => {
 })
 
 watch(query, async () => {
+  router.replace({
+    query: {
+      q: query.q || undefined,
+      start: query.start && !query.q?.trim() ? dayjs(query.start).format('YYYY-MM-DD') : undefined,
+      end: query.end && !query.q?.trim() ? dayjs(query.end).format('YYYY-MM-DD') : undefined,
+      page: (query.page ?? 1) > 1 ? String(query.page) : undefined,
+    },
+  })
   competitions.value = await fetchCompetitions(query)
 })
 
