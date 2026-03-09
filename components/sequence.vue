@@ -16,6 +16,8 @@ defineProps<{
 </template>
 
 <style scoped>
+@reference "~/assets/css/tailwind.css";
+
 .sequence {
   @apply whitespace-pre-wrap;
 

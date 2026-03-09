@@ -651,7 +651,7 @@ if (duelsBySeason.value.length > 0) {
       <h3 class="font-bold text-lg mb-3">
         {{ $t('league.profile.seasonSummary') }}
       </h3>
-      <div class="shadow overflow-x-auto">
+      <div class="shadow-sm overflow-x-auto">
         <table class="w-full text-sm">
           <thead class="bg-indigo-600 text-white">
             <tr>
@@ -781,7 +781,7 @@ if (duelsBySeason.value.length > 0) {
           leave-from-class="max-h-[2000px] opacity-100"
           leave-to-class="max-h-0 opacity-0"
         >
-          <div v-if="expandedSeasons[group.seasonNumber]" class="shadow overflow-x-auto">
+          <div v-if="expandedSeasons[group.seasonNumber]" class="shadow-sm overflow-x-auto">
             <table class="w-full text-sm">
               <thead class="bg-gray-100">
                 <tr>

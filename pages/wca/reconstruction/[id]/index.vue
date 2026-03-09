@@ -163,8 +163,7 @@ function getSingleRecord(userId: number, roundNumber: number, moves: number): st
           :name="tab.label"
           :hash="tab.hash"
         >
-          <StickyScramble v-if="tab.scramble" :scramble="tab.scramble.scramble" />
-          <CubeExpanded v-if="tab.scramble" :moves="tab.scramble.scramble" />
+          <ScrambleDisplay v-if="tab.scramble" :scramble="tab.scramble.scramble" />
 
           <div v-if="getUserAttemptMoves(tab.roundNumber, tab.scrambleNumber) != null" class="text-xs flex items-center gap-1 my-1">
             <template v-if="getUserAttemptMoves(tab.roundNumber, tab.scrambleNumber)! > 0">

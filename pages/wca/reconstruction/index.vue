@@ -52,7 +52,7 @@ useSeoMeta({
       </h1>
       <NuxtLink
         to="/wca/competitions"
-        class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium shadow-sm transition-colors"
+        class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium shadow-xs transition-colors"
       >
         <Icon name="heroicons:plus-16-solid" />
         {{ t('wca.recon.submitRecon') }}

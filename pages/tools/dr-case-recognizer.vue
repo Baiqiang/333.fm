@@ -99,7 +99,7 @@ function reset() {
         </template>
       </FormInput>
       <div class="mt-4 col-span-full">
-        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none ml-2" @click.prevent="reset">
+        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-hidden ml-2" @click.prevent="reset">
           {{ $t('form.reset') }}
         </button>
       </div>

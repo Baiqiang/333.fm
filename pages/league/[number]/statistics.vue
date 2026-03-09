@@ -131,7 +131,7 @@ useSeoMeta({
     <Heading1>
       {{ $t('league.nav.statistics') }}
     </Heading1>
-    <div class="shadow overflow-x-auto w-full h-screen overflow-y-auto mb-4">
+    <div class="shadow-sm overflow-x-auto w-full h-screen overflow-y-auto mb-4">
       <div class="grid grid-cols-[max-content_max-content_max-content_max-content_max-content_1fr]">
         <div class="grid grid-cols-subgrid col-span-full bg-indigo-600 text-white sticky top-0 z-10">
           <SortingField

@@ -493,7 +493,7 @@ async function signInAs({ wcaId }: User) {
       <button
         class="bg-indigo-500 text-white px-2 py-1 text-sm"
         :class="{
-          'cursor-not-allowed bg-opacity-80': !canGenerate,
+          'cursor-not-allowed opacity-80': !canGenerate,
         }"
         :disabled="!canGenerate"
         @click="generateSchedules"
@@ -520,15 +520,15 @@ async function signInAs({ wcaId }: User) {
           <button
             class="bg-indigo-500 text-white px-2 py-1"
             :class="{
-              'cursor-pointer hover:bg-opacity-90': scramblesValid,
-              'cursor-not-allowed bg-opacity-80': !scramblesValid,
+              'cursor-pointer hover:bg-indigo-500/90': scramblesValid,
+              'cursor-not-allowed opacity-80': !scramblesValid,
             }"
             :disabled="!scramblesValid"
             @click="editDialog.confirm"
           >
             {{ $t('form.submit') }}
           </button>
-          <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="editDialog.cancel">
+          <button class="bg-gray-300 hover:bg-gray-300/80 cursor-pointer px-2 py-1" @click="editDialog.cancel">
             {{ $t('form.cancel') }}
           </button>
         </div>
@@ -593,13 +593,13 @@ async function signInAs({ wcaId }: User) {
         <div class="flex gap-2 justify-end">
           <button
             class="bg-indigo-500 text-white px-2 py-1"
-            :class="{ 'cursor-not-allowed bg-opacity-80': !canSubmitAddSubmission || addSubmissionSubmitting }"
+            :class="{ 'cursor-not-allowed opacity-80': !canSubmitAddSubmission || addSubmissionSubmitting }"
             :disabled="!canSubmitAddSubmission || addSubmissionSubmitting"
             @click="submitAddSubmission"
           >
             {{ addSubmissionSubmitting ? '...' : $t('form.submit') }}
           </button>
-          <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="addSubmissionModal = false">
+          <button class="bg-gray-300 hover:bg-gray-300/80 cursor-pointer px-2 py-1" @click="addSubmissionModal = false">
             {{ $t('form.cancel') }}
           </button>
         </div>

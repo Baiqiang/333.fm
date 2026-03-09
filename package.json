@@ -32,10 +32,10 @@
     "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/i18n": "^8.5.5",
     "@nuxtjs/mdc": "0.18.0",
-    "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia-plugin-persistedstate/nuxt": "^1.2.1",
     "@pinia/nuxt": "^0.5.5",
-    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/vite": "^4.2.1",
     "@types/three": "^0.169.0",
     "@vite-pwa/assets-generator": "^0.2.6",
     "@vite-pwa/nuxt": "^0.10.5",
@@ -43,13 +43,13 @@
     "@vueuse/nuxt": "^14.0.0",
     "dayjs-nuxt": "^2.1.11",
     "eslint": "^9.13.0",
-    "less": "^4.2.0",
+    "less": "^4.5.1",
     "nuxt": "^3.13.2",
     "nuxt-echarts": "^0.2.3",
     "nuxt-gtag": "^3.0.1",
     "nuxt-icon": "^0.6.10",
     "pinia": "^2.2.4",
-    "postcss-html": "^1.7.0",
+    "tailwindcss": "^4.2.1",
     "typescript": "5.5"
   }
 }

@@ -239,7 +239,7 @@ useSeoMeta({ title: t('search.title') })
       <input
         v-model="query"
         type="text"
-        class="flex-1 block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+        class="flex-1 block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
         :placeholder="$t('search.placeholder')"
       >
       <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 shadow-md hover:shadow-lg transition-all duration-200">
@@ -355,7 +355,7 @@ useSeoMeta({ title: t('search.title') })
         </button>
       </div>
 
-      <div v-if="advancedTab === 'submissions'" class="bg-white shadow-sm p-4 mb-4">
+      <div v-if="advancedTab === 'submissions'" class="bg-white shadow-xs p-4 mb-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
             <label class="block text-sm text-gray-600 mb-1">{{ $t('search.filters.minMoves') }}</label>
@@ -363,7 +363,7 @@ useSeoMeta({ title: t('search.title') })
               v-model.number="minMoves"
               type="number"
               min="0"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
           <div>
@@ -372,7 +372,7 @@ useSeoMeta({ title: t('search.title') })
               v-model.number="maxMoves"
               type="number"
               min="0"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
           <div>
@@ -380,7 +380,7 @@ useSeoMeta({ title: t('search.title') })
             <input
               v-model="startDate"
               type="date"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
           <div>
@@ -388,7 +388,7 @@ useSeoMeta({ title: t('search.title') })
             <input
               v-model="endDate"
               type="date"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
         </div>
@@ -400,14 +400,14 @@ useSeoMeta({ title: t('search.title') })
         </button>
       </div>
 
-      <div v-if="advancedTab === 'scrambles'" class="bg-white shadow-sm p-4 mb-4">
+      <div v-if="advancedTab === 'scrambles'" class="bg-white shadow-xs p-4 mb-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label class="block text-sm text-gray-600 mb-1">{{ $t('search.filters.startDate') }}</label>
             <input
               v-model="startDate"
               type="date"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
           <div>
@@ -415,7 +415,7 @@ useSeoMeta({ title: t('search.title') })
             <input
               v-model="endDate"
               type="date"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
         </div>
@@ -427,13 +427,13 @@ useSeoMeta({ title: t('search.title') })
         </button>
       </div>
 
-      <div v-if="advancedTab === 'competitions'" class="bg-white shadow-sm p-4 mb-4">
+      <div v-if="advancedTab === 'competitions'" class="bg-white shadow-xs p-4 mb-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <label class="block text-sm text-gray-600 mb-1">{{ $t('search.filters.type') }}</label>
             <select
               v-model="competitionType"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
               <option v-for="ct in competitionTypes" :key="String(ct.value)" :value="ct.value">
                 {{ ct.label }}
@@ -445,7 +445,7 @@ useSeoMeta({ title: t('search.title') })
             <input
               v-model="startDate"
               type="date"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
           <div>
@@ -453,7 +453,7 @@ useSeoMeta({ title: t('search.title') })
             <input
               v-model="endDate"
               type="date"
-              class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200"
+              class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
             >
           </div>
         </div>

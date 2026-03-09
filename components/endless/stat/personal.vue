@@ -356,7 +356,7 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
       cls.push('bg-orange-500')
     }
     else {
-      cls.push('bg-gradient-to-r from-orange-500 from-50% to-50%')
+      cls.push('bg-linear-to-r from-orange-500 from-50% to-50%')
       if (value === best)
         cls.push('to-green-500')
       if (value === worst)
@@ -457,6 +457,6 @@ function setDataRange(event: { start: number, end: number }) {
 
 <style scoped>
 .unlimited-best {
-  background-image: linear-gradient(to right, theme('colors.orange.500') 50%, theme('colors.green.500') 50%);
+  background-image: linear-gradient(to right, var(--color-orange-500) 50%, var(--color-green-500) 50%);
 }
 </style>

@@ -74,6 +74,8 @@ watch(() => route.hash, (newHash) => {
 </template>
 
 <style scoped>
+@reference "~/assets/css/tailwind.css";
+
 .tabs-container {
   @apply w-full;
 }

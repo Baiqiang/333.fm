@@ -86,14 +86,14 @@ function reset() {
       />
       <div class="mt-4">
         <button
-          class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
-          :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }"
+          class="px-2 py-1 text-white bg-blue-500 focus:outline-hidden"
+          :class="{ 'opacity-50 cursor-not-allowed': !formState }"
           :disabled="!formState"
           @click.prevent="submit"
         >
           {{ $t('form.submit') }}
         </button>
-        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none ml-2" @click.prevent="reset">
+        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-hidden ml-2" @click.prevent="reset">
           {{ $t('form.reset') }}
         </button>
       </div>

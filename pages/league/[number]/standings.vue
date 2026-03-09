@@ -44,17 +44,17 @@ function getStandingClass(tierIndex: number, index: number) {
   // winner in tier 1
   if (tierIndex === 0 && index < 3) {
     return [
-      'bg-gradient-to-r from-[#ffd700] to-[#d4af37] text-white',
-      'bg-gradient-to-r from-[#c0c0c0] to-[#a8a8a8] text-white',
-      'bg-gradient-to-r from-[#cd7f32] to-[#c79b56] text-white',
+      'bg-linear-to-r from-[#ffd700] to-[#d4af37] text-white',
+      'bg-linear-to-r from-[#c0c0c0] to-[#a8a8a8] text-white',
+      'bg-linear-to-r from-[#cd7f32] to-[#c79b56] text-white',
     ][index]
   }
   const promotions = season.value.number < 6 ? 2 : 3
   if (index < promotions) {
-    ret = 'bg-gradient-to-r from-green-300 to-green-200'
+    ret = 'bg-linear-to-r from-green-300 to-green-200'
   }
   if (index > tierStandings.value[0].standings.length - promotions - 1) {
-    ret = 'bg-gradient-to-r from-red-300 to-red-200'
+    ret = 'bg-linear-to-r from-red-300 to-red-200'
     if (tierIndex === tierStandings.value.length - 1) {
       ret = ''
     }
@@ -64,11 +64,11 @@ function getStandingClass(tierIndex: number, index: number) {
 function getResultClass(points?: number) {
   switch (points) {
     case 2:
-      return 'bg-gradient-to-r from-green-500 to-green-400 text-white font-bold'
+      return 'bg-linear-to-r from-green-500 to-green-400 text-white font-bold'
     case 1:
-      return 'bg-gradient-to-r from-yellow-500 to-yellow-400 text-white font-bold'
+      return 'bg-linear-to-r from-yellow-500 to-yellow-400 text-white font-bold'
     default:
-      return 'bg-gradient-to-r from-red-500 to-red-400 text-white font-bold'
+      return 'bg-linear-to-r from-red-500 to-red-400 text-white font-bold'
   }
 }
 </script>
@@ -78,10 +78,10 @@ function getResultClass(points?: number) {
     <Heading1>
       {{ $t('league.nav.standings') }}
     </Heading1>
-    <div class="shadow">
+    <div class="shadow-sm">
       <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content_1fr] overflow-x-auto">
         <template v-for="{ tier, standings }, tierIndex in tierStandings" :key="tier.id">
-          <div class="grid grid-cols-subgrid col-span-full bg-gradient-to-r from-indigo-600 to-indigo-500 text-white mt-1 first:mt-0">
+          <div class="grid grid-cols-subgrid col-span-full bg-linear-to-r from-indigo-600 to-indigo-500 text-white mt-1 first:mt-0">
             <div class="p-2 font-semibold tracking-wide">
               {{ tier.name }}
             </div>

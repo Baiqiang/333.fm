@@ -12,7 +12,7 @@ const totalPlayers = computed(() => props.season.tiers.reduce((sum, tier) => sum
 
 <template>
   <div class="py-4">
-    <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 text-white mb-6">
+    <div class="bg-linear-to-r from-blue-500 to-purple-500 p-4 text-white mb-6">
       <h1 class="text-3xl font-bold mb-3">
         {{ season.title }}
       </h1>

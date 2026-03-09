@@ -223,7 +223,7 @@ watch(() => props.expanded, (expanded) => {
         Either this solution is not a valid one or the moves is incorrect.
       </div>
       <div class="flex gap-2 justify-end">
-        <button class="bg-indigo-500 hover:bg-opacity-90 text-white cursor-pointer px-2 py-1" @click="cancel">
+        <button class="bg-indigo-500 hover:bg-indigo-500/90 text-white cursor-pointer px-2 py-1" @click="cancel">
           {{ $t('form.confirm') }}
         </button>
       </div>

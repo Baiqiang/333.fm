@@ -68,7 +68,7 @@ useSeoMeta({
         <input
           id="wca-q"
           v-model="query.q"
-          class="border rounded-sm px-2 py-1"
+          class="border rounded-xs px-2 py-1"
           placeholder="Competition name..."
           type="text"
         >
@@ -77,7 +77,7 @@ useSeoMeta({
         <FormDateInput
           id="wca-start"
           v-model="query.start"
-          class="border rounded-sm px-2 py-1 flex-1"
+          class="border rounded-xs px-2 py-1 flex-1"
           type="date"
           placeholder="Start date"
         />
@@ -85,7 +85,7 @@ useSeoMeta({
         <FormDateInput
           id="wca-end"
           v-model="query.end"
-          class="border rounded-sm px-2 py-1 flex-1"
+          class="border rounded-xs px-2 py-1 flex-1"
           type="date"
           placeholder="End date"
         />
@@ -93,7 +93,7 @@ useSeoMeta({
     </div>
     <Loading v-if="loading" />
     <div v-else class="space-y-2">
-      <div v-for="competition in competitions" :key="competition.id" class="p-4 border shadow-sm bg-white">
+      <div v-for="competition in competitions" :key="competition.id" class="p-4 border shadow-xs bg-white">
         <h3 class="font-semibold text-lg">
           <NuxtLink :to="`/wca/competition/${competition.id}`" class="hover:underline text-blue-700">
             {{ competition.name }}

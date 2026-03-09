@@ -233,7 +233,7 @@ function reset() {
     </Heading1>
     <p class="mb-2" v-html="$t('if.description')" />
     <FormWrapper class="pb-20" @submit="submit" @reset="reset">
-      <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none" @click.prevent="reset">
+      <button class="px-2 py-1 text-white bg-gray-500 focus:outline-hidden" @click.prevent="reset">
         {{ $t('form.reset') }}
       </button>
       <FormInput
@@ -309,13 +309,13 @@ function reset() {
         :label="$t('if.algs.label')"
       >
         <div class="flex md:mt-2">
-          <button class=" bg-green-600 focus:outline-none text-white px-2 py-1" @click.prevent="checkAll">
+          <button class=" bg-green-600 focus:outline-hidden text-white px-2 py-1" @click.prevent="checkAll">
             {{ $t('if.algs.all') }}
           </button>
-          <button class="bg-gray-500 focus:outline-none text-white px-2 py-1" @click.prevent="checkNone">
+          <button class="bg-gray-500 focus:outline-hidden text-white px-2 py-1" @click.prevent="checkNone">
             {{ $t('if.algs.none') }}
           </button>
-          <button class=" bg-sky-500 focus:outline-none text-white px-2 py-1" @click.prevent="checkNecessary">
+          <button class=" bg-sky-500 focus:outline-hidden text-white px-2 py-1" @click.prevent="checkNecessary">
             {{ $t('if.algs.necessary') }}
           </button>
         </div>
@@ -328,7 +328,7 @@ function reset() {
               v-for="alg in list"
               :key="alg"
               class="flex items-center gap-1"
-              :class="{ 'border-b border-red-500 border-opacity-50': suggestAlgs.indexOf(alg) > -1 }"
+              :class="{ 'border-b border-red-500/50': suggestAlgs.indexOf(alg) > -1 }"
             >
               <input v-model="form.algs" :value="alg" type="checkbox" class="border-gray-300 text-if focus:outline-if focus:ring-if focus:ring-2">
               <span class="whitespace-nowrap">{{ $t(`if.algs.${alg}.label`) }}</span>
@@ -361,14 +361,14 @@ function reset() {
       </FormInput>
       <div class="mt-4">
         <button
-          class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
-          :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }"
+          class="px-2 py-1 text-white bg-blue-500 focus:outline-hidden"
+          :class="{ 'opacity-50 cursor-not-allowed': !formState }"
           :disabled="!formState"
           @click.prevent="submit"
         >
           {{ $t('form.submit') }}
         </button>
-        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none ml-2" @click.prevent="reset">
+        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-hidden ml-2" @click.prevent="reset">
           {{ $t('form.reset') }}
         </button>
       </div>

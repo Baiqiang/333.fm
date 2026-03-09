@@ -83,7 +83,7 @@ function toggleMobileMenu() {
   </button>
   <div class="relative">
     <nav
-      class="fixed md:sticky top-0 left-0 h-screen w-full bg-gray-50 md:border-r-2 transform transition-transform duration-300 ease-in-out z-40"
+      class="fixed md:sticky top-0 left-0 h-screen w-full bg-gray-50 md:border-gray-200 md:border-r-2 transform transition-transform duration-300 ease-in-out z-40"
       :class="{
         '-translate-x-full md:translate-x-0': !isMobileMenuOpen,
         'translate-x-0': isMobileMenuOpen,

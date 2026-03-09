@@ -14,15 +14,15 @@ const props = withDefaults(defineProps<{
 })
 const value = defineModel<string | number>()
 const inputClass = computed<string>(() => {
-  const className = ['focus:ring-2 focus:ring-opacity-50']
+  const className = ['focus:ring-2']
   if (props.type !== 'file')
-    className.push('block w-full shadow-sm')
+    className.push('block w-full shadow-xs')
   if (props.state === null)
-    className.push('border-gray-300 focus:border-indigo-300 focus:ring-indigo-200')
+    className.push('border-gray-300 focus:border-indigo-300 focus:ring-indigo-200/50')
   else if (props.state === true)
-    className.push('border-green-600 focus:border-green-600 focus:ring-green-200')
+    className.push('border-green-600 focus:border-green-600 focus:ring-green-200/50')
   else
-    className.push('border-red-600 focus:border-red-600 focus:ring-red-200')
+    className.push('border-red-600 focus:border-red-600 focus:ring-red-200/50')
   if (props.attrs?.disabled)
     className.push('bg-gray-100 cursor-not-allowed')
 

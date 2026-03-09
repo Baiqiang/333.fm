@@ -45,12 +45,3 @@ useIntervalFn(checkAuth, 1000 * 60 * 5)
     <NuxtPage />
   </NuxtLayout>
 </template>
-
-<style>
-body {
-  @apply font-inter bg-gray-50;
-}
-h1, h2, h3, h4, h5, h6 {
-  @apply font-poppins;
-}
-</style>

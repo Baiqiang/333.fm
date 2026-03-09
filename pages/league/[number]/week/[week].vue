@@ -86,8 +86,7 @@ bus.on(fetchSubmissions)
         :name="$t('weekly.scramble', { number: scramble.number })"
         :hash="`scramble-${scramble.number}`"
       >
-        <StickyScramble :scramble="scramble.scramble" />
-        <CubeExpanded :moves="scramble.scramble" />
+        <ScrambleDisplay :scramble="scramble.scramble" />
         <p v-if="!isPlayer" class="text-gray-600 text-sm italic my-2">
           {{ $t('league.rules.others') }}
         </p>

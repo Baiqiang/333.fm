@@ -25,19 +25,19 @@ async function unparticipate() {
 
 <template>
   <div v-if="show" class="flex flex-col items-center justify-center bg-white shadow-md p-6 my-6">
-    <h3 class="text-2xl font-extrabold my-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 drop-shadow-md tracking-wide uppercase">
+    <h3 class="text-2xl font-extrabold my-4 text-transparent bg-clip-text bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 drop-shadow-md tracking-wide uppercase">
       {{ $t('league.participate.signUp', { number: season.number + 1 }) }}
     </h3>
     <button
       v-if="!participated"
-      class="px-6 py-2 text-lg font-semibold bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow hover:from-blue-500 hover:to-blue-700 transition"
+      class="px-6 py-2 text-lg font-semibold bg-linear-to-r from-blue-400 to-blue-600 text-white shadow-sm hover:from-blue-500 hover:to-blue-700 transition"
       @click="participate"
     >
       {{ $t('league.participate.label') }}
     </button>
     <button
       v-else
-      class="px-6 py-2 text-lg font-semibold bg-gradient-to-r from-red-400 to-red-600 text-white shadow hover:from-red-500 hover:to-red-700 transition"
+      class="px-6 py-2 text-lg font-semibold bg-linear-to-r from-red-400 to-red-600 text-white shadow-sm hover:from-red-500 hover:to-red-700 transition"
       @click="unparticipate"
     >
       {{ $t('league.participate.unparticipate') }}

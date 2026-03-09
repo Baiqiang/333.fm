@@ -182,7 +182,7 @@ function handleKeydown(e: KeyboardEvent) {
       <textarea
         ref="textareaRef"
         v-model="content"
-        class="w-full border border-gray-300 px-3 py-2 text-sm resize-none focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-opacity-50 focus:ring-indigo-200"
+        class="w-full border border-gray-300 px-3 py-2 text-sm resize-none focus:outline-hidden focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200/50"
         rows="2"
         :placeholder="$t('comment.placeholder')"
         @input="handleInput"

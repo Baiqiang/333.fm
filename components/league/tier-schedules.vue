@@ -23,7 +23,7 @@ const grouppedSchedules = computed(() => {
   </h4>
   <template v-for="{ competition, duels } of grouppedSchedules" :key="competition.id">
     <div class="col-span-5 col-start-5 grid grid-cols-subgrid mt-2">
-      <div class="col-span-4 flex items-center bg-indigo-50 border border-r-0 border-indigo-200 p-2 shadow-sm">
+      <div class="col-span-4 flex items-center bg-indigo-50 border border-r-0 border-indigo-200 p-2 shadow-xs">
         <div class="font-semibold text-indigo-700 mr-3">
           Week {{ leagueWeek(competition) }}
         </div>

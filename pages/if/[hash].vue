@@ -132,7 +132,7 @@ if (status.value !== IFStatus.FINISHED) {
 <template>
   <div class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-y-1 mt-4">
     <div v-if="isIF" class="md:col-span-2 flex justify-end">
-      <button class="bg-indigo-500 px-2 py-1 text-white hover:bg-opacity-80" @click="findThis">
+      <button class="bg-indigo-500 px-2 py-1 text-white hover:bg-indigo-500/80" @click="findThis">
         {{ $t('if.find') }}
       </button>
     </div>

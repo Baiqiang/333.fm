@@ -20,7 +20,7 @@ const typeLabels: Record<number, string> = {
 </script>
 
 <template>
-  <NuxtLink :to="competition.url" class="block p-3 bg-white shadow-sm hover:shadow-md transition-all duration-200">
+  <NuxtLink :to="competition.url" class="block p-3 bg-white shadow-xs hover:shadow-md transition-all duration-200">
     <div class="flex items-center gap-2">
       <span class="font-medium">{{ competition.name }}</span>
       <span class="text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5">

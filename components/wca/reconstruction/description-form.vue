@@ -47,7 +47,7 @@ async function save() {
         <textarea
           v-model="description"
           rows="4"
-          class="block w-full shadow-sm border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:border-indigo-300 focus:ring-indigo-200 text-sm"
+          class="block w-full shadow-xs border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50 text-sm"
           :placeholder="t('wca.recon.descriptionPlaceholder')"
         />
       </template>

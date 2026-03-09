@@ -281,8 +281,8 @@ function reset() {
       />
       <div class="mt-4">
         <button
-          class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
-          :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }"
+          class="px-2 py-1 text-white bg-blue-500 focus:outline-hidden"
+          :class="{ 'opacity-50 cursor-not-allowed': !formState }"
           :disabled="!formState"
           @click.prevent="submit"
         >
@@ -291,12 +291,12 @@ function reset() {
             {{ $t('form.submit') }}
           </template>
         </button>
-        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none ml-2" @click.prevent="reset">
+        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-hidden ml-2" @click.prevent="reset">
           {{ $t('form.reset') }}
         </button>
         <button
           v-if="allowUnlimited && !allowChangeMode && form.mode === CompetitionMode.REGULAR && submissionsMap[CompetitionMode.REGULAR] && !submissionsMap[CompetitionMode.UNLIMITED] && isOnGoing"
-          class="px-2 py-1 text-white bg-orange-500 focus:outline-none ml-2"
+          class="px-2 py-1 text-white bg-orange-500 focus:outline-hidden ml-2"
           @click.prevent="turnToUnlimited"
         >
           {{ $t('weekly.turnToUnlimited.label') }}
@@ -310,10 +310,10 @@ function reset() {
         {{ confirmMessage }}
       </div>
       <div class="flex gap-2 justify-end">
-        <button class="bg-rose-500 hover:bg-opacity-90 text-white cursor-pointer px-2 py-1" @click="confirm">
+        <button class="bg-rose-500 hover:bg-rose-500/90 text-white cursor-pointer px-2 py-1" @click="confirm">
           {{ $t('form.confirm') }}
         </button>
-        <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="cancel">
+        <button class="bg-gray-300 hover:bg-gray-300/80 cursor-pointer px-2 py-1" @click="cancel">
           {{ $t('form.cancel') }}
         </button>
       </div>

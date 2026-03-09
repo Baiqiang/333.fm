@@ -63,8 +63,8 @@ async function submit() {
       />
       <div class="mt-4">
         <button
-          class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
-          :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }"
+          class="px-2 py-1 text-white bg-blue-500 focus:outline-hidden"
+          :class="{ 'opacity-50 cursor-not-allowed': !formState }"
           :disabled="!formState"
           @click.prevent="submit"
         >

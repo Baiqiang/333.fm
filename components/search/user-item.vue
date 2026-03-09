@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <NuxtLink :to="`/profile/${userId(user)}`" class="flex items-center gap-3 p-3 bg-white shadow-sm hover:shadow-md transition-all duration-200">
+  <NuxtLink :to="`/profile/${userId(user)}`" class="flex items-center gap-3 p-3 bg-white shadow-xs hover:shadow-md transition-all duration-200">
     <UserAvatar :user="user" :link="false" :size="10" />
     <div>
       <div class="font-medium">

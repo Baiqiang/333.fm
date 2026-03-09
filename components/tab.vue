@@ -30,6 +30,8 @@ index.value = addTab({
 </template>
 
 <style scoped>
+@reference "~/assets/css/tailwind.css";
+
 .tab-panel {
   @apply w-full;
   min-height: 6.25rem;

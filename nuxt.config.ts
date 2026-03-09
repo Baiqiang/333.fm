@@ -1,5 +1,10 @@
+import tailwindcss from '@tailwindcss/vite'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  vite: {
+    plugins: [tailwindcss()],
+  },
   app: {
     head: {
       titleTemplate: '%s - Fewest Moves',
@@ -18,7 +23,6 @@ export default defineNuxtConfig({
 
   modules: [
     // '@nuxtjs/eslint-module',
-    '@nuxtjs/tailwindcss',
     '@nuxtjs/i18n',
     '@nuxtjs/google-fonts',
     '@nuxtjs/mdc',
@@ -63,7 +67,7 @@ export default defineNuxtConfig({
       : undefined,
   ],
 
-  css: ['viewerjs/dist/viewer.css'],
+  css: ['~/assets/css/tailwind.css', 'viewerjs/dist/viewer.css'],
 
   dayjs: {
     locales: ['en', 'zh-cn'],

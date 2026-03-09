@@ -225,8 +225,8 @@ async function decline() {
       </FormInput>
       <div class="mt-4 flex gap-2">
         <button
-          class="px-2 py-1 text-white bg-blue-500 focus:outline-none"
-          :class="{ 'bg-opacity-50 cursor-not-allowed': !formState }"
+          class="px-2 py-1 text-white bg-blue-500 focus:outline-hidden"
+          :class="{ 'opacity-50 cursor-not-allowed': !formState }"
           :disabled="!formState"
           @click.prevent="submit"
         >
@@ -235,12 +235,12 @@ async function decline() {
             {{ $t('form.submit') }}
           </template>
         </button>
-        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-none" @click.prevent="reset">
+        <button class="px-2 py-1 text-white bg-gray-500 focus:outline-hidden" @click.prevent="reset">
           {{ $t('form.reset') }}
         </button>
         <button
           v-if="tree"
-          class="px-2 py-1 text-white bg-yellow-500 focus:outline-none"
+          class="px-2 py-1 text-white bg-yellow-500 focus:outline-hidden"
           @click.prevent="decline"
         >
           <Spinner v-if="loading" class="w-4 h-4 text-white border-[3px]" />

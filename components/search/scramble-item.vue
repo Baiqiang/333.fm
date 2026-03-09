@@ -7,7 +7,7 @@ defineProps<{
 <template>
   <NuxtLink
     :to="competitionPath(scramble.competition, scramble)"
-    class="block p-3 bg-white shadow-sm hover:shadow-md transition-all duration-200"
+    class="block p-3 bg-white shadow-xs hover:shadow-md transition-all duration-200"
   >
     <div class="font-mono text-sm break-all">
       {{ scramble.scramble }}

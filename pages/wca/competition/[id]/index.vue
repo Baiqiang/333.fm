@@ -160,7 +160,7 @@ const displayName = computed(() => liveCompetition?.value?.name ?? wcaCompetitio
     <NuxtLink
       v-if="hasStarted"
       :to="`/wca/reconstruction/${wcaCompetitionId}`"
-      class="inline-flex items-center gap-2 my-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium shadow-sm transition-colors"
+      class="inline-flex items-center gap-2 my-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium shadow-xs transition-colors"
     >
       <Icon name="heroicons:document-text-16-solid" />
       {{ t('wca.recon.viewReconstructions') }}
@@ -169,7 +169,7 @@ const displayName = computed(() => liveCompetition?.value?.name ?? wcaCompetitio
     <Tabs v-if="displayRounds.length > 0">
       <Tab v-for="round in displayRounds" :key="round.key" :name="round.name" :hash="round.key">
         <Loading v-if="round.loading" />
-        <div v-else-if="round.results && round.results.length > 0" class="mb-6 p-4 bg-gray-50 shadow w-full overflow-x-auto">
+        <div v-else-if="round.results && round.results.length > 0" class="mb-6 p-4 bg-gray-50 shadow-sm w-full overflow-x-auto">
           <WcaLiveResults :results="round.results" />
         </div>
         <div v-else class="text-sm text-gray-400 italic py-4">

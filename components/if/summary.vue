@@ -28,8 +28,8 @@ const commentedSkeleton = computed<string>(() => {
 
 <template>
   <div class="flex flex-col">
-    <fieldset class="flex-1 border border-opacity-50 px-4 py-2 transition-colors hover:bg-opacity-50" :class="{ 'border-if hover:bg-if': isIF, 'border-sf hover:bg-sf': isSF }">
-      <legend class="bg-opacity-50 px-2 text-gray" :class="{ 'bg-if': isIF, 'bg-sf': isSF }">
+    <fieldset class="flex-1 border px-4 py-2 transition-colors" :class="{ 'border-if/50 hover:bg-if/50': isIF, 'border-sf/50 hover:bg-sf/50': isSF }">
+      <legend class="px-2 text-gray" :class="{ 'bg-if/50': isIF, 'bg-sf/50': isSF }">
         {{ type }}
       </legend>
       <NuxtLink :to="`/${isIF ? 'if' : 'sf'}/${finder.hash}`" class="block h-full">
@@ -84,10 +84,10 @@ const commentedSkeleton = computed<string>(() => {
       </NuxtLink>
     </fieldset>
     <div v-if="editable" class="flex gap-2 my-1">
-      <button class="bg-sky-500 hover:bg-opacity-90 text-white px-2 py-1 flex items-center" @click="emit('edit', finder)">
+      <button class="bg-sky-500 hover:bg-sky-500/90 text-white px-2 py-1 flex items-center" @click="emit('edit', finder)">
         <Icon name="solar:pen-new-square-bold-duotone" size="20" />
       </button>
-      <button class="bg-rose-500 hover:bg-opacity-90 text-white px-2 py-1 flex items-center" @click="emit('remove', finder.hash)">
+      <button class="bg-rose-500 hover:bg-rose-500/90 text-white px-2 py-1 flex items-center" @click="emit('remove', finder.hash)">
         <Icon name="solar:trash-bin-2-bold-duotone" size="20" />
       </button>
     </div>

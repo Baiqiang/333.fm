@@ -67,15 +67,16 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style lang="less">
+<style scoped>
+@reference "~/assets/css/tailwind.css";
+
 .nav {
   @apply text-gray-300 hover:text-white whitespace-nowrap block px-4 py-2 md:p-0;
-
-  &.router-link-active {
-    @apply text-white;
-  }
+}
+.nav:where(.router-link-active) {
+  @apply text-white;
 }
 .sub-nav {
-  @apply md:px-4 py-2 !important;
+  @apply md:px-4! py-2!;
 }
 </style>

@@ -74,8 +74,7 @@ bus.on(fetchSubmissions)
         :name="$t('weekly.scramble', { number: scramble.number })"
         :hash="`scramble-${scramble.number}`"
       >
-        <StickyScramble :scramble="scramble.scramble" />
-        <CubeExpanded :moves="scramble.scramble" />
+        <ScrambleDisplay :scramble="scramble.scramble" />
         <CompetitionForm
           :scramble="scramble"
           :competition="competition"

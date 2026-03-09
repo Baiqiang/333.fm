@@ -18,7 +18,7 @@ const modelValue = defineModel<string>({ default: '' })
     :toolbars="['bold', 'italic', 'strikeThrough', '-', 'unorderedList', 'orderedList', '-', 'link', '-', 'preview']"
     :footers="[]"
     :scroll-auto="false"
-    class="!border-gray-300 !shadow-sm"
+    class="!border-gray-300 !shadow-xs"
     style="height: auto; min-height: 160px;"
   />
 </template>

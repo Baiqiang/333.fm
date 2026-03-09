@@ -77,10 +77,10 @@ await fetchData()
         {{ $t('form.removeConfirm') }}
       </div>
       <div class="flex gap-2 justify-end">
-        <button class="bg-rose-500 hover:bg-opacity-90 text-white cursor-pointer px-2 py-1" @click="removeDialog.confirm">
+        <button class="bg-rose-500 hover:bg-rose-500/90 text-white cursor-pointer px-2 py-1" @click="removeDialog.confirm">
           {{ $t('form.remove') }}
         </button>
-        <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="removeDialog.cancel">
+        <button class="bg-gray-300 hover:bg-gray-300/80 cursor-pointer px-2 py-1" @click="removeDialog.cancel">
           {{ $t('form.cancel') }}
         </button>
       </div>
@@ -98,10 +98,10 @@ await fetchData()
         >
       </div>
       <div class="flex gap-2 justify-end">
-        <button class="bg-rose-500 hover:bg-opacity-90 text-white cursor-pointer px-2 py-1" @click="editDialog.confirm">
+        <button class="bg-rose-500 hover:bg-rose-500/90 text-white cursor-pointer px-2 py-1" @click="editDialog.confirm">
           {{ $t('form.submit') }}
         </button>
-        <button class="bg-gray-300 hover:bg-opacity-80 cursor-pointer px-2 py-1" @click="editDialog.cancel">
+        <button class="bg-gray-300 hover:bg-gray-300/80 cursor-pointer px-2 py-1" @click="editDialog.cancel">
           {{ $t('form.cancel') }}
         </button>
       </div>
