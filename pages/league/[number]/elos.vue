@@ -161,7 +161,7 @@ useSeoMeta({
           <div class="border-t border-gray-200 content-center text-center px-2" :class="tierBackgrounds[tierMaps[elo.user.id]?.level]">
             {{ tierMaps[elo.user.id]?.name }}
           </div>
-          <UserAvatarName :user="elo.user" class="p-2 border-l border-r border-gray-200 md:sticky left-0" />
+          <UserAvatarName :user="elo.user" class="p-2 border-l border-r border-gray-200 bg-gray-50 md:sticky left-0" />
           <div class="p-2 border-l border-gray-200 text-center font-mono font-bold content-center">
             {{ elo.currentElo }}
           </div>
