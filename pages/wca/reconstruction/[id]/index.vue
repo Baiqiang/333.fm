@@ -51,6 +51,15 @@ const scrambleTabs = computed<ScrambleTab[]>(() => {
 
   const roundNumbers = new Set<number>()
   for (const s of reconData.value.scrambles) roundNumbers.add(s.roundNumber!)
+  if (reconData.value.currentUser?.attempts) {
+    for (const key of Object.keys(reconData.value.currentUser.attempts)) {
+      const rn = Number(key.split('-')[0])
+      if (rn)
+        roundNumbers.add(rn)
+    }
+  }
+  if (roundNumbers.size === 0)
+    roundNumbers.add(1)
   const hasMultipleRounds = roundNumbers.size > 1
 
   for (const s of reconData.value.scrambles) {
@@ -66,14 +75,20 @@ const scrambleTabs = computed<ScrambleTab[]>(() => {
     })
   }
 
-  if (tabs.length === 0) {
-    for (let i = 1; i <= 3; i++) {
-      tabs.push({
-        roundNumber: 1,
-        scrambleNumber: i,
-        label: t('wca.recon.attempt', { n: i }),
-        hash: `r1-a${i}`,
-      })
+  for (const rn of roundNumbers) {
+    const numAttempts = reconData.value.attemptsPerRound?.[rn] ?? 3
+    for (let i = 1; i <= numAttempts; i++) {
+      if (!tabs.some(tab => tab.roundNumber === rn && tab.scrambleNumber === i)) {
+        const label = hasMultipleRounds
+          ? `R${rn}-${i}`
+          : t('wca.recon.attempt', { n: i })
+        tabs.push({
+          roundNumber: rn,
+          scrambleNumber: i,
+          label,
+          hash: `r${rn}-a${i}`,
+        })
+      }
     }
   }
 

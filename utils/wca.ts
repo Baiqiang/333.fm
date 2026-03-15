@@ -224,6 +224,7 @@ export interface WcaReconstructionCompetitionData {
   submissions: Record<number, Submission[]>
   isPublished: boolean
   hasOfficialScrambles: boolean
+  attemptsPerRound: Record<number, number>
   currentUser: {
     isParticipant: boolean
     attempts: Record<string, number>
