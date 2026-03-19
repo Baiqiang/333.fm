@@ -11,9 +11,6 @@ interface Tutorial {
   category: string
   language: string
 }
-const { data: finders } = await useApi<InsertionFinder[]>('/if/latest')
-if (!finders.value)
-  finders.value = []
 const { data: tutorials } = await useApi<Tutorial[]>('/tutorial')
 const { data: weekly } = await useApi<Competition>('/weekly/on-going')
 const { data: daily } = await useApi<Competition>('/daily/on-going')
@@ -22,7 +19,7 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
 </script>
 
 <template>
-  <div class="mx-auto py-4">
+  <div class="mx-auto py-4 space-y-2 lg:space-y-4">
     <div class="grid lg:grid-cols-3 lg:grid-flow-dense gap-2 lg:gap-4">
       <div class="lg:col-span-2">
         <h1 class="text-4xl font-bold mb-4 flex items-center gap-2">
@@ -40,7 +37,7 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
           {{ $t('title') }}
         </h1>
 
-        <div class="bg-white shadow-md p-4 mb-4">
+        <div class="bg-white shadow-md p-4">
           <I18nT tag="blockquote" keypath="index.defination" scope="global" cite="" class="text-gray-600 italic">
             <template #title>
               <b>{{ $t('title') }}</b>
@@ -61,7 +58,7 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
         </div>
       </div>
 
-      <div class="bg-white shadow-md border-l-2 md:border-l-4 border-indigo-500 p-2 md:p-4 mb-4 lg:col-span-2">
+      <div class="bg-white shadow-md border-l-2 md:border-l-4 border-indigo-500 p-2 md:p-4 lg:col-span-2">
         <h2 class="text-2xl font-bold mb-3 flex items-center gap-2">
           <NuxtLink to="/tutorial" class="flex items-center gap-2 hover:text-blue-500">
             <Icon name="mdi:book-open-variant" />
@@ -91,7 +88,9 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
       <div class="lg:row-span-2">
         <LeagueConciseSummary :league="league" />
       </div>
+    </div>
 
+    <div class="grid lg:grid-cols-3 gap-2 lg:gap-4">
       <div>
         <div v-if="weekly" class="bg-white shadow-md border-l-2 md:border-l-4 border-blue-500 p-2 md:p-4">
           <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
@@ -109,8 +108,8 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
         </div>
       </div>
 
-      <div>
-        <div v-if="daily" class="bg-white shadow-md border-l-2 md:border-l-4 border-green-500 p-2 md:p-4">
+      <div v-if="daily">
+        <div class="bg-white shadow-md border-l-2 md:border-l-4 border-green-500 p-2 md:p-4">
           <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
             <NuxtLink :to="competitionPath(daily)" class="flex items-center gap-2 hover:text-blue-500">
               <Icon name="mdi:calendar-today" />
@@ -119,24 +118,15 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
           </h2>
           <WeeklySummary :competition="daily" />
         </div>
-        <div class="bg-white shadow-md border-l-2 md:border-l-4 border-purple-500 p-2 lg:p-4 mt-2 lg:mt-4">
+      </div>
+
+      <div>
+        <div class="bg-white shadow-md border-l-2 md:border-l-4 border-purple-500 p-2 md:p-4">
           <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
             <Icon name="mdi:infinity" />
             {{ $t('endless.title') }}
           </h2>
           <EndlessList />
-        </div>
-      </div>
-
-      <div>
-        <div class="bg-white shadow-md border-l-2 md:border-l-4 border-orange-500 p-2 md:p-4">
-          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <Icon name="mdi:clock-outline" />
-            {{ $t('index.latest') }}
-          </h3>
-          <div class="space-y-4">
-            <IfSummary v-for="finder in finders" :key="finder.hash" :finder="finder" />
-          </div>
         </div>
       </div>
     </div>
