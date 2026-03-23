@@ -376,3 +376,20 @@ export const WCA_LIVE_ROUND_QUERY = gql`
   }
   ${WCA_LIVE_ROUND_RESULT_FRAGMENT}
 `
+
+export function formatIdToAttempts(formatId: string): number {
+  switch (formatId) {
+    case '1':
+      return 1
+    case '2':
+      return 2
+    case '3':
+    case 'm':
+      return 3
+    case 'a':
+    case '5':
+      return 5
+    default:
+      return 5
+  }
+}

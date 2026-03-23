@@ -425,6 +425,9 @@ export default {
     single: 'Single',
     challenge: 'Challenge',
     competition: 'Competition',
+    sequence: 'No.',
+    competitionOrder: 'No. {n}',
+    date: 'Date',
     round: 'Round',
     roundType: {
       1: 'First',

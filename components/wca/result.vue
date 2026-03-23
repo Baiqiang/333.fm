@@ -6,6 +6,9 @@ defineProps<{
 
 <template>
   <div class="grid grid-cols-subgrid col-span-full border-b border-gray-300 pb-2">
+    <slot name="sequence">
+      <div />
+    </slot>
     <slot name="competition">
       <a
         :href="`https://www.worldcubeassociation.org/competitions/${result.competition_id}`"
@@ -31,15 +34,19 @@ defineProps<{
       {{ formatWCAResult(result.best) }}
     </div>
     <div
-      v-for="value, index in result.attempts.filter(r => r !== 0)"
+      v-for="value, index in result.attempts.slice(0, 3)"
       :key="index"
       class="font-mono"
       :class="{
         'text-red-400': value === WCA_DNF,
         'text-orange-400': value === WCA_DNS,
+        'text-gray-500': value > 0,
       }"
     >
       {{ formatWCAResult(value) }}
     </div>
+    <slot name="date">
+      <div />
+    </slot>
   </div>
 </template>

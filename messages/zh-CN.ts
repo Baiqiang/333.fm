@@ -425,6 +425,9 @@ export default {
     single: '单次',
     challenge: '赛事',
     competition: '比赛',
+    sequence: '场次',
+    competitionOrder: '第{n}场',
+    date: '日期',
     round: '轮次',
     roundType: {
       1: '初赛',

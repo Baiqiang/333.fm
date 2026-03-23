@@ -2,9 +2,46 @@
 const { t, locale } = useI18n()
 const user = inject(SYMBOL_USER)!
 const config = useRuntimeConfig().public
-const { data } = await useFetch<WCAResult[]>(`${config.wca.apiBaseURL}/persons/${user.value.wcaId}/results`)
-const results = ref<WCAResult[]>(data.value || [])
-const fmResults = results.value.filter(r => r.event_id === '333fm')
+const { data } = await useFetch<WCAResult[]>(`${config.wca.apiBaseURL}/persons/${user.value.wcaId}/results?event_id=333fm`)
+const { data: competitionsData } = await useFetch<WCACompetition[]>(`${config.wca.apiBaseURL}/persons/${user.value.wcaId}/competitions`)
+const fmResults = data.value || []
+const competitions = competitionsData.value || []
+const competitionMap = new Map(competitions.map(competition => [competition.id, competition]))
+const competitionDateMap = new Map(competitions.map(competition => [
+  competition.id,
+  {
+    start: Date.parse(competition.start_date),
+    end: Date.parse(competition.end_date),
+  },
+]))
+const fmResultsByCompetitionDateDesc = fmResults.slice().sort((a, b) => {
+  const dateA = competitionDateMap.get(a.competition_id)
+  const dateB = competitionDateMap.get(b.competition_id)
+  const endDiff = (dateB?.end ?? 0) - (dateA?.end ?? 0)
+  if (endDiff !== 0)
+    return endDiff
+  const startDiff = (dateB?.start ?? 0) - (dateA?.start ?? 0)
+  if (startDiff !== 0)
+    return startDiff
+  return 0
+})
+const competitionMeta = Object.fromEntries(
+  (() => {
+    const competitionIds = [...new Set(fmResultsByCompetitionDateDesc.map(result => result.competition_id))]
+    return competitionIds.map((competitionId, index) => {
+      const competition = competitionMap.get(competitionId)
+      const date = !competition
+        ? ''
+        : competition.start_date === competition.end_date
+          ? competition.start_date
+          : `${competition.start_date} ~ ${competition.end_date}`
+      return [competitionId, {
+        index: competitionIds.length - index,
+        date,
+      }]
+    })
+  })(),
+) as Record<string, { index: number, date: string }>
 const chartSettings = useLocalStorage('profile.wca.chartSettings', {
   expanded: false,
   includeDNF: true,
@@ -395,7 +432,7 @@ const mixedChartOption = computed<ECOption>(() => ({
       <VChart :option="meanChartOption" autoresize />
     </div>
     <div class="overflow-x-auto">
-      <WcaResults :results="fmResults" />
+      <WcaResults :results="fmResultsByCompetitionDateDesc" :competition-meta="competitionMeta" />
     </div>
   </div>
 </template>
