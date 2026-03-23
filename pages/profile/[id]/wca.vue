@@ -5,10 +5,23 @@ const config = useRuntimeConfig().public
 const { data } = await useFetch<WCAResult[]>(`${config.wca.apiBaseURL}/persons/${user.value.wcaId}/results`)
 const results = ref<WCAResult[]>(data.value || [])
 const fmResults = results.value.filter(r => r.event_id === '333fm')
+const chartSettings = useLocalStorage('profile.wca.chartSettings', {
+  expanded: false,
+  includeDNF: true,
+  trimPercent: 5,
+}, {
+  initOnMounted: true,
+})
 const nonDNFMeanResults = fmResults.filter(r => r.average > 0)
 const singles: Record<number, [string, number][]> = {}
 const movesCountMap: Record<number, number> = {}
 const meansCountMap: Record<number, number> = {}
+const allAttempts = fmResults.flatMap(result =>
+  result.attempts
+    .filter(moves => moves > 0 || moves === WCA_DNF)
+    .map(moves => ({ moves })),
+).map((attempt, index) => ({ index: index + 1, moves: attempt.moves }))
+const nonDNFAttempts = allAttempts.filter(attempt => attempt.moves > 0)
 const allSingles: number[] = []
 for (const result of fmResults) {
   const mean = result.average
@@ -25,19 +38,60 @@ for (const result of fmResults) {
     }
   }
 }
-const mo3s: number[] = []
-const ao5s: number[] = []
-const ao12s: number[] = []
-const ao50s: number[] = []
-const ao100s: number[] = []
-const means: number[] = []
-for (let i = 0; i < allSingles.length; i++) {
-  mo3s.push(aoN(allSingles.slice(i - 2, i + 1), 3, true))
-  ao5s.push(aoN(allSingles.slice(i - 4, i + 1), 5))
-  ao12s.push(aoN(allSingles.slice(i - 11, i + 1), 12))
-  ao50s.push(aoN(allSingles.slice(i - 49, i + 1), 50))
-  ao100s.push(aoN(allSingles.slice(i - 99, i + 1), 100))
-  means.push(aoN(allSingles.slice(0, i + 1), 0, true))
+function toChartValue(value: number) {
+  return Number.isNaN(value) ? null : value
+}
+
+function trimmedAverage(results: number[], requiredCount: number, trimCount: number) {
+  const normalizedTrimCount = Math.max(0, Math.floor(trimCount))
+  if (results.length < requiredCount || results.length <= normalizedTrimCount * 2)
+    return Number.NaN
+
+  const sorted = results.slice().sort((a, b) => {
+    if (a === WCA_DNF)
+      return b === WCA_DNF ? 0 : 1
+    if (b === WCA_DNF)
+      return -1
+    return a - b
+  })
+  const trimmed = sorted.slice(normalizedTrimCount, sorted.length - normalizedTrimCount)
+  if (!trimmed.length || trimmed.includes(WCA_DNF))
+    return Number.NaN
+
+  const total = trimmed.reduce((sum, result) => sum + result, 0)
+  return Number((total / trimmed.length).toFixed(2))
+}
+
+const sourceAttempts = computed(() => chartSettings.value.includeDNF ? allAttempts : nonDNFAttempts)
+
+function buildSingleSeries(sourceAttempts: { index: number, moves: number }[]) {
+  return sourceAttempts.map(attempt => [attempt.index, attempt.moves === WCA_DNF ? null : attempt.moves])
+}
+
+function buildAverageSeries(sourceAttempts: { index: number, moves: number }[], n: number, trimCount: number) {
+  const sourceValues = sourceAttempts.map(attempt => attempt.moves)
+  return sourceAttempts.map((attempt, index) => [
+    attempt.index,
+    toChartValue(trimmedAverage(sourceValues.slice(index - n + 1, index + 1), n, trimCount)),
+  ])
+}
+
+function buildCumulativeAverageSeries(sourceAttempts: { index: number, moves: number }[], trimPercent: number) {
+  const normalizedPercent = Math.max(0, Math.min(49, Number(trimPercent) || 0))
+  const sourceValues = sourceAttempts.map(attempt => attempt.moves)
+  return sourceAttempts.map((attempt, index) => {
+    const currentValues = sourceValues.slice(0, index + 1)
+    const trimCount = Math.ceil(currentValues.length * normalizedPercent / 100)
+    return [
+      attempt.index,
+      toChartValue(trimmedAverage(currentValues, 1, trimCount)),
+    ]
+  })
+}
+
+function getAverageTrimCount(n: number, trimPercent: number) {
+  const normalizedPercent = Math.max(0, Math.min(49, Number(trimPercent) || 0))
+  return Math.ceil(n * normalizedPercent / 100)
 }
 const movesCount = Object.entries(movesCountMap).map(([m, count]) => [Number(m), count])
 movesCount.sort((a, b) => a[0] - b[0])
@@ -197,9 +251,9 @@ const meansCountOption: ECOption = {
     },
   ],
 }
-const mixedChartOption: ECOption = {
+const mixedChartOption = computed<ECOption>(() => ({
   title: {
-    text: `${localeName(user.value.name, locale.value)} - WCA - mixed (DNF excluded)`,
+    text: `${localeName(user.value.name, locale.value)} - WCA - mixed`,
   },
   tooltip: {
     trigger: 'axis',
@@ -225,7 +279,7 @@ const mixedChartOption: ECOption = {
   ],
   xAxis: {
     type: 'category',
-    // data: fmResults.map(r => r.competition_id),
+    data: sourceAttempts.value.map(attempt => attempt.index),
   },
   yAxis: {
     type: 'value',
@@ -247,56 +301,87 @@ const mixedChartOption: ECOption = {
       zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: allSingles,
+      data: buildSingleSeries(sourceAttempts.value),
     },
     {
       name: 'Mo3',
       zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: mo3s,
+      data: buildAverageSeries(sourceAttempts.value, 3, 0),
     },
     {
       name: 'Ao5',
       zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: ao5s,
+      data: buildAverageSeries(sourceAttempts.value, 5, getAverageTrimCount(5, chartSettings.value.trimPercent)),
     },
     {
       name: 'Ao12',
       zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: ao12s,
+      data: buildAverageSeries(sourceAttempts.value, 12, getAverageTrimCount(12, chartSettings.value.trimPercent)),
     },
     {
       name: 'Ao50',
       zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: ao50s,
+      data: buildAverageSeries(sourceAttempts.value, 50, getAverageTrimCount(50, chartSettings.value.trimPercent)),
     },
     {
       name: 'Ao100',
       zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: ao100s,
+      data: buildAverageSeries(sourceAttempts.value, 100, getAverageTrimCount(100, chartSettings.value.trimPercent)),
     },
     {
       name: t('result.mean'),
       zlevel: 10,
       showSymbol: false,
       type: 'line',
-      data: means,
+      data: buildCumulativeAverageSeries(sourceAttempts.value, chartSettings.value.trimPercent),
     },
   ],
-}
+}))
 </script>
 
 <template>
   <div class="mt-4">
+    <div class="mb-4">
+      <button
+        class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 shadow-md hover:shadow-lg transition-all duration-200"
+        @click="chartSettings.expanded = !chartSettings.expanded"
+      >
+        {{ chartSettings.expanded ? 'Hide chart options' : 'Show chart options' }}
+      </button>
+    </div>
+    <div v-if="chartSettings.expanded" class="mb-4 flex flex-wrap items-center gap-3 text-sm">
+      <label class="flex items-center gap-2 text-gray-600">
+        <span>Include DNF</span>
+        <input
+          v-model="chartSettings.includeDNF"
+          type="checkbox"
+          class="border-gray-300 text-indigo-500 focus:ring-2 focus:ring-indigo-200/50"
+        >
+      </label>
+      <label class="flex items-center gap-2 text-gray-600">
+        <span>Trim</span>
+        <div class="relative w-20">
+          <input
+            v-model.number="chartSettings.trimPercent"
+            type="number"
+            min="0"
+            max="49"
+            class="block w-full pr-7 shadow-sm border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50"
+          >
+          <span class="absolute inset-y-0 right-2 flex items-center text-sm text-gray-500 pointer-events-none">%</span>
+        </div>
+      </label>
+    </div>
     <div class="h-[480px]">
       <VChart :option="mixedChartOption" autoresize />
     </div>
@@ -309,6 +394,8 @@ const mixedChartOption: ECOption = {
     <div class="h-[480px]">
       <VChart :option="meanChartOption" autoresize />
     </div>
-    <WcaResults :results="fmResults" />
+    <div class="overflow-x-auto">
+      <WcaResults :results="fmResults" />
+    </div>
   </div>
 </template>
