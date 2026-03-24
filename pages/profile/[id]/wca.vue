@@ -146,13 +146,13 @@ function trimmedAverage(results: number[], requiredCount: number, trimCount: num
 const sourceAttempts = computed(() => chartSettings.value.includeDNF ? allAttempts : nonDNFAttempts)
 
 function buildSingleSeries(sourceAttempts: MixedChartAttempt[]) {
-  return sourceAttempts.map(attempt => [attempt.index, attempt.moves === WCA_DNF ? null : attempt.moves])
+  return sourceAttempts.map(attempt => [attempt.index - 1, attempt.moves === WCA_DNF ? null : attempt.moves])
 }
 
 function buildAverageSeries(sourceAttempts: MixedChartAttempt[], n: number, trimCount: number) {
   const sourceValues = sourceAttempts.map(attempt => attempt.moves)
   return sourceAttempts.map((attempt, index) => [
-    attempt.index,
+    attempt.index - 1,
     toChartValue(trimmedAverage(sourceValues.slice(index - n + 1, index + 1), n, trimCount)),
   ])
 }
@@ -164,7 +164,7 @@ function buildCumulativeAverageSeries(sourceAttempts: MixedChartAttempt[], trimP
     const currentValues = sourceValues.slice(0, index + 1)
     const trimCount = Math.ceil(currentValues.length * normalizedPercent / 100)
     return [
-      attempt.index,
+      attempt.index - 1,
       toChartValue(trimmedAverage(currentValues, 1, trimCount)),
     ]
   })
