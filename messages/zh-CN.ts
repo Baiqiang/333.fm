@@ -428,6 +428,7 @@ export default {
     sequence: '场次',
     competitionOrder: '第{n}场',
     date: '日期',
+    bestAverages: '最佳平均',
     round: '轮次',
     roundType: {
       1: '初赛',

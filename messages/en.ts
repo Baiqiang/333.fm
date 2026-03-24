@@ -428,6 +428,7 @@ export default {
     sequence: 'No.',
     competitionOrder: 'No. {n}',
     date: 'Date',
+    bestAverages: 'Best averages',
     round: 'Round',
     roundType: {
       1: 'First',

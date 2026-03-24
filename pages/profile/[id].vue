@@ -106,7 +106,7 @@ useSeoMeta({
     <div v-if="filters.length === 0">
       {{ $t('profile.noRecord') }}
     </div>
-    <div v-else class="grid grid-cols-[max-content_max-content_max-content_1fr] gap-2">
+    <div v-else class="grid grid-cols-[6rem_1fr_1fr_1fr] gap-2">
       <div v-if="records.competitionRecords.length" class="col-span-full grid grid-cols-subgrid pb-2 border-b border-gray-300 font-bold">
         <div class="pl-4">
           {{ $t('result.challenge') }}
@@ -195,7 +195,7 @@ useSeoMeta({
         </div>
       </div>
     </div>
-    <div v-if="filters.length" class="flex flex-wrap gap-2 mt-2 text-xs md:text-base">
+    <div v-if="filters.length" class="flex flex-wrap gap-2 mt-2 text-[0.6rem] md:text-base">
       <NuxtLink
         v-for="{ type, to, label, count } in filters"
         :key="type"
@@ -207,7 +207,7 @@ useSeoMeta({
         }"
       >
         {{ label }}
-        <span v-if="count" class="text-xs">
+        <span v-if="count" class="text-[0.6rem] md:text-xs">
           ({{ count }})
         </span>
       </NuxtLink>
