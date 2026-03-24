@@ -146,7 +146,7 @@ function trimmedAverage(results: number[], requiredCount: number, trimCount: num
 const sourceAttempts = computed(() => chartSettings.value.includeDNF ? allAttempts : nonDNFAttempts)
 
 function buildSingleSeries(sourceAttempts: MixedChartAttempt[]) {
-  return sourceAttempts.map(attempt => [attempt.index - 1, attempt.moves === WCA_DNF ? null : attempt.moves])
+  return sourceAttempts.map(attempt => [attempt.index, attempt.moves === WCA_DNF ? null : attempt.moves])
 }
 
 function buildAverageSeries(sourceAttempts: MixedChartAttempt[], n: number, trimCount: number) {
@@ -170,10 +170,10 @@ function buildCumulativeAverageSeries(sourceAttempts: MixedChartAttempt[], trimP
   })
 }
 
-function formatMixedTooltipValue(value: number | null | undefined) {
+function formatMixedSeriesTooltipValue(seriesName: string, value: number | null | undefined) {
   if (value == null)
     return '-'
-  return formatWCAResult(value, Number.isInteger(value) ? 0 : 2, 1)
+  return formatWCAResult(value, seriesName === t('result.single') ? 0 : 2, 1)
 }
 
 function getTooltipAverageStatus(results: number[], requiredCount: number, trimCount: number) {
@@ -424,6 +424,7 @@ const meansCountOption: ECOption = {
 const mixedChartOption = computed<ECOption>(() => {
   const sourceValues = sourceAttempts.value.map(attempt => attempt.moves)
   const averageSeriesConfig = getMixedAverageSeriesConfig(chartSettings.value.trimPercent)
+  const sourceAttemptMap = new Map(sourceAttempts.value.map(attempt => [attempt.index, attempt]))
 
   function getMixedTooltipStatus(seriesName: string, dataIndex: number) {
     if (seriesName === t('result.single'))
@@ -448,7 +449,8 @@ const mixedChartOption = computed<ECOption>(() => {
       trigger: 'axis',
       formatter: (params: any) => {
         const items = Array.isArray(params) ? params : [params]
-        const attempt = sourceAttempts.value[items[0]?.dataIndex]
+        const axisValue = Number(items[0]?.axisValue ?? items[0]?.name)
+        const attempt = sourceAttemptMap.get(axisValue)
         const title = [
           items[0]?.axisValueLabel || items[0]?.name || '',
           attempt?.competitionName,
@@ -458,7 +460,7 @@ const mixedChartOption = computed<ECOption>(() => {
         const lines = items.map((item: any) => {
           const value = Array.isArray(item.value) ? item.value[1] : item.value
           const status = getMixedTooltipStatus(item.seriesName, item.dataIndex)
-          return `${item.marker}${item.seriesName}: ${status ?? formatMixedTooltipValue(value)}`
+          return `${item.marker}${item.seriesName}: ${status ?? formatMixedSeriesTooltipValue(item.seriesName, value)}`
         })
         return [title, ...lines].join('<br>')
       },
