@@ -230,7 +230,7 @@ movesCount.sort((a, b) => a[0] - b[0])
 const meansCount = Object.entries(meansCountMap).map(([m, count]) => [Number(m), count])
 meansCount.sort((a, b) => a[0] - b[0])
 
-const meanChartData = fmResultsByCompetitionDateDesc.map((result, index) => ({
+const meanChartData = fmResultsByCompetitionDateAsc.map((result, index) => ({
   ...result,
   xIndex: index + 1,
 }))
