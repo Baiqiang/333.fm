@@ -79,7 +79,7 @@ const singles: Record<number, [string, number][]> = {}
 const movesCountMap: Record<number, number> = {}
 const meansCountMap: Record<number, number> = {}
 interface MixedChartAttempt {
-  index: number
+  // index: number
   moves: number
   competitionId: string
   competitionName: string
@@ -94,8 +94,7 @@ const allAttempts = fmResultsByCompetitionDateAsc.flatMap(result =>
       competitionName: competitionMap.get(result.competition_id)?.name || result.competition_id,
     }))
     .filter(({ moves }) => moves > 0 || moves === WCA_DNF),
-).map((attempt, index) => ({
-  index: index + 1,
+).map(attempt => ({
   roundTypeId: attempt.roundTypeId,
   attemptIndex: attempt.attemptIndex,
   moves: attempt.moves,
@@ -146,13 +145,13 @@ function trimmedAverage(results: number[], requiredCount: number, trimCount: num
 const sourceAttempts = computed(() => chartSettings.value.includeDNF ? allAttempts : nonDNFAttempts)
 
 function buildSingleSeries(sourceAttempts: MixedChartAttempt[]) {
-  return sourceAttempts.map(attempt => [attempt.index - 1, attempt.moves === WCA_DNF ? null : attempt.moves])
+  return sourceAttempts.map((attempt, index) => [index, attempt.moves === WCA_DNF ? null : attempt.moves])
 }
 
 function buildAverageSeries(sourceAttempts: MixedChartAttempt[], n: number, trimCount: number) {
   const sourceValues = sourceAttempts.map(attempt => attempt.moves)
   return sourceAttempts.map((attempt, index) => [
-    attempt.index - 1,
+    index,
     toChartValue(trimmedAverage(sourceValues.slice(index - n + 1, index + 1), n, trimCount)),
   ])
 }
@@ -164,7 +163,7 @@ function buildCumulativeAverageSeries(sourceAttempts: MixedChartAttempt[], trimP
     const currentValues = sourceValues.slice(0, index + 1)
     const trimCount = Math.ceil(currentValues.length * normalizedPercent / 100)
     return [
-      attempt.index - 1,
+      index,
       toChartValue(trimmedAverage(currentValues, 1, trimCount)),
     ]
   })
@@ -232,8 +231,9 @@ meansCount.sort((a, b) => a[0] - b[0])
 
 const meanChartData = fmResultsByCompetitionDateAsc.map((result, index) => ({
   ...result,
-  xIndex: index + 1,
+  xIndex: index,
 }))
+const meanChartDataMap = new Map(meanChartData.map(result => [result.xIndex, result]))
 
 const meanChartOption = computed<ECOption>(() => ({
   title: {
@@ -243,8 +243,8 @@ const meanChartOption = computed<ECOption>(() => ({
     trigger: 'axis',
     formatter: (params: any) => {
       const items = Array.isArray(params) ? params : [params]
-      const dataIndex = items[0]?.dataIndex ?? 0
-      const result = meanChartData[dataIndex]
+      const axisValue = Number(items[0]?.axisValue ?? items[0]?.name)
+      const result = meanChartDataMap.get(axisValue)
       const title = result
         ? [
             result.competition_id,
@@ -424,7 +424,7 @@ const meansCountOption: ECOption = {
 const mixedChartOption = computed<ECOption>(() => {
   const sourceValues = sourceAttempts.value.map(attempt => attempt.moves)
   const averageSeriesConfig = getMixedAverageSeriesConfig(chartSettings.value.trimPercent)
-  const sourceAttemptMap = new Map(sourceAttempts.value.map(attempt => [attempt.index, attempt]))
+  const sourceAttemptMap = new Map(sourceAttempts.value.map((attempt, index) => [index + 1, attempt]))
 
   function getMixedTooltipStatus(seriesName: string, dataIndex: number) {
     if (seriesName === t('result.single'))
@@ -486,7 +486,7 @@ const mixedChartOption = computed<ECOption>(() => {
     ],
     xAxis: {
       type: 'category',
-      data: sourceAttempts.value.map(attempt => attempt.index),
+      data: sourceAttempts.value.map((_, index) => index + 1),
     },
     yAxis: {
       type: 'value',
