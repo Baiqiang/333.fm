@@ -207,6 +207,7 @@ function getSingleRecord(userId: number, roundNumber: number, moves: number): st
             <Submissions
               :submissions="reconData.submissions[tab.scramble.id] ?? []"
               :competition="reconData.competition ?? undefined"
+              :scramble="tab.scramble"
               sortable
             >
               <template #extra="submission">
