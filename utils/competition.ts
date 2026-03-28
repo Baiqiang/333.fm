@@ -44,6 +44,8 @@ export interface Scramble extends Time {
   id: number
   number: number
   scramble: string
+  currentHP?: number
+  initialHP?: number
   cubieCube?: {
     corners: number[]
     edges: number[]
@@ -78,6 +80,7 @@ export interface Submission extends Time {
   inverse: boolean
   comment: string
   moves: number
+  damage?: number
   cancelMoves: number
   cumulativeMoves: number
   scramble: Scramble
@@ -157,13 +160,38 @@ export interface Endless extends Competition {
   levels: Level[]
   challenges?: Challenge[]
 }
-export interface Challenge {
+export enum ChallengeType {
+  REGULAR,
+  BOSS,
+}
+
+export interface RegularChallengeRule {
   single: number
   team: [number, number]
+}
+
+export interface BossChallengeRule {
+  instantKill: number
+  minHitPoints: number
+  maxHitPoints: number
+}
+
+export interface BaseChallenge {
+  type: ChallengeType
   startLevel?: number
   endLevel?: number
   levels?: number[]
 }
+
+export type Challenge =
+  | (BaseChallenge & {
+    type: ChallengeType.REGULAR
+    challenge: RegularChallengeRule
+  })
+  | (BaseChallenge & {
+    type: ChallengeType.BOSS
+    challenge: BossChallengeRule
+  })
 
 export interface EndlessStats {
   [key: string]: any[]
@@ -197,6 +225,7 @@ export interface Progress {
   scramble: Scramble
   submission?: Submission
   kickedBy: Kickoff[]
+  dnfPenalty?: boolean
 }
 
 export interface Kickoff extends Time {

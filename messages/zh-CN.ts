@@ -371,6 +371,8 @@ export default {
       any: '有人提交了有效解法',
       single: '有人提交了少于等于 {moves} 步的解法；',
       team: '有 {persons} 人提交了少于等于 {moves} 步的解法；',
+      bossInstantKill: '有人提交了少于等于 {moves} 步的解法，可直接击破 Boss；',
+      bossHitPoints: 'Boss 血量范围为 {min}-{max}。',
     },
     level: '{level} 层',
     progress: {
@@ -383,6 +385,12 @@ export default {
     toBeContinued: '未完待续',
     kickedBy: '破关者',
     kickCondition: '下一关开启：有人提交 ≤{single} 步或者 {persons} 个人提交 ≤{team} 步。',
+    kickConditionAny: '下一关开启：有人提交了有效解法。',
+    bossKickCondition: '下一关开启：有人提交 ≤{instantKill} 步可直接击破 Boss，否则会按步数对 Boss 造成伤害。',
+    bossCurrentHp: '当前 Boss 血量：{hp}',
+    bossDnfPenalty: 'DNF 惩罚生效：本关不能秒杀 Boss，且造成的伤害减半。',
+    instantKill: '秒杀',
+    damageDealt: '伤害 {damage}',
     stats: {
       title: '统计',
       singles: '最佳单次',
@@ -406,7 +414,7 @@ export default {
     },
     type: [
       '常规爬塔，每一层要求一样。',
-      'Boss 挑战，每个整 10 关难度大提升，每过 10 关难度稍微提升。',
+      'Boss 挑战，每一层都是 Boss；每逢整 10 关血量显著提高，秒杀门槛也更严格。',
       'EO 练习塔，每个打乱的 EO 已做好。',
       'DR 练习塔，每个打乱的 DR 已做好。',
       'HTR 练习塔，每个打乱的 HTR 已做好。',

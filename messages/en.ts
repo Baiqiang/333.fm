@@ -371,6 +371,8 @@ export default {
       any: 'A person submits a valid solution.',
       single: 'A person gets a result that is less than or equal to {moves} moves.',
       team: '{persons} persons get results that are less than or equal to {moves} moves.',
+      bossInstantKill: 'A result of {moves} moves or less defeats the boss instantly.',
+      bossHitPoints: 'Boss HP ranges from {min} to {max}.',
     },
     level: 'LV {level}',
     progress: {
@@ -383,6 +385,12 @@ export default {
     toBeContinued: 'To be Continued',
     kickedBy: 'Kicked by',
     kickCondition: 'Next Level: A result that ≤{single} moves or {persons} results that ≤{team} moves submitted.',
+    kickConditionAny: 'Next Level: a valid solution is submitted.',
+    bossKickCondition: 'Next Level: A result of ≤{instantKill} moves defeats the boss instantly; otherwise submissions deal damage based on move count.',
+    bossCurrentHp: 'Current Boss HP: {hp}',
+    bossDnfPenalty: 'DNF penalty active: this level cannot instant-kill the boss, and all damage is halved.',
+    instantKill: 'instant kill',
+    damageDealt: 'damage {damage}',
     stats: {
       title: 'Statistics',
       singles: 'Best Singles',
@@ -406,7 +414,7 @@ export default {
     },
     type: [
       'Regular endless challenge with same requirements for every level.',
-      'Every 10th level is a boss level with difficulty increased. And difficulty increases a little every 10 levels.',
+      'Every level is a boss level. Every 10th level has much higher HP and a stricter instant-kill threshold.',
       'The EO practice has EO done in every scramble.',
       'The DR practice has DR done in every scramble.',
       'The HTR practice has HTR done in every scramble.',
