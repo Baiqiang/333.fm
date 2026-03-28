@@ -19,6 +19,53 @@ interface PersonalResult {
   unlimited: boolean
 }
 
+function sortResultsForAverage(results: number[]) {
+  return results.slice().sort((a, b) => {
+    if (a === DNF)
+      return b === DNF ? 0 : 1
+    if (b === DNF)
+      return -1
+    return a - b
+  })
+}
+
+function trimmedAverage(results: number[], requiredCount: number, trimCount: number) {
+  if (results.length < requiredCount || results.length <= trimCount * 2)
+    return Number.NaN
+  const trimmed = sortResultsForAverage(results).slice(trimCount, results.length - trimCount)
+  if (!trimmed.length || trimmed.includes(DNF))
+    return DNF
+  return Number((trimmed.reduce((sum, result) => sum + result, 0) / trimmed.length).toFixed(2))
+}
+
+function moN(results: number[], n: number) {
+  if (results.length < n)
+    return Number.NaN
+  const current = results.slice(-n)
+  if (current.includes(DNF))
+    return DNF
+  return Number((current.reduce((sum, result) => sum + result, 0) / current.length).toFixed(2))
+}
+
+function aoNWithDNF(results: number[], n: number) {
+  return trimmedAverage(results.slice(-n), n, 1)
+}
+
+function totalMean(results: number[]) {
+  const trimCount = Math.ceil(results.length * 0.05)
+  return trimmedAverage(results, 1, trimCount)
+}
+
+function isFiniteResult(value: number) {
+  return !Number.isNaN(value) && value !== Number.POSITIVE_INFINITY && value !== Number.NEGATIVE_INFINITY
+}
+
+function toChartValue(value: number, precision = 0) {
+  if (!isFiniteResult(value) || value === DNF || value === DNS || value <= 0)
+    return null
+  return Number((value / 100).toFixed(precision))
+}
+
 const stats = computed<{
   results: PersonalResult[]
   movesCount: {
@@ -48,6 +95,7 @@ const stats = computed<{
     unlimited: number
   }> = {}
   const moves: number[] = []
+  const validMoves: number[] = []
   const best = {
     single: Number.POSITIVE_INFINITY,
     mean: Number.POSITIVE_INFINITY,
@@ -69,29 +117,31 @@ const stats = computed<{
       unlimited: (movesCountMap[submission.moves]?.unlimited || 0) + (submission.mode === CompetitionMode.UNLIMITED ? 1 : 0),
     }
     moves.push(submission.moves)
-    const mo3 = aoN(moves, 3, true)
-    const ao5 = aoN(moves, 5)
-    const ao12 = aoN(moves, 12)
-    const mean = aoN(moves, 0, true)
-    if (submission.moves < best.single)
+    if (submission.moves !== DNF)
+      validMoves.push(submission.moves)
+    const mo3 = moN(moves, 3)
+    const ao5 = aoNWithDNF(moves, 5)
+    const ao12 = aoNWithDNF(moves, 12)
+    const mean = totalMean(moves)
+    if (submission.moves !== DNF && submission.moves < best.single)
       best.single = submission.moves
     if (submission.moves > worst.single)
       worst.single = submission.moves
-    if (mo3 < best.mo3)
+    if (isFiniteResult(mo3) && mo3 < best.mo3)
       best.mo3 = mo3
-    if (mo3 > worst.mo3)
+    if (isFiniteResult(mo3) && mo3 > worst.mo3)
       worst.mo3 = mo3
-    if (ao5 < best.ao5)
+    if (isFiniteResult(ao5) && ao5 < best.ao5)
       best.ao5 = ao5
-    if (ao5 > worst.ao5)
+    if (isFiniteResult(ao5) && ao5 > worst.ao5)
       worst.ao5 = ao5
-    if (ao12 < best.ao12)
+    if (isFiniteResult(ao12) && ao12 < best.ao12)
       best.ao12 = ao12
-    if (ao12 > worst.ao12)
+    if (isFiniteResult(ao12) && ao12 > worst.ao12)
       worst.ao12 = ao12
-    if (mean < best.mean)
+    if (isFiniteResult(mean) && mean < best.mean)
       best.mean = mean
-    if (mean > worst.mean)
+    if (isFiniteResult(mean) && mean > worst.mean)
       worst.mean = mean
 
     results.push({
@@ -105,6 +155,9 @@ const stats = computed<{
       unlimited: submission.mode === CompetitionMode.UNLIMITED,
     })
   }
+
+  if (validMoves.length === 0)
+    best.single = Number.NaN
 
   return {
     results,
@@ -128,9 +181,12 @@ const dataRange = reactive({
 })
 const currentMean = computed(() => {
   const results = stats.value.results.slice(dataRange.start, dataRange.end + 1)
-  return formatResult(aoN(results.map(r => r.moves), 0, true), 2)
+  return formatResult(totalMean(results.map(r => r.moves)), 2)
 })
 const lineOptions = computed<ECOption>(() => {
+  const chartMoves = stats.value.results.map(r => r.moves).filter(m => m > 0 && m !== DNF && m !== DNS)
+  const minMove = chartMoves.length ? Math.min(...chartMoves) / 100 - 1 : 0
+  const maxMove = chartMoves.length ? Math.max(...chartMoves) / 100 + 1 : 1
   return {
     title: {
       text: `${localeName(user.name, locale.value)} - ${props.endless.name}`,
@@ -168,8 +224,8 @@ const lineOptions = computed<ECOption>(() => {
     },
     yAxis: {
       type: 'value',
-      min: Math.min(...stats.value.results.map(r => r.moves / 100)) - 1,
-      max: Math.max(...stats.value.results.map(r => r.moves / 100)) + 1,
+      min: minMove,
+      max: maxMove,
       interval: 1,
     },
     legend: {
@@ -185,7 +241,7 @@ const lineOptions = computed<ECOption>(() => {
         name: t('endless.stats.moves'),
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => formatResult(r.moves)),
+        data: stats.value.results.map(r => toChartValue(r.moves)),
         markPoint: {
           data: [
             {
@@ -209,25 +265,25 @@ const lineOptions = computed<ECOption>(() => {
         name: 'Mo3',
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => Number.isNaN(r.mo3) ? null : formatResult(r.mo3, 2)),
+        data: stats.value.results.map(r => toChartValue(r.mo3, 2)),
       },
       {
         name: 'Ao5',
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => Number.isNaN(r.ao5) ? null : formatResult(r.ao5, 2)),
+        data: stats.value.results.map(r => toChartValue(r.ao5, 2)),
       },
       {
         name: 'Ao12',
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => Number.isNaN(r.ao12) ? null : formatResult(r.ao12, 2)),
+        data: stats.value.results.map(r => toChartValue(r.ao12, 2)),
       },
       {
         name: t('result.mean'),
         showSymbol: false,
         type: 'line',
-        data: stats.value.results.map(r => formatResult(r.mean, 2)),
+        data: stats.value.results.map(r => toChartValue(r.mean, 2)),
       },
       {
         type: 'line',
