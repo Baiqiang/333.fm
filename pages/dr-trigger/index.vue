@@ -17,15 +17,9 @@ interface DRTriggerGame {
   totalTimeBonus: number
   createdAt: string
 }
-interface CubieCube {
-  corners: number[]
-  edges: number[]
-  placement: number
-}
 interface DRTrigger {
   id: number
   scramble: string
-  cubieCube: CubieCube
   rzp: string
   arm: string
 }
@@ -413,7 +407,7 @@ onUnmounted(() => {
       <!-- Scramble + Cube Display -->
       <div class="mb-2">
         <StickyScramble :scramble="trigger.scramble" :sticky="false" />
-        <CubeExpanded :moves="trigger.scramble" :cubie-cube="trigger.cubieCube" class="max-w-48!" />
+        <Cube3d :moves="trigger.scramble + solution" />
         <div class="text-xs text-gray-400 font-mono mt-0.5">
           RZP: {{ trigger.rzp }}
         </div>
@@ -627,7 +621,7 @@ onUnmounted(() => {
         <div v-if="leaderboard.highestLevels.length === 0" class="text-gray-400 text-sm">
           {{ $t('drTrigger.noGamesYet') }}
         </div>
-        <div v-else class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-x-3 gap-y-2 text-sm items-center">
+        <div v-else class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-x-3 gap-y-2 text-sm items-center">
           <template v-for="(entry, i) in leaderboard.highestLevels" :key="entry.id">
             <span class="text-gray-400 text-right">{{ i + 1 }}</span>
             <UserAvatarName :user="entry.user" />
@@ -636,6 +630,9 @@ onUnmounted(() => {
             <span class="text-xs text-right" :class="entry.remainingTime > 0 ? 'text-green-600' : 'text-gray-300'">
               {{ entry.remainingTime > 0 ? formatTime(entry.remainingTime) : '' }}
             </span>
+            <NuxtLink :to="`/dr-trigger/${entry.id}`" class="text-indigo-400 hover:text-indigo-600 transition-colors">
+              <Icon name="mdi:eye-outline" />
+            </NuxtLink>
           </template>
         </div>
       </div>

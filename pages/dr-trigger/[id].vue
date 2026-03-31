@@ -1,8 +1,4 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth',
-})
-
 interface GameDetail {
   id: number
   status: number
@@ -11,6 +7,7 @@ interface GameDetail {
   remainingTime: number
   totalTimeBonus: number
   createdAt: string
+  user: User
 }
 
 interface RoundTrigger {
@@ -75,8 +72,12 @@ function toggleRound(i: number) {
 
     <!-- Summary -->
     <div class="bg-white shadow-md p-4 mb-4">
-      <div class="text-sm text-gray-500 mb-2">
-        {{ $dayjs(game.createdAt).format('YYYY-MM-DD HH:mm:ss') }}
+      <div class="flex items-center justify-between mb-2">
+        <UserAvatarName :user="game.user" />
+        <span class="text-sm text-gray-400">
+          {{ $dayjs(game.createdAt).format('YYYY-MM-DD HH:mm:ss') }}
+          · {{ game.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${game.difficulty}` }}
+        </span>
       </div>
       <div class="grid grid-cols-3 gap-4 text-center">
         <div>
