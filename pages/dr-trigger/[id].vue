@@ -28,9 +28,19 @@ interface GameRound {
   trigger: RoundTrigger | null
 }
 
+interface LastTrigger {
+  scramble: string
+  caseId: number
+  rzp: string
+  arm: string
+  optimalMoves: number
+  solutions: DRTriggerSolution[]
+}
+
 interface GameResponse {
   game: GameDetail
   rounds: GameRound[]
+  lastTrigger: LastTrigger | null
 }
 
 const { params } = useRoute()
@@ -43,6 +53,7 @@ if (!data.value || error.value) {
 
 const game = data.value.game
 const rounds = data.value.rounds
+const lastTrigger = data.value.lastTrigger
 
 useSeoMeta({
   title: `${t('drTrigger.title')} - ${t('drTrigger.level', { level: game.levels })}`,
@@ -59,6 +70,19 @@ function formatTime(ms: number): string {
 const expandedRound = ref<number | null>(null)
 function toggleRound(i: number) {
   expandedRound.value = expandedRound.value === i ? null : i
+}
+
+const expandedSolutions = reactive(new Set<string>())
+function toggleSolutions(key: string) {
+  if (expandedSolutions.has(key))
+    expandedSolutions.delete(key)
+  else
+    expandedSolutions.add(key)
+}
+
+function optimalSolutions(solutions: DRTriggerSolution[]) {
+  const min = Math.min(...solutions.map(s => s.length))
+  return solutions.filter(s => s.length === min)
 }
 </script>
 
@@ -157,15 +181,15 @@ function toggleRound(i: number) {
             </div>
           </div>
 
-          <!-- Optimal solutions from case data -->
+          <!-- Solutions from case data -->
           <div v-if="r.trigger?.solutions">
             <div class="text-xs text-gray-400 mb-1">
               {{ $t('drTrigger.history.optimalSolutions') }}
               <span class="text-gray-300">(RZP: {{ r.trigger.rzp }})</span>
             </div>
-            <div class="space-y-0.5 max-h-40 overflow-y-auto">
+            <div class="space-y-0.5">
               <div
-                v-for="(s, si) in r.trigger.solutions.filter((s: DRTriggerSolution) => s.length * 100 <= r.optimalMoves).slice(0, 20)"
+                v-for="(s, si) in optimalSolutions(r.trigger.solutions)"
                 :key="si"
                 class="font-mono text-xs bg-gray-50 px-2 py-1"
               >
@@ -173,7 +197,75 @@ function toggleRound(i: number) {
                 <span class="text-gray-400 ml-1">({{ s.length }})</span>
               </div>
             </div>
+            <template v-if="r.trigger.solutions.length > optimalSolutions(r.trigger.solutions).length">
+              <button
+                class="text-xs text-indigo-500 hover:underline mt-1"
+                @click="toggleSolutions(`r-${i}`)"
+              >
+                {{ expandedSolutions.has(`r-${i}`) ? $t('drTrigger.history.hideSolutions') : $t('drTrigger.history.showAll', { count: r.trigger.solutions.length }) }}
+              </button>
+              <div v-if="expandedSolutions.has(`r-${i}`)" class="space-y-0.5 mt-1 max-h-48 overflow-y-auto">
+                <div
+                  v-for="(s, si) in r.trigger.solutions.filter((s: DRTriggerSolution) => s.length > optimalSolutions(r.trigger!.solutions)[0].length)"
+                  :key="si"
+                  class="font-mono text-xs bg-gray-50 px-2 py-1"
+                >
+                  {{ s.solution }}
+                  <span class="text-gray-400 ml-1">({{ s.length }})</span>
+                </div>
+              </div>
+            </template>
           </div>
+        </div>
+      </div>
+
+      <!-- Last unsolved trigger -->
+      <div v-if="lastTrigger" class="bg-white shadow-sm border-l-4 border-red-400">
+        <div class="p-3 text-sm">
+          <div class="text-red-500 font-semibold mb-2">
+            {{ $t('drTrigger.history.unsolved') }}
+          </div>
+          <div class="text-xs text-gray-400 mb-1">
+            {{ $t('if.scramble.label') }}
+          </div>
+          <div class="font-mono text-xs bg-gray-50 p-2 break-all mb-1">
+            {{ lastTrigger.scramble }}
+          </div>
+          <CubeExpanded :moves="lastTrigger.scramble" class="mb-2" />
+          <div class="text-xs text-gray-400 font-mono mb-2">
+            RZP: {{ lastTrigger.rzp }}
+          </div>
+          <div class="text-xs text-gray-400 mb-1">
+            {{ $t('drTrigger.history.optimalSolutions') }}
+          </div>
+          <div class="space-y-0.5">
+            <div
+              v-for="(s, si) in optimalSolutions(lastTrigger.solutions)"
+              :key="si"
+              class="font-mono text-xs bg-gray-50 px-2 py-1"
+            >
+              {{ s.solution }}
+              <span class="text-gray-400 ml-1">({{ s.length }})</span>
+            </div>
+          </div>
+          <template v-if="lastTrigger.solutions.length > optimalSolutions(lastTrigger.solutions).length">
+            <button
+              class="text-xs text-indigo-500 hover:underline mt-1"
+              @click="toggleSolutions('last')"
+            >
+              {{ expandedSolutions.has('last') ? $t('drTrigger.history.hideSolutions') : $t('drTrigger.history.showAll', { count: lastTrigger.solutions.length }) }}
+            </button>
+            <div v-if="expandedSolutions.has('last')" class="space-y-0.5 mt-1 max-h-48 overflow-y-auto">
+              <div
+                v-for="(s, si) in lastTrigger.solutions.filter((s: DRTriggerSolution) => s.length > optimalSolutions(lastTrigger!.solutions)[0].length)"
+                :key="si"
+                class="font-mono text-xs bg-gray-50 px-2 py-1"
+              >
+                {{ s.solution }}
+                <span class="text-gray-400 ml-1">({{ s.length }})</span>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>

@@ -58,6 +58,7 @@ const isDR = ref<boolean | null>(null)
 const solutionMoves = ref(0)
 const showKeyboard = ref(false)
 const difficulty = ref(5)
+const lastTriggerInfo = ref<any>(null)
 const myGames = ref<DRTriggerGame[]>([])
 const myGamesTotal = ref(0)
 const myGamesPage = ref(1)
@@ -200,6 +201,7 @@ async function submitSolution() {
       game.value = data.game
       rounds.value = data.rounds || []
       allCleared.value = data.allCleared || false
+      lastTriggerInfo.value = data.lastTrigger || null
       gameState.value = 'ended'
       stopTimer()
       timerDisplay.value = allCleared.value ? formatTime(data.game.remainingTime) : '0:00.00'
@@ -237,6 +239,7 @@ async function handleTimeUp() {
     const data = await useClientApi<any>(`/dr-trigger/abandon/${game.value.id}`, { method: 'POST' })
     game.value = data.game
     rounds.value = data.rounds || []
+    lastTriggerInfo.value = data.lastTrigger || null
     gameState.value = 'ended'
     refreshLeaderboard()
     loadMyGames()
@@ -252,6 +255,7 @@ async function abandonGame() {
     const data = await useClientApi<any>(`/dr-trigger/abandon/${game.value.id}`, { method: 'POST' })
     game.value = data.game
     rounds.value = data.rounds || []
+    lastTriggerInfo.value = data.lastTrigger || null
     gameState.value = 'ended'
     stopTimer()
     timerDisplay.value = '0:00.00'
@@ -273,6 +277,7 @@ async function resetToIdle() {
   rounds.value = []
   lastRound.value = null
   allCleared.value = false
+  lastTriggerInfo.value = null
   solution.value = ''
   error.value = ''
   await loadMyGames()
@@ -562,6 +567,29 @@ onUnmounted(() => {
                 {{ r.timeBonus > 0 ? `+${(r.timeBonus / 1000).toFixed(0)}s` : '-' }}
               </div>
             </template>
+          </div>
+        </div>
+
+        <!-- Last unsolved trigger -->
+        <div v-if="lastTriggerInfo" class="border-t border-red-200 pt-3 mt-3">
+          <div class="text-red-500 font-semibold text-sm mb-1">
+            {{ $t('drTrigger.history.unsolved') }}
+          </div>
+          <div class="font-mono text-xs bg-gray-50 p-2 break-all mb-1">
+            {{ lastTriggerInfo.scramble }}
+          </div>
+          <div class="text-xs text-gray-400 font-mono mb-1">
+            RZP: {{ lastTriggerInfo.rzp }}
+            · {{ $t('drTrigger.optimalMoves', { moves: (lastTriggerInfo.optimalMoves / 100).toFixed(0) }) }}
+          </div>
+          <div class="space-y-0.5 max-h-32 overflow-y-auto">
+            <div
+              v-for="(s, si) in lastTriggerInfo.solutions.filter((s: any) => s.length * 100 <= lastTriggerInfo.optimalMoves).slice(0, 10)"
+              :key="si"
+              class="font-mono text-xs bg-gray-50 px-2 py-0.5"
+            >
+              {{ s.solution }}
+            </div>
           </div>
         </div>
       </div>
