@@ -17,6 +17,10 @@ const navs = computed(() => [
     path: '/endless',
   },
   {
+    title: t('drTrigger.shortTitle'),
+    path: '/dr-trigger',
+  },
+  {
     title: t('practice.shortTitle'),
     path: '/practice',
   },
@@ -137,12 +141,12 @@ async function changeLocale(code: string) {
         </div>
         <Nav v-for="nav, index in navs" :key="index" v-bind="nav" />
         <div class="md:ml-auto flex flex-col md:flex-row md:items-center md:gap-3">
-          <NuxtLink to="/search" class="nav">
+          <NuxtLink to="/search" class="px-4 py-2 md:p-0 ">
             <Icon name="heroicons:magnifying-glass" size="20" />
             <span class="md:hidden ml-2">{{ $t('search.title') }}</span>
           </NuxtLink>
           <div class="relative">
-            <a ref="langButton" class="nav" @click="dropdowns.lang = !dropdowns.lang">
+            <a ref="langButton" class="px-4 py-2 md:p-0 " @click="dropdowns.lang = !dropdowns.lang">
               <Icon name="ic:round-translate" size="20" />
               <span class="md:hidden ml-2">
                 {{ locales.find(l => l.code === $i18n.locale)?.label }}
