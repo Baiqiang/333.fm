@@ -4,6 +4,7 @@ interface GameDetail {
   status: number
   levels: number
   difficulty: number
+  rzp: string | null
   remainingTime: number
   totalTimeBonus: number
   createdAt: string
@@ -100,7 +101,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
         <UserAvatarName :user="game.user" />
         <span class="text-sm text-gray-400">
           {{ $dayjs(game.createdAt).format('YYYY-MM-DD HH:mm:ss') }}
-          · {{ game.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${game.difficulty}` }}
+          · {{ game.rzp ? `RZP: ${game.rzp}` : game.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${game.difficulty}` }}
         </span>
       </div>
       <div class="grid grid-cols-3 gap-4 text-center">

@@ -13,6 +13,7 @@ interface DRTriggerGame {
   status: number
   levels: number
   difficulty: number
+  rzp: string | null
   remainingTime: number
   totalTimeBonus: number
   createdAt: string
@@ -33,6 +34,7 @@ interface LeaderboardGame {
   id: number
   levels: number
   difficulty: number
+  rzp: string | null
   remainingTime: number
   totalTimeBonus: number
   createdAt: string
@@ -58,11 +60,17 @@ const isDR = ref<boolean | null>(null)
 const solutionMoves = ref(0)
 const showKeyboard = ref(false)
 const difficulty = ref(5)
+const gameMode = ref<'normal' | 'rzp'>('normal')
+const selectedRzp = ref('')
+const rzpList = ref<string[]>([])
 const lastTriggerInfo = ref<any>(null)
 const myGames = ref<DRTriggerGame[]>([])
 const myGamesTotal = ref(0)
 const myGamesPage = ref(1)
 const myGamesLoading = ref(false)
+const leaderboardMode = ref<'normal' | 'rzp'>('normal')
+const leaderboardDifficulty = ref(5)
+const leaderboardRzp = ref('')
 
 const cubeKeys = [
   ['U', 'U\'', 'U2', 'D', 'D\'', 'D2'],
@@ -74,7 +82,19 @@ let timerRaf: number | null = null
 let gameStartedAt = 0
 let serverRemainingAtSync = 0
 
-const { data: leaderboard, refresh: refreshLeaderboard } = await useApi<Leaderboard>('/dr-trigger/leaderboard')
+const leaderboardQuery = computed(() => {
+  if (leaderboardRzp.value)
+    return `?rzp=${encodeURIComponent(leaderboardRzp.value)}`
+  return `?difficulty=${leaderboardDifficulty.value}`
+})
+const { data: leaderboard, refresh: refreshLeaderboard } = await useApi<Leaderboard>(() => `/dr-trigger/leaderboard${leaderboardQuery.value}`)
+
+const { data: fetchedRzps } = await useApi<string[]>('/dr-trigger/rzps')
+if (fetchedRzps.value) {
+  rzpList.value = fetchedRzps.value
+  if (rzpList.value.length > 0)
+    selectedRzp.value = rzpList.value[0]
+}
 
 onMounted(async () => {
   if (!user.signedIn)
@@ -131,7 +151,10 @@ async function startGame() {
   loading.value = true
   error.value = ''
   try {
-    const data = await useClientApi<any>('/dr-trigger/start', { method: 'POST', body: { difficulty: difficulty.value } })
+    const body: any = gameMode.value === 'rzp'
+      ? { rzp: selectedRzp.value }
+      : { difficulty: difficulty.value }
+    const data = await useClientApi<any>('/dr-trigger/start', { method: 'POST', body })
     game.value = data.game
     trigger.value = data.trigger
     rounds.value = []
@@ -348,9 +371,28 @@ onUnmounted(() => {
         <a href="https://github.com/EvanBrown96/drm_doc_dev/tree/main/public" target="_blank" class="text-indigo-400 hover:underline">EvanBrown96/drm_doc_dev</a>
       </p>
 
-      <!-- Difficulty + Start -->
+      <!-- Mode + Difficulty/RZP + Start -->
       <div v-if="user.signedIn" class="mb-6">
         <div class="mb-3">
+          <label class="font-bold text-sm block mb-1">{{ $t('drTrigger.mode.label') }}</label>
+          <div class="flex gap-1.5">
+            <button
+              class="px-3 py-1.5 text-sm transition-all duration-200 border"
+              :class="gameMode === 'normal' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
+              @click="gameMode = 'normal'"
+            >
+              {{ $t('drTrigger.mode.normal') }}
+            </button>
+            <button
+              class="px-3 py-1.5 text-sm transition-all duration-200 border"
+              :class="gameMode === 'rzp' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
+              @click="gameMode = 'rzp'"
+            >
+              RZP
+            </button>
+          </div>
+        </div>
+        <div v-if="gameMode === 'normal'" class="mb-3">
           <label class="font-bold text-sm block mb-1">{{ $t('drTrigger.difficulty.label') }}</label>
           <div class="flex gap-1.5 flex-wrap">
             <button
@@ -363,6 +405,17 @@ onUnmounted(() => {
               {{ d === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${d}` }}
             </button>
           </div>
+        </div>
+        <div v-else class="mb-3">
+          <label class="font-bold text-sm block mb-1">{{ $t('drTrigger.rzp.label') }}</label>
+          <select
+            v-model="selectedRzp"
+            class="block w-full max-w-xs font-mono shadow-sm border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50 p-2 border text-sm"
+          >
+            <option v-for="r in rzpList" :key="r" :value="r">
+              {{ r }}
+            </option>
+          </select>
         </div>
         <button
           class="bg-indigo-500 text-white px-6 py-3 text-lg shadow-md hover:bg-indigo-600 hover:-translate-y-0.5 transition-all duration-200"
@@ -389,7 +442,7 @@ onUnmounted(() => {
       <div class="sticky top-0 z-10 bg-white shadow-md px-3 py-2 mb-2 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="text-gray-500 text-sm font-semibold">{{ $t('drTrigger.level', { level: (game?.levels ?? 0) + 1 }) }}</span>
-          <span class="text-xs text-gray-400">({{ game?.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${game?.difficulty}` }})</span>
+          <span class="text-xs text-gray-400">({{ game?.rzp ? `RZP: ${game.rzp}` : game?.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${game?.difficulty}` }})</span>
         </div>
         <div class="font-mono font-bold text-2xl" :class="{ 'text-red-500': game && game.remainingTime < 30000, 'text-indigo-600': !game || game.remainingTime >= 30000 }">
           {{ timerDisplay }}
@@ -615,7 +668,7 @@ onUnmounted(() => {
           class="grid grid-cols-subgrid col-span-4 items-center px-1.5 py-1.5 mb-1 bg-white shadow hover:bg-gray-50 transition-colors"
         >
           <span class="text-gray-500">{{ $dayjs(g.createdAt).format('YYYY-MM-DD HH:mm') }}</span>
-          <span class="text-xs text-gray-400 text-right">{{ g.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${g.difficulty}` }}</span>
+          <span class="text-xs text-gray-400 text-right">{{ g.rzp ? g.rzp : g.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${g.difficulty}` }}</span>
           <span class="font-mono font-bold text-indigo-600 text-right">{{ g.levels }}</span>
           <span class="text-green-600 text-xs text-right">{{ g.totalTimeBonus > 0 ? `+${(g.totalTimeBonus / 1000).toFixed(0)}s` : '' }}</span>
         </NuxtLink>
@@ -645,15 +698,57 @@ onUnmounted(() => {
         {{ $t('drTrigger.leaderboard.title') }}
       </h2>
 
+      <!-- Leaderboard mode tabs -->
+      <div class="mb-3 flex gap-1.5">
+        <button
+          class="px-3 py-1.5 text-sm transition-all duration-200 border"
+          :class="leaderboardMode === 'normal' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
+          @click="leaderboardMode = 'normal'; leaderboardRzp = ''"
+        >
+          {{ $t('drTrigger.mode.normal') }}
+        </button>
+        <button
+          class="px-3 py-1.5 text-sm transition-all duration-200 border"
+          :class="leaderboardMode === 'rzp' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
+          @click="leaderboardMode = 'rzp'; if (!leaderboardRzp && rzpList.length) leaderboardRzp = rzpList[0]"
+        >
+          RZP
+        </button>
+      </div>
+
+      <!-- Difficulty selector -->
+      <div v-if="leaderboardMode === 'normal'" class="mb-3 flex gap-1.5 flex-wrap">
+        <button
+          v-for="d in DIFFICULTY_OPTIONS"
+          :key="d"
+          class="px-3 py-1.5 text-sm font-mono transition-all duration-200 border"
+          :class="leaderboardDifficulty === d ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
+          @click="leaderboardDifficulty = d"
+        >
+          {{ d === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${d}` }}
+        </button>
+      </div>
+
+      <!-- RZP selector -->
+      <div v-else class="mb-3">
+        <select
+          v-model="leaderboardRzp"
+          class="block w-full max-w-xs font-mono shadow-sm border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50 p-2 border text-sm"
+        >
+          <option v-for="r in rzpList" :key="r" :value="r">
+            {{ r }}
+          </option>
+        </select>
+      </div>
+
       <div class="bg-white shadow-md p-4">
         <div v-if="leaderboard.highestLevels.length === 0" class="text-gray-400 text-sm">
           {{ $t('drTrigger.noGamesYet') }}
         </div>
-        <div v-else class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-x-3 gap-y-2 text-sm items-center">
+        <div v-else class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-x-3 gap-y-2 text-sm items-center">
           <template v-for="(entry, i) in leaderboard.highestLevels" :key="entry.id">
             <span class="text-gray-400 text-right">{{ i + 1 }}</span>
             <UserAvatarName :user="entry.user" />
-            <span class="text-xs text-gray-400 text-right">{{ entry.difficulty === 0 ? '∞' : `≤${entry.difficulty}` }}</span>
             <span class="font-mono font-bold text-indigo-600 text-right">{{ entry.levels }}</span>
             <span class="text-xs text-right" :class="entry.remainingTime > 0 ? 'text-green-600' : 'text-gray-300'">
               {{ entry.remainingTime > 0 ? formatTime(entry.remainingTime) : '' }}

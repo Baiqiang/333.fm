@@ -35,11 +35,11 @@ const cubeMeshes: Mesh[] = []
 
 const colorMap: Record<string, number> = {
   U: 0xFF_FF_FF,
-  D: 0xFF_D5_00,
-  L: 0xFF_8C_00,
-  R: 0xC4_1E_3A,
-  F: 0x00_9E_60,
-  B: 0x00_51_BA,
+  D: 0xFF_E0_00,
+  L: 0xFF_7B_00,
+  R: 0xDD_00_00,
+  F: 0x00_AA_44,
+  B: 0x00_66_DD,
 }
 const BODY_COLOR = 0x1A_1A_1A
 const GAP = 0.06
@@ -102,8 +102,8 @@ function getMat(hex: number) {
   if (!matCache.has(hex)) {
     matCache.set(hex, new MeshStandardMaterial({
       color: new Color(hex),
-      roughness: hex === BODY_COLOR ? 0.9 : 0.25,
-      metalness: hex === BODY_COLOR ? 0.0 : 0.02,
+      roughness: hex === BODY_COLOR ? 1.0 : 0.9,
+      metalness: 0,
     }))
   }
   return matCache.get(hex)!
@@ -157,12 +157,12 @@ function init() {
   camera.position.set(5.5, 4.5, 5.5)
   camera.lookAt(0, 0, 0)
 
-  const ambient = new AmbientLight(0xFF_FF_FF, 2.5)
+  const ambient = new AmbientLight(0xFF_FF_FF, 3.5)
   scene.add(ambient)
-  const dirLight = new DirectionalLight(0xFF_FF_FF, 1.5)
+  const dirLight = new DirectionalLight(0xFF_FF_FF, 0.6)
   dirLight.position.set(4, 8, 6)
   scene.add(dirLight)
-  const fillLight = new DirectionalLight(0xFF_FF_FF, 0.8)
+  const fillLight = new DirectionalLight(0xFF_FF_FF, 0.3)
   fillLight.position.set(-3, -2, -4)
   scene.add(fillLight)
 

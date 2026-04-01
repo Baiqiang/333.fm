@@ -819,6 +819,13 @@ export default {
     },
     allCleared: 'All Cleared!',
     allClearedDesc: 'You solved every available trigger! Remaining time: {time}',
+    mode: {
+      label: 'Mode',
+      normal: 'Normal',
+    },
+    rzp: {
+      label: 'Select RZP',
+    },
     difficulty: {
       label: 'Difficulty (max optimal moves)',
       unlimited: 'Unlimited',

@@ -819,6 +819,13 @@ export default {
     },
     allCleared: '全部通关！',
     allClearedDesc: '你完成了所有可用的 trigger！剩余时间: {time}',
+    mode: {
+      label: '模式',
+      normal: '普通',
+    },
+    rzp: {
+      label: '选择 RZP',
+    },
     difficulty: {
       label: '难度（最大最优步数）',
       unlimited: '不限',
