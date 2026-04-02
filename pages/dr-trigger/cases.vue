@@ -1,0 +1,456 @@
+<script setup lang="ts">
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+
+useSeoMeta({
+  title: t('drTrigger.cases.title'),
+})
+
+interface TriggerCase {
+  id: number
+  caseId: number
+  rzp: string
+  arm: string
+  pairs: number
+  tetrad: string | null
+  corners: string | null
+  optimalMoves: number
+  solutions: DRTriggerSolution[]
+}
+
+interface CasesResponse {
+  items: TriggerCase[]
+  meta: PaginationMeta
+}
+
+const moves = ref(route.query.moves ? Number(route.query.moves) : 0)
+const rzpN = ref(route.query.n ? String(route.query.n) : '')
+const rzpM = ref(route.query.m ? String(route.query.m) : '')
+const armN = ref(route.query.an ? String(route.query.an) : '')
+const armM = ref(route.query.am ? String(route.query.am) : '')
+const page = ref(route.query.page ? Number(route.query.page) : 1)
+const meta = ref<PaginationMeta>({
+  totalItems: 0,
+  itemCount: 0,
+  itemsPerPage: 50,
+  totalPages: 0,
+  currentPage: 1,
+})
+
+const { data: distinctMoves } = await useApi<number[]>('/dr-trigger/distinct-moves')
+const { data: rzpList } = await useApi<string[]>('/dr-trigger/rzps')
+const { data: armList } = await useApi<string[]>('/dr-trigger/distinct-arms')
+
+const rzpOptions = computed(() => {
+  if (!rzpList.value)
+    return { ns: [] as string[], ms: [] as string[] }
+  const ns = new Set<string>()
+  const ms = new Set<string>()
+  for (const r of rzpList.value) {
+    const match = r.match(/^(\d+)c(\d+)e$/)
+    if (match) {
+      ns.add(match[1])
+      ms.add(match[2])
+    }
+  }
+  return {
+    ns: [...ns].sort((a, b) => Number(a) - Number(b)),
+    ms: [...ms].sort((a, b) => Number(a) - Number(b)),
+  }
+})
+
+const armOptions = computed(() => {
+  if (!armList.value)
+    return { ns: [] as string[], ms: [] as string[] }
+  const ns = new Set<string>()
+  const ms = new Set<string>()
+  for (const a of armList.value) {
+    if (a.length === 2) {
+      ns.add(a[0])
+      ms.add(a[1])
+    }
+  }
+  return {
+    ns: [...ns].sort((a, b) => Number(a) - Number(b)),
+    ms: [...ms].sort((a, b) => Number(a) - Number(b)),
+  }
+})
+
+const queryString = computed(() => {
+  const params = new URLSearchParams()
+  if (moves.value > 0)
+    params.set('moves', String(moves.value))
+  if (rzpN.value && rzpM.value)
+    params.set('rzp', `${rzpN.value}c${rzpM.value}e`)
+  if (armN.value && armM.value)
+    params.set('arm', `${armN.value}${armM.value}`)
+  if (page.value > 1)
+    params.set('page', String(page.value))
+  const qs = params.toString()
+  return qs ? `?${qs}` : ''
+})
+
+const { data: casesData } = await useApi<CasesResponse>(() => `/dr-trigger/cases${queryString.value}`)
+
+watch(casesData, (val) => {
+  if (val)
+    meta.value = val.meta
+}, { immediate: true })
+
+function buildQuery() {
+  const query: Record<string, string> = {}
+  if (moves.value > 0)
+    query.moves = String(moves.value)
+  if (rzpN.value)
+    query.n = rzpN.value
+  if (rzpM.value)
+    query.m = rzpM.value
+  if (armN.value)
+    query.an = armN.value
+  if (armM.value)
+    query.am = armM.value
+  if (page.value > 1)
+    query.page = String(page.value)
+  return query
+}
+
+function updateUrl() {
+  router.replace({ path: '/dr-trigger/cases', query: buildQuery() })
+}
+
+watch([moves, rzpN, rzpM, armN, armM], () => {
+  page.value = 1
+  updateUrl()
+})
+
+watch(page, () => {
+  updateUrl()
+})
+
+function onPageUpdate(p: number) {
+  page.value = p
+}
+
+function reverseSolution(solution: string): string {
+  return solution
+    .split(' ')
+    .filter(t => t)
+    .map((t) => {
+      if (t.endsWith('2'))
+        return t
+      if (t.endsWith('\''))
+        return t.slice(0, -1)
+      return `${t}'`
+    })
+    .reverse()
+    .join(' ')
+}
+
+function getCaseMoves(c: TriggerCase): string {
+  if (!c.solutions || c.solutions.length === 0)
+    return ''
+  return reverseSolution(c.solutions[0].solution)
+}
+
+// --- Modal ---
+const modalCase = ref<TriggerCase | null>(null)
+const modalLoading = ref(false)
+const showAllSolutions = ref(false)
+
+const selectedCaseId = computed(() => {
+  const id = route.params.id
+  return id ? Number(id) : null
+})
+
+watch(selectedCaseId, async (id) => {
+  if (!id) {
+    modalCase.value = null
+    return
+  }
+  const found = casesData.value?.items.find(c => c.id === id)
+  if (found) {
+    modalCase.value = found
+    showAllSolutions.value = false
+    return
+  }
+  modalLoading.value = true
+  try {
+    const data = await useClientApi<TriggerCase>(`/dr-trigger/case/${id}`)
+    modalCase.value = data
+    showAllSolutions.value = false
+  }
+  catch {
+    modalCase.value = null
+  }
+  modalLoading.value = false
+}, { immediate: true })
+
+function openCase(c: TriggerCase) {
+  router.push({ path: `/dr-trigger/cases/${c.id}`, query: buildQuery() })
+}
+
+function closeModal() {
+  router.push({ path: '/dr-trigger/cases', query: buildQuery() })
+}
+
+function optimalSolutions(solutions: DRTriggerSolution[]) {
+  const min = Math.min(...solutions.map(s => s.length))
+  return solutions.filter(s => s.length === min)
+}
+</script>
+
+<template>
+  <div class="container mx-auto px-4 py-6 max-w-5xl">
+    <BackTo to="/dr-trigger" :label="$t('drTrigger.title')" />
+
+    <h1 class="text-2xl font-bold font-poppins mb-4">
+      {{ $t('drTrigger.cases.title') }}
+    </h1>
+
+    <!-- Compact filters -->
+    <div class="bg-white shadow-md p-3 mb-4">
+      <div class="flex flex-wrap items-end gap-x-4 gap-y-2">
+        <!-- Moves -->
+        <div>
+          <label class="font-bold text-xs md:text-sm text-gray-500 block mb-0.5">{{ $t('drTrigger.cases.moves') }}</label>
+          <select
+            v-model.number="moves"
+            class="w-20 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50"
+          >
+            <option :value="0">
+              {{ $t('drTrigger.cases.allMoves') }}
+            </option>
+            <option v-for="m in distinctMoves" :key="m" :value="m">
+              {{ m }}
+            </option>
+          </select>
+        </div>
+
+        <!-- RZP -->
+        <div>
+          <label class="font-bold text-xs md:text-sm text-gray-500 block mb-0.5">RZP</label>
+          <div class="flex items-center gap-1">
+            <select v-model="rzpN" class="w-14 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50">
+              <option value="">
+                N
+              </option>
+              <option v-for="n in rzpOptions.ns" :key="n" :value="n">
+                {{ n }}
+              </option>
+            </select>
+            <span class="text-gray-400 text-xs md:text-sm font-mono">c</span>
+            <select v-model="rzpM" class="w-14 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50">
+              <option value="">
+                M
+              </option>
+              <option v-for="m in rzpOptions.ms" :key="m" :value="m">
+                {{ m }}
+              </option>
+            </select>
+            <span class="text-gray-400 text-xs md:text-sm font-mono">e</span>
+            <button v-if="rzpN || rzpM" class="text-gray-400 hover:text-red-500 transition-colors" @click="rzpN = ''; rzpM = ''">
+              <Icon name="mdi:close" class="text-sm" />
+            </button>
+          </div>
+        </div>
+
+        <!-- ARM -->
+        <div>
+          <label class="font-bold text-xs md:text-sm text-gray-500 block mb-0.5">ARM</label>
+          <div class="flex items-center gap-1">
+            <select v-model="armN" class="w-14 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50">
+              <option value="">
+                N
+              </option>
+              <option v-for="n in armOptions.ns" :key="n" :value="n">
+                {{ n }}
+              </option>
+            </select>
+            <span class="text-gray-400 text-xs md:text-sm font-mono">c</span>
+            <select v-model="armM" class="w-14 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50">
+              <option value="">
+                M
+              </option>
+              <option v-for="m in armOptions.ms" :key="m" :value="m">
+                {{ m }}
+              </option>
+            </select>
+            <span class="text-gray-400 text-xs md:text-sm font-mono">e</span>
+            <button v-if="armN || armM" class="text-gray-400 hover:text-red-500 transition-colors" @click="armN = ''; armM = ''">
+              <Icon name="mdi:close" class="text-sm" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Count -->
+        <div v-if="casesData" class="text-xs md:text-sm text-gray-400 self-end pb-0.5">
+          {{ $t('drTrigger.cases.total', { total: meta.totalItems }) }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div v-if="casesData && casesData.items.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+      <button
+        v-for="c in casesData.items"
+        :key="c.id"
+        class="bg-white shadow-sm p-2 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-left group cursor-pointer"
+        @click="openCase(c)"
+      >
+        <Cube3d :moves="getCaseMoves(c)" filter="dr" is-static class="w-full mb-1.5" />
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] md:text-xs text-gray-500 font-mono">{{ c.rzp }}</span>
+          <span class="text-[10px] md:text-xs text-gray-400 font-mono">{{ formatArm(c.arm) }}</span>
+        </div>
+        <div class="text-[10px] md:text-xs text-gray-400 mt-0.5">
+          {{ $t('drTrigger.cases.moves') }}: <span class="font-mono font-semibold text-gray-600">{{ c.optimalMoves / 100 }}</span>
+        </div>
+        <div v-if="c.solutions.length > 0" class="font-mono text-xs md:text-sm mt-1 truncate">
+          {{ c.solutions[0].solution }}
+        </div>
+      </button>
+    </div>
+
+    <div v-else-if="casesData" class="text-gray-400 text-sm py-8 text-center">
+      {{ $t('drTrigger.cases.noResults') }}
+    </div>
+
+    <Pagination :meta="meta" @update="onPageUpdate" />
+
+    <!-- Modal backdrop -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div
+          v-if="selectedCaseId"
+          class="fixed inset-0 z-100 flex items-center justify-center bg-black/40 cursor-pointer"
+          @click.self="closeModal"
+        >
+          <div class="modal-panel bg-white shadow-xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto overflow-x-hidden relative cursor-default">
+            <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors z-10 cursor-pointer" @click="closeModal">
+              <Icon name="mdi:close" class="text-xl" />
+            </button>
+
+            <div v-if="modalLoading" class="p-8 text-center">
+              <Spinner class="w-6 h-6 border-[3px] text-indigo-500 mx-auto" />
+            </div>
+
+            <template v-else-if="modalCase">
+              <div class="p-4">
+                <!-- Header -->
+                <h2 class="text-lg font-bold font-poppins mb-3">
+                  {{ $t('drTrigger.cases.detail') }}
+                  <span class="font-mono text-indigo-600">#{{ modalCase.caseId }}</span>
+                </h2>
+
+                <!-- Info -->
+                <div class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm mb-3">
+                  <span class="font-mono">RZP: <span class="font-semibold text-indigo-600">{{ modalCase.rzp }}</span></span>
+                  <span class="font-mono">{{ formatArm(modalCase.arm) }}</span>
+                  <span class="text-gray-500">{{ $t('drTrigger.cases.optimalMoves') }}: <span class="font-mono font-bold text-indigo-600">{{ modalCase.optimalMoves / 100 }}</span></span>
+                  <span class="text-gray-500">{{ $t('drTrigger.cases.pairs') }}: <span class="font-mono">{{ modalCase.pairs }}</span></span>
+                  <span v-if="modalCase.tetrad" class="text-gray-500">Tetrad: <span class="font-mono">{{ modalCase.tetrad }}</span></span>
+                  <span v-if="modalCase.corners" class="text-gray-500">Corners: <span class="font-mono">{{ modalCase.corners }}</span></span>
+                </div>
+
+                <!-- Cube -->
+                <Cube3d :key="modalCase.id" :moves="getCaseMoves(modalCase)" filter="dr" class="max-w-56 mb-4" />
+
+                <!-- Optimal solutions -->
+                <div class="mb-3">
+                  <h3 class="font-bold text-xs text-gray-500 mb-1">
+                    {{ $t('drTrigger.history.optimalSolutions') }}
+                    <span class="text-gray-400 font-normal">({{ optimalSolutions(modalCase.solutions).length }})</span>
+                  </h3>
+                  <div class="space-y-0.5">
+                    <div
+                      v-for="(s, si) in optimalSolutions(modalCase.solutions)"
+                      :key="si"
+                      class="font-mono text-sm bg-gray-50 px-2 py-1.5 flex items-center justify-between gap-2"
+                    >
+                      <span class="break-all">
+                        {{ s.solution }}
+                        <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-xs">{{ $t('drTrigger.cases.eoBreaking') }}</span>
+                      </span>
+                      <span class="text-gray-400 text-xs shrink-0">({{ s.length }})</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- All solutions -->
+                <div v-if="modalCase.solutions.length > optimalSolutions(modalCase.solutions).length">
+                  <button
+                    class="font-bold text-sm text-gray-500 mb-1 flex items-center gap-1 hover:text-indigo-500 transition-colors cursor-pointer"
+                    @click="showAllSolutions = !showAllSolutions"
+                  >
+                    {{ $t('drTrigger.cases.allSolutions') }}
+                    <span class="text-gray-400 font-normal">({{ modalCase.solutions.length }})</span>
+                    <Icon
+                      name="mdi:chevron-down"
+                      class="transition-transform text-gray-400"
+                      :class="{ 'rotate-180': showAllSolutions }"
+                    />
+                  </button>
+                  <div v-if="showAllSolutions" class="space-y-0.5 max-h-60 overflow-y-auto">
+                    <div
+                      v-for="(s, si) in modalCase.solutions.filter(s => s.length > optimalSolutions(modalCase!.solutions)[0].length)"
+                      :key="si"
+                      class="font-mono text-sm bg-gray-50 px-2 py-1.5 flex items-center justify-between gap-2"
+                    >
+                      <span class="break-all">
+                        {{ s.solution }}
+                        <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-xs">{{ $t('drTrigger.cases.eoBreaking') }}</span>
+                      </span>
+                      <span class="text-gray-400 text-xs shrink-0">({{ s.length }})</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <NuxtPage />
+  </div>
+</template>
+
+<style scoped>
+.modal-enter-active {
+  transition: opacity 0.2s ease;
+}
+.modal-leave-active {
+  transition: opacity 0.15s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+.modal-enter-active .modal-panel {
+  animation: modal-in 0.2s ease-out;
+}
+.modal-leave-active .modal-panel {
+  animation: modal-out 0.15s ease-in;
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes modal-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+}
+</style>

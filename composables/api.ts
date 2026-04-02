@@ -1,6 +1,6 @@
 import type { UseFetchOptions } from 'nuxt/app'
 
-export async function useApi<DataT>(url: string, options?: UseFetchOptions<DataT>) {
+export async function useApi<DataT>(url: string | (() => string), options?: UseFetchOptions<DataT>) {
   const config = useRuntimeConfig()
   const user = useUser()
   const accessToken = useAccessToken()

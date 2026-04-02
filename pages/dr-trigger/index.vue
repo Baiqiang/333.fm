@@ -349,9 +349,15 @@ onUnmounted(() => {
 
 <template>
   <div class="container mx-auto px-4 py-6 max-w-3xl">
-    <h1 class="text-2xl font-bold font-poppins mb-4">
-      {{ $t('drTrigger.title') }}
-    </h1>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+      <h1 class="text-2xl font-bold font-poppins">
+        {{ $t('drTrigger.title') }}
+      </h1>
+      <NuxtLink to="/dr-trigger/cases" class="bg-indigo-500 text-white px-3 py-1.5 text-sm shadow-md hover:bg-indigo-600 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-1 self-start sm:self-auto">
+        <Icon name="mdi:database-outline" />
+        {{ $t('drTrigger.cases.title') }}
+      </NuxtLink>
+    </div>
 
     <!-- Rules -->
     <div v-if="gameState === 'idle'" class="mb-6">
@@ -467,7 +473,7 @@ onUnmounted(() => {
         <StickyScramble :scramble="trigger.scramble" :sticky="false" />
         <Cube3d :moves="trigger.scramble + solution" />
         <div class="text-xs text-gray-400 font-mono mt-0.5">
-          RZP: {{ trigger.rzp }}
+          RZP: {{ trigger.rzp }} · {{ formatArm(trigger.arm) }}
         </div>
       </div>
 
@@ -642,6 +648,7 @@ onUnmounted(() => {
               class="font-mono text-xs bg-gray-50 px-2 py-0.5"
             >
               {{ s.solution }}
+              <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-[10px]">{{ $t('drTrigger.cases.eoBreaking') }}</span>
             </div>
           </div>
         </div>

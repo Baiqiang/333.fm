@@ -186,7 +186,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
           <div v-if="r.trigger?.solutions">
             <div class="text-xs text-gray-400 mb-1">
               {{ $t('drTrigger.history.optimalSolutions') }}
-              <span class="text-gray-300">(RZP: {{ r.trigger.rzp }})</span>
+              <span class="text-gray-300">(RZP: {{ r.trigger.rzp }} · {{ formatArm(r.trigger.arm) }})</span>
             </div>
             <div class="space-y-0.5">
               <div
@@ -196,6 +196,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
               >
                 {{ s.solution }}
                 <span class="text-gray-400 ml-1">({{ s.length }})</span>
+                <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-[10px]">{{ $t('drTrigger.cases.eoBreaking') }}</span>
               </div>
             </div>
             <template v-if="r.trigger.solutions.length > optimalSolutions(r.trigger.solutions).length">
@@ -213,6 +214,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
                 >
                   {{ s.solution }}
                   <span class="text-gray-400 ml-1">({{ s.length }})</span>
+                  <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-[10px]">{{ $t('drTrigger.cases.eoBreaking') }}</span>
                 </div>
               </div>
             </template>
@@ -234,7 +236,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
           </div>
           <CubeExpanded :moves="lastTrigger.scramble" class="mb-2" />
           <div class="text-xs text-gray-400 font-mono mb-2">
-            RZP: {{ lastTrigger.rzp }}
+            RZP: {{ lastTrigger.rzp }} · {{ formatArm(lastTrigger.arm) }}
           </div>
           <div class="text-xs text-gray-400 mb-1">
             {{ $t('drTrigger.history.optimalSolutions') }}
@@ -247,6 +249,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
             >
               {{ s.solution }}
               <span class="text-gray-400 ml-1">({{ s.length }})</span>
+              <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-[10px]">{{ $t('drTrigger.cases.eoBreaking') }}</span>
             </div>
           </div>
           <template v-if="lastTrigger.solutions.length > optimalSolutions(lastTrigger.solutions).length">
@@ -264,6 +267,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
               >
                 {{ s.solution }}
                 <span class="text-gray-400 ml-1">({{ s.length }})</span>
+                <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-[10px]">{{ $t('drTrigger.cases.eoBreaking') }}</span>
               </div>
             </div>
           </template>

@@ -5,6 +5,9 @@ import {
   BoxGeometry,
   Color,
   DirectionalLight,
+  EdgesGeometry,
+  LineBasicMaterial,
+  LineSegments,
   Mesh,
   MeshStandardMaterial,
   PerspectiveCamera,
@@ -22,6 +25,8 @@ const props = defineProps<{
     edges: number[]
     placement: number
   }
+  filter?: 'dr'
+  isStatic?: boolean
 }>()
 
 const cubeElement = ref<HTMLElement>()
@@ -31,6 +36,7 @@ let camera: PerspectiveCamera
 let renderer: WebGLRenderer
 let controls: OrbitControls
 let animating = false
+let staticCanvas: HTMLCanvasElement | null = null
 const cubeMeshes: Mesh[] = []
 
 const colorMap: Record<string, number> = {
@@ -42,6 +48,7 @@ const colorMap: Record<string, number> = {
   B: 0x00_66_DD,
 }
 const BODY_COLOR = 0x1A_1A_1A
+const GRAY_COLOR = 0x80_80_80
 const GAP = 0.06
 const CUBIE_SIZE = 1 - GAP
 
@@ -55,6 +62,25 @@ const facelet = computed(() => {
   catch {}
   return cube.toFaceletString()
 })
+
+const DR_BAD_ON_SIDE = 0xFF_FF_FF
+const DR_BAD_ON_UD = 0x88_CC_FF
+
+function isEdgePosition(x: number, y: number, z: number): boolean {
+  const abs = [Math.abs(x), Math.abs(y), Math.abs(z)]
+  return abs.filter(v => v === 1).length === 2 && abs.filter(v => v === 0).length === 1
+}
+
+function applyFilter(axis: Axis, stickerFace: string, x: number, y: number, z: number): number {
+  if (props.filter !== 'dr')
+    return colorMap[stickerFace]
+  const isUD = stickerFace === 'U' || stickerFace === 'D'
+  if (isUD)
+    return axis === 'y' ? GRAY_COLOR : DR_BAD_ON_SIDE
+  if (axis === 'y' && isEdgePosition(x, y, z))
+    return DR_BAD_ON_UD
+  return GRAY_COLOR
+}
 
 function buildFaceColors(fl: string) {
   const colors: Record<number, Record<string, Record<number, number>>> = {}
@@ -70,19 +96,19 @@ function buildFaceColors(fl: string) {
     const y = i < 9 ? 1 : -1
     const x = i % 3 - 1
     const z = (Math.floor(i % 9 / 3) - 1) * y
-    push(x, y, z, 'y', y, colorMap[fl[i]])
+    push(x, y, z, 'y', y, applyFilter('y', fl[i], x, y, z))
   }
   for (let i = 18; i < 36; i++) {
     const x = i < 27 ? 1 : -1
     const y = 1 - Math.floor(i % 9 / 3)
     const z = (i % 3 - 1) * -x
-    push(x, y, z, 'x', x, colorMap[fl[i]])
+    push(x, y, z, 'x', x, applyFilter('x', fl[i], x, y, z))
   }
   for (let i = 36; i < 54; i++) {
     const z = i < 45 ? 1 : -1
     const x = (i % 3 - 1) * z
     const y = 1 - Math.floor(i % 9 / 3)
-    push(x, y, z, 'z', z, colorMap[fl[i]])
+    push(x, y, z, 'z', z, applyFilter('z', fl[i], x, y, z))
   }
   return colors
 }
@@ -166,21 +192,27 @@ function init() {
   fillLight.position.set(-3, -2, -4)
   scene.add(fillLight)
 
-  controls = new OrbitControls(camera, canvas)
-  controls.enablePan = false
-  controls.enableZoom = false
-  controls.rotateSpeed = 0.8
-  controls.minPolarAngle = Math.PI * 0.1
-  controls.maxPolarAngle = Math.PI * 0.8
-  controls.enableDamping = true
-  controls.dampingFactor = 0.12
+  if (!props.isStatic) {
+    controls = new OrbitControls(camera, canvas)
+    controls.enablePan = false
+    controls.enableZoom = false
+    controls.rotateSpeed = 0.8
+    controls.minPolarAngle = Math.PI * 0.1
+    controls.maxPolarAngle = Math.PI * 0.8
+    controls.enableDamping = true
+    controls.dampingFactor = 0.12
+  }
 
   const geometry = new BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE)
+  const edgesGeo = new EdgesGeometry(geometry)
+  const edgeMat = new LineBasicMaterial({ color: 0x00_00_00, linewidth: 1 })
   cubePositions.forEach((x) => {
     cubePositions.forEach((y) => {
       cubePositions.forEach((z) => {
         const mesh = new Mesh(geometry, [])
         mesh.position.set(x, y, z)
+        const edges = new LineSegments(edgesGeo, edgeMat)
+        mesh.add(edges)
         cubeMeshes.push(mesh)
         scene.add(mesh)
       })
@@ -189,20 +221,70 @@ function init() {
 
   updateMaterials()
   setSize()
-  animating = true
-  render()
+  if (props.isStatic) {
+    renderer.render(scene, camera)
+    const srcCanvas = renderer.domElement
+    const w = srcCanvas.width
+    const h = srcCanvas.height
+    const canvas2d = document.createElement('canvas')
+    canvas2d.width = w
+    canvas2d.height = h
+    canvas2d.style.width = '100%'
+    canvas2d.style.height = '100%'
+    const ctx = canvas2d.getContext('2d')!
+    ctx.drawImage(srcCanvas, 0, 0)
+    dom.replaceChild(canvas2d, srcCanvas)
+    staticCanvas = canvas2d
+    renderer.dispose()
+    renderer = null as any
+  }
+  else {
+    animating = true
+    render()
+  }
 }
 
 function render() {
   if (!animating)
     return
   requestAnimationFrame(render)
-  controls.update()
+  controls?.update()
   renderer.render(scene, camera)
 }
 
-watch(facelet, updateMaterials)
-watch(width, setSize)
+function staticRerender() {
+  if (!props.isStatic || !scene || !staticCanvas)
+    return
+  const dom = cubeElement.value
+  if (!dom || width.value === 0)
+    return
+  const tmpCanvas = document.createElement('canvas')
+  const tmpRenderer = new WebGLRenderer({ antialias: true, canvas: tmpCanvas, alpha: true })
+  tmpRenderer.setPixelRatio(window.devicePixelRatio)
+  tmpRenderer.setSize(width.value, width.value)
+  camera.aspect = 1
+  camera.updateProjectionMatrix()
+  tmpRenderer.render(scene, camera)
+  staticCanvas.width = tmpCanvas.width
+  staticCanvas.height = tmpCanvas.height
+  const ctx = staticCanvas.getContext('2d')!
+  ctx.drawImage(tmpCanvas, 0, 0)
+  tmpRenderer.dispose()
+}
+
+watch(facelet, () => {
+  updateMaterials()
+  if (props.isStatic)
+    staticRerender()
+})
+watch(width, () => {
+  if (props.isStatic) {
+    staticRerender()
+  }
+  else {
+    setSize()
+  }
+})
 
 onMounted(() => {
   const dom = cubeElement.value!
@@ -213,13 +295,14 @@ onMounted(() => {
         observer.disconnect()
       }
     })
-  }, { root: document.documentElement })
+  }, { root: null })
   observer.observe(dom)
 })
 
 onUnmounted(() => {
   animating = false
-  renderer?.dispose()
+  if (renderer)
+    renderer.dispose()
   controls?.dispose()
 })
 </script>

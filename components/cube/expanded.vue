@@ -101,7 +101,7 @@ onMounted(async () => {
       }
     })
   }, {
-    root: document.documentElement,
+    root: null,
   })
   observer.observe(dom)
   two = new Two({
