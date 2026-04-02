@@ -395,6 +395,7 @@ export default {
       title: '统计',
       singles: '最佳单次',
       means: '最佳平均',
+      averages: '最佳平均',
       rollingMo3: '最佳滚动 Mo3',
       rollingAo5: '最佳滚动 Ao5',
       rollingAo12: '最佳滚动 Ao12',
@@ -801,7 +802,7 @@ export default {
     rules: {
       title: '规则',
       list: [
-        '每一关展示一个处于 EO 状态的魔方，你需要找到一个解法使其到达 DR 状态。',
+        '每一关展示一个处于 EO 状态的魔方，你需要找到一个解法使其到达 DR 状态。EO 轴为 FB，DR 要求 UD。',
         '初始时间为10分钟，在时间耗尽前尽可能多地完成关卡。',
         '你的步数 ≤ 最短步数：+10秒。步数 ≤ 最短步数+1：+3秒。否则无奖励。',
         '只有到达 DR 状态的解法才能提交。',

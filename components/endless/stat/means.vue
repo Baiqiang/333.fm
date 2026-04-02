@@ -1,13 +1,14 @@
 <script setup lang="ts">
 defineProps<{
   results: Result[]
+  isAvg?: boolean
 }>()
 </script>
 
 <template>
   <div>
     <h4 class="font-bold mb-2">
-      {{ $t('endless.stats.means') }}
+      {{ isAvg ? $t('endless.stats.averages') : $t('endless.stats.means') }}
     </h4>
     <div class="grid grid-cols-[1.5rem_max-content_1fr] gap-2">
       <template v-for="r, k in results" :key="k">

@@ -16,8 +16,8 @@ const stats = ref<EndlessStats>(data.value!)
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-4 whitespace-nowrap">
         <template v-for="stat, key in stats" :key="key">
           <EndlessStatSingles v-if="key === 'singles'" :results="stat" />
-          <EndlessStatMeans v-else-if="key === 'means'" :results="stat" />
-          <EndlessStatHighestLevels v-else-if="key === 'highestLevels'" :results="stat" />
+          <EndlessStatMeans v-else-if="key === 'means'" :is-avg="endless.challenges?.[0]?.type === ChallengeType.BOSS && endless.challenges?.[0]?.challenge.instantKill !== undefined" :results="stat" />
+          <!-- <EndlessStatHighestLevels v-else-if="key === 'highestLevels'" :results="stat" /> -->
           <EndlessStatAon v-else-if="key.toString().startsWith('rolling')" :results="stat" :type="key" />
         </template>
       </div>

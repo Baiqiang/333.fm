@@ -395,6 +395,7 @@ export default {
       title: 'Statistics',
       singles: 'Best Singles',
       means: 'Best Means',
+      averages: 'Best Averages',
       rollingMo3: 'Best Rolling Mo3',
       rollingAo5: 'Best Rolling Ao5',
       rollingAo12: 'Best Rolling Ao12',
@@ -801,7 +802,7 @@ export default {
     rules: {
       title: 'Rules',
       list: [
-        'Each round shows a cube in EO state. Find a solution to reach DR state.',
+        'Each round shows a cube in EO state. Find a solution to reach DR state. EO axis is FB, DR requires UD.',
         'You start with 10 minutes. Solve as many as you can before time runs out.',
         'If your moves ≤ optimal: +10 seconds. If ≤ optimal + 1: +3 seconds. Otherwise no bonus.',
         'Only solutions that reach DR state can be submitted.',
