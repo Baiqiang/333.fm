@@ -25,10 +25,10 @@ interface CasesResponse {
 }
 
 const moves = ref(route.query.moves ? Number(route.query.moves) : 0)
-const rzpN = ref(route.query.n ? String(route.query.n) : '')
-const rzpM = ref(route.query.m ? String(route.query.m) : '')
-const armN = ref(route.query.an ? String(route.query.an) : '')
-const armM = ref(route.query.am ? String(route.query.am) : '')
+const rzpN = ref(route.query.rzpc ? String(route.query.rzpc) : '')
+const rzpM = ref(route.query.rzpe ? String(route.query.rzpe) : '')
+const armN = ref(route.query.armc ? String(route.query.armc) : '')
+const armM = ref(route.query.arme ? String(route.query.arme) : '')
 const page = ref(route.query.page ? Number(route.query.page) : 1)
 const meta = ref<PaginationMeta>({
   totalItems: 0,
@@ -81,10 +81,14 @@ const queryString = computed(() => {
   const params = new URLSearchParams()
   if (moves.value > 0)
     params.set('moves', String(moves.value))
-  if (rzpN.value && rzpM.value)
-    params.set('rzp', `${rzpN.value}c${rzpM.value}e`)
-  if (armN.value && armM.value)
-    params.set('arm', `${armN.value}${armM.value}`)
+  if (rzpN.value)
+    params.set('rzpc', rzpN.value)
+  if (rzpM.value)
+    params.set('rzpe', rzpM.value)
+  if (armN.value)
+    params.set('armc', armN.value)
+  if (armM.value)
+    params.set('arme', armM.value)
   if (page.value > 1)
     params.set('page', String(page.value))
   const qs = params.toString()
@@ -103,13 +107,13 @@ function buildQuery() {
   if (moves.value > 0)
     query.moves = String(moves.value)
   if (rzpN.value)
-    query.n = rzpN.value
+    query.rzpc = rzpN.value
   if (rzpM.value)
-    query.m = rzpM.value
+    query.rzpe = rzpM.value
   if (armN.value)
-    query.an = armN.value
+    query.armc = armN.value
   if (armM.value)
-    query.am = armM.value
+    query.arme = armM.value
   if (page.value > 1)
     query.page = String(page.value)
   return query
@@ -292,24 +296,25 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
 
     <!-- Grid -->
     <div v-if="casesData && casesData.items.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-      <button
+      <div
         v-for="c in casesData.items"
         :key="c.id"
-        class="bg-white shadow-sm p-2 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-left group cursor-pointer"
-        @click="openCase(c)"
+        class="bg-white shadow-sm p-2 hover:shadow-md transition-all duration-200 group"
       >
-        <Cube3d :moves="getCaseMoves(c)" filter="dr" is-static class="w-full mb-1.5" />
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] md:text-xs text-gray-500 font-mono">{{ c.rzp }}</span>
-          <span class="text-[10px] md:text-xs text-gray-400 font-mono">{{ formatArm(c.arm) }}</span>
+        <CubeCss3d :moves="getCaseMoves(c)" filter="dr" class="w-full mb-1.5" />
+        <div class="cursor-pointer" @click="openCase(c)">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] md:text-xs text-gray-500 font-mono">{{ c.rzp }}</span>
+            <span class="text-[10px] md:text-xs text-gray-400 font-mono">{{ formatArm(c.arm) }}</span>
+          </div>
+          <div class="text-[10px] md:text-xs text-gray-400 mt-0.5">
+            {{ $t('drTrigger.cases.moves') }}: <span class="font-mono font-semibold text-gray-600">{{ c.optimalMoves / 100 }}</span>
+          </div>
+          <div v-if="c.solutions.length > 0" class="font-mono text-xs md:text-sm mt-1 truncate">
+            {{ c.solutions[0].solution }}
+          </div>
         </div>
-        <div class="text-[10px] md:text-xs text-gray-400 mt-0.5">
-          {{ $t('drTrigger.cases.moves') }}: <span class="font-mono font-semibold text-gray-600">{{ c.optimalMoves / 100 }}</span>
-        </div>
-        <div v-if="c.solutions.length > 0" class="font-mono text-xs md:text-sm mt-1 truncate">
-          {{ c.solutions[0].solution }}
-        </div>
-      </button>
+      </div>
     </div>
 
     <div v-else-if="casesData" class="text-gray-400 text-sm py-8 text-center">

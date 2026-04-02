@@ -33,10 +33,12 @@ const cubeElement = ref<HTMLElement>()
 const { width } = useElementSize(cubeElement)
 let scene: Scene
 let camera: PerspectiveCamera
-let renderer: WebGLRenderer
-let controls: OrbitControls
+let renderer: WebGLRenderer | null = null
+let controls: OrbitControls | null = null
 let animating = false
 let staticCanvas: HTMLCanvasElement | null = null
+let liveCanvas: HTMLCanvasElement | null = null
+let deactivateTimer: ReturnType<typeof setTimeout> | null = null
 const cubeMeshes: Mesh[] = []
 
 const colorMap: Record<string, number> = {
@@ -71,8 +73,14 @@ function isEdgePosition(x: number, y: number, z: number): boolean {
   return abs.filter(v => v === 1).length === 2 && abs.filter(v => v === 0).length === 1
 }
 
+function isCenterPosition(x: number, y: number, z: number): boolean {
+  return [x, y, z].filter(v => v === 0).length === 2
+}
+
 function applyFilter(axis: Axis, stickerFace: string, x: number, y: number, z: number): number {
   if (props.filter !== 'dr')
+    return colorMap[stickerFace]
+  if (isCenterPosition(x, y, z))
     return colorMap[stickerFace]
   const isUD = stickerFace === 'U' || stickerFace === 'D'
   if (isUD)
@@ -165,20 +173,8 @@ function setSize() {
   renderer.setSize(width.value, width.value)
 }
 
-function init() {
-  const dom = cubeElement.value!
+function buildScene() {
   scene = new Scene()
-  const canvas = document.createElement('canvas')
-  canvas.tabIndex = -1
-  canvas.style.outline = 'none'
-  canvas.addEventListener('mousedown', e => e.preventDefault())
-  canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false })
-  dom.appendChild(canvas)
-
-  renderer = new WebGLRenderer({ antialias: true, canvas, alpha: true })
-  renderer.setPixelRatio(window.devicePixelRatio)
-  renderer.shadowMap.enabled = false
-
   camera = new PerspectiveCamera(40, 1, 1, 100)
   camera.position.set(5.5, 4.5, 5.5)
   camera.lookAt(0, 0, 0)
@@ -191,17 +187,6 @@ function init() {
   const fillLight = new DirectionalLight(0xFF_FF_FF, 0.3)
   fillLight.position.set(-3, -2, -4)
   scene.add(fillLight)
-
-  if (!props.isStatic) {
-    controls = new OrbitControls(camera, canvas)
-    controls.enablePan = false
-    controls.enableZoom = false
-    controls.rotateSpeed = 0.8
-    controls.minPolarAngle = Math.PI * 0.1
-    controls.maxPolarAngle = Math.PI * 0.8
-    controls.enableDamping = true
-    controls.dampingFactor = 0.12
-  }
 
   const geometry = new BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE)
   const edgesGeo = new EdgesGeometry(geometry)
@@ -218,46 +203,10 @@ function init() {
       })
     })
   })
-
   updateMaterials()
-  setSize()
-  if (props.isStatic) {
-    renderer.render(scene, camera)
-    const srcCanvas = renderer.domElement
-    const w = srcCanvas.width
-    const h = srcCanvas.height
-    const canvas2d = document.createElement('canvas')
-    canvas2d.width = w
-    canvas2d.height = h
-    canvas2d.style.width = '100%'
-    canvas2d.style.height = '100%'
-    const ctx = canvas2d.getContext('2d')!
-    ctx.drawImage(srcCanvas, 0, 0)
-    dom.replaceChild(canvas2d, srcCanvas)
-    staticCanvas = canvas2d
-    renderer.dispose()
-    renderer = null as any
-  }
-  else {
-    animating = true
-    render()
-  }
 }
 
-function render() {
-  if (!animating)
-    return
-  requestAnimationFrame(render)
-  controls?.update()
-  renderer.render(scene, camera)
-}
-
-function staticRerender() {
-  if (!props.isStatic || !scene || !staticCanvas)
-    return
-  const dom = cubeElement.value
-  if (!dom || width.value === 0)
-    return
+function renderToStaticCanvas(target?: HTMLCanvasElement): HTMLCanvasElement {
   const tmpCanvas = document.createElement('canvas')
   const tmpRenderer = new WebGLRenderer({ antialias: true, canvas: tmpCanvas, alpha: true })
   tmpRenderer.setPixelRatio(window.devicePixelRatio)
@@ -265,21 +214,132 @@ function staticRerender() {
   camera.aspect = 1
   camera.updateProjectionMatrix()
   tmpRenderer.render(scene, camera)
-  staticCanvas.width = tmpCanvas.width
-  staticCanvas.height = tmpCanvas.height
-  const ctx = staticCanvas.getContext('2d')!
+
+  const out = target || document.createElement('canvas')
+  out.width = tmpCanvas.width
+  out.height = tmpCanvas.height
+  out.style.width = '100%'
+  out.style.height = '100%'
+  const ctx = out.getContext('2d')!
   ctx.drawImage(tmpCanvas, 0, 0)
   tmpRenderer.dispose()
+  return out
+}
+
+function init() {
+  const dom = cubeElement.value!
+  buildScene()
+
+  if (props.isStatic) {
+    staticCanvas = renderToStaticCanvas()
+    dom.appendChild(staticCanvas)
+    staticCanvas.addEventListener('pointerdown', activate)
+  }
+  else {
+    liveCanvas = document.createElement('canvas')
+    liveCanvas.tabIndex = -1
+    liveCanvas.style.outline = 'none'
+    liveCanvas.addEventListener('mousedown', e => e.preventDefault())
+    liveCanvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false })
+    dom.appendChild(liveCanvas)
+    renderer = new WebGLRenderer({ antialias: true, canvas: liveCanvas, alpha: true })
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.shadowMap.enabled = false
+    controls = new OrbitControls(camera, liveCanvas)
+    controls.enablePan = false
+    controls.enableZoom = false
+    controls.rotateSpeed = 0.8
+    controls.minPolarAngle = Math.PI * 0.1
+    controls.maxPolarAngle = Math.PI * 0.8
+    controls.enableDamping = true
+    controls.dampingFactor = 0.12
+    setSize()
+    animating = true
+    render()
+  }
+}
+
+function activate() {
+  if (!props.isStatic || !scene || !staticCanvas)
+    return
+  const dom = cubeElement.value!
+  if (deactivateTimer) {
+    clearTimeout(deactivateTimer)
+    deactivateTimer = null
+  }
+
+  if (renderer)
+    return
+
+  liveCanvas = document.createElement('canvas')
+  liveCanvas.tabIndex = -1
+  liveCanvas.style.outline = 'none'
+  liveCanvas.addEventListener('mousedown', e => e.preventDefault())
+  liveCanvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false })
+  dom.replaceChild(liveCanvas, staticCanvas!)
+
+  renderer = new WebGLRenderer({ antialias: true, canvas: liveCanvas, alpha: true })
+  renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.shadowMap.enabled = false
+  controls = new OrbitControls(camera, liveCanvas)
+  controls.enablePan = false
+  controls.enableZoom = false
+  controls.rotateSpeed = 0.8
+  controls.minPolarAngle = Math.PI * 0.1
+  controls.maxPolarAngle = Math.PI * 0.8
+  controls.enableDamping = true
+  controls.dampingFactor = 0.12
+
+  setSize()
+  animating = true
+  render()
+
+  liveCanvas.addEventListener('pointerup', scheduleDeactivate)
+  liveCanvas.addEventListener('pointerleave', scheduleDeactivate)
+}
+
+function scheduleDeactivate() {
+  if (deactivateTimer)
+    clearTimeout(deactivateTimer)
+  deactivateTimer = setTimeout(deactivate, 1500)
+}
+
+function deactivate() {
+  if (!renderer || !props.isStatic)
+    return
+  const dom = cubeElement.value
+  if (!dom)
+    return
+
+  animating = false
+  renderToStaticCanvas(staticCanvas!)
+  dom.replaceChild(staticCanvas!, liveCanvas!)
+  staticCanvas!.addEventListener('pointerdown', activate)
+
+  renderer.dispose()
+  renderer = null
+  controls?.dispose()
+  controls = null
+  liveCanvas = null
+  deactivateTimer = null
+}
+
+function render() {
+  if (!animating)
+    return
+  requestAnimationFrame(render)
+  controls?.update()
+  renderer?.render(scene, camera)
 }
 
 watch(facelet, () => {
   updateMaterials()
-  if (props.isStatic)
-    staticRerender()
+  if (props.isStatic && staticCanvas && !renderer)
+    renderToStaticCanvas(staticCanvas)
 })
 watch(width, () => {
-  if (props.isStatic) {
-    staticRerender()
+  if (props.isStatic && staticCanvas && !renderer) {
+    renderToStaticCanvas(staticCanvas)
   }
   else {
     setSize()
@@ -301,6 +361,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   animating = false
+  if (deactivateTimer)
+    clearTimeout(deactivateTimer)
   if (renderer)
     renderer.dispose()
   controls?.dispose()
