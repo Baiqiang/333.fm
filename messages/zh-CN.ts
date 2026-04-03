@@ -849,6 +849,8 @@ export default {
       optimalMoves: '最优步数',
       allSolutions: '所有解法',
       eoBreaking: '破坏EO',
+      include: '包含',
+      only: '限制',
     },
     credit: 'RZP 数据来源',
     signInToPlay: '登录以开始游戏',

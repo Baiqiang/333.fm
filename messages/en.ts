@@ -849,6 +849,8 @@ export default {
       optimalMoves: 'Optimal Moves',
       allSolutions: 'All Solutions',
       eoBreaking: 'EO Breaking',
+      include: 'Include',
+      only: 'Only',
     },
     credit: 'RZP case data from',
     signInToPlay: 'Sign in to play',

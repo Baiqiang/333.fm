@@ -29,6 +29,7 @@ const rzpN = ref(route.query.rzpc ? String(route.query.rzpc) : '')
 const rzpM = ref(route.query.rzpe ? String(route.query.rzpe) : '')
 const armN = ref(route.query.armc ? String(route.query.armc) : '')
 const armM = ref(route.query.arme ? String(route.query.arme) : '')
+const eo = ref(route.query.eo ? String(route.query.eo) : '')
 const page = ref(route.query.page ? Number(route.query.page) : 1)
 const meta = ref<PaginationMeta>({
   totalItems: 0,
@@ -89,6 +90,8 @@ const queryString = computed(() => {
     params.set('armc', armN.value)
   if (armM.value)
     params.set('arme', armM.value)
+  if (eo.value)
+    params.set('eo', eo.value)
   if (page.value > 1)
     params.set('page', String(page.value))
   const qs = params.toString()
@@ -114,6 +117,8 @@ function buildQuery() {
     query.armc = armN.value
   if (armM.value)
     query.arme = armM.value
+  if (eo.value)
+    query.eo = eo.value
   if (page.value > 1)
     query.page = String(page.value)
   return query
@@ -123,7 +128,7 @@ function updateUrl() {
   router.replace({ path: '/dr-trigger/cases', query: buildQuery() })
 }
 
-watch([moves, rzpN, rzpM, armN, armM], () => {
+watch([moves, rzpN, rzpM, armN, armM, eo], () => {
   page.value = 1
   updateUrl()
 })
@@ -285,6 +290,25 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
               <Icon name="mdi:close" class="text-sm" />
             </button>
           </div>
+        </div>
+
+        <!-- EO -->
+        <div>
+          <label class="font-bold text-xs md:text-sm text-gray-500 block mb-0.5">{{ $t('drTrigger.cases.eoBreaking') }}</label>
+          <select
+            v-model="eo"
+            class="w-20 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50"
+          >
+            <option value="">
+              {{ $t('drTrigger.cases.allMoves') }}
+            </option>
+            <option value="include">
+              Include
+            </option>
+            <option value="only">
+              Only
+            </option>
+          </select>
         </div>
 
         <!-- Count -->
