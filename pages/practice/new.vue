@@ -34,7 +34,12 @@ async function submit() {
     })
   }
   catch (e: any) {
-    const message = (e.data || e.response?.data)?.message || e.message
+    const errorData = e.data || e.response?.data
+    if (errorData?.competition) {
+      router.push(competitionPath(errorData.competition))
+      return
+    }
+    const message = errorData?.message || e.message
     alert(message)
   }
   finally {
