@@ -17,6 +17,8 @@ interface TriggerCase {
   corners: string | null
   optimalMoves: number
   solutions: DRTriggerSolution[]
+  symmetryGroup: string | null
+  symmetryGroupSize?: number
 }
 
 interface CasesResponse {
@@ -24,6 +26,7 @@ interface CasesResponse {
   meta: PaginationMeta
 }
 
+const merged = ref(route.query.merged !== 'false')
 const moves = ref(route.query.moves ? Number(route.query.moves) : 0)
 const rzpN = ref(route.query.rzpc ? String(route.query.rzpc) : '')
 const rzpM = ref(route.query.rzpe ? String(route.query.rzpe) : '')
@@ -80,6 +83,8 @@ const armOptions = computed(() => {
 
 const queryString = computed(() => {
   const params = new URLSearchParams()
+  if (!merged.value)
+    params.set('merged', 'false')
   if (moves.value > 0)
     params.set('moves', String(moves.value))
   if (rzpN.value)
@@ -107,6 +112,8 @@ watch(casesData, (val) => {
 
 function buildQuery() {
   const query: Record<string, string> = {}
+  if (!merged.value)
+    query.merged = 'false'
   if (moves.value > 0)
     query.moves = String(moves.value)
   if (rzpN.value)
@@ -128,7 +135,7 @@ function updateUrl() {
   router.replace({ path: '/dr-trigger/cases', query: buildQuery() })
 }
 
-watch([moves, rzpN, rzpM, armN, armM, eo], () => {
+watch([merged, moves, rzpN, rzpM, armN, armM, eo], () => {
   page.value = 1
   updateUrl()
 })
@@ -162,46 +169,118 @@ function getCaseMoves(c: TriggerCase): string {
   return reverseSolution(c.solutions[0].solution)
 }
 
-// --- Modal ---
+// --- Modal (fully decoupled from Vue Router to prevent flicker) ---
 const modalCase = ref<TriggerCase | null>(null)
 const modalLoading = ref(false)
 const showAllSolutions = ref(false)
+const symmetryVariants = ref<TriggerCase[]>([])
+const symmetryVariantsLoading = ref(false)
+const showSymmetryVariants = ref(false)
+const modalOpen = ref(false)
 
-const selectedCaseId = computed(() => {
-  const id = route.params.id
-  return id ? Number(id) : null
-})
-
-watch(selectedCaseId, async (id) => {
-  if (!id) {
-    modalCase.value = null
-    return
+async function loadSymmetryVariants(group: string) {
+  symmetryVariantsLoading.value = true
+  try {
+    symmetryVariants.value = await useClientApi<TriggerCase[]>(`/dr-trigger/symmetry-group/${group}`)
   }
+  catch {
+    symmetryVariants.value = []
+  }
+  symmetryVariantsLoading.value = false
+}
+
+function buildCaseUrl(id: number) {
+  const query = buildQuery()
+  const qs = new URLSearchParams(query).toString()
+  return `/dr-trigger/cases/${id}${qs ? `?${qs}` : ''}`
+}
+
+function resetModalState() {
+  modalOpen.value = false
+  modalCase.value = null
+  modalLoading.value = false
+  showAllSolutions.value = false
+  showSymmetryVariants.value = false
+  symmetryVariants.value = []
+}
+
+function openCase(c: TriggerCase) {
+  modalCase.value = c
+  modalOpen.value = true
+  showAllSolutions.value = false
+  showSymmetryVariants.value = false
+  symmetryVariants.value = []
+  history.pushState(null, '', buildCaseUrl(c.id))
+}
+
+async function openCaseById(id: number) {
   const found = casesData.value?.items.find(c => c.id === id)
   if (found) {
     modalCase.value = found
+    modalOpen.value = true
     showAllSolutions.value = false
+    showSymmetryVariants.value = false
+    symmetryVariants.value = []
     return
   }
+  modalOpen.value = true
   modalLoading.value = true
   try {
     const data = await useClientApi<TriggerCase>(`/dr-trigger/case/${id}`)
     modalCase.value = data
     showAllSolutions.value = false
+    showSymmetryVariants.value = false
+    symmetryVariants.value = []
   }
   catch {
     modalCase.value = null
   }
   modalLoading.value = false
-}, { immediate: true })
-
-function openCase(c: TriggerCase) {
-  router.push({ path: `/dr-trigger/cases/${c.id}`, query: buildQuery() })
 }
+
+function selectVariant(v: TriggerCase) {
+  modalCase.value = v
+  showAllSolutions.value = false
+  history.replaceState(null, '', buildCaseUrl(v.id))
+}
+
+let closingByButton = false
 
 function closeModal() {
-  router.push({ path: '/dr-trigger/cases', query: buildQuery() })
+  resetModalState()
+  closingByButton = true
+  history.back()
 }
+
+function onPopState() {
+  if (closingByButton) {
+    closingByButton = false
+    return
+  }
+  if (modalOpen.value) {
+    resetModalState()
+  }
+}
+
+function toggleSymmetryVariants() {
+  showSymmetryVariants.value = !showSymmetryVariants.value
+  if (showSymmetryVariants.value && symmetryVariants.value.length === 0 && modalCase.value?.symmetryGroup) {
+    loadSymmetryVariants(modalCase.value.symmetryGroup)
+  }
+}
+
+const initialCaseId = route.params.id ? Number(route.params.id) : null
+if (initialCaseId) {
+  openCaseById(initialCaseId)
+}
+
+onMounted(() => {
+  window.addEventListener('popstate', onPopState)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('popstate', onPopState)
+})
 
 function optimalSolutions(solutions: DRTriggerSolution[]) {
   const min = Math.min(...solutions.map(s => s.length))
@@ -297,7 +376,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
           <label class="font-bold text-xs md:text-sm text-gray-500 block mb-0.5">{{ $t('drTrigger.cases.eoBreaking') }}</label>
           <select
             v-model="eo"
-            class="w-20 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50"
+            class="w-22 font-mono text-xs md:text-sm p-1 border border-gray-300 focus:border-indigo-300 focus:ring-1 focus:ring-indigo-200/50"
           >
             <option value="">
               {{ $t('drTrigger.cases.allMoves') }}
@@ -309,6 +388,18 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
               Only
             </option>
           </select>
+        </div>
+
+        <!-- Merged -->
+        <div class="self-end pb-0.5">
+          <label class="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              v-model="merged"
+              type="checkbox"
+              class="accent-indigo-500"
+            >
+            <span class="text-xs md:text-sm text-gray-600">{{ $t('drTrigger.cases.merged') }}</span>
+          </label>
         </div>
 
         <!-- Count -->
@@ -326,10 +417,16 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
         class="bg-white shadow-sm p-2 hover:shadow-md transition-all duration-200 group"
       >
         <CubeCss3d :moves="getCaseMoves(c)" filter="dr" class="w-full mb-1.5" />
-        <div class="cursor-pointer" @click="openCase(c)">
+        <div
+          class="cursor-pointer px-1 -mx-1 py-0.5 transition-colors group-hover:bg-indigo-50"
+          @click="openCase(c)"
+        >
           <div class="flex items-center justify-between">
             <span class="text-[10px] md:text-xs text-gray-500 font-mono">{{ c.rzp }}</span>
-            <span class="text-[10px] md:text-xs text-gray-400 font-mono">{{ formatArm(c.arm) }}</span>
+            <span class="flex items-center gap-1">
+              <span v-if="merged && c.symmetryGroupSize && c.symmetryGroupSize > 1" class="text-[10px] bg-indigo-100 text-indigo-600 font-mono px-1">x{{ c.symmetryGroupSize }}</span>
+              <span class="text-[10px] md:text-xs text-gray-400 font-mono">{{ formatArm(c.arm) }}</span>
+            </span>
           </div>
           <div class="text-[10px] md:text-xs text-gray-400 mt-0.5">
             {{ $t('drTrigger.cases.moves') }}: <span class="font-mono font-semibold text-gray-600">{{ c.optimalMoves / 100 }}</span>
@@ -347,139 +444,133 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
 
     <Pagination :meta="meta" @update="onPageUpdate" />
 
-    <!-- Modal backdrop -->
-    <Teleport to="body">
-      <Transition name="modal">
-        <div
-          v-if="selectedCaseId"
-          class="fixed inset-0 z-100 flex items-center justify-center bg-black/40 cursor-pointer"
-          @click.self="closeModal"
-        >
-          <div class="modal-panel bg-white shadow-xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto overflow-x-hidden relative cursor-default">
-            <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors z-10 cursor-pointer" @click="closeModal">
-              <Icon name="mdi:close" class="text-xl" />
-            </button>
+    <!-- Modal overlay: always mounted, visibility controlled by CSS -->
+    <div
+      class="fixed inset-0 z-100 flex items-center justify-center transition-all duration-200 cursor-pointer"
+      :class="modalOpen ? 'bg-black/40 visible opacity-100' : 'invisible opacity-0 pointer-events-none'"
+      @click.self="closeModal"
+    >
+      <div
+        class="bg-white shadow-xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto overflow-x-hidden relative cursor-default transition-transform duration-200"
+        :class="modalOpen ? 'scale-100' : 'scale-95'"
+      >
+        <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors z-10 cursor-pointer" @click="closeModal">
+          <Icon name="mdi:close" class="text-xl" />
+        </button>
 
-            <div v-if="modalLoading" class="p-8 text-center">
-              <Spinner class="w-6 h-6 border-[3px] text-indigo-500 mx-auto" />
+        <div v-if="modalLoading" class="p-8 text-center">
+          <Spinner class="w-6 h-6 border-[3px] text-indigo-500 mx-auto" />
+        </div>
+
+        <template v-else-if="modalCase">
+          <div class="p-4">
+            <!-- Header -->
+            <h2 class="text-lg font-bold font-poppins mb-3">
+              {{ $t('drTrigger.cases.detail') }}
+              <span class="font-mono text-indigo-600">#{{ modalCase.caseId }}</span>
+            </h2>
+
+            <!-- Info -->
+            <div class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm mb-3">
+              <span class="font-mono">RZP: <span class="font-semibold text-indigo-600">{{ modalCase.rzp }}</span></span>
+              <span class="font-mono">{{ formatArm(modalCase.arm) }}</span>
+              <span class="text-gray-500">{{ $t('drTrigger.cases.optimalMoves') }}: <span class="font-mono font-bold text-indigo-600">{{ modalCase.optimalMoves / 100 }}</span></span>
+              <span class="text-gray-500">{{ $t('drTrigger.cases.pairs') }}: <span class="font-mono">{{ modalCase.pairs }}</span></span>
+              <span v-if="modalCase.tetrad" class="text-gray-500">Tetrad: <span class="font-mono">{{ modalCase.tetrad }}</span></span>
+              <span v-if="modalCase.corners" class="text-gray-500">Corners: <span class="font-mono">{{ modalCase.corners }}</span></span>
             </div>
 
-            <template v-else-if="modalCase">
-              <div class="p-4">
-                <!-- Header -->
-                <h2 class="text-lg font-bold font-poppins mb-3">
-                  {{ $t('drTrigger.cases.detail') }}
-                  <span class="font-mono text-indigo-600">#{{ modalCase.caseId }}</span>
-                </h2>
+            <!-- Cube -->
+                <Cube3d :moves="getCaseMoves(modalCase)" filter="dr" class="max-w-56 mb-4" />
 
-                <!-- Info -->
-                <div class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm mb-3">
-                  <span class="font-mono">RZP: <span class="font-semibold text-indigo-600">{{ modalCase.rzp }}</span></span>
-                  <span class="font-mono">{{ formatArm(modalCase.arm) }}</span>
-                  <span class="text-gray-500">{{ $t('drTrigger.cases.optimalMoves') }}: <span class="font-mono font-bold text-indigo-600">{{ modalCase.optimalMoves / 100 }}</span></span>
-                  <span class="text-gray-500">{{ $t('drTrigger.cases.pairs') }}: <span class="font-mono">{{ modalCase.pairs }}</span></span>
-                  <span v-if="modalCase.tetrad" class="text-gray-500">Tetrad: <span class="font-mono">{{ modalCase.tetrad }}</span></span>
-                  <span v-if="modalCase.corners" class="text-gray-500">Corners: <span class="font-mono">{{ modalCase.corners }}</span></span>
+            <!-- Optimal solutions -->
+            <div class="mb-3">
+              <h3 class="font-bold text-xs text-gray-500 mb-1">
+                {{ $t('drTrigger.history.optimalSolutions') }}
+                <span class="text-gray-400 font-normal">({{ optimalSolutions(modalCase.solutions).length }})</span>
+              </h3>
+              <div class="space-y-0.5">
+                <div
+                  v-for="(s, si) in optimalSolutions(modalCase.solutions)"
+                  :key="si"
+                  class="font-mono text-sm bg-gray-50 px-2 py-1.5 flex items-center justify-between gap-2"
+                >
+                  <span class="break-all">
+                    {{ s.solution }}
+                    <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-xs">{{ $t('drTrigger.cases.eoBreaking') }}</span>
+                  </span>
+                  <span class="text-gray-400 text-xs shrink-0">({{ s.length }})</span>
                 </div>
+              </div>
+            </div>
 
-                <!-- Cube -->
-                <Cube3d :key="modalCase.id" :moves="getCaseMoves(modalCase)" filter="dr" class="max-w-56 mb-4" />
-
-                <!-- Optimal solutions -->
-                <div class="mb-3">
-                  <h3 class="font-bold text-xs text-gray-500 mb-1">
-                    {{ $t('drTrigger.history.optimalSolutions') }}
-                    <span class="text-gray-400 font-normal">({{ optimalSolutions(modalCase.solutions).length }})</span>
-                  </h3>
-                  <div class="space-y-0.5">
-                    <div
-                      v-for="(s, si) in optimalSolutions(modalCase.solutions)"
-                      :key="si"
-                      class="font-mono text-sm bg-gray-50 px-2 py-1.5 flex items-center justify-between gap-2"
-                    >
-                      <span class="break-all">
-                        {{ s.solution }}
-                        <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-xs">{{ $t('drTrigger.cases.eoBreaking') }}</span>
-                      </span>
-                      <span class="text-gray-400 text-xs shrink-0">({{ s.length }})</span>
-                    </div>
-                  </div>
+            <!-- All solutions -->
+            <div v-if="modalCase.solutions.length > optimalSolutions(modalCase.solutions).length">
+              <button
+                class="font-bold text-sm text-gray-500 mb-1 flex items-center gap-1 hover:text-indigo-500 transition-colors cursor-pointer"
+                @click="showAllSolutions = !showAllSolutions"
+              >
+                {{ $t('drTrigger.cases.allSolutions') }}
+                <span class="text-gray-400 font-normal">({{ modalCase.solutions.length }})</span>
+                <Icon
+                  name="mdi:chevron-down"
+                  class="transition-transform text-gray-400"
+                  :class="{ 'rotate-180': showAllSolutions }"
+                />
+              </button>
+              <div v-if="showAllSolutions" class="space-y-0.5 max-h-60 overflow-y-auto">
+                <div
+                  v-for="(s, si) in modalCase.solutions.filter(s => s.length > optimalSolutions(modalCase!.solutions)[0].length)"
+                  :key="si"
+                  class="font-mono text-sm bg-gray-50 px-2 py-1.5 flex items-center justify-between gap-2"
+                >
+                  <span class="break-all">
+                    {{ s.solution }}
+                    <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-xs">{{ $t('drTrigger.cases.eoBreaking') }}</span>
+                  </span>
+                  <span class="text-gray-400 text-xs shrink-0">({{ s.length }})</span>
                 </div>
+              </div>
+            </div>
 
-                <!-- All solutions -->
-                <div v-if="modalCase.solutions.length > optimalSolutions(modalCase.solutions).length">
-                  <button
-                    class="font-bold text-sm text-gray-500 mb-1 flex items-center gap-1 hover:text-indigo-500 transition-colors cursor-pointer"
-                    @click="showAllSolutions = !showAllSolutions"
+            <!-- Symmetric variants -->
+            <div v-if="modalCase.symmetryGroup" class="mt-3 border-t border-gray-200 pt-3">
+              <button
+                class="font-bold text-sm text-gray-500 mb-1 flex items-center gap-1 hover:text-indigo-500 transition-colors cursor-pointer"
+                @click="toggleSymmetryVariants"
+              >
+                {{ $t('drTrigger.cases.symmetricVariants') }}
+                <span v-if="modalCase.symmetryGroupSize" class="text-gray-400 font-normal">({{ modalCase.symmetryGroupSize }})</span>
+                <Icon
+                  name="mdi:chevron-down"
+                  class="transition-transform text-gray-400"
+                  :class="{ 'rotate-180': showSymmetryVariants }"
+                />
+              </button>
+              <div v-if="showSymmetryVariants">
+                <Spinner v-if="symmetryVariantsLoading" class="w-5 h-5 border-[3px] text-indigo-500 my-2" />
+                <div v-else class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-80 overflow-y-auto">
+                  <div
+                    v-for="v in symmetryVariants"
+                    :key="v.id"
+                    class="p-1.5 cursor-pointer transition-colors"
+                    :class="v.id === modalCase.id ? 'bg-indigo-50 border-l-2 border-indigo-500' : 'bg-gray-50 hover:bg-gray-100'"
+                    @click="selectVariant(v)"
                   >
-                    {{ $t('drTrigger.cases.allSolutions') }}
-                    <span class="text-gray-400 font-normal">({{ modalCase.solutions.length }})</span>
-                    <Icon
-                      name="mdi:chevron-down"
-                      class="transition-transform text-gray-400"
-                      :class="{ 'rotate-180': showAllSolutions }"
-                    />
-                  </button>
-                  <div v-if="showAllSolutions" class="space-y-0.5 max-h-60 overflow-y-auto">
-                    <div
-                      v-for="(s, si) in modalCase.solutions.filter(s => s.length > optimalSolutions(modalCase!.solutions)[0].length)"
-                      :key="si"
-                      class="font-mono text-sm bg-gray-50 px-2 py-1.5 flex items-center justify-between gap-2"
-                    >
-                      <span class="break-all">
-                        {{ s.solution }}
-                        <span v-if="s.eoBreaking" class="text-red-400 ml-1 text-xs">{{ $t('drTrigger.cases.eoBreaking') }}</span>
-                      </span>
-                      <span class="text-gray-400 text-xs shrink-0">({{ s.length }})</span>
+                    <CubeCss3d :moves="getCaseMoves(v)" filter="dr" class="w-full mb-1 pointer-events-none" />
+                    <div class="text-[10px] font-mono text-gray-500 truncate">
+                      {{ v.rzp }} #{{ v.caseId }}
+                    </div>
+                    <div class="text-[10px] font-mono text-gray-400 truncate">
+                      {{ v.solutions[0]?.solution }}
                     </div>
                   </div>
                 </div>
               </div>
-            </template>
+            </div>
           </div>
-        </div>
-      </Transition>
-    </Teleport>
-
-    <NuxtPage />
+        </template>
+      </div>
+    </div>
   </div>
 </template>
-
-<style scoped>
-.modal-enter-active {
-  transition: opacity 0.2s ease;
-}
-.modal-leave-active {
-  transition: opacity 0.15s ease;
-}
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-.modal-enter-active .modal-panel {
-  animation: modal-in 0.2s ease-out;
-}
-.modal-leave-active .modal-panel {
-  animation: modal-out 0.15s ease-in;
-}
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-@keyframes modal-out {
-  from {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-}
-</style>

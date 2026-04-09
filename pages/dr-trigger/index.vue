@@ -14,6 +14,7 @@ interface DRTriggerGame {
   levels: number
   difficulty: number
   rzp: string | null
+  merged: boolean
   remainingTime: number
   totalTimeBonus: number
   createdAt: string
@@ -68,9 +69,11 @@ const myGames = ref<DRTriggerGame[]>([])
 const myGamesTotal = ref(0)
 const myGamesPage = ref(1)
 const myGamesLoading = ref(false)
+const gameMerged = ref(true)
 const leaderboardMode = ref<'normal' | 'rzp'>('normal')
 const leaderboardDifficulty = ref(5)
 const leaderboardRzp = ref('')
+const leaderboardMerged = ref(true)
 
 const cubeKeys = [
   ['U', 'U\'', 'U2', 'D', 'D\'', 'D2'],
@@ -83,9 +86,16 @@ let gameStartedAt = 0
 let serverRemainingAtSync = 0
 
 const leaderboardQuery = computed(() => {
+  const params = new URLSearchParams()
   if (leaderboardRzp.value)
-    return `?rzp=${encodeURIComponent(leaderboardRzp.value)}`
-  return `?difficulty=${leaderboardDifficulty.value}`
+    params.set('rzp', leaderboardRzp.value)
+  else
+    params.set('difficulty', String(leaderboardDifficulty.value))
+  if (leaderboardMerged.value)
+    params.set('merged', 'true')
+  else
+    params.set('merged', 'false')
+  return `?${params.toString()}`
 })
 const { data: leaderboard, refresh: refreshLeaderboard } = await useApi<Leaderboard>(() => `/dr-trigger/leaderboard${leaderboardQuery.value}`)
 
@@ -152,8 +162,8 @@ async function startGame() {
   error.value = ''
   try {
     const body: any = gameMode.value === 'rzp'
-      ? { rzp: selectedRzp.value }
-      : { difficulty: difficulty.value }
+      ? { rzp: selectedRzp.value, merged: gameMerged.value }
+      : { difficulty: difficulty.value, merged: gameMerged.value }
     const data = await useClientApi<any>('/dr-trigger/start', { method: 'POST', body })
     game.value = data.game
     trigger.value = data.trigger
@@ -422,6 +432,16 @@ onUnmounted(() => {
               {{ r }}
             </option>
           </select>
+        </div>
+        <div class="mb-3">
+          <label class="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              v-model="gameMerged"
+              type="checkbox"
+              class="accent-indigo-500"
+            >
+            <span class="text-sm text-gray-600">{{ $t('drTrigger.mergedCases') }}</span>
+          </label>
         </div>
         <button
           class="bg-indigo-500 text-white px-6 py-3 text-lg shadow-md hover:bg-indigo-600 hover:-translate-y-0.5 transition-all duration-200"
@@ -706,21 +726,31 @@ onUnmounted(() => {
       </h2>
 
       <!-- Leaderboard mode tabs -->
-      <div class="mb-3 flex gap-1.5">
-        <button
-          class="px-3 py-1.5 text-sm transition-all duration-200 border"
-          :class="leaderboardMode === 'normal' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
-          @click="leaderboardMode = 'normal'; leaderboardRzp = ''"
-        >
-          {{ $t('drTrigger.mode.normal') }}
-        </button>
-        <button
-          class="px-3 py-1.5 text-sm transition-all duration-200 border"
-          :class="leaderboardMode === 'rzp' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
-          @click="leaderboardMode = 'rzp'; if (!leaderboardRzp && rzpList.length) leaderboardRzp = rzpList[0]"
-        >
-          RZP
-        </button>
+      <div class="mb-3 flex items-center gap-3">
+        <div class="flex gap-1.5">
+          <button
+            class="px-3 py-1.5 text-sm transition-all duration-200 border"
+            :class="leaderboardMode === 'normal' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
+            @click="leaderboardMode = 'normal'; leaderboardRzp = ''"
+          >
+            {{ $t('drTrigger.mode.normal') }}
+          </button>
+          <button
+            class="px-3 py-1.5 text-sm transition-all duration-200 border"
+            :class="leaderboardMode === 'rzp' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'"
+            @click="leaderboardMode = 'rzp'; if (!leaderboardRzp && rzpList.length) leaderboardRzp = rzpList[0]"
+          >
+            RZP
+          </button>
+        </div>
+        <label class="flex items-center gap-1.5 cursor-pointer select-none">
+          <input
+            v-model="leaderboardMerged"
+            type="checkbox"
+            class="accent-indigo-500"
+          >
+          <span class="text-xs text-gray-600">{{ $t('drTrigger.mergedCases') }}</span>
+        </label>
       </div>
 
       <!-- Difficulty selector -->
