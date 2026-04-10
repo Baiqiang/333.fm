@@ -2,9 +2,9 @@
 const { t } = useI18n()
 const route = useRoute()
 const day = route.params.day as string
-const userId = Number(route.params.userId)
+const id = route.params.id as string
 
-const { data } = await useApi<SubmissionPageResponse>(`/quiz/day/${day}/submission/${userId}`)
+const { data } = await useApi<SubmissionPageResponse>(`/quiz/day/${day}/submission/${id}`)
 
 const quizData = computed(() => data.value?.quiz ?? null)
 const questions = computed(() => data.value?.questions ?? [])
@@ -62,7 +62,7 @@ onMounted(() => {
         :leaderboard="leaderboard"
         :format-time="formatTime"
         :quiz-day="day"
-        :active-user-id="userId"
+        :active-user-id="targetUser.id"
       />
 
       <!-- User info banner -->
