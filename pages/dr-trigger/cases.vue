@@ -418,13 +418,13 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
       >
         <CubeCss3d :moves="getCaseMoves(c)" filter="dr" class="w-full mb-1.5" />
         <div
-          class="cursor-pointer px-1 -mx-1 py-0.5 transition-colors group-hover:bg-indigo-50"
+          class="cursor-pointer px-1 -mx-1 py-0.5 transition-colors group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30"
           @click="openCase(c)"
         >
           <div class="flex items-center justify-between">
             <span class="text-[10px] md:text-xs text-gray-500 font-mono">{{ c.rzp }}</span>
             <span class="flex items-center gap-1">
-              <span v-if="merged && c.symmetryGroupSize && c.symmetryGroupSize > 1" class="text-[10px] bg-indigo-100 text-indigo-600 font-mono px-1">x{{ c.symmetryGroupSize }}</span>
+              <span v-if="merged && c.symmetryGroupSize && c.symmetryGroupSize > 1" class="text-[10px] bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 font-mono px-1">x{{ c.symmetryGroupSize }}</span>
               <span class="text-[10px] md:text-xs text-gray-400 font-mono">{{ formatArm(c.arm) }}</span>
             </span>
           </div>
@@ -481,7 +481,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
             </div>
 
             <!-- Cube -->
-                <Cube3d :moves="getCaseMoves(modalCase)" filter="dr" class="max-w-56 mb-4" />
+            <Cube3d :moves="getCaseMoves(modalCase)" filter="dr" class="max-w-56 mb-4" />
 
             <!-- Optimal solutions -->
             <div class="mb-3">

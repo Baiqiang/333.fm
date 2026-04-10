@@ -90,15 +90,33 @@ useIntervalFn(() => {
 }, 5000)
 
 const langButton = ref()
+const colorModeButton = ref()
+const colorMode = useColorMode()
 const locales = [
   { code: 'en', label: 'English' },
   { code: 'zh-CN', label: '简体中文' },
 ]
+const colorModes = [
+  { value: 'system', icon: 'mdi:monitor' },
+  { value: 'light', icon: 'mdi:white-balance-sunny' },
+  { value: 'dark', icon: 'mdi:moon-waning-crescent' },
+] as const
+const colorModeIcon = computed(() => {
+  if (colorMode.preference === 'dark')
+    return 'mdi:moon-waning-crescent'
+  if (colorMode.preference === 'light')
+    return 'mdi:white-balance-sunny'
+  return 'mdi:monitor'
+})
 const dropdowns = reactive({
   lang: false,
+  colorMode: false,
 })
 onClickOutside(langButton, () => {
   dropdowns.lang = false
+})
+onClickOutside(colorModeButton, () => {
+  dropdowns.colorMode = false
 })
 async function changeLocale(code: string) {
   setLocaleCookie(code)
@@ -108,7 +126,7 @@ async function changeLocale(code: string) {
 </script>
 
 <template>
-  <header class="bg-indigo-500 text-white relative text-sm md:text-base">
+  <header class="bg-indigo-500 dark:bg-gray-900 text-white relative text-sm md:text-base">
     <div class="container flex items-center py-2 px-4 mx-auto gap-x-2">
       <h1 class="mr-2">
         <NuxtLink to="/" class="flex items-center">
@@ -127,7 +145,7 @@ async function changeLocale(code: string) {
         </button>
       </div>
       <div
-        class="fixed inset-0 bg-indigo-500 md:static transition-all duration-300 z-50 flex flex-col md:flex-row md:gap-x-2 md:items-center md:w-full"
+        class="fixed inset-0 bg-indigo-500 dark:bg-gray-900 md:static transition-all duration-300 z-50 flex flex-col md:flex-row md:gap-x-2 md:items-center md:w-full"
         :class="{
           'left-0': showMenu,
           'left-full': !showMenu,
@@ -158,9 +176,31 @@ async function changeLocale(code: string) {
             </a>
 
             <TransitionSlide :offset="[0, 4]">
-              <div v-if="dropdowns.lang" class="flex flex-col gap-1 md:absolute top-10 right-0 bg-indigo-500 p-2 text-sm">
-                <button v-for="item in locales" :key="item.code" class="w-24 flex items-center text-left px-2 py-1 transition hover:bg-indigo-400" @click="changeLocale(item.code)">
+              <div v-if="dropdowns.lang" class="flex flex-col gap-1 md:absolute top-10 right-0 bg-indigo-500 dark:bg-indigo-700 p-2 text-sm">
+                <button v-for="item in locales" :key="item.code" class="w-24 flex items-center text-left px-2 py-1 transition hover:bg-indigo-400 dark:hover:bg-indigo-600" @click="changeLocale(item.code)">
                   <span>{{ item.label }}</span>
+                </button>
+              </div>
+            </TransitionSlide>
+          </div>
+
+          <div class="relative">
+            <a ref="colorModeButton" class="px-4 py-2 md:p-0 cursor-pointer" @click="dropdowns.colorMode = !dropdowns.colorMode">
+              <Icon :name="colorModeIcon" size="20" />
+              <span class="md:hidden ml-2">{{ $t(`colorMode.${colorMode.preference}`) }}</span>
+            </a>
+
+            <TransitionSlide :offset="[0, 4]">
+              <div v-if="dropdowns.colorMode" class="flex flex-col gap-1 md:absolute top-10 right-0 bg-indigo-500 dark:bg-indigo-700 p-2 text-sm">
+                <button
+                  v-for="mode in colorModes"
+                  :key="mode.value"
+                  class="w-28 flex items-center text-left px-2 py-1 transition hover:bg-indigo-400 dark:hover:bg-indigo-600"
+                  :class="{ 'bg-indigo-400 dark:bg-indigo-600': colorMode.preference === mode.value }"
+                  @click="colorMode.preference = mode.value; dropdowns.colorMode = false"
+                >
+                  <Icon :name="mode.icon" size="16" class="mr-2" />
+                  <span>{{ $t(`colorMode.${mode.value}`) }}</span>
                 </button>
               </div>
             </TransitionSlide>

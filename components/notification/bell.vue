@@ -118,9 +118,9 @@ if (user.signedIn) {
     <TransitionSlide :offset="[0, 4]">
       <div
         v-if="showDropdown"
-        class="absolute right-0 top-10 bg-white text-black border border-gray-200 shadow-lg w-80 max-h-96 overflow-y-auto z-50"
+        class="absolute right-0 top-10 bg-white dark:bg-gray-800 text-black dark:text-gray-200 border border-gray-200 dark:border-gray-700 shadow-lg w-80 max-h-96 overflow-y-auto z-50"
       >
-        <div class="flex justify-between items-center px-3 py-2 border-b border-gray-100">
+        <div class="flex justify-between items-center px-3 py-2 border-b border-gray-100 dark:border-gray-700">
           <span class="font-medium text-sm">{{ t('notification.title') }}</span>
           <button
             v-if="unreadCount > 0"
@@ -142,8 +142,8 @@ if (user.signedIn) {
             v-for="notification in notifications"
             :key="notification.id"
             :to="getNotificationLink(notification)"
-            class="flex gap-2 px-3 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-b-0"
-            :class="{ 'bg-indigo-50': !notification.read }"
+            class="flex gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-50 dark:border-gray-700 last:border-b-0"
+            :class="{ 'bg-indigo-50 dark:bg-indigo-900/30': !notification.read }"
             @click="markOneRead(notification); showDropdown = false"
           >
             <img :src="notification.sourceUser?.avatarThumb" class="w-8 h-8 rounded-full shrink-0">
@@ -166,7 +166,7 @@ if (user.signedIn) {
         <NuxtLink
           v-if="total > 10"
           to="/user/notifications"
-          class="block text-center text-xs text-indigo-500 py-2 border-t border-gray-100 hover:bg-gray-50"
+          class="block text-center text-xs text-indigo-500 dark:text-indigo-400 py-2 border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
           @click="showDropdown = false"
         >
           {{ t('notification.viewAll') }}

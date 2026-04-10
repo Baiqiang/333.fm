@@ -155,7 +155,7 @@ watch(() => props.open, (isOpen) => {
         {{ loadingMore ? t('loading') : t('comment.viewAll', { count: total }) }}
       </button>
 
-      <div v-if="comments.length > 0" class="divide-y divide-gray-100">
+      <div v-if="comments.length > 0" class="divide-y divide-gray-100 dark:divide-gray-700">
         <CommentItem
           v-for="comment in comments"
           :key="comment.id"

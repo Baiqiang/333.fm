@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @plugin "@tailwindcss/forms" {
   strategy: base;
 }
@@ -14,11 +16,205 @@
   --font-inter: 'Inter', sans-serif;
 }
 
+/* ===== Light mode base ===== */
+
 body {
   font-family: var(--font-inter);
   background-color: var(--color-gray-50);
+  color: var(--color-gray-800);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-poppins);
+}
+
+/* ===== Dark mode global overrides ===== */
+
+.dark body {
+  background-color: var(--color-gray-950);
+  color: var(--color-gray-200);
+}
+
+/* Surfaces */
+.dark .bg-white {
+  background-color: var(--color-gray-900) !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: var(--color-gray-900) !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: var(--color-gray-800) !important;
+}
+
+.dark .bg-gray-200 {
+  background-color: var(--color-gray-700) !important;
+}
+
+.dark .bg-indigo-50 {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+.dark .bg-green-50 {
+  background-color: rgba(34, 197, 94, 0.15) !important;
+}
+
+.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+.dark .bg-yellow-50 {
+  background-color: rgba(234, 179, 8, 0.15) !important;
+}
+
+.dark .bg-weekly {
+  background-color: var(--color-gray-800) !important;
+}
+
+/* Hover surfaces */
+.dark .hover\:bg-gray-50:hover {
+  background-color: var(--color-gray-800) !important;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: var(--color-gray-700) !important;
+}
+
+.dark .hover\:bg-gray-200:hover {
+  background-color: var(--color-gray-600) !important;
+}
+
+.dark .hover\:bg-indigo-50:hover {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+.dark .hover\:bg-indigo-100:hover {
+  background-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Colored light tints */
+.dark .bg-orange-100 {
+  background-color: rgba(234, 88, 12, 0.25) !important;
+}
+
+.dark .bg-indigo-100 {
+  background-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Text colors */
+.dark .text-black {
+  color: var(--color-gray-100) !important;
+}
+
+.dark .text-gray-900 {
+  color: var(--color-gray-100) !important;
+}
+
+.dark .text-gray-800 {
+  color: var(--color-gray-200) !important;
+}
+
+.dark .text-gray-700 {
+  color: var(--color-gray-300) !important;
+}
+
+.dark .text-gray-600 {
+  color: var(--color-gray-400) !important;
+}
+
+/* Borders */
+.dark .border-gray-100 {
+  border-color: var(--color-gray-800) !important;
+}
+
+.dark .border-gray-200 {
+  border-color: var(--color-gray-700) !important;
+}
+
+.dark .border-gray-300 {
+  border-color: var(--color-gray-600) !important;
+}
+
+.dark .border-gray-400 {
+  border-color: var(--color-gray-600) !important;
+}
+
+.dark .divide-gray-100 > :not(:last-child) {
+  border-color: var(--color-gray-800) !important;
+}
+
+.dark .divide-gray-200 > :not(:last-child) {
+  border-color: var(--color-gray-700) !important;
+}
+
+.dark .divide-gray-300 > :not(:last-child) {
+  border-color: var(--color-gray-600) !important;
+}
+
+/* Forms */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+  color: var(--color-gray-200);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--color-gray-500);
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: var(--color-indigo-400);
+  --tw-ring-color: rgba(99, 102, 241, 0.3);
+}
+
+/* Tables */
+.dark hr {
+  border-color: var(--color-gray-700);
+}
+
+.dark table {
+  border-color: var(--color-gray-700);
+}
+
+.dark th {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-700);
+  color: var(--color-gray-300);
+}
+
+.dark td {
+  border-color: var(--color-gray-700);
+}
+
+.dark tr:nth-child(even) {
+  background-color: color-mix(in srgb, var(--color-gray-800) 50%, transparent);
+}
+
+/* Shadows — soften in dark mode */
+.dark .shadow-md {
+  --tw-shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow-lg {
+  --tw-shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar */
+.dark ::-webkit-scrollbar {
+  background-color: var(--color-gray-900);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-600);
 }

@@ -117,7 +117,7 @@ watch(() => props.expanded, (expanded) => {
   <div
     :id="`submission-${submission.id}`"
     ref="el"
-    class="border-t first:border-t-0 border-gray-300 pt-2 mt-2 transition-colors duration-1000"
+    class="border-t first:border-t-0 border-gray-300 dark:border-gray-700 pt-2 mt-2 transition-colors duration-1000"
     :class="{ 'border border-indigo-300': isTargeted }"
   >
     <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
@@ -176,12 +176,12 @@ watch(() => props.expanded, (expanded) => {
         />
       </div>
       <template v-if="alwaysExpanded">
-        <Sequence v-if="submission.comment" :sequence="submission.comment" class="bg-gray-200 font-mono" />
+        <Sequence v-if="submission.comment" :sequence="submission.comment" class="bg-gray-200 dark:bg-gray-800 font-mono" />
         <SubmissionAttachments :attachments="submission.attachments" :show="showAttachment" @hide="showAttachment = false" />
       </template>
       <TransitionExpand v-else>
         <div v-if="showComment" class="basis-full">
-          <Sequence :sequence="submission.comment" class="bg-gray-200 font-mono" />
+          <Sequence :sequence="submission.comment" class="bg-gray-200 dark:bg-gray-800 font-mono" />
           <SubmissionAttachments :attachments="submission.attachments" :show="showAttachment" @hide="showAttachment = false" />
         </div>
       </TransitionExpand>

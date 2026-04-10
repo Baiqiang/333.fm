@@ -81,7 +81,7 @@ watch(() => route.hash, (newHash) => {
 }
 
 .tabs-header {
-  @apply border-b border-gray-200 bg-white sticky top-0 z-10;
+  @apply border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 sticky top-0 z-10;
 }
 
 .tabs-nav {
@@ -95,15 +95,15 @@ watch(() => route.hash, (newHash) => {
 }
 
 .tab-button {
-  @apply flex-shrink-0 px-2.5 py-2 text-xs md:px-3 md:py-2.5 md:text-sm lg:px-4 lg:py-3 lg:text-sm font-medium text-gray-500 bg-transparent border-none cursor-pointer relative whitespace-nowrap text-center transition-all duration-200 ease-in-out;
+  @apply flex-shrink-0 px-2.5 py-2 text-xs md:px-3 md:py-2.5 md:text-sm lg:px-4 lg:py-3 lg:text-sm font-medium text-gray-500 dark:text-gray-400 bg-transparent border-none cursor-pointer relative whitespace-nowrap text-center transition-all duration-200 ease-in-out;
 }
 
 .tab-button:hover {
-  @apply text-gray-700 bg-gray-50;
+  @apply text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800;
 }
 
 .tab-button--active {
-  @apply text-blue-600 bg-white;
+  @apply text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-900;
 }
 
 .tab-button--active::after {

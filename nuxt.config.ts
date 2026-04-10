@@ -27,6 +27,7 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@nuxtjs/mdc',
     '@nuxtjs/apollo',
+    '@nuxtjs/color-mode',
     'nuxt-icon',
     'nuxt-gtag',
     'nuxt-echarts',
@@ -66,6 +67,13 @@ export default defineNuxtConfig({
         }]
       : undefined,
   ],
+
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+    storageKey: 'color-mode',
+  },
 
   css: ['~/assets/css/tailwind.css', 'viewerjs/dist/viewer.css'],
 

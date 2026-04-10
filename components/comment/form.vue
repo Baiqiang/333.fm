@@ -191,13 +191,13 @@ function handleKeydown(e: KeyboardEvent) {
       <div
         v-if="showMentionDropdown && mentionResults.length > 0"
         ref="mentionListRef"
-        class="absolute z-50 bg-white border border-gray-200 shadow-lg max-h-40 overflow-y-auto w-60"
+        class="absolute z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg max-h-40 overflow-y-auto w-60"
       >
         <button
           v-for="(mentionUser, idx) in mentionResults"
           :key="mentionUser.id"
           class="flex items-center gap-2 w-full px-3 py-1.5 text-sm cursor-pointer text-left"
-          :class="idx === mentionActiveIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'"
+          :class="idx === mentionActiveIndex ? 'bg-indigo-100 dark:bg-indigo-900/50' : 'hover:bg-indigo-50 dark:hover:bg-gray-700'"
           @mousedown.prevent="selectMention(mentionUser)"
           @mouseenter="mentionActiveIndex = idx"
         >

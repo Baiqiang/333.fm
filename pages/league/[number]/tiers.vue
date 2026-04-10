@@ -27,8 +27,8 @@ useSeoMeta({
           <div
             v-for="week in weeks"
             :key="week"
-            class="p-4 hover:bg-indigo-50 transition-colors flex items-center"
-            :class="{ 'bg-orange-100': user.id === tierPlayers[tier.id][week - 1]?.id }"
+            class="p-4 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors flex items-center"
+            :class="{ 'bg-orange-100 dark:bg-orange-900/40': user.id === tierPlayers[tier.id][week - 1]?.id }"
           >
             <span class="w-8 text-sm font-medium text-gray-500">{{ week }}</span>
             <UserAvatarName

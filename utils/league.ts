@@ -139,12 +139,12 @@ export function leagueWeekPoints(user1Points: number, user2Points: number) {
 }
 
 export const tierBackgrounds = [
-  'bg-sky-200',
-  'bg-red-200',
-  'bg-green-200',
-  'bg-purple-200',
-  'bg-yellow-200',
-  'bg-orange-200',
+  'bg-sky-200 dark:bg-sky-900/60',
+  'bg-red-200 dark:bg-red-900/60',
+  'bg-green-200 dark:bg-green-900/60',
+  'bg-purple-200 dark:bg-purple-900/60',
+  'bg-yellow-200 dark:bg-yellow-900/60',
+  'bg-orange-200 dark:bg-orange-900/60',
 ]
 
 export const unassignedTier = {

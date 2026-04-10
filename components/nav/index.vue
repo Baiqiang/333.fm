@@ -51,7 +51,7 @@ onUnmounted(() => {
     <TransitionExpand>
       <div
         v-if="showChildren"
-        class="z-10 min-w-[10rem] overflow-hidden md:absolute md:left-0 bg-indigo-500"
+        class="z-10 min-w-[10rem] overflow-hidden md:absolute md:left-0 bg-indigo-500 dark:bg-gray-800"
       >
         <NuxtLink
           v-for="(child, idx) in children"

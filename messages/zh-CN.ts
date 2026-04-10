@@ -4,6 +4,11 @@ export default {
     signIn: '登录',
     signOut: '退出',
   },
+  colorMode: {
+    system: '跟随系统',
+    light: '浅色',
+    dark: '深色',
+  },
   common: {
     id: 'ID',
     wcaId: 'WCA ID',
@@ -914,5 +919,7 @@ export default {
     expired: '该测验已过期，仅供查看答案',
     scramble: '打乱',
     multipleChoice: '不定项选择——选出所有正确选项',
+    viewingUser: '正在查看 {name} 的答案',
+    backToMine: '返回我的答案',
   },
 }

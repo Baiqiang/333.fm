@@ -37,8 +37,8 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
           {{ $t('title') }}
         </h1>
 
-        <div class="bg-white shadow-md p-4">
-          <I18nT tag="blockquote" keypath="index.defination" scope="global" cite="" class="text-gray-600 italic">
+        <div class="bg-white dark:bg-gray-900 shadow-md p-4">
+          <I18nT tag="blockquote" keypath="index.defination" scope="global" cite="" class="text-gray-600 dark:text-gray-400 italic">
             <template #title>
               <b>{{ $t('title') }}</b>
             </template>

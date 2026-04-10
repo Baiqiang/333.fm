@@ -24,7 +24,7 @@ const link = computed(() => {
 </script>
 
 <template>
-  <NuxtLink :to="link" class="px-3 py-1" :class="{ 'bg-blue-500 text-white cursor-pointer': !isCurrent, 'bg-gray-200 text-black': isCurrent }" @click="goToPage">
+  <NuxtLink :to="link" class="px-3 py-1" :class="{ 'bg-blue-500 text-white cursor-pointer': !isCurrent, 'bg-gray-200 dark:bg-gray-700 text-black dark:text-gray-200': isCurrent }" @click="goToPage">
     {{ page }}
   </NuxtLink>
 </template>

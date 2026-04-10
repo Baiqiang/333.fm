@@ -49,6 +49,18 @@ export interface LeaderboardEntry {
   remainingTime: number
 }
 
+export interface SubmissionPageResponse {
+  quiz: QuizInfo
+  questions: QuizQuestionData[]
+  user: User
+  submission: {
+    answers: number[][]
+    correctCount: number
+    totalQuestions: number
+    remainingTime: number
+  }
+}
+
 export interface HistoryResponse {
   items: QuizInfo[]
   total: number

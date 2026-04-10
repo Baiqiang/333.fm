@@ -6,7 +6,7 @@ defineProps<{
 const user = useUser()
 const open = ref(false)
 const el = ref<HTMLElement>()
-const menuClass = 'hover:bg-gray-200 cursor-pointer px-3 py-1'
+const menuClass = 'hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer px-3 py-1'
 
 onClickOutside(el, () => {
   open.value = false
@@ -20,12 +20,12 @@ useRouter().afterEach(() => {
   <div ref="el" class="relative">
     <div class="flex items-center cursor-pointer" @click="open = !open">
       <div class="w-8 h-8 overflow-hidden">
-        <img class="w-8" :src="user.avatarThumb">
+        <img class="w-8 bg-gray-200 dark:bg-gray-700" :src="user.avatarThumb || '/images/default-avatar.svg'" @error="(e: Event) => { (e.target as HTMLImageElement).src = '/images/default-avatar.svg' }">
       </div>
       <Icon v-if="arrow" name="solar:alt-arrow-down-bold" size="20" />
     </div>
     <TransitionSlide>
-      <div v-if="open" class="absolute right-0 top-10 bg-white text-black border border-gray-200 whitespace-nowrap py-1 flex flex-col items-stretch shadow-md z-50">
+      <div v-if="open" class="absolute right-0 top-10 bg-white dark:bg-gray-800 text-black dark:text-gray-200 border border-gray-200 dark:border-gray-700 whitespace-nowrap py-1 flex flex-col items-stretch shadow-md z-50">
         <div class="text-gray-400 px-3 py-1 text-sm flex items-center gap-2">
           <Icon name="mdi:account-circle" class="opacity-60" size="18" />
           {{ $i18n.locale === 'en' ? user.englishName : user.localName }}

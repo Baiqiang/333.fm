@@ -1,9 +1,11 @@
 <script setup lang="ts">
 const { t } = useI18n()
+const route = useRoute()
 const user = useUser()
+const day = route.params.day as string
 
 useSeoMeta({
-  title: t('quiz.title'),
+  title: `${t('quiz.title')} - ${day}`,
 })
 
 const {
@@ -14,6 +16,7 @@ const {
   error,
   timerDisplay,
   leaderboard,
+  isToday,
   isPlaying,
   isFinished,
   isReviewOnly,
@@ -27,45 +30,42 @@ const {
   onAfterSubmit,
 } = useQuizGame()
 
-const { data: initialData } = await useApi<QuizResponse>('/quiz/today')
+const { data: initialData } = await useApi<QuizResponse>(`/quiz/day/${day}`)
 if (initialData.value) {
   applyData(initialData.value)
 }
 
 onAfterSubmit(() => {
   if (quiz.value) {
-    navigateTo(`/quiz/${quiz.value.day}/${user.id}`)
+    navigateTo(`/quiz/${day}/${user.id}`)
   }
 })
 </script>
 
 <template>
   <div class="container mx-auto px-4 py-6 max-w-3xl">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-      <h1 class="text-2xl font-bold font-poppins">
-        {{ $t('quiz.title') }}
-      </h1>
-      <NuxtLink to="/quiz/history" class="bg-indigo-500 text-white px-3 py-1.5 text-sm shadow-md hover:bg-indigo-600 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-1 self-start sm:self-auto">
-        <Icon name="mdi:history" />
-        {{ $t('quiz.history.title') }}
+    <div class="flex items-center gap-2 mb-4">
+      <NuxtLink to="/quiz" class="text-indigo-500 hover:text-indigo-600 transition-colors">
+        <Icon name="mdi:arrow-left" />
       </NuxtLink>
+      <h1 class="text-2xl font-bold font-poppins">
+        {{ $t('quiz.title') }} · {{ day }}
+      </h1>
     </div>
 
-    <p class="text-gray-600 mb-4">
-      {{ $t('quiz.description', { count: quiz?.questionCount || 10 }) }}
-    </p>
-    <p class="text-xs text-gray-400 mb-4">
-      {{ $t('quiz.multipleChoice') }}
-    </p>
+    <!-- Quiz not found -->
+    <div v-if="!quiz" class="text-gray-400">
+      {{ $t('quiz.noQuiz') }}
+    </div>
 
     <!-- Not started -->
-    <div v-if="quiz && !submission?.started">
+    <div v-else-if="!submission?.started && isToday">
       <div class="bg-white shadow-md p-6 mb-4 text-center">
         <div class="text-lg font-bold text-indigo-600 mb-2">
           {{ quiz.day }}
         </div>
         <div class="text-gray-500 mb-4">
-          {{ quiz.questionCount }} {{ $t('quiz.today') }}
+          {{ quiz.questionCount }} Q
         </div>
         <div v-if="user.signedIn">
           <button
@@ -85,9 +85,15 @@ onAfterSubmit(() => {
       </div>
     </div>
 
+    <!-- Review-only banner for expired quizzes -->
+    <div v-else-if="isReviewOnly" class="bg-gray-100 border-l-4 border-gray-400 p-4 mb-4 text-gray-600">
+      <Icon name="mdi:lock-outline" class="mr-1" />
+      {{ $t('quiz.expired') }}
+    </div>
+
     <!-- Playing / Finished -->
-    <div v-if="(isPlaying || isFinished) && questions.length > 0">
-      <!-- Sticky timer bar -->
+    <div v-if="(isPlaying || isFinished || isReviewOnly) && questions.length > 0">
+      <!-- Timer -->
       <div v-if="isPlaying" class="sticky top-0 z-10 bg-white shadow-md px-3 py-2 mb-4 flex items-center justify-between">
         <span class="text-gray-500 text-sm font-semibold">{{ $t('quiz.timeRemaining') }}</span>
         <div class="font-mono font-bold text-2xl" :class="timerDisplay.startsWith('0:') ? 'text-red-500' : 'text-indigo-600'">
@@ -97,11 +103,11 @@ onAfterSubmit(() => {
 
       <!-- Leaderboard (on top when finished) -->
       <QuizLeaderboard
-        v-if="isFinished && leaderboard.length > 0 && quiz"
+        v-if="(isFinished || isReviewOnly) && leaderboard.length > 0"
         class="mb-6"
         :leaderboard="leaderboard"
         :format-time="formatTime"
-        :quiz-day="quiz.day"
+        :quiz-day="day"
       />
 
       <QuizResultSummary v-if="isFinished && submission" :submission="submission" :timer-display="timerDisplay" />
@@ -116,12 +122,12 @@ onAfterSubmit(() => {
           :user-answers="answers[qi] || []"
           :is-finished="isFinished"
           :is-review-only="isReviewOnly"
-          :cube-static="false"
+          :cube-static="true"
           @toggle="toggleOption(qi, $event)"
         />
       </div>
 
-      <!-- Submit button -->
+      <!-- Submit -->
       <div v-if="isPlaying" class="sticky bottom-0 bg-white shadow-md p-4 mt-4 flex items-center justify-between">
         <span class="text-sm text-gray-400">
           {{ answeredCount }}/{{ questions.length }}

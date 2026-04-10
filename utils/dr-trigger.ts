@@ -6,6 +6,7 @@ export interface DRTriggerSolution {
 }
 
 export function formatArm(arm: string): string {
-  if (arm.length === 2) return `ARM-${arm[0]}c${arm[1]}e`
+  if (arm.length === 2)
+    return `ARM-${arm[0]}c${arm[1]}e`
   return arm
 }

@@ -56,7 +56,7 @@ function levelLabel(challenge: Challenge) {
     <template v-else>
       <table class="border-spacing-3 w-100">
         <thead>
-          <tr class="font-bold border-b-2 border-gray-400">
+          <tr class="font-bold border-b-2 border-gray-400 dark:border-gray-600">
             <th class="pl-1 text-left">
               Level
             </th>
@@ -69,7 +69,7 @@ function levelLabel(challenge: Challenge) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="challenge, i in challenges.slice().reverse()" :key="i" class="border-b border-gray-400 odd:bg-gray-200">
+          <tr v-for="challenge, i in challenges.slice().reverse()" :key="i" class="border-b border-gray-400 dark:border-gray-600 odd:bg-gray-200 dark:odd:bg-gray-800">
             <td class="pl-1">
               {{ levelLabel(challenge) }}
             </td>

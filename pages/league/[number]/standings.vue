@@ -41,20 +41,19 @@ useSeoMeta({
 })
 function getStandingClass(tierIndex: number, index: number) {
   let ret = ''
-  // winner in tier 1
   if (tierIndex === 0 && index < 3) {
     return [
-      'bg-linear-to-r from-[#ffd700] to-[#d4af37] text-white',
-      'bg-linear-to-r from-[#c0c0c0] to-[#a8a8a8] text-white',
-      'bg-linear-to-r from-[#cd7f32] to-[#c79b56] text-white',
+      'bg-linear-to-r from-[#ffd700] to-[#d4af37] text-white dark:from-[#b8960b] dark:to-[#9a7e1e]',
+      'bg-linear-to-r from-[#c0c0c0] to-[#a8a8a8] text-white dark:from-[#7a7a7a] dark:to-[#666]',
+      'bg-linear-to-r from-[#cd7f32] to-[#c79b56] text-white dark:from-[#8b5e23] dark:to-[#7a5a30]',
     ][index]
   }
   const promotions = season.value.number < 6 ? 2 : 3
   if (index < promotions) {
-    ret = 'bg-linear-to-r from-green-300 to-green-200'
+    ret = 'bg-linear-to-r from-green-300 to-green-200 dark:from-green-900/60 dark:to-green-800/40'
   }
   if (index > tierStandings.value[0].standings.length - promotions - 1) {
-    ret = 'bg-linear-to-r from-red-300 to-red-200'
+    ret = 'bg-linear-to-r from-red-300 to-red-200 dark:from-red-900/60 dark:to-red-800/40'
     if (tierIndex === tierStandings.value.length - 1) {
       ret = ''
     }
@@ -112,7 +111,7 @@ function getResultClass(points?: number) {
           <div
             v-for="(standing, index) in standings"
             :key="standing.id"
-            class="grid grid-cols-subgrid col-span-full border-t border-gray-200 hover:bg-gray-50 transition-colors"
+            class="grid grid-cols-subgrid col-span-full border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             :class="getStandingClass(tierIndex, index)"
           >
             <div class="text-right p-2 font-mono font-semibold">

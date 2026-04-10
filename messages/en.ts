@@ -4,6 +4,11 @@ export default {
     signIn: 'Sign in',
     signOut: 'Sign out',
   },
+  colorMode: {
+    system: 'System',
+    light: 'Light',
+    dark: 'Dark',
+  },
   common: {
     id: 'ID',
     wcaId: 'WCA ID',
@@ -914,5 +919,7 @@ export default {
     expired: 'This quiz has expired. Answers are shown for review only.',
     scramble: 'Scramble',
     multipleChoice: 'Multiple choice — select all that apply',
+    viewingUser: 'Viewing {name}\'s answers',
+    backToMine: 'Back to my answers',
   },
 }
