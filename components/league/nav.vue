@@ -95,8 +95,8 @@ function toggleMobileMenu() {
         :to="link.to"
         class="flex items-center gap-2 px-2 my-1 py-2 text-sm transition-colors"
         :class="{
-          'bg-indigo-100 text-indigo-600': route.path === link.to,
-          'text-gray-600 hover:bg-gray-100': route.path !== link.to,
+          'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300': route.path === link.to,
+          'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800': route.path !== link.to,
         }"
         @click="isMobileMenuOpen = false"
       >
