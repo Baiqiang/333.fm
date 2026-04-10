@@ -864,6 +864,7 @@ export default {
   },
   quiz: {
     title: '每日测验',
+    shortTitle: 'Quiz',
     description: '每天 {count} 道题，测试你的 FMC 知识！',
     today: '今日测验',
     notStarted: '测验尚未开始',
@@ -910,6 +911,7 @@ export default {
     correctAnswer: '正确答案',
     signInToPlay: '登录以参加',
     noQuiz: '该日期没有测验',
+    expired: '该测验已过期，仅供查看答案',
     scramble: '打乱',
     multipleChoice: '不定项选择——选出所有正确选项',
   },

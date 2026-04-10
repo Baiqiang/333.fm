@@ -782,18 +782,20 @@ onUnmounted(() => {
         <div v-if="leaderboard.highestLevels.length === 0" class="text-gray-400 text-sm">
           {{ $t('drTrigger.noGamesYet') }}
         </div>
-        <div v-else class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-x-3 gap-y-2 text-sm items-center">
-          <template v-for="(entry, i) in leaderboard.highestLevels" :key="entry.id">
+        <div v-else class="grid grid-cols-[auto_1fr_auto_auto] gap-x-3 text-sm items-center">
+          <NuxtLink
+            v-for="(entry, i) in leaderboard.highestLevels"
+            :key="entry.id"
+            :to="`/dr-trigger/${entry.id}`"
+            class="grid grid-cols-subgrid col-span-4 items-center px-2 py-1.5 -mx-2 hover:bg-indigo-50 transition-colors cursor-pointer"
+          >
             <span class="text-gray-400 text-right">{{ i + 1 }}</span>
-            <UserAvatarName :user="entry.user" />
+            <UserAvatarName :user="entry.user" :link="false" />
             <span class="font-mono font-bold text-indigo-600 text-right">{{ entry.levels }}</span>
             <span class="text-xs text-right" :class="entry.remainingTime > 0 ? 'text-green-600' : 'text-gray-300'">
               {{ entry.remainingTime > 0 ? formatTime(entry.remainingTime) : '' }}
             </span>
-            <NuxtLink :to="`/dr-trigger/${entry.id}`" class="text-indigo-400 hover:text-indigo-600 transition-colors">
-              <Icon name="mdi:eye-outline" />
-            </NuxtLink>
-          </template>
+          </NuxtLink>
         </div>
       </div>
     </div>

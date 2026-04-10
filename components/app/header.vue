@@ -21,6 +21,10 @@ const navs = computed(() => [
     path: '/dr-trigger',
   },
   {
+    title: t('quiz.shortTitle'),
+    path: '/quiz',
+  },
+  {
     title: t('practice.shortTitle'),
     path: '/practice',
   },

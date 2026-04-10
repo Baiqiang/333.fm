@@ -864,6 +864,7 @@ export default {
   },
   quiz: {
     title: 'Daily Quiz',
+    shortTitle: 'Quiz',
     description: 'Test your FMC knowledge with {count} questions every day!',
     today: 'Today\'s Quiz',
     notStarted: 'Quiz not started yet',
@@ -910,6 +911,7 @@ export default {
     correctAnswer: 'Correct answer',
     signInToPlay: 'Sign in to play',
     noQuiz: 'No quiz available for this day',
+    expired: 'This quiz has expired. Answers are shown for review only.',
     scramble: 'Scramble',
     multipleChoice: 'Multiple choice — select all that apply',
   },
