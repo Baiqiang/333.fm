@@ -7,6 +7,10 @@ const props = defineProps<{
 const { data } = await useApi<{ submissions: Submission[] }>(`/endless/${props.endless.alias}/user-stats`)
 const { t, locale } = useI18n()
 const user = useUser()
+const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
+const chartTextColor = computed(() => isDark.value ? '#d1d5db' : '#333')
+const chartAxisColor = computed(() => isDark.value ? '#4b5563' : '#ccc')
 
 interface PersonalResult {
   level: number
@@ -190,6 +194,7 @@ const lineOptions = computed<ECOption>(() => {
   return {
     title: {
       text: `${localeName(user.name, locale.value)} - ${props.endless.name}`,
+      textStyle: { color: chartTextColor.value },
     },
     tooltip: {
       trigger: 'axis',
@@ -212,6 +217,7 @@ const lineOptions = computed<ECOption>(() => {
         type: 'slider',
         xAxisIndex: [0],
         bottom: '7%',
+        textStyle: { color: chartTextColor.value },
       },
     ],
     xAxis: {
@@ -221,15 +227,21 @@ const lineOptions = computed<ECOption>(() => {
       axisTick: {
         alignWithLabel: true,
       },
+      axisLabel: { color: chartTextColor.value },
+      axisLine: { lineStyle: { color: chartAxisColor.value } },
     },
     yAxis: {
       type: 'value',
       min: minMove,
       max: maxMove,
       interval: 1,
+      axisLabel: { color: chartTextColor.value },
+      axisLine: { lineStyle: { color: chartAxisColor.value } },
+      splitLine: { lineStyle: { color: chartAxisColor.value } },
     },
     legend: {
       bottom: '0%',
+      textStyle: { color: chartTextColor.value },
     },
     grid: {
       left: '20px',
@@ -308,6 +320,7 @@ const barOptions = computed<ECOption>(() => {
   return {
     title: {
       text: `${localeName(user.name, locale.value)} - ${props.endless.name}`,
+      textStyle: { color: chartTextColor.value },
     },
     tooltip: {
       trigger: 'axis',
@@ -322,6 +335,7 @@ const barOptions = computed<ECOption>(() => {
     },
     legend: {
       bottom: '0%',
+      textStyle: { color: chartTextColor.value },
     },
     grid: {
       left: '3%',
@@ -331,10 +345,15 @@ const barOptions = computed<ECOption>(() => {
     yAxis: {
       type: 'value',
       minInterval: 1,
+      axisLabel: { color: chartTextColor.value },
+      axisLine: { lineStyle: { color: chartAxisColor.value } },
+      splitLine: { lineStyle: { color: chartAxisColor.value } },
     },
     xAxis: {
       type: 'category',
       data: stats.value.movesCount.map(m => formatResult(m.moves)),
+      axisLabel: { color: chartTextColor.value },
+      axisLine: { lineStyle: { color: chartAxisColor.value } },
     },
     series: [
       {
@@ -462,7 +481,7 @@ function setDataRange(event: { start: number, end: number }) {
             {{ $t('result.mean') }}
           </div>
         </div>
-        <div v-for="r, i in reversedResults" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 items-center">
+        <div v-for="r, i in reversedResults" :key="r.level" class="grid grid-cols-subgrid col-span-6 font-mono odd:bg-gray-200 dark:odd:bg-gray-800 items-center">
           <NuxtLink :to="competitionPath(endless, { number: r.level })" class="text-blue-500 hover:text-white hover:bg-blue-500 py-1">
             {{ r.level }}
           </NuxtLink>
@@ -495,7 +514,7 @@ function setDataRange(event: { start: number, end: number }) {
             {{ $t('weekly.unlimited.label') }}
           </div>
         </div>
-        <div v-for="m in movesCount" :key="m.moves" class="grid grid-cols-subgrid col-span-3 font-mono odd:bg-gray-200 items-center">
+        <div v-for="m in movesCount" :key="m.moves" class="grid grid-cols-subgrid col-span-3 font-mono odd:bg-gray-200 dark:odd:bg-gray-800 items-center">
           <div class="py-1">
             {{ formatResult(m.moves) }}
           </div>
