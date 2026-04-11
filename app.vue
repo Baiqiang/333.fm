@@ -2,6 +2,8 @@
 const accessToken = useAccessToken()
 const user = useUser()
 const { t } = useI18n()
+const colorMode = useColorMode()
+const themeColor = computed(() => colorMode.value === 'dark' ? '#030712' : '#6366f1')
 useSeoMeta({
   titleTemplate: `%s - ${t('title')}`,
 })
@@ -40,7 +42,7 @@ useIntervalFn(checkAuth, 1000 * 60 * 5)
   <NuxtLoadingIndicator />
   <NuxtLayout>
     <Link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <Meta name="theme-color" content="#6366f1" />
+    <Meta name="theme-color" :content="themeColor" />
     <NuxtPwaManifest />
     <NuxtPage />
   </NuxtLayout>
