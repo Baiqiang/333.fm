@@ -55,16 +55,6 @@ onMounted(() => {
     </div>
 
     <template v-else>
-      <!-- Leaderboard -->
-      <QuizLeaderboard
-        v-if="leaderboard.length > 0"
-        class="mb-6"
-        :leaderboard="leaderboard"
-        :format-time="formatTime"
-        :quiz-day="day"
-        :active-user-id="targetUser.id"
-      />
-
       <!-- User info banner -->
       <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -89,6 +79,15 @@ onMounted(() => {
           :is-review-only="false"
         />
       </div>
+      <!-- Leaderboard -->
+      <QuizLeaderboard
+        v-if="leaderboard.length > 0"
+        class="mb-6"
+        :leaderboard="leaderboard"
+        :format-time="formatTime"
+        :quiz-day="day"
+        :active-user-id="targetUser.id"
+      />
     </template>
   </div>
 </template>
