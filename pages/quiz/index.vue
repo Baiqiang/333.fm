@@ -116,7 +116,6 @@ onAfterSubmit(() => {
           :user-answers="answers[qi] || []"
           :is-finished="isFinished"
           :is-review-only="isReviewOnly"
-          :cube-static="false"
           @toggle="toggleOption(qi, $event)"
         />
       </div>

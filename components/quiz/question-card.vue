@@ -5,7 +5,7 @@ const props = defineProps<{
   userAnswers: number[]
   isFinished: boolean
   isReviewOnly: boolean
-  cubeStatic: boolean
+
 }>()
 
 const emit = defineEmits<{
@@ -88,7 +88,7 @@ function getLabelClass(oi: number, option: QuizOptionData) {
       <div class="font-mono text-xs bg-gray-50 p-2 break-all mb-1">
         {{ question.scramble }}
       </div>
-      <Cube3d :moves="question.scramble" :is-static="cubeStatic" />
+      <CubeCss3d :moves="question.scramble" />
       <div class="text-xs text-gray-400 font-mono mt-1 flex gap-3">
         <span v-if="question.drAxis">{{ $t('quiz.drAxis', { axis: question.drAxis }) }}</span>
         <span v-if="question.lastMove">{{ $t('quiz.lastMove', { move: question.lastMove }) }}</span>
@@ -96,13 +96,12 @@ function getLabelClass(oi: number, option: QuizOptionData) {
     </div>
 
     <div class="grid grid-cols-1 gap-2">
-      <button
+      <div
         v-for="(o, oi) in question.options"
         :key="oi"
         class="text-left border-2 p-3 transition-all duration-200 flex items-start gap-2"
-        :class="getOptionClass(oi)"
-        :disabled="isFinished || isReviewOnly"
-        @click="emit('toggle', oi)"
+        :class="[getOptionClass(oi), (isFinished || isReviewOnly) ? '' : 'cursor-pointer']"
+        @click="!(isFinished || isReviewOnly) && emit('toggle', oi)"
       >
         <span class="font-bold text-sm shrink-0 w-6 h-6 flex items-center justify-center border" :class="getLabelClass(oi, o)">
           {{ o.label }}
@@ -110,7 +109,7 @@ function getLabelClass(oi: number, option: QuizOptionData) {
         <span class="font-mono text-sm">{{ o.solution }}</span>
         <span v-if="showAnswers && o.correct" class="ml-auto text-green-600 text-xs font-semibold shrink-0">✓</span>
         <span v-if="isFinished && !isReviewOnly && !o.correct && (userAnswers || []).includes(oi)" class="ml-auto text-red-500 text-xs font-semibold shrink-0">✗</span>
-      </button>
+      </div>
     </div>
   </div>
 </template>

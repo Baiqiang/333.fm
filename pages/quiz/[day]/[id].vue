@@ -87,7 +87,6 @@ onMounted(() => {
           :user-answers="sub?.answers[qi] || []"
           :is-finished="true"
           :is-review-only="false"
-          :cube-static="true"
         />
       </div>
     </template>
