@@ -825,6 +825,10 @@ export default {
     },
     allCleared: '全部通关！',
     allClearedDesc: '你完成了所有可用的 trigger！剩余时间: {time}',
+    practice: {
+      label: '练习模式（不参与排名）',
+      badge: '练习',
+    },
     mode: {
       label: '模式',
       normal: '普通',

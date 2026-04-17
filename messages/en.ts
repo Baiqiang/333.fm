@@ -825,6 +825,10 @@ export default {
     },
     allCleared: 'All Cleared!',
     allClearedDesc: 'You solved every available trigger! Remaining time: {time}',
+    practice: {
+      label: 'Practice mode (no ranking)',
+      badge: 'Practice',
+    },
     mode: {
       label: 'Mode',
       normal: 'Normal',

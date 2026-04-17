@@ -15,6 +15,7 @@ interface DRTriggerGame {
   difficulty: number
   rzp: string | null
   merged: boolean
+  practice: boolean
   remainingTime: number
   totalTimeBonus: number
   createdAt: string
@@ -70,6 +71,7 @@ const myGamesTotal = ref(0)
 const myGamesPage = ref(1)
 const myGamesLoading = ref(false)
 const gameMerged = ref(true)
+const gamePractice = ref(false)
 const leaderboardMode = ref<'normal' | 'rzp'>('normal')
 const leaderboardDifficulty = ref(5)
 const leaderboardRzp = ref('')
@@ -162,8 +164,8 @@ async function startGame() {
   error.value = ''
   try {
     const body: any = gameMode.value === 'rzp'
-      ? { rzp: selectedRzp.value, merged: gameMerged.value }
-      : { difficulty: difficulty.value, merged: gameMerged.value }
+      ? { rzp: selectedRzp.value, merged: gameMerged.value, practice: gamePractice.value }
+      : { difficulty: difficulty.value, merged: gameMerged.value, practice: gamePractice.value }
     const data = await useClientApi<any>('/dr-trigger/start', { method: 'POST', body })
     game.value = data.game
     trigger.value = data.trigger
@@ -433,7 +435,7 @@ onUnmounted(() => {
             </option>
           </select>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 flex flex-wrap gap-x-4 gap-y-1">
           <label class="flex items-center gap-1.5 cursor-pointer select-none">
             <input
               v-model="gameMerged"
@@ -441,6 +443,14 @@ onUnmounted(() => {
               class="accent-indigo-500"
             >
             <span class="text-sm text-gray-600">{{ $t('drTrigger.mergedCases') }}</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              v-model="gamePractice"
+              type="checkbox"
+              class="accent-indigo-500"
+            >
+            <span class="text-sm text-gray-600">{{ $t('drTrigger.practice.label') }}</span>
           </label>
         </div>
         <button
@@ -469,6 +479,7 @@ onUnmounted(() => {
         <div class="flex items-center gap-2">
           <span class="text-gray-500 text-sm font-semibold">{{ $t('drTrigger.level', { level: (game?.levels ?? 0) + 1 }) }}</span>
           <span class="text-xs text-gray-400">({{ game?.rzp ? `RZP: ${game.rzp}` : game?.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${game?.difficulty}` }})</span>
+          <span v-if="game?.practice" class="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 font-semibold">{{ $t('drTrigger.practice.badge') }}</span>
         </div>
         <div class="font-mono font-bold text-2xl" :class="{ 'text-red-500': game && game.remainingTime < 30000, 'text-indigo-600': !game || game.remainingTime >= 30000 }">
           {{ timerDisplay }}
@@ -588,6 +599,7 @@ onUnmounted(() => {
       <div class="bg-white shadow-md p-6 mb-4">
         <h2 class="text-xl font-bold mb-4" :class="allCleared ? 'text-green-600' : 'text-indigo-600'">
           {{ allCleared ? $t('drTrigger.allCleared') : $t('drTrigger.gameOver') }}
+          <span v-if="game?.practice" class="text-sm bg-yellow-100 text-yellow-700 px-1.5 py-0.5 font-semibold ml-2 align-middle">{{ $t('drTrigger.practice.badge') }}</span>
         </h2>
         <div v-if="allCleared && game" class="mb-4 px-3 py-2 border-l-4 border-green-500 bg-green-50 text-green-700 text-sm">
           {{ $t('drTrigger.allClearedDesc', { time: formatTime(game.remainingTime) }) }}
@@ -695,7 +707,10 @@ onUnmounted(() => {
           class="grid grid-cols-subgrid col-span-4 items-center px-1.5 py-1.5 mb-1 bg-white shadow hover:bg-gray-50 transition-colors"
         >
           <span class="text-gray-500">{{ $dayjs(g.createdAt).format('YYYY-MM-DD HH:mm') }}</span>
-          <span class="text-xs text-gray-400 text-right">{{ g.rzp ? g.rzp : g.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${g.difficulty}` }}</span>
+          <span class="text-xs text-gray-400 text-right">
+            {{ g.rzp ? g.rzp : g.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${g.difficulty}` }}
+            <span v-if="g.practice" class="bg-yellow-100 text-yellow-700 px-1 font-semibold ml-0.5">{{ $t('drTrigger.practice.badge') }}</span>
+          </span>
           <span class="font-mono font-bold text-indigo-600 text-right">{{ g.levels }}</span>
           <span class="text-green-600 text-xs text-right">{{ g.totalTimeBonus > 0 ? `+${(g.totalTimeBonus / 1000).toFixed(0)}s` : '' }}</span>
         </NuxtLink>
