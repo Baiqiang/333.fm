@@ -14,7 +14,7 @@ interface LeagueStats {
 const { data: statsData } = await useApi<LeagueStats>(`/profile/${user.value.id}/league-stats`)
 const stats = ref<LeagueStats>(statsData.value || { duels: [], standings: [], eloHistories: [], currentElo: 0, leagueResults: [] })
 
-const nonDNFMeanResults = results.value.filter(result => result.average !== DNF)
+const nonDNFMeanResults = results.value.filter(result => result.average !== DNF).sort((a, b) => a.competition.alias.localeCompare(b.competition.alias, undefined, { numeric: true }))
 const regularResults = nonDNFMeanResults.filter(result => result.mode === CompetitionMode.REGULAR).reverse()
 const unlimitedMap: Record<number, Result> = {}
 for (const result of nonDNFMeanResults) {
@@ -323,7 +323,7 @@ const meanChartOption: ECOption = {
   ],
   xAxis: {
     type: 'category',
-    data: nonDNFMeanResults.map(r => leagueWeekName(r.competition)).sort(),
+    data: nonDNFMeanResults.map(r => leagueWeekName(r.competition)),
     boundaryGap: true,
   },
   yAxis: {
