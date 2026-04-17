@@ -87,7 +87,7 @@ const expandLevels = computed<number[]>(() => {
         <div v-if="myLevel < level" class="flex items-center">
           {{ $t('endless.level', { level }) }}
         </div>
-        <NuxtLink v-else :to="competitionPath(endless, { number: level })" class="text-indigo-500 flex items-center">
+        <NuxtLink v-else :to="competitionPath(endless, { number: level })" class="text-indigo-500 dark:text-indigo-400 flex items-center">
           {{ $t('endless.level', { level }) }}
         </NuxtLink>
         <div class="flex items-center flex-wrap">
@@ -106,7 +106,7 @@ const expandLevels = computed<number[]>(() => {
             </div>
           </template>
         </div>
-        <div class="text-indigo-500 font-semibold flex items-center">
+        <div class="text-indigo-500 dark:text-indigo-400 font-semibold flex items-center">
           <Icon v-if="myLevel <= level" name="material-symbols:lock-outline-sharp" class="text-black" />
           <template v-else-if="bestSubmissions.length > 0">
             <div class="mr-1">
@@ -119,13 +119,13 @@ const expandLevels = computed<number[]>(() => {
         </div>
         <div class="col-span-3 md:col-span-1">
           <div class="whitespace-nowrap border px-1 relative">
-            <div class="bg-indigo-500 absolute -z-10 inset-0" :style="{ width: `${competitors / maxCompetitors * 100}%` }" />
+            <div class="bg-indigo-500 dark:bg-indigo-500/50 absolute -z-10 inset-0" :style="{ width: `${competitors / maxCompetitors * 100}%` }" />
             {{ $t('endless.progress.competitors', { competitors }) }}
           </div>
         </div>
         <template v-if="!expanded && expandLevels.includes(level)">
           <div class="col-span-3 md:col-span-4">
-            <button class="text-indigo-500 flex items-center gap-2" @click="expanded = true">
+            <button class="text-indigo-500 dark:text-indigo-400 flex items-center gap-2" @click="expanded = true">
               <Icon name="mdi:arrow-expand-vertical" />
               {{ $t('endless.showAll') }}
             </button>

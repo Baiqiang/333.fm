@@ -16,6 +16,6 @@ defineProps<{
 @reference "~/assets/css/tailwind.css";
 
 .button-primary {
-  @apply inline-block bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white px-4 py-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 focus:outline-hidden focus:ring-2 focus:ring-indigo-400/50;
+  @apply inline-block bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 dark:bg-indigo-800 dark:hover:bg-indigo-700 dark:active:bg-indigo-900 text-white px-4 py-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 focus:outline-hidden focus:ring-2 focus:ring-indigo-400/50;
 }
 </style>

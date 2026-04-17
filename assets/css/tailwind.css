@@ -31,26 +31,32 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ===== Dark mode global overrides ===== */
 
+.dark {
+  --color-indigo-500: #4338ca;
+  --color-indigo-600: #3730a3;
+  --color-indigo-700: #312e81;
+}
+
 .dark body {
-  background-color: var(--color-gray-950);
+  background-color: #0c0c0c;
   color: var(--color-gray-200);
 }
 
-/* Surfaces */
+/* Surfaces — neutral blacks without Tailwind's blue undertone */
 .dark .bg-white {
-  background-color: var(--color-gray-900) !important;
+  background-color: #161616 !important;
 }
 
 .dark .bg-gray-50 {
-  background-color: var(--color-gray-900) !important;
+  background-color: #161616 !important;
 }
 
 .dark .bg-gray-100 {
-  background-color: var(--color-gray-800) !important;
+  background-color: #1e1e1e !important;
 }
 
 .dark .bg-gray-200 {
-  background-color: var(--color-gray-700) !important;
+  background-color: #282828 !important;
 }
 
 .dark .bg-indigo-50 {
@@ -74,20 +80,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dark .bg-weekly {
-  background-color: var(--color-gray-800) !important;
+  background-color: #1e1e1e !important;
 }
 
 /* Hover surfaces */
 .dark .hover\:bg-gray-50:hover {
-  background-color: var(--color-gray-800) !important;
+  background-color: #1e1e1e !important;
 }
 
 .dark .hover\:bg-gray-100:hover {
-  background-color: var(--color-gray-700) !important;
+  background-color: #282828 !important;
 }
 
 .dark .hover\:bg-gray-200:hover {
-  background-color: var(--color-gray-600) !important;
+  background-color: #333 !important;
 }
 
 .dark .hover\:bg-indigo-50:hover {
@@ -161,7 +167,7 @@ h1, h2, h3, h4, h5, h6 {
 .dark input,
 .dark textarea,
 .dark select {
-  background-color: var(--color-gray-800);
+  background-color: #1e1e1e;
   border-color: var(--color-gray-600);
   color: var(--color-gray-200);
 }
@@ -188,7 +194,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dark th {
-  background-color: var(--color-gray-800);
+  background-color: #1e1e1e;
   border-color: var(--color-gray-700);
   color: var(--color-gray-300);
 }
@@ -198,7 +204,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dark tr:nth-child(even) {
-  background-color: color-mix(in srgb, var(--color-gray-800) 50%, transparent);
+  background-color: rgba(30, 30, 30, 0.5);
 }
 
 /* Shadows — soften in dark mode */
@@ -212,9 +218,14 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Scrollbar */
 .dark ::-webkit-scrollbar {
-  background-color: var(--color-gray-900);
+  background-color: #121212;
 }
 
 .dark ::-webkit-scrollbar-thumb {
   background-color: var(--color-gray-600);
+}
+
+/* Odd-row variant (not caught by global .bg-gray-* overrides) */
+.dark .odd\:bg-gray-200:nth-child(odd) {
+  background-color: #282828 !important;
 }
