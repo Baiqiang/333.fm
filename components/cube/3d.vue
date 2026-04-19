@@ -15,8 +15,9 @@ import {
   WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { BODY_COLOR, colorToHex, CUBIE_GAP, filterColor, getFaceletPositions } from '~/utils/cube'
 
-type Axis = 'x' | 'y' | 'z'
+import type { Axis } from '~/utils/cube'
 
 const props = defineProps<{
   moves?: string
@@ -41,18 +42,9 @@ let liveCanvas: HTMLCanvasElement | null = null
 let deactivateTimer: ReturnType<typeof setTimeout> | null = null
 const cubeMeshes: Mesh[] = []
 
-const colorMap: Record<string, number> = {
-  U: 0xFF_FF_FF,
-  D: 0xFF_E0_00,
-  L: 0xFF_7B_00,
-  R: 0xDD_00_00,
-  F: 0x00_AA_44,
-  B: 0x00_66_DD,
-}
-const BODY_COLOR = 0x1A_1A_1A
-const GRAY_COLOR = 0x80_80_80
-const GAP = 0.06
-const CUBIE_SIZE = 1 - GAP
+const BODY_HEX = colorToHex(BODY_COLOR)
+const CUBIE_SIZE = 1 - CUBIE_GAP
+const faceletPositions = getFaceletPositions()
 
 const facelet = computed(() => {
   if (props.cubieCube)
@@ -65,31 +57,6 @@ const facelet = computed(() => {
   return cube.toFaceletString()
 })
 
-const DR_BAD_ON_SIDE = 0xFF_FF_FF
-const DR_BAD_ON_UD = 0x88_CC_FF
-
-function isEdgePosition(x: number, y: number, z: number): boolean {
-  const abs = [Math.abs(x), Math.abs(y), Math.abs(z)]
-  return abs.filter(v => v === 1).length === 2 && abs.filter(v => v === 0).length === 1
-}
-
-function isCenterPosition(x: number, y: number, z: number): boolean {
-  return [x, y, z].filter(v => v === 0).length === 2
-}
-
-function applyFilter(axis: Axis, stickerFace: string, x: number, y: number, z: number): number {
-  if (props.filter !== 'dr')
-    return colorMap[stickerFace]
-  if (isCenterPosition(x, y, z))
-    return colorMap[stickerFace]
-  const isUD = stickerFace === 'U' || stickerFace === 'D'
-  if (isUD)
-    return axis === 'y' ? GRAY_COLOR : DR_BAD_ON_SIDE
-  if (axis === 'y' && isEdgePosition(x, y, z))
-    return DR_BAD_ON_UD
-  return GRAY_COLOR
-}
-
 function buildFaceColors(fl: string) {
   const colors: Record<number, Record<string, Record<number, number>>> = {}
   function push(x: number, y: number, z: number, axis: Axis, n: number, color: number) {
@@ -100,24 +67,8 @@ function buildFaceColors(fl: string) {
       colors[index][axis] = {}
     colors[index][axis][n] = color
   }
-  for (let i = 0; i < 18; i++) {
-    const y = i < 9 ? 1 : -1
-    const x = i % 3 - 1
-    const z = (Math.floor(i % 9 / 3) - 1) * y
-    push(x, y, z, 'y', y, applyFilter('y', fl[i], x, y, z))
-  }
-  for (let i = 18; i < 36; i++) {
-    const x = i < 27 ? 1 : -1
-    const y = 1 - Math.floor(i % 9 / 3)
-    const z = (i % 3 - 1) * -x
-    push(x, y, z, 'x', x, applyFilter('x', fl[i], x, y, z))
-  }
-  for (let i = 36; i < 54; i++) {
-    const z = i < 45 ? 1 : -1
-    const x = (i % 3 - 1) * z
-    const y = 1 - Math.floor(i % 9 / 3)
-    push(x, y, z, 'z', z, applyFilter('z', fl[i], x, y, z))
-  }
+  for (const { i, x, y, z, axis, dir } of faceletPositions)
+    push(x, y, z, axis, dir, colorToHex(filterColor(props.filter, fl[i], x, y, z, fl)))
   return colors
 }
 
@@ -136,7 +87,7 @@ function getMat(hex: number) {
   if (!matCache.has(hex)) {
     matCache.set(hex, new MeshStandardMaterial({
       color: new Color(hex),
-      roughness: hex === BODY_COLOR ? 1.0 : 0.9,
+      roughness: hex === BODY_HEX ? 1.0 : 0.9,
       metalness: 0,
     }))
   }
@@ -155,9 +106,9 @@ function updateMaterials() {
         const matArray = colorConditions.map(([axis, n]) => {
           if (({ x, y, z })[axis] === n) {
             const index = (x + 1) + (y + 1) * 3 + (z + 1) * 9
-            return getMat(fc[index]?.[axis]?.[n] ?? BODY_COLOR)
+            return getMat(fc[index]?.[axis]?.[n] ?? BODY_HEX)
           }
-          return getMat(BODY_COLOR)
+          return getMat(BODY_HEX)
         })
         mesh.material = matArray
       })

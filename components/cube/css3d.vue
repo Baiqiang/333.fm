@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Algorithm, Cube } from 'insertionfinder'
-
-type Axis = 'x' | 'y' | 'z'
+import { BODY_COLOR, CUBIE_GAP, filterColor, getFaceletPositions } from '~/utils/cube'
 
 const props = defineProps<{
   moves?: string
@@ -17,18 +16,7 @@ let dragging = false
 let lastPx = 0
 let lastPy = 0
 
-const colorMap: Record<string, string> = {
-  U: '#ffffff',
-  D: '#ffe000',
-  L: '#ff7b00',
-  R: '#dd0000',
-  F: '#00aa44',
-  B: '#0066dd',
-}
-const BODY = '#1a1a1a'
-const GRAY = '#808080'
-const DR_BAD_SIDE = '#ffffff'
-const DR_BAD_UD = '#88ccff'
+const faceletPositions = getFaceletPositions()
 
 const facelet = computed(() => {
   const cube = new Cube()
@@ -39,28 +27,6 @@ const facelet = computed(() => {
   return cube.toFaceletString()
 })
 
-function isEdge(x: number, y: number, z: number) {
-  const a = [Math.abs(x), Math.abs(y), Math.abs(z)]
-  return a.filter(v => v === 1).length === 2 && a.filter(v => v === 0).length === 1
-}
-
-function isCenter(x: number, y: number, z: number) {
-  return [x, y, z].filter(v => v === 0).length === 2
-}
-
-function getColor(axis: Axis, face: string, x: number, y: number, z: number): string {
-  if (props.filter !== 'dr')
-    return colorMap[face]
-  if (isCenter(x, y, z))
-    return colorMap[face]
-  const ud = face === 'U' || face === 'D'
-  if (ud)
-    return axis === 'y' ? GRAY : DR_BAD_SIDE
-  if (axis === 'y' && isEdge(x, y, z))
-    return DR_BAD_UD
-  return GRAY
-}
-
 interface Quad {
   pts: [number, number, number][]
   color: string
@@ -69,11 +35,10 @@ interface Quad {
 function buildQuads(): Quad[] {
   const fl = facelet.value
   const quads: Quad[] = []
-  const GAP = 0.06
-  const S = 1 - GAP
+  const S = 1 - CUBIE_GAP
   const H = S / 2
 
-  function addSticker(cx: number, cy: number, cz: number, axis: Axis, dir: number, color: string) {
+  function addSticker(cx: number, cy: number, cz: number, axis: 'x' | 'y' | 'z', dir: number, color: string) {
     const pts: [number, number, number][] = []
     if (axis === 'y') {
       const y = cy + dir * H
@@ -90,8 +55,8 @@ function buildQuads(): Quad[] {
     quads.push({ pts, color })
   }
 
-  function addBody(cx: number, cy: number, cz: number, axis: Axis, dir: number) {
-    addSticker(cx, cy, cz, axis, dir, BODY)
+  function addBody(cx: number, cy: number, cz: number, axis: 'x' | 'y' | 'z', dir: number) {
+    addSticker(cx, cy, cz, axis, dir, BODY_COLOR)
   }
 
   const POS = [-1, 0, 1]
@@ -114,24 +79,8 @@ function buildQuads(): Quad[] {
     }
   }
 
-  for (let i = 0; i < 18; i++) {
-    const y = i < 9 ? 1 : -1
-    const x = i % 3 - 1
-    const z = (Math.floor(i % 9 / 3) - 1) * y
-    addSticker(x, y, z, 'y', y, getColor('y', fl[i], x, y, z))
-  }
-  for (let i = 18; i < 36; i++) {
-    const x = i < 27 ? 1 : -1
-    const y = 1 - Math.floor(i % 9 / 3)
-    const z = (i % 3 - 1) * -x
-    addSticker(x, y, z, 'x', x, getColor('x', fl[i], x, y, z))
-  }
-  for (let i = 36; i < 54; i++) {
-    const z = i < 45 ? 1 : -1
-    const x = (i % 3 - 1) * z
-    const y = 1 - Math.floor(i % 9 / 3)
-    addSticker(x, y, z, 'z', z, getColor('z', fl[i], x, y, z))
-  }
+  for (const { i, x, y, z, axis, dir } of faceletPositions)
+    addSticker(x, y, z, axis, dir, filterColor(props.filter, fl[i], x, y, z, fl))
   return quads
 }
 

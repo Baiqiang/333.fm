@@ -1,5 +1,103 @@
 import { Algorithm, Cube } from 'insertionfinder'
 
+export type Axis = 'x' | 'y' | 'z'
+
+export const FACE_COLORS: Record<string, string> = {
+  U: '#ffffff',
+  D: '#ffe000',
+  L: '#ff7b00',
+  R: '#dd0000',
+  F: '#00aa44',
+  B: '#0066dd',
+}
+
+export const BODY_COLOR = '#1a1a1a'
+export const GRAY_COLOR = '#808080'
+export const CUBIE_GAP = 0.06
+
+const EDGE_FACELET_PAIRS: Record<string, [number, number]> = {
+  '0,1,1': [7, 37],
+  '0,1,-1': [1, 46],
+  '-1,1,0': [3, 28],
+  '1,1,0': [5, 19],
+  '0,-1,1': [10, 43],
+  '0,-1,-1': [16, 52],
+  '-1,-1,0': [12, 34],
+  '1,-1,0': [14, 25],
+  '1,0,1': [21, 41],
+  '-1,0,1': [32, 39],
+  '1,0,-1': [23, 48],
+  '-1,0,-1': [30, 50],
+}
+
+export function isCenter(x: number, y: number, z: number): boolean {
+  return [x, y, z].filter(v => v === 0).length === 2
+}
+
+export function isEdge(x: number, y: number, z: number): boolean {
+  const abs = [Math.abs(x), Math.abs(y), Math.abs(z)]
+  return abs.filter(v => v === 1).length === 2 && abs.filter(v => v === 0).length === 1
+}
+
+function isESliceEdge(x: number, y: number, z: number, fl: string): boolean {
+  const pair = EDGE_FACELET_PAIRS[`${x},${y},${z}`]
+  if (!pair)
+    return false
+  const a = fl[pair[0]]
+  const b = fl[pair[1]]
+  return a !== 'U' && a !== 'D' && b !== 'U' && b !== 'D'
+}
+
+export function filterColor(filter: string | undefined, face: string, x: number, y: number, z: number, fl: string): string {
+  if (filter !== 'dr')
+    return FACE_COLORS[face]
+  if (isCenter(x, y, z))
+    return FACE_COLORS[face]
+  if (face === 'U' || face === 'D')
+    return '#ffffff'
+  if (isEdge(x, y, z) && isESliceEdge(x, y, z, fl)) {
+    if (face === 'F' || face === 'B')
+      return FACE_COLORS[face]
+  }
+  return GRAY_COLOR
+}
+
+export interface FaceletPosition {
+  i: number
+  x: number
+  y: number
+  z: number
+  axis: Axis
+  dir: number
+}
+
+export function getFaceletPositions(): FaceletPosition[] {
+  const result: FaceletPosition[] = []
+  for (let i = 0; i < 18; i++) {
+    const y = i < 9 ? 1 : -1
+    const x = i % 3 - 1
+    const z = (Math.floor(i % 9 / 3) - 1) * y
+    result.push({ i, x, y, z, axis: 'y', dir: y })
+  }
+  for (let i = 18; i < 36; i++) {
+    const x = i < 27 ? 1 : -1
+    const y = 1 - Math.floor(i % 9 / 3)
+    const z = (i % 3 - 1) * -x
+    result.push({ i, x, y, z, axis: 'x', dir: x })
+  }
+  for (let i = 36; i < 54; i++) {
+    const z = i < 45 ? 1 : -1
+    const x = (i % 3 - 1) * z
+    const y = 1 - Math.floor(i % 9 / 3)
+    result.push({ i, x, y, z, axis: 'z', dir: z })
+  }
+  return result
+}
+
+export function colorToHex(color: string): number {
+  return Number.parseInt(color.slice(1), 16)
+}
+
 export function reverseTwists(twists: string) {
   return twists
     .split(' ')
