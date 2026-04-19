@@ -122,9 +122,9 @@ async function syncAfterSubmission() {
 
 async function updateData(submission: Submission) {
   progress.submission = submission
+  fetchSubmissions()
   await updateMyProgress()
   await syncAfterSubmission()
-  await fetchSubmissions()
   if ((myProgress.value.next?.level ?? 0) > level.value || endless.value.levels.length === level.value)
     await updateEndless()
 }
