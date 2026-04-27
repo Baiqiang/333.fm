@@ -6,6 +6,7 @@ useSeoMeta({
   title: `${t('endless.title')} ${endless.value.name}`,
 })
 const maxCompetitors = computed(() => Math.max(...endless.value.levels.map(l => l.competitors)) || 1)
+const isConditionMode = computed(() => endless.value.subType === CompetitionSubType.MYSTERY)
 
 const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
 const highestLevel = computed(() => Math.max(...endless.value.levels.map(l => l.level)))
@@ -28,6 +29,36 @@ const expandLevels = computed<number[]>(() => {
     levels.push(myLevel.value - 10)
   return levels
 })
+
+function matchesChallengeLevel(challenge: Challenge, targetLevel: number) {
+  if (challenge.levels?.includes(targetLevel))
+    return true
+  if (challenge.startLevel === undefined || challenge.startLevel === null)
+    return false
+  if (targetLevel < challenge.startLevel)
+    return false
+  return challenge.endLevel === undefined || challenge.endLevel === null || targetLevel <= challenge.endLevel
+}
+
+function bossChallengeForLevel(targetLevel: number) {
+  return endless.value.challenges?.find(challenge =>
+    challenge.type === ChallengeType.BOSS && matchesChallengeLevel(challenge, targetLevel),
+  )
+}
+
+function isBossInstantKill(submission: Submission, targetLevel: number) {
+  return !!bossChallengeForLevel(targetLevel) && submission.bossInstantKill === true
+}
+
+function bossEffectLabel(submission: Submission, targetLevel: number) {
+  if (!bossChallengeForLevel(targetLevel))
+    return ''
+  if (isBossInstantKill(submission, targetLevel))
+    return t('endless.instantKill')
+  if (submission.damage && submission.damage > 0)
+    return t('endless.damageDealt', { damage: submission.damage })
+  return ''
+}
 </script>
 
 <template>
@@ -83,7 +114,7 @@ const expandLevels = computed<number[]>(() => {
         {{ $t('result.best') }}
       </div>
       <div class="col-span-3 md:col-span-1" />
-      <template v-for="{ level, competitors, bestSubmissions, kickedOffs } in levels" :key="level">
+      <template v-for="{ level, competitors, bestSubmissions, kickedOffs, conditions } in levels" :key="level">
         <div v-if="myLevel < level" class="flex items-center">
           {{ $t('endless.level', { level }) }}
         </div>
@@ -95,6 +126,15 @@ const expandLevels = computed<number[]>(() => {
           <UserAvatarName v-else-if="kickedOffs.length === 1" :user="kickedOffs[0].user">
             <template v-if="kickedOffs[0].submission.moves > 0">
               ({{ formatResult(kickedOffs[0].submission.moves) }})
+              <span
+                v-if="bossEffectLabel(kickedOffs[0].submission, level)"
+                class="ml-1 inline-flex items-center border px-1 text-xs font-bold"
+                :class="isBossInstantKill(kickedOffs[0].submission, level)
+                  ? 'border-orange-300 bg-red-600 text-white shadow-sm shadow-red-900/30 dark:border-orange-400 dark:bg-red-500'
+                  : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/40 dark:text-red-300'"
+              >
+                {{ bossEffectLabel(kickedOffs[0].submission, level) }}
+              </span>
             </template>
           </UserAvatarName>
           <template v-else-if="kickedOffs.length > 1">
@@ -102,6 +142,15 @@ const expandLevels = computed<number[]>(() => {
               <UserAvatar :user="user" />
               <template v-if="submission.moves > 0">
                 ({{ formatResult(submission.moves) }})
+                <span
+                  v-if="bossEffectLabel(submission, level)"
+                  class="ml-1 inline-flex items-center border px-1 text-xs font-bold"
+                  :class="isBossInstantKill(submission, level)
+                    ? 'border-orange-300 bg-red-600 text-white shadow-sm shadow-red-900/30 dark:border-orange-400 dark:bg-red-500'
+                    : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/40 dark:text-red-300'"
+                >
+                  {{ bossEffectLabel(submission, level) }}
+                </span>
               </template>
             </div>
           </template>
@@ -121,6 +170,23 @@ const expandLevels = computed<number[]>(() => {
           <div class="whitespace-nowrap border px-1 relative">
             <div class="bg-indigo-500 dark:bg-indigo-500/50 absolute -z-10 inset-0" :style="{ width: `${competitors / maxCompetitors * 100}%` }" />
             {{ $t('endless.progress.competitors', { competitors }) }}
+          </div>
+        </div>
+        <div v-if="isConditionMode && conditions?.length" class="col-span-3 md:col-span-4 flex flex-wrap gap-1">
+          <div
+            v-for="condition in conditions"
+            :key="condition.id"
+            class="text-xs px-1.5 py-0.5 border"
+            :class="condition.revealed
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-700 dark:text-green-400'
+              : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400'"
+          >
+            <template v-if="condition.revealed">
+              ✓
+            </template>
+            <template v-else>
+              ?
+            </template>
           </div>
         </div>
         <template v-if="!expanded && expandLevels.includes(level)">

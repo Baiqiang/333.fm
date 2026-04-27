@@ -88,6 +88,8 @@ watch(form, (state) => {
   }
 })
 async function submit() {
+  if (loading.value)
+    return
   loading.value = true
   try {
     const { data, refresh, error } = await useApiPost<Submission>(`/chain`, {

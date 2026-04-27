@@ -127,6 +127,8 @@ const { confirm, cancel, reveal, isRevealed } = useConfirmDialog()
 const loading = ref(false)
 const confirmMessage = ref(t('weekly.confirmDNF'))
 async function submit() {
+  if (loading.value)
+    return
   loading.value = true
   await uploadingPromise.value
   try {
@@ -282,8 +284,8 @@ function reset() {
       <div class="mt-4">
         <button
           class="px-2 py-1 text-white bg-blue-500 focus:outline-hidden"
-          :class="{ 'opacity-50 cursor-not-allowed': !formState }"
-          :disabled="!formState"
+          :class="{ 'opacity-50 cursor-not-allowed': !formState || loading }"
+          :disabled="!formState || loading"
           @click.prevent="submit"
         >
           <Spinner v-if="loading" class="w-4 h-4 text-white border-[3px]" />

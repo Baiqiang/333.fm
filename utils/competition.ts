@@ -81,6 +81,7 @@ export interface Submission extends Time {
   comment: string
   moves: number
   damage?: number
+  bossInstantKill?: boolean
   cancelMoves: number
   cumulativeMoves: number
   scramble: Scramble
@@ -137,6 +138,9 @@ export enum CompetitionSubType {
   EO_PRACTICE,
   DR_PRACTICE,
   HTR_PRACTICE,
+  HIDDEN_SCRAMBLE,
+  JZP_PRACTICE,
+  MYSTERY,
 }
 
 export enum CompetitionFormat {
@@ -208,11 +212,44 @@ export interface ChainStats {
   top10: Submission[]
 }
 
+export enum ConditionType {
+  MOVES_EQUAL = 'moves-equal',
+  MOVES_LE = 'moves-le',
+  MOVES_GE = 'moves-ge',
+  MOVES_PARITY = 'moves-parity',
+  SAME_SOLUTION = 'same-solution',
+  SAME_MOVES = 'same-moves',
+  ALL_DIFFERENT_MOVES = 'all-different-moves',
+  TOTAL_SUBMISSIONS = 'total-submissions',
+  CONSECUTIVE_MOVES = 'consecutive-moves',
+}
+
+export enum ParityType {
+  EVEN = 'even',
+  ODD = 'odd',
+  MULTIPLE_OF_3 = 'multiple-of-3',
+  MULTIPLE_OF_5 = 'multiple-of-5',
+  MULTIPLE_OF_7 = 'multiple-of-7',
+}
+
+export interface ConditionInfo {
+  id: number
+  type: ConditionType
+  revealed: boolean
+  autoRevealed: boolean
+  revealedAt: string | null
+  triggeredByUser: User | null
+  contributors?: { userId: number, submissionId: number }[]
+  description?: string
+  params?: any
+}
+
 export interface Level {
   level: number
   competitors: number
   bestSubmissions: Submission[]
   kickedOffs: Kickoff[]
+  conditions?: ConditionInfo[]
 }
 
 export interface UserProgress {
@@ -226,6 +263,7 @@ export interface Progress {
   submission?: Submission
   kickedBy: Kickoff[]
   dnfPenalty?: boolean
+  conditions?: ConditionInfo[]
 }
 
 export interface Kickoff extends Time {

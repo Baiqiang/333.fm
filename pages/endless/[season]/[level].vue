@@ -65,15 +65,27 @@ const bossHpPercent = computed(() => {
 function kickoffSummary(submission: Submission) {
   if (submission.moves <= 0)
     return ''
-  const moveText = formatResult(submission.moves)
-  if (challenge.value?.type !== ChallengeType.BOSS)
-    return moveText
-  if (submission.moves <= challenge.value.challenge.instantKill)
-    return `${moveText}, ${t('endless.instantKill')}`
-  if (submission.damage && submission.damage > 0)
-    return `${moveText}, ${t('endless.damageDealt', { damage: submission.damage })}`
-  return moveText
+  return formatResult(submission.moves)
 }
+
+function isBossInstantKill(submission: Submission) {
+  return challenge.value?.type === ChallengeType.BOSS && submission.bossInstantKill === true
+}
+
+function bossEffectLabel(submission: Submission) {
+  if (challenge.value?.type !== ChallengeType.BOSS)
+    return ''
+  if (isBossInstantKill(submission))
+    return t('endless.instantKill')
+  if (submission.damage && submission.damage > 0)
+    return t('endless.damageDealt', { damage: submission.damage })
+  return ''
+}
+
+const isConditionMode = computed(() => endless.value.subType === CompetitionSubType.MYSTERY)
+const conditions = computed(() => progress.conditions ?? [])
+const allTriggered = computed(() => conditions.value.length > 0 && conditions.value.every(c => c.revealed && !c.autoRevealed))
+const triggeredCount = computed(() => conditions.value.filter(c => c.revealed && !c.autoRevealed).length)
 
 const submissions = ref<Submission[]>([])
 useSeoMeta({
@@ -106,6 +118,16 @@ async function sleep(ms: number) {
 }
 
 async function syncAfterSubmission() {
+  if (isConditionMode.value) {
+    const prevTriggered = triggeredCount.value
+    for (let attempt = 0; attempt < 4; attempt++) {
+      await refreshLevelProgress()
+      if (triggeredCount.value > prevTriggered)
+        return
+      await sleep(250 * (attempt + 1))
+    }
+    return
+  }
   const previousHp = progress.scramble.currentHP || 0
   const previousKickoffs = progress.kickedBy.length
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -170,6 +192,59 @@ async function updateData(submission: Submission) {
       <div v-if="progress.dnfPenalty" class="border-l-4 border-red-700 bg-red-100 px-3 py-2 my-3 text-red-900 font-semibold">
         {{ $t('endless.bossDnfPenalty') }}
       </div>
+      <div v-if="isConditionMode && conditions.length > 0" class="border border-gray-300 p-4 mb-3">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold">
+            {{ $t('endlessChallenge.conditions.title') }}
+          </h3>
+          <span class="text-sm" :class="allTriggered ? 'text-green-600 dark:text-green-400 font-bold' : 'text-gray-500'">
+            {{ triggeredCount }} / {{ conditions.length }}
+          </span>
+        </div>
+        <div class="space-y-2">
+          <div
+            v-for="(condition, idx) in conditions"
+            :key="condition.id"
+            class="flex items-center gap-3 p-2 border transition-all duration-300"
+            :class="condition.revealed && !condition.autoRevealed
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+              : condition.autoRevealed
+                ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
+                : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'"
+          >
+            <div
+              class="shrink-0 w-8 h-8 flex items-center justify-center text-sm font-bold"
+              :class="condition.revealed && !condition.autoRevealed
+                ? 'bg-green-500 text-white'
+                : condition.autoRevealed
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400'"
+            >
+              {{ condition.revealed && !condition.autoRevealed ? '✓' : condition.autoRevealed ? '?' : idx + 1 }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div v-if="condition.revealed" class="font-medium">
+                <EndlessChallengeConditionLabel :condition="condition" />
+              </div>
+              <div v-else class="text-gray-400 italic">
+                {{ $t('endlessChallenge.conditions.hidden') }}
+              </div>
+            </div>
+            <div v-if="condition.revealed && condition.contributors?.length" class="flex items-center gap-1 text-sm shrink-0">
+              <UserAvatar v-for="c in condition.contributors" :key="c.userId" :user="(submissions.find(s => s.id === c.submissionId)?.user ?? condition.triggeredByUser)!" />
+            </div>
+            <div v-else-if="condition.revealed && condition.triggeredByUser" class="flex items-center gap-1 text-sm shrink-0">
+              <UserAvatar :user="condition.triggeredByUser" />
+            </div>
+            <div v-if="condition.autoRevealed" class="text-xs text-amber-500 shrink-0">
+              {{ $t('endlessChallenge.autoRevealed') }}
+            </div>
+          </div>
+        </div>
+        <div v-if="allTriggered" class="mt-3 text-center text-green-600 dark:text-green-400 font-bold">
+          {{ $t('endlessChallenge.conditions.allMet') }}
+        </div>
+      </div>
       <div class="mb-2">
         {{ $t('endless.openAt', { time: $dayjs(progress.scramble.createdAt).locale($i18n.locale).format('LLL') }) }}
       </div>
@@ -185,6 +260,15 @@ async function updateData(submission: Submission) {
             <UserAvatarName :user="kickoffUser">
               <template v-if="kickoffSummary(submission)">
                 ({{ kickoffSummary(submission) }})
+                <span
+                  v-if="bossEffectLabel(submission)"
+                  class="ml-1 inline-flex items-center border px-1 text-xs font-bold"
+                  :class="isBossInstantKill(submission)
+                    ? 'border-orange-300 bg-red-600 text-white shadow-sm shadow-red-900/30 dark:border-orange-400 dark:bg-red-500'
+                    : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/40 dark:text-red-300'"
+                >
+                  {{ bossEffectLabel(submission) }}
+                </span>
               </template>
             </UserAvatarName>
           </div>
@@ -202,7 +286,7 @@ async function updateData(submission: Submission) {
       :competition="endless"
       :submissions="submissions.filter(s => s.user.id === user.id)"
       :mode-description="$t('endless.mode.description')"
-      :allow-dnf="challenge?.type === ChallengeType.BOSS"
+      :allow-dnf="challenge?.type === ChallengeType.BOSS || isConditionMode"
       allow-submit
       allow-change-mode
       @submitted="updateData"
@@ -220,7 +304,19 @@ async function updateData(submission: Submission) {
       </div>
     </div>
     <div v-if="progress.submission">
-      <Submissions :submissions="submissions" :scramble="progress.scramble" :competition="endless" sortable />
+      <Submissions :submissions="submissions" :scramble="progress.scramble" :competition="endless" sortable>
+        <template #extra="submission">
+          <span
+            v-if="bossEffectLabel(submission)"
+            class="ml-1 inline-flex items-center border px-1 text-xs font-bold"
+            :class="isBossInstantKill(submission)
+              ? 'border-orange-300 bg-red-600 text-white shadow-sm shadow-red-900/30 dark:border-orange-400 dark:bg-red-500'
+              : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/40 dark:text-red-300'"
+          >
+            {{ bossEffectLabel(submission) }}
+          </span>
+        </template>
+      </Submissions>
     </div>
   </div>
 </template>
