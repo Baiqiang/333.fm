@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios'
 import { InjectQueue } from '@nestjs/bull'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { Cron } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Queue } from 'bull'
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate'
@@ -26,6 +27,7 @@ import { UserService } from '@/user/user.service'
 import { calculateMoves, transformWCAMoves } from '@/utils'
 
 const WCA_API_BASE = 'https://www.worldcubeassociation.org/api/v0'
+const WCA_API_V1_BASE = 'https://www.worldcubeassociation.org/api/v1'
 const WCA_LIVE_API = 'https://live.worldcubeassociation.org/api'
 
 export const RECON_SYNC_QUEUE = 'wca-recon-sync'
@@ -72,6 +74,32 @@ interface WcaApiScramblesResponse {
     roundTypeId: string
     scrambles: WcaApiScramble[]
   }>
+}
+
+interface WcaApiV1Registration {
+  id: number
+  registrant_id: number
+  user?: {
+    wca_id: string | null
+  }
+  competing?: {
+    event_ids?: string[]
+  }
+}
+
+interface WcaApiV1RoundResult {
+  registration_id?: number
+  registrant_id?: number
+  attempts?: Array<{
+    attempt_number: number
+    value: number
+  }>
+}
+
+interface WcaApiV1RoundResponse {
+  format?: string
+  linked_round_ids?: string[]
+  results?: WcaApiV1RoundResult[]
 }
 
 interface ParsedWcaResults {
@@ -421,9 +449,9 @@ export class WcaReconstructionService {
       const { results, roundMap } = officialResultsData
       const toSave: WcaReconstructions[] = []
       for (const recon of recons) {
-        if (recon.wcaData?.officialResults?.length) continue
         const wcaId = recon.user?.wcaId
         if (!wcaId) continue
+        let dirty = false
         const userResults = results
           .filter(r => r.wca_id === wcaId)
           .map(r => ({
@@ -437,7 +465,23 @@ export class WcaReconstructionService {
             regionalAverageRecord: r.regional_average_record,
           }))
         if (userResults.length > 0) {
-          recon.wcaData = { ...recon.wcaData, officialResults: userResults }
+          const wcaData = { ...recon.wcaData, officialResults: userResults }
+          delete wcaData.officialNonParticipant
+          delete wcaData.officialNonParticipantAt
+          recon.wcaData = wcaData
+          if (!recon.isParticipant) {
+            recon.isParticipant = true
+          }
+          dirty = true
+        } else if (!recon.wcaData?.officialNonParticipant) {
+          recon.wcaData = {
+            ...recon.wcaData,
+            officialNonParticipant: true,
+            officialNonParticipantAt: new Date().toISOString(),
+          }
+          dirty = true
+        }
+        if (dirty) {
           toSave.push(recon)
         }
       }
@@ -638,6 +682,33 @@ export class WcaReconstructionService {
     this.logger.log(`Queued WCA data sync for ${wcaCompetitionId}`)
   }
 
+  @Cron('0 * * * *')
+  async syncUnresolvedNonParticipantRecons() {
+    const recons = await this.reconstructionsRepository.find({
+      where: { isParticipant: false },
+      relations: { competition: true, user: true },
+    })
+    const groups = new Map<string, WcaReconstructions[]>()
+
+    for (const recon of recons) {
+      const wcaCompetitionId = recon.competition?.wcaCompetitionId
+      if (!wcaCompetitionId || recon.competition.type !== CompetitionType.WCA_RECONSTRUCTION) continue
+      if (recon.wcaData?.officialNonParticipant) continue
+
+      const group = groups.get(wcaCompetitionId) ?? []
+      group.push(recon)
+      groups.set(wcaCompetitionId, group)
+    }
+
+    let synced = 0
+    for (const [wcaCompetitionId, group] of groups) {
+      synced += await this.syncNonParticipantReconsForPublishedCompetition(wcaCompetitionId, group)
+    }
+    if (synced > 0) {
+      this.logger.log(`Synced ${synced} unresolved WCA non-participant reconstructions`)
+    }
+  }
+
   async syncWcaDataForCompetition(wcaCompetitionId: string): Promise<number> {
     const competition = await this.competitionsRepository.findOne({
       where: { wcaCompetitionId },
@@ -650,6 +721,10 @@ export class WcaReconstructionService {
     })
     if (recons.length === 0) return 0
 
+    // sync scrambles first
+    await this.syncScramblesFromWca(wcaCompetitionId)
+
+    // sync results
     const officialResultsData = await this.getWcaOfficialResults(wcaCompetitionId)
     const reconsToSave: WcaReconstructions[] = []
 
@@ -686,7 +761,17 @@ export class WcaReconstructionService {
             regionalAverageRecord: r.regional_average_record,
           }))
         if (userResults.length > 0) {
-          recon.wcaData = { ...recon.wcaData, officialResults: userResults }
+          const wcaData = { ...recon.wcaData, officialResults: userResults }
+          delete wcaData.officialNonParticipant
+          delete wcaData.officialNonParticipantAt
+          recon.wcaData = wcaData
+          dirty = true
+        } else if (!recon.wcaData?.officialNonParticipant) {
+          recon.wcaData = {
+            ...recon.wcaData,
+            officialNonParticipant: true,
+            officialNonParticipantAt: new Date().toISOString(),
+          }
           dirty = true
         }
       }
@@ -727,6 +812,53 @@ export class WcaReconstructionService {
     }
 
     return reconsToSave.length + subsToSave.length
+  }
+
+  private async syncNonParticipantReconsForPublishedCompetition(
+    wcaCompetitionId: string,
+    recons: WcaReconstructions[],
+  ): Promise<number> {
+    const officialResultsData = await this.getWcaOfficialResults(wcaCompetitionId)
+    if (!officialResultsData) return 0
+
+    const toSave: WcaReconstructions[] = []
+    for (const recon of recons) {
+      const wcaId = recon.user?.wcaId
+      if (!wcaId || recon.wcaData?.officialNonParticipant) continue
+
+      const userResults = officialResultsData.results
+        .filter(r => r.wca_id === wcaId)
+        .map(r => ({
+          roundNumber: officialResultsData.roundMap.get(r.round_type_id) ?? 1,
+          roundTypeId: r.round_type_id,
+          pos: r.pos,
+          best: r.best,
+          average: r.average,
+          attempts: r.attempts,
+          regionalSingleRecord: r.regional_single_record,
+          regionalAverageRecord: r.regional_average_record,
+        }))
+
+      if (userResults.length > 0) {
+        const wcaData = { ...recon.wcaData, officialResults: userResults }
+        delete wcaData.officialNonParticipant
+        delete wcaData.officialNonParticipantAt
+        recon.wcaData = wcaData
+        recon.isParticipant = true
+      } else {
+        recon.wcaData = {
+          ...recon.wcaData,
+          officialNonParticipant: true,
+          officialNonParticipantAt: new Date().toISOString(),
+        }
+      }
+      toSave.push(recon)
+    }
+
+    if (toSave.length > 0) {
+      await this.reconstructionsRepository.save(toSave)
+    }
+    return toSave.length
   }
 
   async isUserParticipant(wcaCompetitionId: string, wcaId: string): Promise<boolean> {
@@ -913,9 +1045,10 @@ export class WcaReconstructionService {
     roundNumber: number,
     scrambleNumber: number,
   ): Promise<number | null> {
+    let shouldTryV1 = false
     try {
       const liveCompId = await this.findLiveCompetitionId(wcaCompetitionId)
-      if (!liveCompId) return null
+      if (!liveCompId) return this.getWcaMovesFromV1Live(wcaCompetitionId, wcaId, roundNumber, scrambleNumber)
 
       const compResp = await firstValueFrom(
         this.httpService.post<{ data?: { competition?: { competitionEvents: any[] } } }>(WCA_LIVE_API, {
@@ -932,9 +1065,10 @@ export class WcaReconstructionService {
       )
       const events = compResp.data?.data?.competition?.competitionEvents
       const fmEvent = events?.find((e: any) => e.event.id === '333fm')
-      if (!fmEvent?.rounds?.length) return null
+      if (!fmEvent?.rounds?.length)
+        return this.getWcaMovesFromV1Live(wcaCompetitionId, wcaId, roundNumber, scrambleNumber)
       const targetRound = fmEvent.rounds.find((r: any) => r.number === roundNumber) ?? fmEvent.rounds[roundNumber - 1]
-      if (!targetRound) return null
+      if (!targetRound) return this.getWcaMovesFromV1Live(wcaCompetitionId, wcaId, roundNumber, scrambleNumber)
 
       const roundResp = await firstValueFrom(
         this.httpService.post<{ data?: { round?: { results: any[] } } }>(WCA_LIVE_API, {
@@ -951,13 +1085,16 @@ export class WcaReconstructionService {
       )
       const roundResults = roundResp.data?.data?.round?.results
       const personResult = roundResults?.find((r: any) => r.person?.wcaId === wcaId)
-      if (!personResult?.attempts?.[scrambleNumber - 1]) return null
+      if (!personResult) return this.getWcaMovesFromV1Live(wcaCompetitionId, wcaId, roundNumber, scrambleNumber)
+      if (!personResult.attempts?.[scrambleNumber - 1]) return null
       const attemptResult = personResult.attempts[scrambleNumber - 1].result
       return transformWCAMoves(attemptResult)
     } catch (e) {
       this.logger.debug(`Failed to fetch WCA Live data: ${e}`)
-      return null
+      shouldTryV1 = true
     }
+
+    return shouldTryV1 ? this.getWcaMovesFromV1Live(wcaCompetitionId, wcaId, roundNumber, scrambleNumber) : null
   }
 
   private async findLiveCompetitionId(wcaCompetitionId: string): Promise<string | null> {
@@ -981,7 +1118,7 @@ export class WcaReconstructionService {
   ): Promise<{ participantWcaIds: Set<string>; attemptsPerRound: Record<number, number> } | null> {
     try {
       const liveCompId = await this.findLiveCompetitionId(wcaCompetitionId)
-      if (!liveCompId) return null
+      if (!liveCompId) return this.getV1LiveCompetitionInfo(wcaCompetitionId)
 
       const compResp = await firstValueFrom(
         this.httpService.post<{ data?: { competition?: { competitionEvents: any[] } } }>(WCA_LIVE_API, {
@@ -998,7 +1135,7 @@ export class WcaReconstructionService {
       )
       const events = compResp.data?.data?.competition?.competitionEvents
       const fmEvent = events?.find((e: any) => e.event.id === '333fm')
-      if (!fmEvent?.rounds?.length) return null
+      if (!fmEvent?.rounds?.length) return this.getV1LiveCompetitionInfo(wcaCompetitionId)
 
       const attemptsPerRound: Record<number, number> = {}
       for (const round of fmEvent.rounds) {
@@ -1014,10 +1151,13 @@ export class WcaReconstructionService {
       )
       const results = roundResp.data?.data?.round?.results ?? []
       const participantWcaIds = new Set(results.map((r: any) => r.person?.wcaId).filter(Boolean) as string[])
+      if (participantWcaIds.size === 0) {
+        return this.getV1LiveCompetitionInfo(wcaCompetitionId, attemptsPerRound)
+      }
 
       return { participantWcaIds, attemptsPerRound }
     } catch {
-      return null
+      return this.getV1LiveCompetitionInfo(wcaCompetitionId)
     }
   }
 
@@ -1032,7 +1172,7 @@ export class WcaReconstructionService {
   ): Promise<{ isParticipant: boolean; attempts: Record<string, number> } | null> {
     try {
       const liveCompId = await this.findLiveCompetitionId(wcaCompetitionId)
-      if (!liveCompId) return null
+      if (!liveCompId) return this.getV1LiveUserData(wcaCompetitionId, wcaId)
 
       const compResp = await firstValueFrom(
         this.httpService.post<{ data?: { competition?: { competitionEvents: any[] } } }>(WCA_LIVE_API, {
@@ -1049,7 +1189,7 @@ export class WcaReconstructionService {
       )
       const events = compResp.data?.data?.competition?.competitionEvents
       const fmEvent = events?.find((e: any) => e.event.id === '333fm')
-      if (!fmEvent?.rounds?.length) return null
+      if (!fmEvent?.rounds?.length) return this.getV1LiveUserData(wcaCompetitionId, wcaId)
 
       let isParticipant = false
       const attempts: Record<string, number> = {}
@@ -1073,10 +1213,132 @@ export class WcaReconstructionService {
         }
       }
 
-      return isParticipant ? { isParticipant, attempts } : null
+      if (isParticipant) return { isParticipant, attempts }
+      return this.getV1LiveUserData(wcaCompetitionId, wcaId)
+    } catch {
+      return this.getV1LiveUserData(wcaCompetitionId, wcaId)
+    }
+  }
+
+  private async getWcaMovesFromV1Live(
+    wcaCompetitionId: string,
+    wcaId: string,
+    roundNumber: number,
+    scrambleNumber: number,
+  ): Promise<number | null> {
+    const liveData = await this.getV1LiveUserData(wcaCompetitionId, wcaId)
+    const value = liveData?.attempts[`${roundNumber}-${scrambleNumber}`]
+    return value === undefined ? null : transformWCAMoves(value)
+  }
+
+  private async getV1LiveCompetitionInfo(
+    wcaCompetitionId: string,
+    attemptsPerRound: Record<number, number> = {},
+  ): Promise<{ participantWcaIds: Set<string>; attemptsPerRound: Record<number, number> } | null> {
+    try {
+      const [registrationMaps, firstRound] = await Promise.all([
+        this.getV1RegistrationMaps(wcaCompetitionId),
+        this.getV1LiveRound(wcaCompetitionId, 1),
+      ])
+
+      const roundIds = firstRound?.linked_round_ids?.length ? firstRound.linked_round_ids : ['333fm-r1']
+      for (const roundId of roundIds) {
+        const rn = this.getRoundNumberFromLiveRoundId(roundId)
+        if (!rn || attemptsPerRound[rn]) continue
+
+        const round = rn === 1 && firstRound ? firstRound : await this.getV1LiveRound(wcaCompetitionId, rn)
+        attemptsPerRound[rn] = formatIdToAttempts(round?.format ?? 'm')
+      }
+
+      return { participantWcaIds: registrationMaps.participantWcaIds, attemptsPerRound }
+    } catch (e) {
+      this.logger.debug(`Failed to fetch WCA API v1 live competition data: ${e}`)
+      return null
+    }
+  }
+
+  private async getV1LiveUserData(
+    wcaCompetitionId: string,
+    wcaId: string,
+  ): Promise<{ isParticipant: boolean; attempts: Record<string, number> } | null> {
+    try {
+      const [registrationMaps, firstRound] = await Promise.all([
+        this.getV1RegistrationMaps(wcaCompetitionId),
+        this.getV1LiveRound(wcaCompetitionId, 1),
+      ])
+      const isParticipant = registrationMaps.participantWcaIds.has(wcaId)
+      const attempts: Record<string, number> = {}
+
+      const roundIds = firstRound?.linked_round_ids?.length ? firstRound.linked_round_ids : ['333fm-r1']
+      for (const roundId of roundIds) {
+        const rn = this.getRoundNumberFromLiveRoundId(roundId)
+        if (!rn) continue
+
+        const round = rn === 1 && firstRound ? firstRound : await this.getV1LiveRound(wcaCompetitionId, rn)
+        const personResult = round?.results?.find(result => {
+          const registrationWcaId =
+            result.registration_id === undefined
+              ? undefined
+              : registrationMaps.wcaIdByRegistrationId.get(result.registration_id)
+          const registrantWcaId =
+            result.registrant_id === undefined
+              ? undefined
+              : registrationMaps.wcaIdByRegistrantId.get(result.registrant_id)
+          return registrationWcaId === wcaId || registrantWcaId === wcaId
+        })
+        if (!personResult?.attempts?.length) continue
+
+        for (const attempt of personResult.attempts) {
+          if (attempt.value !== 0) {
+            attempts[`${rn}-${attempt.attempt_number}`] = attempt.value
+          }
+        }
+      }
+
+      return isParticipant || Object.keys(attempts).length > 0 ? { isParticipant, attempts } : null
+    } catch (e) {
+      this.logger.debug(`Failed to fetch WCA API v1 live user data: ${e}`)
+      return null
+    }
+  }
+
+  private async getV1RegistrationMaps(wcaCompetitionId: string): Promise<{
+    participantWcaIds: Set<string>
+    wcaIdByRegistrationId: Map<number, string>
+    wcaIdByRegistrantId: Map<number, string>
+  }> {
+    const url = `${WCA_API_V1_BASE}/competitions/${wcaCompetitionId}/registrations`
+    const response = await firstValueFrom(this.httpService.get<WcaApiV1Registration[]>(url))
+    const registrations = response.data ?? []
+    const participantWcaIds = new Set<string>()
+    const wcaIdByRegistrationId = new Map<number, string>()
+    const wcaIdByRegistrantId = new Map<number, string>()
+
+    for (const registration of registrations) {
+      const wcaId = registration.user?.wca_id
+      if (!wcaId || !registration.competing?.event_ids?.includes('333fm')) continue
+
+      participantWcaIds.add(wcaId)
+      wcaIdByRegistrationId.set(registration.id, wcaId)
+      wcaIdByRegistrantId.set(registration.registrant_id, wcaId)
+    }
+
+    return { participantWcaIds, wcaIdByRegistrationId, wcaIdByRegistrantId }
+  }
+
+  private async getV1LiveRound(wcaCompetitionId: string, roundNumber: number): Promise<WcaApiV1RoundResponse | null> {
+    try {
+      const url = `${WCA_API_V1_BASE}/competitions/${wcaCompetitionId}/live/rounds/333fm-r${roundNumber}`
+      const response = await firstValueFrom(this.httpService.get<WcaApiV1RoundResponse>(url))
+      return response.data ?? null
     } catch {
       return null
     }
+  }
+
+  private getRoundNumberFromLiveRoundId(roundId: string): number | null {
+    const match = roundId.match(/^333fm-r(\d+)$/)
+    return match ? Number(match[1]) : null
   }
 
   private async tryVerifyScramble(scramble: Scrambles, wcaCompetitionId: string) {

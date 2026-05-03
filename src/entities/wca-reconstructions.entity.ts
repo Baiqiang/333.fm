@@ -16,6 +16,8 @@ export interface WcaOfficialRoundResult {
 
 export interface WcaReconData {
   officialResults?: WcaOfficialRoundResult[]
+  officialNonParticipant?: boolean
+  officialNonParticipantAt?: string
 }
 
 @Entity()
