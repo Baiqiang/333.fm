@@ -12,6 +12,9 @@ const hasStarted = computed(() => {
 })
 
 const { data: reconData, refresh: refreshReconData } = await useApi<WcaReconstructionCompetitionData>(`wca/reconstruction/${wcaCompetitionId.value}`)
+const syncingWcaData = ref(false)
+const syncWcaDataError = ref('')
+const syncWcaDataQueued = ref(false)
 
 const bus = useEventBus('submission')
 bus.on(() => refreshReconData())
@@ -51,6 +54,11 @@ const scrambleTabs = computed<ScrambleTab[]>(() => {
 
   const roundNumbers = new Set<number>()
   for (const s of reconData.value.scrambles) roundNumbers.add(s.roundNumber!)
+  for (const rn of Object.keys(reconData.value.attemptsPerRound ?? {})) {
+    const roundNumber = Number(rn)
+    if (roundNumber)
+      roundNumbers.add(roundNumber)
+  }
   if (reconData.value.currentUser?.attempts) {
     for (const key of Object.keys(reconData.value.currentUser.attempts)) {
       const rn = Number(key.split('-')[0])
@@ -107,6 +115,28 @@ function getSingleRecord(userId: number, roundNumber: number, moves: number): st
   if (result && result.regionalSingleRecord && moves / 100 === result.best)
     return result.regionalSingleRecord
   return null
+}
+
+async function syncWcaData() {
+  if (syncingWcaData.value)
+    return
+
+  syncingWcaData.value = true
+  syncWcaDataError.value = ''
+  syncWcaDataQueued.value = false
+  try {
+    await useClientApi(`wca/reconstruction/${wcaCompetitionId.value}/sync-wca-data`, {
+      method: 'POST',
+    })
+    syncWcaDataQueued.value = true
+    await refreshReconData()
+  }
+  catch (e: any) {
+    syncWcaDataError.value = e?.data?.message || e?.message || t('wca.recon.syncFailed')
+  }
+  finally {
+    syncingWcaData.value = false
+  }
 }
 </script>
 
@@ -169,6 +199,24 @@ function getSingleRecord(userId: number, roundNumber: number, moves: number): st
           <Icon name="heroicons:user-circle-16-solid" />
           {{ t('wca.recon.myReconForComp') }}
         </NuxtLink>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-end gap-2 my-2">
+        <button
+          class="inline-flex items-center gap-1 px-1 py-0.5 text-xs text-gray-500 hover:text-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="syncingWcaData"
+          @click="syncWcaData"
+        >
+          <Spinner v-if="syncingWcaData" class="w-3 h-3 text-gray-500 border-2" />
+          <Icon v-else name="heroicons:arrow-path-16-solid" />
+          {{ syncingWcaData ? t('wca.recon.syncingWcaData') : t('wca.recon.syncWcaData') }}
+        </button>
+        <span v-if="syncWcaDataQueued" class="text-xs text-green-600">
+          {{ t('wca.recon.syncQueued') }}
+        </span>
+        <span v-if="syncWcaDataError" class="text-xs text-red-600">
+          {{ syncWcaDataError }}
+        </span>
       </div>
 
       <Tabs>
