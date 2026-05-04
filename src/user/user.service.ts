@@ -58,7 +58,10 @@ export class UserService {
     }
     user.email = profile.email
     user.name = profile.name
-    user.wcaId = profile.wca_id || ''
+    // don't overwrite WCA ID if it already exists
+    if (profile.wca_id) {
+      user.wcaId = profile.wca_id
+    }
     user.avatar = profile.avatar.url || ''
     user.avatarThumb = profile.avatar.thumb_url || ''
     user.source = 'WCA'
