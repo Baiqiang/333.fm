@@ -5,7 +5,7 @@ const props = withDefaults(defineProps<{
   submission: Submission
   scramble?: Scramble
   competition?: Competition
-  user?: User
+  user?: { name: string }
   chain?: boolean
   expanded?: boolean
   alwaysExpanded?: boolean

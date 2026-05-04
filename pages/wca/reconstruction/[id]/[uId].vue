@@ -13,6 +13,7 @@ bus.on(() => refresh())
 const recon = computed(() => data.value?.recon ?? null)
 const competition = computed(() => data.value?.competition ?? undefined)
 const officialResults = computed(() => data.value?.officialResults ?? [])
+const reconUserForSubmission = computed(() => recon.value?.user as User | undefined)
 
 const officialByRound = computed(() => {
   const map: Record<number, WcaOfficialRoundResult> = {}
@@ -159,6 +160,7 @@ useSeoMeta({
           <Submission
             :submission="sub"
             :competition="competition"
+            :user="reconUserForSubmission"
             always-expanded
           />
         </div>
