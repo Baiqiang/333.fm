@@ -8,6 +8,8 @@
   "scripts": {
     "build": "nest build",
     "cmd": "node --max-old-space-size=8192 -r ts-node/register -r tsconfig-paths/register src/cmd.ts",
+    "check:merge-users": "npm run cmd -- user check-merge",
+    "migrate:user-data": "npm run cmd -- user migrate-data",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
