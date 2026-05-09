@@ -2,6 +2,7 @@
 defineProps<{
   title: string
   path?: string
+  onClick?: () => void
   children?: { title: string, path: string }[]
 }>()
 const showChildren = ref(false)
@@ -22,8 +23,16 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <a
+    v-if="path && onClick"
+    :href="path"
+    class="nav cursor-pointer"
+    @click.prevent="onClick"
+  >
+    {{ title }}
+  </a>
   <NuxtLink
-    v-if="path"
+    v-else-if="path"
     :to="path"
     class="nav"
     active-class="text-indigo-600 font-bold"

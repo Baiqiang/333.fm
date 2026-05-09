@@ -70,6 +70,10 @@ useSeoMeta({
       </div>
 
       <div class="flex items-center gap-3 my-3 text-sm">
+        <a :href="`https://www.worldcubeassociation.org/competitions/${wcaCompetitionId}/results/all?event=333fm`" target="_blank" class="text-blue-500 flex items-center gap-1">
+          <WcaLogo class="w-4 h-4" />
+          WCA 官方成绩
+        </a>
         <NuxtLink
           :to="`/wca/reconstruction/${wcaCompetitionId}`"
           class="text-indigo-500 flex items-center gap-1 hover:underline"

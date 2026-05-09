@@ -2,15 +2,40 @@
 const { data: daily } = await useApi<Competition>('/daily/on-going')
 const { data: weekly } = await useApi<Competition>('/weekly/on-going')
 const { setLocale, setLocaleCookie, finalizePendingLocaleChange, t } = useI18n()
-let lastUpdate = useDayjs()().format('YYYY-MM-DD')
+const router = useRouter()
+
+async function navigateToDaily() {
+  const { data } = await useApi<Competition>('/daily/on-going')
+  if (data.value) {
+    daily.value = data.value
+    router.push(competitionPath(data.value))
+  }
+  else {
+    router.push('/daily')
+  }
+}
+
+async function navigateToWeekly() {
+  const { data } = await useApi<Competition>('/weekly/on-going')
+  if (data.value) {
+    weekly.value = data.value
+    router.push(competitionPath(data.value))
+  }
+  else {
+    router.push('/weekly')
+  }
+}
+
 const navs = computed(() => [
   {
     title: t('weekly.shortTitle'),
     path: weekly.value ? competitionPath(weekly.value) : '/weekly',
+    onClick: navigateToWeekly,
   },
   {
     title: t('daily.shortTitle'),
     path: daily.value ? competitionPath(daily.value) : '/daily',
+    onClick: navigateToDaily,
   },
   {
     title: t('endless.shortTitle'),
@@ -76,18 +101,9 @@ const navs = computed(() => [
 ])
 const user = useUser()
 const showMenu = ref(false)
-const router = useRouter()
 router.afterEach(() => {
   showMenu.value = false
 })
-useIntervalFn(() => {
-  const now = useDayjs()().format('YYYY-MM-DD')
-  if (now !== lastUpdate) {
-    lastUpdate = now
-    useApi<Competition>('/daily/on-going').then(({ data }) => daily.value = data.value)
-    useApi<Competition>('/weekly/on-going').then(({ data }) => weekly.value = data.value)
-  }
-}, 5000)
 
 const langButton = ref()
 const colorModeButton = ref()

@@ -148,6 +148,12 @@ async function syncWcaData() {
     <div v-if="wcaCompetition" class="text-sm text-gray-400 mb-2">
       {{ wcaCompetition.start_date }} ~ {{ wcaCompetition.end_date }}
     </div>
+    <div class="flex items-center gap-2 text-sm my-2">
+      <a :href="`https://www.worldcubeassociation.org/competitions/${wcaCompetitionId}/results/all?event=333fm`" target="_blank" class="text-blue-500 flex items-center gap-1">
+        <WcaLogo class="w-4 h-4" />
+        WCA 官方成绩
+      </a>
+    </div>
 
     <div v-if="reconData">
       <div v-if="reconData.isPublished" class="flex items-center gap-1.5 text-sm text-green-700 bg-green-50 p-2 border-l-4 border-green-500 mb-2">
