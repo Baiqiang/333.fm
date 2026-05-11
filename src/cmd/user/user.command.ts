@@ -24,6 +24,9 @@ export class UserCommand extends CommandRunner {
       case 'migrate-user-data':
         await this.migrateUserData(passedParam[1], passedParam[2])
         break
+      case 'backfill-primary':
+        await this.userService.backfillPrimaryUserId()
+        break
       default:
         break
     }

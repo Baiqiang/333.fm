@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, EntityManager, Repository } from 'typeorm'
+import { DataSource, EntityManager, IsNull, Repository } from 'typeorm'
 
 import { Users } from '@/entities/users.entity'
 
@@ -183,6 +183,25 @@ export class UserService {
     this.logger.log('User data migration completed')
   }
 
+  async backfillPrimaryUserId() {
+    const mergedUsers = await this.usersRepository.find({
+      where: { source: 'MERGED', primaryUserId: IsNull() },
+    })
+    this.logger.log(`Found ${mergedUsers.length} merged users without primaryUserId`)
+
+    let updated = 0
+    for (const user of mergedUsers) {
+      const target = await this.resolveMergeTarget(user)
+      if (!target) {
+        this.logger.warn(`No active target for merged user #${user.id} ${user.name} (${user.wcaId || 'no WCA ID'})`)
+        continue
+      }
+      await this.usersRepository.update({ id: user.id }, { primaryUserId: target.id })
+      updated++
+    }
+    this.logger.log(`Backfilled primaryUserId for ${updated} merged users`)
+  }
+
   private async mergeUsers(users: Users[], reason: string) {
     const activeUsers = users.filter(user => user.source !== 'MERGED')
     if (activeUsers.length <= 1) return
@@ -207,7 +226,7 @@ export class UserService {
 
   private async mergeUser(user: Users, mainUser: Users, manager: EntityManager) {
     await this.migrateUserReferences(user.id, mainUser.id, manager)
-    await manager.update(Users, { id: user.id }, { source: 'MERGED' })
+    await manager.update(Users, { id: user.id }, { source: 'MERGED', primaryUserId: mainUser.id })
   }
 
   private async migrateUserReferences(fromUserId: number, toUserId: number, manager: EntityManager) {

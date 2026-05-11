@@ -36,6 +36,9 @@ export class Users {
   @Column()
   sourceId: string
 
+  @Column({ nullable: true })
+  primaryUserId: number
+
   @CreateDateColumn()
   createdAt: Date
 

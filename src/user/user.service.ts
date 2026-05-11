@@ -53,6 +53,21 @@ export class UserService {
         },
       })
     }
+
+    if (user?.source === 'MERGED' && user.primaryUserId) {
+      const primaryUser = await this.usersRepository.findOne({ where: { id: user.primaryUserId } })
+      if (primaryUser) {
+        primaryUser.name = profile.name
+        if (profile.wca_id) {
+          primaryUser.wcaId = profile.wca_id
+        }
+        primaryUser.avatar = profile.avatar.url || ''
+        primaryUser.avatarThumb = profile.avatar.thumb_url || ''
+        await this.usersRepository.save(primaryUser)
+        return primaryUser
+      }
+    }
+
     if (!user) {
       user = new Users()
     }
@@ -99,10 +114,17 @@ export class UserService {
         return null
       }
     }
-    return this.usersRepository.findOne({
+    const user = await this.usersRepository.findOne({
       where: { id },
       relations: ['roles'],
     })
+    if (user?.source === 'MERGED' && user.primaryUserId) {
+      return this.usersRepository.findOne({
+        where: { id: user.primaryUserId },
+        relations: ['roles'],
+      })
+    }
+    return user
   }
 
   getUserIFs(user: Users, options: IPaginationOptions): Promise<Pagination<UserInsertionFinders>> {
