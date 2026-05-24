@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common'
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator'
+import { BannedGuard } from '@/auth/guards/banned.guard'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { JwtRequiredGuard } from '@/auth/guards/jwt-required.guard'
 import { SubmitSolutionDto } from '@/dtos/submit-solution.dto'
@@ -102,7 +103,7 @@ export class EndlessController {
   }
 
   @Post(':season')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, BannedGuard)
   async submit(@Param('season') season: string, @CurrentUser() user: Users, @Body() solution: SubmitSolutionDto) {
     const competition = await this.endlessService.getBySeason(season)
     if (!competition) {

@@ -12,6 +12,7 @@ import {
 import { ApiBearerAuth } from '@nestjs/swagger'
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator'
+import { BannedGuard } from '@/auth/guards/banned.guard'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { JwtOrBotRequiredGuard } from '@/auth/guards/jwt-or-bot-required.guard'
 import { CreateCompetitionDto } from '@/dtos/create-comptition.dto'
@@ -41,7 +42,7 @@ export class PracticeController {
 
   @Post()
   @ApiBearerAuth()
-  @UseGuards(JwtOrBotRequiredGuard)
+  @UseGuards(JwtOrBotRequiredGuard, BannedGuard)
   async create(@Body() dto: CreateCompetitionDto, @CurrentUser() user: Users) {
     const last = await this.practiceService.getLatest(user)
     if (last) {
@@ -82,7 +83,7 @@ export class PracticeController {
 
   @Post(':alias')
   @ApiBearerAuth()
-  @UseGuards(JwtOrBotRequiredGuard)
+  @UseGuards(JwtOrBotRequiredGuard, BannedGuard)
   public async submit(@Param('alias') alias: string, @CurrentUser() user: Users, @Body() solution: SubmitSolutionDto) {
     const competition = await this.getOrThrow(alias)
     return await this.practiceService.submitSolution(competition, user, solution)

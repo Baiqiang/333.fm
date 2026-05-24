@@ -50,6 +50,7 @@ import { PointCommand } from './point/point.command'
 import { PointService } from './point/point.service'
 import { SubmissionCommand } from './submission/submission.command'
 import { SubmissionService } from './submission/submission.service'
+import { BanService } from './user/ban.service'
 import { UserCommand } from './user/user.command'
 import { UserService } from './user/user.service'
 import { WcaCommand } from './wca/wca.command'
@@ -128,6 +129,7 @@ import { WcaService } from './wca/wca.service'
     SubmissionCommand,
     UserService,
     UserCommand,
+    BanService,
     LeagueService,
     LeagueCommand,
     WcaService,

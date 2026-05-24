@@ -12,6 +12,7 @@ import {
 import { isInt } from 'class-validator'
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator'
+import { BannedGuard } from '@/auth/guards/banned.guard'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { JwtRequiredGuard } from '@/auth/guards/jwt-required.guard'
 import { SubmitSolutionDto } from '@/dtos/submit-solution.dto'
@@ -147,7 +148,7 @@ export class ChainController {
   }
 
   @Post('')
-  @UseGuards(JwtRequiredGuard)
+  @UseGuards(JwtRequiredGuard, BannedGuard)
   async submit(@CurrentUser() user: Users, @Body() solution: SubmitSolutionDto) {
     const competition = await this.chainService.get()
     if (!competition) {

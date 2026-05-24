@@ -4,4 +4,5 @@ export enum Role {
   Bot = 'bot',
   LeagueAdmin = 'league_admin',
   TutorialAdmin = 'tutorial_admin',
+  Banned = 'banned',
 }

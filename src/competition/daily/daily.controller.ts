@@ -1,6 +1,7 @@
 import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common'
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator'
+import { BannedGuard } from '@/auth/guards/banned.guard'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { JwtRequiredGuard } from '@/auth/guards/jwt-required.guard'
 import { PaginationDto } from '@/dtos/pagination.dto'
@@ -58,7 +59,7 @@ export class DailyController {
   }
 
   @Post(':day')
-  @UseGuards(JwtRequiredGuard)
+  @UseGuards(JwtRequiredGuard, BannedGuard)
   public async submit(@Param('day') day: string, @CurrentUser() user: Users, @Body() solution: SubmitSolutionDto) {
     const competition = await this.dailyService.getCompetition(day)
     if (!competition) {

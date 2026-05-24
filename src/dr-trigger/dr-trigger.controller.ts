@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common'
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator'
+import { BannedGuard } from '@/auth/guards/banned.guard'
 import { JwtRequiredGuard } from '@/auth/guards/jwt-required.guard'
 import { DRTriggerStartDto, DRTriggerSubmitDto } from '@/dtos/dr-trigger-submit.dto'
 import { Users } from '@/entities/users.entity'
@@ -24,7 +25,7 @@ export class DRTriggerController {
   constructor(private readonly drTriggerService: DRTriggerService) {}
 
   @Post('start')
-  @UseGuards(JwtRequiredGuard)
+  @UseGuards(JwtRequiredGuard, BannedGuard)
   async start(@CurrentUser() user: Users, @Body() dto: DRTriggerStartDto) {
     return this.drTriggerService.startGame(
       user,
@@ -36,7 +37,7 @@ export class DRTriggerController {
   }
 
   @Post('submit')
-  @UseGuards(JwtRequiredGuard)
+  @UseGuards(JwtRequiredGuard, BannedGuard)
   async submit(@CurrentUser() user: Users, @Body() dto: DRTriggerSubmitDto) {
     return this.drTriggerService.submitSolution(user, dto.gameId, dto.solution)
   }

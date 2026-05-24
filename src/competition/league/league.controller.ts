@@ -2,6 +2,7 @@ import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Us
 import { ApiBearerAuth } from '@nestjs/swagger'
 
 import { CurrentUser } from '@/auth/decorators/current-user.decorator'
+import { BannedGuard } from '@/auth/guards/banned.guard'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { JwtRequiredGuard } from '@/auth/guards/jwt-required.guard'
 import { SubmitSolutionDto } from '@/dtos/submit-solution.dto'
@@ -243,7 +244,7 @@ export class LeagueController {
 
   @Post('season/:number/:alias')
   @ApiBearerAuth()
-  @UseGuards(JwtRequiredGuard)
+  @UseGuards(JwtRequiredGuard, BannedGuard)
   public async submit(
     @Param('number', ParseIntPipe) number: number,
     @Param('alias') alias: string,
