@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth } from '@nestjs/swagger'
@@ -17,6 +18,7 @@ import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { JwtOrBotRequiredGuard } from '@/auth/guards/jwt-or-bot-required.guard'
 import { CreateCompetitionDto } from '@/dtos/create-comptition.dto'
 import { SubmitSolutionDto } from '@/dtos/submit-solution.dto'
+import { UpdatePracticeDescriptionDto } from '@/dtos/update-practice-description.dto'
 import { CompetitionFormat } from '@/entities/competitions.entity'
 import { Users } from '@/entities/users.entity'
 import { UserService } from '@/user/user.service'
@@ -101,6 +103,18 @@ export class PracticeController {
     const competition = await this.getOrThrow(alias)
     await this.practiceService.update(competition, user, submissionId, solution)
     return true
+  }
+
+  @Put(':alias/description')
+  @ApiBearerAuth()
+  @UseGuards(JwtOrBotRequiredGuard)
+  public async updateDescription(
+    @Param('alias') alias: string,
+    @CurrentUser() user: Users,
+    @Body() dto: UpdatePracticeDescriptionDto,
+  ) {
+    const competition = await this.getOrThrow(alias)
+    return await this.practiceService.updateDescription(competition, user, dto.description)
   }
 
   @Get(':userId/competitions')

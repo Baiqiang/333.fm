@@ -105,6 +105,9 @@ export class Competitions {
   @Column({ nullable: true })
   leagueSeasonId: number
 
+  @Column({ type: 'text', nullable: true, default: null })
+  description: string | null
+
   @Column({ length: 50, nullable: true, default: null })
   @Index()
   wcaCompetitionId: string | null

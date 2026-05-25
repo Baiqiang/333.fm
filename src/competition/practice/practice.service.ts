@@ -57,6 +57,7 @@ export class PracticeService {
       },
       relations: {
         scrambles: true,
+        user: true,
       },
     })
   }
@@ -312,5 +313,14 @@ export class PracticeService {
     solution: Pick<SubmitSolutionDto, 'comment' | 'attachments'>,
   ) {
     return await this.competitionService.updateUserSubmission(competition, user, id, solution)
+  }
+
+  async updateDescription(competition: Competitions, user: Users, description: string) {
+    if (competition.userId !== user.id) {
+      throw new BadRequestException('Only the owner can update description')
+    }
+    competition.description = description.trim() || null
+    await this.competitionsRepository.save(competition)
+    return competition
   }
 }
