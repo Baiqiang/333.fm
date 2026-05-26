@@ -260,6 +260,7 @@ export default {
     submit: 'Submit',
     reset: 'Reset',
     save: 'Save',
+    saved: 'Saved',
     confirm: 'Confirm',
     cancel: 'Cancel',
     remove: 'Remove',
@@ -534,6 +535,8 @@ export default {
   practice: {
     title: 'Practice Book',
     shortTitle: 'Practice',
+    description: 'Description',
+    descriptionPlaceholder: 'Add a description for this practice (supports Markdown)',
     new: {
       title: 'New Practice',
     },

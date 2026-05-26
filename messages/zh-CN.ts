@@ -260,6 +260,7 @@ export default {
     submit: '提交',
     reset: '重置',
     save: '保存',
+    saved: '已保存',
     confirm: '确认',
     cancel: '取消',
     remove: '删除',
@@ -534,6 +535,8 @@ export default {
   practice: {
     title: '练习本',
     shortTitle: '练习本',
+    description: '比赛说明',
+    descriptionPlaceholder: '为本次练习添加说明（支持 Markdown）',
     new: {
       title: '新建练习',
     },

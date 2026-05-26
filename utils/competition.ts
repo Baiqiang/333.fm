@@ -17,6 +17,7 @@ export interface Competition {
   scrambles: Scramble[]
   status: CompetitionStatus
   user: User
+  description?: string | null
   prevCompetition?: Competition
   nextCompetition?: Competition
   url: string

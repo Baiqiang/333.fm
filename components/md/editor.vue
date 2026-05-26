@@ -7,11 +7,14 @@ defineProps<{
 }>()
 
 const modelValue = defineModel<string>({ default: '' })
+const colorMode = useColorMode()
+const theme = computed(() => colorMode.value === 'dark' ? 'dark' : 'light')
 </script>
 
 <template>
   <MdEditor
     v-model="modelValue"
+    :theme="theme"
     language="en-US"
     :preview="false"
     :placeholder="placeholder"

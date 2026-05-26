@@ -18,6 +18,7 @@ if (error.value || !data.value) {
   })
 }
 const competition = ref<Practice>(data.value)
+const isOwner = computed(() => user.id === competition.value.user?.id)
 const submissions = reactive<Record<number, Submission[]>>({})
 const results: Ref<Result[]> = ref([])
 const mySubmissions = computed(() => {
@@ -75,6 +76,25 @@ bus.on(fetchData)
       {{ $t('practice.index', { index }) }}
     </h2>
     <WeeklyStatus :competition="competition" />
+    <div v-if="competition.description && !isOwner" class="my-3">
+      <h3 class="font-bold text-sm mb-1">
+        {{ $t('practice.description') }}
+      </h3>
+      <ClientOnly>
+        <MdPreview :content="competition.description" />
+        <template #fallback>
+          <div class="whitespace-pre-wrap">
+            {{ competition.description }}
+          </div>
+        </template>
+      </ClientOnly>
+    </div>
+    <PracticeDescriptionForm
+      v-if="isOwner"
+      :alias="competition.alias"
+      :existing-description="competition.description"
+      @updated="desc => competition.description = desc"
+    />
     <Tabs>
       <Tab
         v-for="scramble in competition.scrambles"
