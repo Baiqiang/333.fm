@@ -32,9 +32,11 @@ useSeoMeta({
           >
             <span class="w-8 text-sm font-medium text-gray-500">{{ week }}</span>
             <UserAvatarName
+              v-if="tierPlayers[tier.id][week - 1]"
               :user="tierPlayers[tier.id][week - 1]"
               class="flex-1"
             />
+            <span v-else class="flex-1 text-gray-400 italic">{{ $t('league.bye') }}</span>
           </div>
         </div>
       </div>
