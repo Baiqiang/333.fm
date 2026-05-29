@@ -566,6 +566,7 @@ export default {
   league: {
     title: '联赛',
     description: '比赛以联赛形式进行，每位选手每周与其他选手进行一对一的比赛。',
+    bye: '轮空',
     nav: {
       summary: '概览',
       tiers: '分组',

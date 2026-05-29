@@ -566,6 +566,7 @@ export default {
   league: {
     title: 'League',
     description: 'The competition is played in the form of a league, where each competitor plays every other competitor in the form of head-to-head matches (one per week).',
+    bye: 'Bye',
     nav: {
       summary: 'Summary',
       tiers: 'Tiers',

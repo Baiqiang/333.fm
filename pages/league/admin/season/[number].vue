@@ -90,7 +90,8 @@ async function saveTierPlayers(tierId: number) {
     await useApiPost(`${baseURL}/players`, {
       body: {
         tierId,
-        players: tierPlayers.value[tierId],
+        // drop empty slots so partially-filled tiers (fewer players than weeks) save cleanly
+        players: tierPlayers.value[tierId].filter(Boolean),
       },
     })
     tierEdited.value[tierId] = false
@@ -109,7 +110,12 @@ const generating = ref(false)
 const canGenerate = computed(() => {
   return canEditTier.value
     && Object.values(tierEdited.value).every(edited => !edited)
-    && Object.values(tierPlayers.value).every(players => players.length === weeks.value)
+    // tiers may have fewer players than weeks; missing slots are filled with byes.
+    // require at least 2 real players and no more than the number of weeks.
+    && Object.values(tierPlayers.value).every((players) => {
+      const count = players.filter(Boolean).length
+      return count >= 2 && count <= weeks.value
+    })
 })
 
 await updateSchedules()

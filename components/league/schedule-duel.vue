@@ -26,6 +26,9 @@ const user2Class = computed(() => {
       class="justify-start flex-row-reverse pl-7 pr-2 py-2"
       :class="user1Class"
     />
+    <div v-else class="flex items-center justify-end pl-7 pr-2 py-2 text-gray-400 italic">
+      {{ $t('league.bye') }}
+    </div>
     <ColoredMoves
       v-for="i in 3"
       :key="i"
@@ -62,5 +65,8 @@ const user2Class = computed(() => {
       class="border-l border-indigo-100 dark:border-indigo-900 px-2 py-2"
       :class="user2Class"
     />
+    <div v-else class="flex items-center border-l border-indigo-100 dark:border-indigo-900 px-2 py-2 text-gray-400 italic">
+      {{ $t('league.bye') }}
+    </div>
   </div>
 </template>
