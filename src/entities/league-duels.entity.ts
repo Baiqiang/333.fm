@@ -31,12 +31,13 @@ export class LeagueDuels {
   @Column()
   tierId: number
 
-  @Column()
-  user1Id: number
+  // null when the slot is a bye (轮空), e.g. tiers with fewer players than weeks
+  @Column({ nullable: true })
+  user1Id: number | null
 
   // for odd number of players, the last player will be the bye player
-  @Column()
-  user2Id: number
+  @Column({ nullable: true })
+  user2Id: number | null
 
   @Column({ default: 0, type: 'decimal', precision: 10, scale: 1, transformer: new ColumnNumericTransformer() })
   user1Points: number

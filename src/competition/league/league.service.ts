@@ -360,21 +360,34 @@ export class LeagueService {
         leagueSeasonId: season.id,
       },
     })
-    let competitionIndex = 0
+    // A round robin with N slots produces N - 1 rounds, so to span every
+    // competition week we need (weeks + 1) slots. Smaller tiers are padded with
+    // byes (null) up to this size; a player paired against a bye is "轮空" that week.
+    const slots = competitions.length + 1
     for (const { tier, players } of tierPlayers) {
       const schedules: LeagueDuels[] = []
-      // round robin
+      // round robin: pad with byes (null) up to the full tier size
+      while (players.length < slots) {
+        players.push(null)
+      }
+      // ensure an even number of slots for the round robin
       if (players.length % 2 === 1) {
         players.push(null)
       }
       // shuffle players
       players.sort(() => Math.random() - 0.5)
       const count = players.length
-      for (let i = 0; i < count - 1; i++) {
-        const competition = competitions[competitionIndex % competitions.length]
+      // never schedule more rounds than there are weeks
+      const rounds = Math.min(count - 1, competitions.length)
+      for (let i = 0; i < rounds; i++) {
+        const competition = competitions[i]
         for (let j = 0; j < count / 2; j++) {
-          const player = players[j].user
-          const opponent = players[count - 1 - j].user
+          const player = players[j]?.user ?? null
+          const opponent = players[count - 1 - j]?.user ?? null
+          // skip bye vs bye: no real players involved
+          if (!player && !opponent) {
+            continue
+          }
           const isHome = false //j === 0 && i % 2 === 1
           const duel = new LeagueDuels()
           duel.user1 = isHome ? player : opponent
@@ -385,7 +398,6 @@ export class LeagueService {
           duel.user1Id = duel.user1?.id
           duel.user2Id = duel.user2?.id
           schedules.push(duel)
-          competitionIndex++
         }
         players.splice(1, 0, players.pop()) // rotate players
       }
@@ -953,6 +965,10 @@ export class LeagueService {
     if (!duel) {
       return
     }
+    // bye player: no opponent, no points to calculate (ELO is handled separately)
+    if (!duel.user1 || !duel.user2) {
+      return
+    }
     const standings = await this.getStandings(season)
     const mappedStandings = Object.fromEntries(standings.map(s => [s.userId, s]))
     const affectedUserIds = [duel.user1Id, duel.user2Id]
@@ -1048,7 +1064,7 @@ export class LeagueService {
       if (!duel.competition.hasEnded) {
         continue
       }
-      // @todo how to handle points for a bye player?
+      // bye player: no points are awarded (ELO is still calculated in calculateElos)
       if (duel.user1 === null || duel.user2 === null) {
         continue
       }
