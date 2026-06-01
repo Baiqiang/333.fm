@@ -15,6 +15,7 @@ import { Results } from '@/entities/results.entity'
 import { Scrambles } from '@/entities/scrambles.entity'
 import { Submissions } from '@/entities/submissions.entity'
 import { Users } from '@/entities/users.entity'
+import { compNow } from '@/utils'
 import { generateScramble } from '@/utils/scramble'
 
 import { CompetitionService } from '../competition.service'
@@ -38,8 +39,7 @@ export class DailyService {
 
   async generateCompetition(user: Users): Promise<Competitions | null> {
     const competition = new Competitions()
-    const startTime = dayjs()
-    // format in Dec-25-2024
+    const startTime = compNow()
     const alias = startTime.format('YYYY-MM-DD')
     const count = await this.competitionsRepository.countBy({
       type: CompetitionType.DAILY,

@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
-import dayjs from 'dayjs'
 import { Algorithm, Cube } from 'insertionfinder'
 import { Repository } from 'typeorm'
 
@@ -9,6 +8,7 @@ import { DailyQuizSubmissions } from '@/entities/daily-quiz-submissions.entity'
 import { DailyQuizzes, QuestionType, type QuizOption, type QuizQuestion } from '@/entities/daily-quizzes.entity'
 import { QuizQuestionBank } from '@/entities/quiz-question-bank.entity'
 import { Users } from '@/entities/users.entity'
+import { compToday } from '@/utils'
 import { generateScramble, ScrambleType } from '@/utils/scramble'
 import {
   type DRAxis,
@@ -400,7 +400,7 @@ export class QuizService {
 
   @Cron('0 0 * * *')
   async generateDailyQuiz() {
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = compToday()
     const existing = await this.quizzesRepository.findOne({ where: { day: today } })
     if (existing) return existing
 
@@ -478,7 +478,7 @@ export class QuizService {
   }
 
   async getTodayQuiz() {
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = compToday()
     let quiz = await this.quizzesRepository.findOne({ where: { day: today } })
     if (!quiz) {
       quiz = await this.createQuiz(today)
@@ -494,7 +494,7 @@ export class QuizService {
     const quiz = await this.quizzesRepository.findOne({ where: { id: quizId } })
     if (!quiz) throw new BadRequestException('Quiz not found')
 
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = compToday()
     const isToday = quiz.day === today
 
     let submission: DailyQuizSubmissions | null = null
@@ -562,7 +562,7 @@ export class QuizService {
   async startQuiz(user: Users, quizId: number) {
     const quiz = await this.quizzesRepository.findOne({ where: { id: quizId } })
     if (!quiz) throw new BadRequestException('Quiz not found')
-    if (quiz.day !== dayjs().format('YYYY-MM-DD')) throw new BadRequestException('Quiz expired')
+    if (quiz.day !== compToday()) throw new BadRequestException('Quiz expired')
 
     let submission = await this.submissionsRepository.findOne({
       where: { quizId, userId: user.id },
@@ -594,7 +594,7 @@ export class QuizService {
   async submitQuiz(user: Users, quizId: number, answers: number[][]) {
     const quiz = await this.quizzesRepository.findOne({ where: { id: quizId } })
     if (!quiz) throw new BadRequestException('Quiz not found')
-    if (quiz.day !== dayjs().format('YYYY-MM-DD')) throw new BadRequestException('Quiz expired')
+    if (quiz.day !== compToday()) throw new BadRequestException('Quiz expired')
 
     const submission = await this.submissionsRepository.findOne({
       where: { quizId, userId: user.id },
@@ -661,7 +661,7 @@ export class QuizService {
     const quiz = await this.quizzesRepository.findOne({ where: { day } })
     if (!quiz) throw new BadRequestException('Quiz not found')
 
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = compToday()
     const isToday = quiz.day === today
 
     if (isToday) {

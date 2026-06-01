@@ -1,6 +1,8 @@
 import { createHash } from 'crypto'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import weekYear from 'dayjs/plugin/weekYear'
 import { Algorithm, Cube } from 'insertionfinder'
@@ -9,9 +11,27 @@ import { SubmitSolutionDto } from '@/dtos/submit-solution.dto'
 import { DNF, DNS, Results } from '@/entities/results.entity'
 import { SolutionMode, SubmissionPhase, Submissions } from '@/entities/submissions.entity'
 
+dayjs.extend(utc)
+dayjs.extend(timezone)
 dayjs.extend(advancedFormat)
 dayjs.extend(weekOfYear)
 dayjs.extend(weekYear)
+
+// The canonical timezone all competitions are scheduled in. Day/week boundaries
+// (weekly/daily/quiz generation, stats cutoffs) are anchored here so they no
+// longer depend on the server's local timezone. Keep in sync with the frontend
+// COMPETITION_TIMEZONE in frontend/composables/datetime.ts.
+export const COMPETITION_TIMEZONE = 'Asia/Shanghai'
+
+// Current time expressed in the competition timezone.
+export function compNow(): dayjs.Dayjs {
+  return dayjs().tz(COMPETITION_TIMEZONE)
+}
+
+// Today's calendar day (YYYY-MM-DD) in the competition timezone.
+export function compToday(): string {
+  return compNow().format('YYYY-MM-DD')
+}
 
 export const rotationString = [
   '',
@@ -314,7 +334,7 @@ export function parseWeek(week: string): dayjs.Dayjs {
   if (!matches) {
     return null
   }
-  return dayjs(matches[1]).week(parseInt(matches[2])).day(1)
+  return dayjs.tz(matches[1], COMPETITION_TIMEZONE).week(parseInt(matches[2])).day(1)
 }
 
 export function sortResult(a: Results, b: Results): number {

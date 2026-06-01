@@ -1,7 +1,6 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
-import dayjs from 'dayjs'
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate'
 import { Repository } from 'typeorm'
 
@@ -17,7 +16,7 @@ import { DNF, DNS, Results } from '@/entities/results.entity'
 import { Scrambles } from '@/entities/scrambles.entity'
 import { Submissions } from '@/entities/submissions.entity'
 import { Users } from '@/entities/users.entity'
-import { calculateMoves, parseWeek, setRanks } from '@/utils'
+import { calculateMoves, compNow, parseWeek, setRanks } from '@/utils'
 import { generateScrambles } from '@/utils/scramble'
 
 import { CompetitionService } from '../competition.service'
@@ -41,7 +40,7 @@ export class WeeklyService {
   // generate weekly competition on Monday 00:00
   async generateCompetition() {
     const competition = new Competitions()
-    const week = dayjs().day(1).hour(0).minute(0).second(0).millisecond(0)
+    const week = compNow().day(1).hour(0).minute(0).second(0).millisecond(0)
     const count = await this.competitionsRepository.countBy({
       type: CompetitionType.WEEKLY,
       startTime: week.toDate(),

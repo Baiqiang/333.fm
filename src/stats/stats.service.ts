@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import dayjs from 'dayjs'
 import { In, Repository } from 'typeorm'
 
 import { Comments } from '@/entities/comments.entity'
@@ -15,6 +14,7 @@ import { Results } from '@/entities/results.entity'
 import { Submissions } from '@/entities/submissions.entity'
 import { UserActivities } from '@/entities/user-activities.entity'
 import { Users } from '@/entities/users.entity'
+import { compNow } from '@/utils'
 
 const excludePracticeSubTypes = [
   CompetitionSubType.EO_PRACTICE,
@@ -70,14 +70,11 @@ export class StatsService {
     }
   }
 
-  /** 当前周周一 10:00 UTC，用于排除当前周避免剧透 */
+  /** 当前周周一 10:00（赛事时区），用于排除当前周避免剧透 */
   private getCurrentWeekStart(): Date {
-    const now = dayjs()
-    let monday = now
-      .day(1)
-      .startOf('day')
-      .hour(10 + now.utcOffset() / 60)
-    // On Sunday or Monday before 10:00 UTC, .day(1) points to the upcoming Monday,
+    const now = compNow()
+    let monday = now.day(1).hour(10).minute(0).second(0).millisecond(0)
+    // On Sunday or Monday before 10:00, .day(1) points to the upcoming Monday,
     // but the current competition started the previous Monday.
     if (now.isBefore(monday)) {
       monday = monday.subtract(7, 'day')
