@@ -1,4 +1,5 @@
-import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common'
+import { Cron } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FindOneOptions, In, Repository } from 'typeorm'
 
@@ -44,6 +45,9 @@ export const ONE_WEEK = 7 * 24 * 60 * 60 * 1000
 
 @Injectable()
 export class LeagueService {
+  private readonly logger = new Logger(LeagueService.name)
+  private updatingSeasons = false
+
   constructor(
     @InjectRepository(LeagueSeasons)
     private readonly leagueSeasonsRepository: Repository<LeagueSeasons>,
@@ -246,6 +250,52 @@ export class LeagueService {
   async startSeason(season: LeagueSeasons) {
     season.status = LeagueSeasonStatus.ON_GOING
     await this.leagueSeasonsRepository.save(season)
+  }
+
+  async endSeason(season: LeagueSeasons) {
+    season.status = LeagueSeasonStatus.ENDED
+    await this.leagueSeasonsRepository.save(season)
+  }
+
+  // Auto start/end league seasons based on their scheduled time: a season
+  // starts when its first week begins and ends when its last week finishes.
+  @Cron('* * * * *')
+  async updateSeasons() {
+    if (this.updatingSeasons) {
+      return
+    }
+    this.updatingSeasons = true
+    try {
+      const now = new Date()
+      const notStarteds = await this.leagueSeasonsRepository.find({
+        where: {
+          status: LeagueSeasonStatus.NOT_STARTED,
+        },
+      })
+      for (const season of notStarteds) {
+        if (season.startTime <= now) {
+          season.status = LeagueSeasonStatus.ON_GOING
+          await this.leagueSeasonsRepository.save(season)
+          this.logger.log(`League season S${season.number} started`)
+        }
+      }
+      const onGoings = await this.leagueSeasonsRepository.find({
+        where: {
+          status: LeagueSeasonStatus.ON_GOING,
+        },
+      })
+      for (const season of onGoings) {
+        if (season.endTime <= now) {
+          season.status = LeagueSeasonStatus.ENDED
+          await this.leagueSeasonsRepository.save(season)
+          this.logger.log(`League season S${season.number} ended`)
+        }
+      }
+    } catch (error) {
+      this.logger.error(error)
+    } finally {
+      this.updatingSeasons = false
+    }
   }
 
   async startCompetition(competition: Competitions) {
@@ -563,22 +613,43 @@ export class LeagueService {
   }
 
   async getOrCreateStandings(season: LeagueSeasons) {
+    // sync standings with the current tier players: add standings for new
+    // players, drop standings for removed players, and update the tier for
+    // players that moved. Existing rows are preserved so accumulated stats are
+    // not reset when players are re-picked before the season starts.
     const standings = await this.getStandings(season)
-    if (standings.length === 0) {
-      // all players have a standing
-      const tierPlayers = await this.getTierPlayers(season)
-      for (const { players } of tierPlayers) {
-        for (const player of players) {
+    const tierPlayers = await this.getTierPlayers(season)
+    const standingByUserId = new Map(standings.map(s => [s.userId, s]))
+    const currentUserIds = new Set<number>()
+    const toSave: LeagueStandings[] = []
+    for (const { players } of tierPlayers) {
+      for (const player of players) {
+        currentUserIds.add(player.userId)
+        const existing = standingByUserId.get(player.userId)
+        if (existing) {
+          // player may have been moved to a different tier
+          if (existing.tierId !== player.tierId) {
+            existing.tierId = player.tierId
+            toSave.push(existing)
+          }
+        } else {
           const standing = new LeagueStandings()
           standing.seasonId = season.id
           standing.userId = player.userId
           standing.tierId = player.tierId
-          standings.push(standing)
+          toSave.push(standing)
         }
       }
-      await this.leagueStandingsRepository.save(standings)
     }
-    return standings
+    // remove standings for players that are no longer part of the season
+    const toRemove = standings.filter(s => !currentUserIds.has(s.userId))
+    if (toRemove.length > 0) {
+      await this.leagueStandingsRepository.remove(toRemove)
+    }
+    if (toSave.length > 0) {
+      await this.leagueStandingsRepository.save(toSave)
+    }
+    return this.getStandings(season)
   }
 
   async getMappedStandings(season: LeagueSeasons) {
