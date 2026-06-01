@@ -101,7 +101,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
       <div class="flex items-center justify-between mb-2">
         <UserAvatarName :user="game.user" />
         <span class="text-sm text-gray-400">
-          {{ $dayjs(game.createdAt).format('YYYY-MM-DD HH:mm:ss') }}
+          <DateTime :value="game.createdAt" />
           · {{ game.rzp ? `RZP: ${game.rzp}` : game.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${game.difficulty}` }}
           <span v-if="game.practice" class="bg-yellow-100 text-yellow-700 px-1 font-semibold ml-1">{{ $t('drTrigger.practice.badge') }}</span>
         </span>

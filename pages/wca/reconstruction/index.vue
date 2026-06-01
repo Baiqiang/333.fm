@@ -1,7 +1,5 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const dayjs = useDayjs()
-const { locale } = useI18n()
 const route = useRoute()
 
 const sort = ref((route.query.sort as string) || 'latest')
@@ -94,11 +92,11 @@ useSeoMeta({
           <img :src="item.user.avatarThumb || '/images/default-avatar.png'" class="w-7 h-7 shrink-0">
           <span class="text-blue-500 font-medium truncate">{{ item.user.name }}</span>
           <span v-if="!item.isParticipant" class="shrink-0 text-gray-400 bg-gray-100 px-1 rounded text-xs">{{ t('wca.recon.unofficial') }}</span>
-          <span class="ml-auto shrink-0 text-xs text-gray-400">{{ dayjs(item.createdAt).locale(locale).fromNow() }}</span>
+          <span class="ml-auto shrink-0 text-xs text-gray-400"><DateTime :value="item.createdAt" intent="relative" /></span>
         </div>
         <div class="mt-0.5 text-xs text-gray-500 truncate pl-9">
           {{ item.competitionName }}
-          <span v-if="item.startTime" class="text-gray-400 ml-1">· {{ dayjs(item.startTime).format('YYYY-MM-DD') }}</span>
+          <span v-if="item.startTime" class="text-gray-400 ml-1">· <DateTime :value="item.startTime" intent="date" /></span>
           <span class="text-gray-400 ml-1">· {{ t('wca.recon.submissions', { count: item.submissionCount }) }}</span>
         </div>
         <div v-if="sortedResults(item).length > 0" class="mt-1 pl-9 flex flex-wrap gap-x-4 gap-y-0.5">

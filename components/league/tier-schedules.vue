@@ -28,7 +28,7 @@ const grouppedSchedules = computed(() => {
           Week {{ leagueWeek(competition) }}
         </div>
         <div class="text-sm text-indigo-600 dark:text-indigo-400">
-          {{ $dayjs(competition.startTime).format('MMM Do') }}-{{ $dayjs(competition.endTime).format('MMM Do') }}
+          <DateTime :value="competition.startTime" intent="date" />-<DateTime :value="competition.endTime" intent="date" />
         </div>
       </div>
       <div class="border-l border-indigo-200 dark:border-indigo-700" />

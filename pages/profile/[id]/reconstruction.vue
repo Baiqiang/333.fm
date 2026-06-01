@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const route = useRoute()
-const dayjs = useDayjs()
-const { locale } = useI18n()
 const user = inject(SYMBOL_USER)!
 
 const { data: items } = await useApi<WcaReconFeedItem[]>(`wca/reconstruction/user/${route.params.id}`)
@@ -28,7 +26,8 @@ function sortedResults(item: WcaReconFeedItem) {
           <span class="text-blue-500 font-medium truncate">{{ item.competitionName }}</span>
           <span v-if="!item.isParticipant" class="shrink-0 text-gray-400 bg-gray-100 px-1 rounded text-xs">{{ t('wca.recon.unofficial') }}</span>
           <span class="ml-auto shrink-0 text-xs text-gray-400 whitespace-nowrap">
-            {{ item.startTime ? dayjs(item.startTime).format('YYYY-MM-DD') : dayjs(item.updatedAt).locale(locale).fromNow() }}
+            <DateTime v-if="item.startTime" :value="item.startTime" intent="date" />
+            <DateTime v-else :value="item.updatedAt" intent="relative" />
           </span>
         </div>
         <div class="mt-0.5 text-xs text-gray-500">

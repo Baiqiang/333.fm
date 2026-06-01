@@ -21,7 +21,7 @@ const index = computed(() => props.competition.alias.split('-').pop())
         {{ $t('endless.progress.competitors', { competitors: competition.attendees }) }}
       </div>
       <div>
-        {{ $dayjs(competition.startTime).format('YYYY-MM-DD HH:mm:ss') }}
+        <DateTime :value="competition.startTime" />
       </div>
     </div>
   </div>

@@ -9,6 +9,18 @@ export default {
     light: 'Light',
     dark: 'Dark',
   },
+  timezone: {
+    title: 'Timezone',
+    auto: 'Local time',
+    competition: 'Competition time (UTC+8)',
+    utc: 'UTC',
+  },
+  countdown: {
+    days: 'Days',
+    hours: 'Hours',
+    minutes: 'Mins',
+    seconds: 'Secs',
+  },
   common: {
     id: 'ID',
     wcaId: 'WCA ID',
@@ -19,6 +31,7 @@ export default {
     yes: 'Yes',
     createdAt: 'Created At',
     createdBy: 'Created By',
+    timeUp: 'Time\'s up!',
     signingInRequired: 'Sign in Required',
     signingToJoin: 'Sign in to join',
     signingIn: 'Signing in with WCA ...',
@@ -284,6 +297,8 @@ export default {
       pendingStart: 'Will start at {start}.',
       onGoing: 'Started at {start} and will end at {end}.',
       ended: 'Ended at {end}.',
+      startsIn: 'Starts in',
+      endsIn: 'Ends in',
     },
     join: 'Join Now',
     mode: {

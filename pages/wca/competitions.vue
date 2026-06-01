@@ -105,7 +105,7 @@ useSeoMeta({
               {{ competition.city }}, {{ competition.country_iso2 }}
             </div>
             <div class="text-gray-500 text-xs mt-1">
-              {{ dayjs(competition.start_date).format('MMM D, YYYY') }} - {{ dayjs(competition.end_date).format('MMM D, YYYY') }}
+              <DateTime :value="competition.start_date" intent="date" /> - <DateTime :value="competition.end_date" intent="date" />
             </div>
           </div>
           <NuxtLink

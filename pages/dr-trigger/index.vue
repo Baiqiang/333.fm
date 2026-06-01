@@ -706,7 +706,7 @@ onUnmounted(() => {
           :to="`/dr-trigger/${g.id}`"
           class="grid grid-cols-subgrid col-span-4 items-center px-1.5 py-1.5 mb-1 bg-white shadow hover:bg-gray-50 transition-colors"
         >
-          <span class="text-gray-500">{{ $dayjs(g.createdAt).format('YYYY-MM-DD HH:mm') }}</span>
+          <span class="text-gray-500"><DateTime :value="g.createdAt" /></span>
           <span class="text-xs text-gray-400 text-right">
             {{ g.rzp ? g.rzp : g.difficulty === 0 ? $t('drTrigger.difficulty.unlimited') : `≤${g.difficulty}` }}
             <span v-if="g.practice" class="bg-yellow-100 text-yellow-700 px-1 font-semibold ml-0.5">{{ $t('drTrigger.practice.badge') }}</span>

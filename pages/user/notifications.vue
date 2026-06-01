@@ -7,7 +7,6 @@ definePageMeta({
 })
 
 const { t, locale } = useI18n()
-const dayjs = useDayjs()
 const notifications = ref<AppNotification[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -130,7 +129,7 @@ useSeoMeta({
             {{ formatCommentPreview(notification) }}
           </div>
           <div class="text-xs text-gray-400 mt-1">
-            {{ dayjs(notification.createdAt).locale(locale).fromNow() }}
+            <DateTime :value="notification.createdAt" intent="relative" />
           </div>
         </div>
         <div v-if="!notification.read" class="w-2 h-2 bg-indigo-500 rounded-full shrink-0 mt-2" />

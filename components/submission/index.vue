@@ -16,8 +16,7 @@ const props = withDefaults(defineProps<{
 const route = useRoute()
 const { hash } = route
 const location = useBrowserLocation()
-const dayjs = useDayjs()
-const { locale } = useI18n()
+const { format: formatDateTime } = useDateTime()
 const el = ref<HTMLElement>()
 const showComment = ref(props.alwaysExpanded || props.submission.competition !== undefined || props.expanded)
 const showOriginal = ref(!!props.chain)
@@ -98,7 +97,7 @@ const formattedSolution = computed<string>(() => {
   solution.push(`Scramble:\n${scramble?.scramble}`)
   solution.push(`Solution:\n${props.submission.solution} (${formatResult(props.submission.moves)})`)
   solution.push(props.submission.comment)
-  solution.push(`By ${user?.name}\n${dayjs(props.submission.createdAt).locale(locale.value).format('LLL')}`)
+  solution.push(`By ${user?.name}\n${formatDateTime(props.submission.createdAt)}`)
   if (location.value.href)
     solution.push(location.value.href)
   return solution.join('\n\n')
@@ -122,7 +121,7 @@ watch(() => props.expanded, (expanded) => {
   >
     <UserAvatarInfo v-if="submission.user" :user="submission.user" class="gap-2 shrink-0">
       <template #info>
-        {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
+        <DateTime :value="submission.createdAt" />
         <slot name="extra" v-bind="submission" />
       </template>
       <SubmissionMoves :submission="submission" class="text-lg" :chain="chain" />
@@ -214,7 +213,7 @@ watch(() => props.expanded, (expanded) => {
       />
     </template>
     <div v-if="!submission.user" class="text-xs text-gray-400">
-      {{ $dayjs(submission.createdAt).locale($i18n.locale).format('LLL') }}
+      <DateTime :value="submission.createdAt" />
     </div>
   </div>
   <Teleport to="body">

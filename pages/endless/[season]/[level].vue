@@ -11,6 +11,7 @@ if (!data.value || error.value) {
   })
 }
 const user = useUser()
+const { format: formatDateTime } = useDateTime()
 const progress = reactive<Progress>(data.value)
 const endless = inject<Ref<Endless>>(SYMBOL_ENDLESS)!
 const myProgress = inject<Ref<UserProgress>>(SYMBOL_ENDLESS_PROGRESS)!
@@ -246,11 +247,11 @@ async function updateData(submission: Submission) {
         </div>
       </div>
       <div class="mb-2">
-        {{ $t('endless.openAt', { time: $dayjs(progress.scramble.createdAt).locale($i18n.locale).format('LLL') }) }}
+        {{ $t('endless.openAt', { time: formatDateTime(progress.scramble.createdAt) }) }}
       </div>
       <template v-if="progress.kickedBy.length > 0 && progress.submission">
         <div class="mb-2">
-          {{ $t('endless.kickedAt', { time: $dayjs(progress.kickedBy[0].createdAt).locale($i18n.locale).format('LLL') }) }}
+          {{ $t('endless.kickedAt', { time: formatDateTime(progress.kickedBy[0].createdAt) }) }}
         </div>
         <div class="font-bold text-lg">
           {{ $t('endless.kickedBy') }}

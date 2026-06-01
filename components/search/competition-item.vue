@@ -2,10 +2,10 @@
 const props = defineProps<{
   competition: Competition
 }>()
-const dayjs = useDayjs()
+const { format } = useDateTime()
 const dateRange = computed(() => {
-  const start = dayjs(props.competition.startTime).format('YYYY-MM-DD')
-  const end = props.competition.endTime ? dayjs(props.competition.endTime).format('YYYY-MM-DD') : ''
+  const start = format(props.competition.startTime, 'date')
+  const end = props.competition.endTime ? format(props.competition.endTime, 'date') : ''
   return end ? `${start} ~ ${end}` : start
 })
 const typeLabels: Record<number, string> = {

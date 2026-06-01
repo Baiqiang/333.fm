@@ -19,6 +19,8 @@
           <Icon name="mdi:github" class="w-4 h-4 inline-block" />
           GitHub
         </a>
+        <span class="hidden md:inline">|</span>
+        <AppTimezoneSelect />
       </div>
       <div class="text-xs text-gray-200">
         © {{ new Date().getFullYear() }} 333.fm

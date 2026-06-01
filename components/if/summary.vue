@@ -78,7 +78,7 @@ const commentedSkeleton = computed<string>(() => {
             {{ $t('common.createdAt') }}
           </div>
           <div class="text-true-gray-500">
-            {{ $dayjs(finder.createdAt).format('YYYY-MM-DD HH:mm:ss') }}
+            <DateTime :value="finder.createdAt" />
           </div>
         </div>
       </NuxtLink>

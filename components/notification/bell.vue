@@ -10,7 +10,6 @@ const total = ref(0)
 const loaded = ref(false)
 const bellRef = ref()
 const { t, locale } = useI18n()
-const dayjs = useDayjs()
 
 onClickOutside(bellRef, () => {
   showDropdown.value = false
@@ -156,7 +155,7 @@ if (user.signedIn) {
                 {{ formatCommentPreview(notification) }}
               </div>
               <div class="text-xs text-gray-300 mt-0.5">
-                {{ dayjs(notification.createdAt).locale(locale).fromNow() }}
+                <DateTime :value="notification.createdAt" intent="relative" />
               </div>
             </div>
             <div v-if="!notification.read" class="w-2 h-2 bg-indigo-500 rounded-full shrink-0 mt-2" />

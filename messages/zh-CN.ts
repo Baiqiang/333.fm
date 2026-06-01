@@ -9,6 +9,18 @@ export default {
     light: '浅色',
     dark: '深色',
   },
+  timezone: {
+    title: '时区',
+    auto: '本地时间',
+    competition: '比赛时间（UTC+8）',
+    utc: 'UTC',
+  },
+  countdown: {
+    days: '天',
+    hours: '时',
+    minutes: '分',
+    seconds: '秒',
+  },
   common: {
     id: 'ID',
     wcaId: 'WCA ID',
@@ -19,6 +31,7 @@ export default {
     yes: '是',
     createdAt: '创建于',
     createdBy: '创建者',
+    timeUp: '时间到！',
     signingInRequired: '请登录',
     signingToJoin: '请登录后参加',
     signingIn: '正在使用 WCA 登录 ...',
@@ -284,6 +297,8 @@ export default {
       pendingStart: '将于{start}开始。',
       onGoing: '{start}开始至{end}结束。',
       ended: '已于{end}结束。',
+      startsIn: '距开始',
+      endsIn: '距结束',
     },
     join: '立即参加',
     solution: {

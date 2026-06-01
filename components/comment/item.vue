@@ -10,7 +10,6 @@ const emit = defineEmits<{
   reply: [comment: SubmissionComment]
   deleted: [commentId: number]
 }>()
-const dayjs = useDayjs()
 const { locale } = useI18n()
 const user = useUser()
 
@@ -32,7 +31,7 @@ async function deleteComment() {
           <UserName :user="comment.user" />
         </NuxtLink>
         <span class="text-gray-400 text-xs">
-          {{ dayjs(comment.createdAt).locale(locale).fromNow() }}
+          <DateTime :value="comment.createdAt" intent="relative" />
         </span>
       </div>
       <div v-if="comment.replyTo" class="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
