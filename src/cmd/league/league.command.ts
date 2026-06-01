@@ -33,6 +33,14 @@ export class LeagueCommand extends CommandRunner {
         this.logger.log(`DNFing result for ${passedParam[3]} in S${passedParam[1]} Week ${passedParam[2]}`)
         await this.leagueService.dnfResult(Number(passedParam[1]), Number(passedParam[2]), passedParam[3])
         break
+      case 'extend-week':
+        this.logger.log(`Extending S${passedParam[1]} Week ${passedParam[2]} by ${passedParam[3] ?? 1} week(s)`)
+        await this.leagueService.extendWeek(
+          Number(passedParam[1]),
+          Number(passedParam[2]),
+          passedParam[3] !== undefined ? Number(passedParam[3]) : 1,
+        )
+        break
       default:
         break
     }

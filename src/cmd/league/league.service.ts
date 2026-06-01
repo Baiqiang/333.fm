@@ -27,6 +27,7 @@ import { betterThan, calculateMoves, setRanks } from '@/utils'
 import { calculateScores, DEFAULT_ELO, updateElo } from '@/utils/elo-calculator'
 
 const { encode_col: encodeCol } = XLSX.utils
+const ONE_WEEK = 7 * 24 * 60 * 60 * 1000
 @Injectable()
 export class LeagueService {
   constructor(
@@ -444,6 +445,60 @@ export class LeagueService {
     await this.recalculateCompetitionRanks(competition.id)
     await this.recalculateSeason(season.number)
     console.log(`DNFed ${user.name} (${user.wcaId || user.id}) in S${season.number} Week ${week}`)
+  }
+
+  async extendWeek(seasonNumber: number, week: number, extraWeeks = 1) {
+    if (!Number.isInteger(extraWeeks) || extraWeeks <= 0) {
+      console.error(`Invalid number of weeks to extend: ${extraWeeks}`)
+      return
+    }
+    const season = await this.leagueSeasonsRepository.findOne({ where: { number: seasonNumber } })
+    if (!season) {
+      console.error(`Season S${seasonNumber} not found`)
+      return
+    }
+    const competitions = await this.competitionsRepository.find({
+      where: { leagueSeasonId: season.id },
+      order: { startTime: 'ASC', id: 'ASC' },
+    })
+    const target = competitions.find(competition => competition.alias === `league-${season.number}-${week}`)
+    if (!target) {
+      console.error(`Competition for S${season.number} Week ${week} not found`)
+      return
+    }
+    // Cannot extend a competition that has already ended
+    if (target.hasEnded) {
+      console.error(`S${season.number} Week ${week} has already ended, cannot extend`)
+      return
+    }
+    const offset = extraWeeks * ONE_WEEK
+    const targetIndex = competitions.indexOf(target)
+    // Push the target week's end time back, then shift every subsequent week
+    // by the same offset so the schedule stays sequential.
+    const toUpdate: Competitions[] = []
+    for (let i = targetIndex; i < competitions.length; i++) {
+      const competition = competitions[i]
+      if (i > targetIndex && competition.startTime) {
+        competition.startTime = new Date(competition.startTime.getTime() + offset)
+      }
+      if (competition.endTime) {
+        competition.endTime = new Date(competition.endTime.getTime() + offset)
+      }
+      toUpdate.push(competition)
+    }
+    // Extend the season end time as well
+    if (season.endTime) {
+      season.endTime = new Date(season.endTime.getTime() + offset)
+    }
+    await this.competitionsRepository.manager.transaction(async em => {
+      await em.save(toUpdate)
+      await em.save(season)
+    })
+    console.log(
+      `Extended S${season.number} Week ${week} by ${extraWeeks} week(s); ` +
+        `new end time: ${target.endTime?.toISOString()}. ` +
+        `Shifted ${toUpdate.length - 1} subsequent week(s) and season end time to ${season.endTime?.toISOString()}.`,
+    )
   }
 
   private async resolveUser(userRef: string) {
