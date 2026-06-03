@@ -43,7 +43,6 @@ function compareWcaResultsDesc(a: WCAResult, b: WCAResult) {
 }
 
 const fmResultsByCompetitionDateDesc = fmResults.slice().sort(compareWcaResultsDesc)
-const fmResultsByCompetitionDateAsc = fmResultsByCompetitionDateDesc.slice().reverse()
 const competitionMeta = Object.fromEntries(
   (() => {
     const competitionIds = [...new Set(fmResultsByCompetitionDateDesc.map(result => result.competition_id))]
@@ -68,56 +67,159 @@ function getCompetitionDateLabel(competitionId?: string) {
   return competitionMeta[competitionId]?.date || ''
 }
 
+const dateBounds = (() => {
+  const starts: string[] = []
+  const ends: string[] = []
+  for (const result of fmResults) {
+    const competition = competitionMap.get(result.competition_id)
+    if (!competition)
+      continue
+    starts.push(competition.start_date)
+    ends.push(competition.end_date)
+  }
+  return {
+    min: starts.length ? starts.reduce((a, b) => (a < b ? a : b)) : '',
+    max: ends.length ? ends.reduce((a, b) => (a > b ? a : b)) : '',
+  }
+})()
+
 const chartSettings = useLocalStorage('profile.wca.chartSettings', {
   expanded: false,
   includeDNF: true,
   trimPercent: 5,
+  startDate: '',
+  endDate: '',
 }, {
   initOnMounted: true,
 })
-const singles: Record<number, [string, number][]> = {}
-const movesCountMap: Record<number, number> = {}
-const meansCountMap: Record<number, number> = {}
+
+const DAY_MS = 86400000
+const minMs = dateBounds.min ? Date.parse(dateBounds.min) : 0
+const maxMs = dateBounds.max ? Date.parse(dateBounds.max) : 0
+
+function toDateStr(ms: number) {
+  const date = new Date(ms)
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-')
+}
+
+const rangeStartMs = computed<number>({
+  get: () => (chartSettings.value.startDate ? Date.parse(chartSettings.value.startDate) : minMs),
+  set: (value) => {
+    const currentEnd = chartSettings.value.endDate ? Date.parse(chartSettings.value.endDate) : maxMs
+    const clamped = Math.min(Math.max(value, minMs), currentEnd)
+    chartSettings.value.startDate = clamped <= minMs ? '' : toDateStr(clamped)
+  },
+})
+const rangeEndMs = computed<number>({
+  get: () => (chartSettings.value.endDate ? Date.parse(chartSettings.value.endDate) : maxMs),
+  set: (value) => {
+    const currentStart = chartSettings.value.startDate ? Date.parse(chartSettings.value.startDate) : minMs
+    const clamped = Math.max(Math.min(value, maxMs), currentStart)
+    chartSettings.value.endDate = clamped >= maxMs ? '' : toDateStr(clamped)
+  },
+})
+
+const rangeTrack = computed(() => {
+  const total = maxMs - minMs || 1
+  return {
+    left: `${((rangeStartMs.value - minMs) / total) * 100}%`,
+    right: `${((maxMs - rangeEndMs.value) / total) * 100}%`,
+  }
+})
+
+function setRangeMonths(months: number | null) {
+  if (months == null) {
+    chartSettings.value.startDate = ''
+    chartSettings.value.endDate = ''
+    return
+  }
+  const start = new Date(maxMs)
+  start.setMonth(start.getMonth() - months)
+  chartSettings.value.startDate = toDateStr(Math.max(start.getTime(), minMs))
+  chartSettings.value.endDate = ''
+}
+
 interface MixedChartAttempt {
   // index: number
   moves: number
+  roundTypeId: string
+  attemptIndex: number
   competitionId: string
   competitionName: string
 }
-const allAttempts = fmResultsByCompetitionDateAsc.flatMap(result =>
-  result.attempts
-    .map((moves, index) => ({
-      moves,
-      roundTypeId: result.round_type_id,
-      attemptIndex: index + 1,
-      competitionId: result.competition_id,
-      competitionName: competitionMap.get(result.competition_id)?.name || result.competition_id,
-    }))
-    .filter(({ moves }) => moves > 0 || moves === WCA_DNF),
-).map(attempt => ({
-  roundTypeId: attempt.roundTypeId,
-  attemptIndex: attempt.attemptIndex,
-  moves: attempt.moves,
-  competitionId: attempt.competitionId,
-  competitionName: attempt.competitionName,
-}))
-const nonDNFAttempts = allAttempts.filter(attempt => attempt.moves > 0)
-const allSingles: number[] = []
-for (const result of fmResultsByCompetitionDateDesc) {
-  const mean = result.average
-  if (mean > 0) {
-    meansCountMap[mean] = (meansCountMap[mean] || 0) + 1
+
+const derived = computed(() => {
+  const start = chartSettings.value.startDate
+  const end = chartSettings.value.endDate
+  const inRange = (competitionId: string) => {
+    const competition = competitionMap.get(competitionId)
+    if (!competition)
+      return false
+    return (!start || competition.end_date >= start) && (!end || competition.start_date <= end)
   }
-  for (const [index, moves] of result.attempts.entries()) {
-    if (moves > 0) {
-      const scrambleNumer = index + 1
-      singles[scrambleNumer] = singles[scrambleNumer] || []
-      singles[scrambleNumer].push([result.competition_id, moves])
-      movesCountMap[moves] = (movesCountMap[moves] || 0) + 1
-      allSingles.push(moves)
+  const resultsDesc = fmResultsByCompetitionDateDesc.filter(result => inRange(result.competition_id))
+  const resultsAsc = resultsDesc.slice().reverse()
+
+  const singles: Record<number, [string, number][]> = {}
+  const movesCountMap: Record<number, number> = {}
+  const meansCountMap: Record<number, number> = {}
+  const allSingles: number[] = []
+  for (const result of resultsDesc) {
+    const mean = result.average
+    if (mean > 0)
+      meansCountMap[mean] = (meansCountMap[mean] || 0) + 1
+    for (const [index, moves] of result.attempts.entries()) {
+      if (moves > 0) {
+        const scrambleNumber = index + 1
+        singles[scrambleNumber] = singles[scrambleNumber] || []
+        singles[scrambleNumber].push([result.competition_id, moves])
+        movesCountMap[moves] = (movesCountMap[moves] || 0) + 1
+        allSingles.push(moves)
+      }
     }
   }
-}
+
+  const allAttempts: MixedChartAttempt[] = resultsAsc.flatMap(result =>
+    result.attempts
+      .map((moves, index) => ({
+        moves,
+        roundTypeId: result.round_type_id,
+        attemptIndex: index + 1,
+        competitionId: result.competition_id,
+        competitionName: competitionMap.get(result.competition_id)?.name || result.competition_id,
+      }))
+      .filter(({ moves }) => moves > 0 || moves === WCA_DNF),
+  )
+  const nonDNFAttempts = allAttempts.filter(attempt => attempt.moves > 0)
+
+  const movesCount = Object.entries(movesCountMap).map(([m, count]) => [Number(m), count])
+  movesCount.sort((a, b) => a[0] - b[0])
+  const meansCount = Object.entries(meansCountMap).map(([m, count]) => [Number(m), count])
+  meansCount.sort((a, b) => a[0] - b[0])
+
+  const meanChartData = resultsAsc.map((result, index) => ({
+    ...result,
+    xIndex: index,
+  }))
+  const meanChartDataMap = new Map(meanChartData.map(result => [result.xIndex, result]))
+
+  return {
+    allAttempts,
+    nonDNFAttempts,
+    allSingles,
+    minSingle: allSingles.length ? Math.min(...allSingles) : 0,
+    maxSingle: allSingles.length ? Math.max(...allSingles) : 0,
+    movesCount,
+    meansCount,
+    meanChartData,
+    meanChartDataMap,
+  }
+})
+
 function toChartValue(value: number) {
   return Number.isNaN(value) ? null : value
 }
@@ -142,7 +244,7 @@ function trimmedAverage(results: number[], requiredCount: number, trimCount: num
   return Number((total / trimmed.length).toFixed(2))
 }
 
-const sourceAttempts = computed(() => chartSettings.value.includeDNF ? allAttempts : nonDNFAttempts)
+const sourceAttempts = computed(() => chartSettings.value.includeDNF ? derived.value.allAttempts : derived.value.nonDNFAttempts)
 
 function buildSingleSeries(sourceAttempts: MixedChartAttempt[]) {
   return sourceAttempts.map((attempt, index) => [index, attempt.moves === WCA_DNF ? null : attempt.moves])
@@ -224,17 +326,6 @@ const mixedBestAverages = computed(() => {
   return items
 })
 
-const movesCount = Object.entries(movesCountMap).map(([m, count]) => [Number(m), count])
-movesCount.sort((a, b) => a[0] - b[0])
-const meansCount = Object.entries(meansCountMap).map(([m, count]) => [Number(m), count])
-meansCount.sort((a, b) => a[0] - b[0])
-
-const meanChartData = fmResultsByCompetitionDateAsc.map((result, index) => ({
-  ...result,
-  xIndex: index,
-}))
-const meanChartDataMap = new Map(meanChartData.map(result => [result.xIndex, result]))
-
 const meanChartOption = computed<ECOption>(() => ({
   title: {
     text: `${localeName(user.value.name, locale.value)} - WCA`,
@@ -244,7 +335,7 @@ const meanChartOption = computed<ECOption>(() => ({
     formatter: (params: any) => {
       const items = Array.isArray(params) ? params : [params]
       const axisValue = Number(items[0]?.axisValue ?? items[0]?.name)
-      const result = meanChartDataMap.get(axisValue)
+      const result = derived.value.meanChartDataMap.get(axisValue)
       const title = result
         ? [
             result.competition_id,
@@ -280,22 +371,22 @@ const meanChartOption = computed<ECOption>(() => ({
   ],
   xAxis: {
     type: 'category',
-    data: meanChartData.map(item => item.xIndex),
+    data: derived.value.meanChartData.map(item => item.xIndex),
     boundaryGap: true,
     axisLabel: {
       formatter: (value: string | number) => {
-        const result = meanChartData[Number(value) - 1]
+        const result = derived.value.meanChartData[Number(value) - 1]
         if (!result)
           return ''
-        const previous = meanChartData[Number(value) - 2]
+        const previous = derived.value.meanChartData[Number(value) - 2]
         return previous?.competition_id === result.competition_id ? '' : result.competition_id
       },
     },
   },
   yAxis: {
     type: 'value',
-    min: Math.min(...allSingles) - 2 / 3,
-    max: Math.max(...allSingles) + 2 / 3,
+    min: derived.value.minSingle - 2 / 3,
+    max: derived.value.maxSingle + 2 / 3,
     axisLabel: {
       formatter: (value: number) => formatResult(Math.floor(value * 300) / 3, 2),
     },
@@ -313,7 +404,7 @@ const meanChartOption = computed<ECOption>(() => ({
       name: t('result.mean'),
       showSymbol: false,
       type: 'line',
-      data: meanChartData
+      data: derived.value.meanChartData
         .filter(r => r.average > 0)
         .map(r => [r.xIndex, formatResult(r.average, 2)]),
       zlevel: 10,
@@ -322,7 +413,7 @@ const meanChartOption = computed<ECOption>(() => ({
       name: 'A1',
       showSymbol: false,
       type: 'line',
-      data: meanChartData
+      data: derived.value.meanChartData
         .filter(result => result.attempts[0] > 0)
         .map(result => [result.xIndex, result.attempts[0]]),
     },
@@ -330,7 +421,7 @@ const meanChartOption = computed<ECOption>(() => ({
       name: 'A2',
       showSymbol: false,
       type: 'line',
-      data: meanChartData
+      data: derived.value.meanChartData
         .filter(result => result.attempts[1] > 0)
         .map(result => [result.xIndex, result.attempts[1]]),
     },
@@ -338,13 +429,13 @@ const meanChartOption = computed<ECOption>(() => ({
       name: 'A3',
       showSymbol: false,
       type: 'line',
-      data: meanChartData
+      data: derived.value.meanChartData
         .filter(result => result.attempts[2] > 0)
         .map(result => [result.xIndex, result.attempts[2]]),
     },
   ],
 }))
-const movesCountOption: ECOption = {
+const movesCountOption = computed<ECOption>(() => ({
   title: {
     text: `${localeName(user.value.name, locale.value)} - WCA`,
   },
@@ -378,12 +469,12 @@ const movesCountOption: ECOption = {
     {
       name: t('weekly.regular.label'),
       type: 'bar',
-      data: movesCount,
+      data: derived.value.movesCount,
     },
   ],
-}
+}))
 
-const meansCountOption: ECOption = {
+const meansCountOption = computed<ECOption>(() => ({
   title: {
     text: `${localeName(user.value.name, locale.value)} - WCA`,
   },
@@ -417,10 +508,10 @@ const meansCountOption: ECOption = {
     {
       name: t('result.mean'),
       type: 'bar',
-      data: meansCount,
+      data: derived.value.meansCount,
     },
   ],
-}
+}))
 const mixedChartOption = computed<ECOption>(() => {
   const sourceValues = sourceAttempts.value.map(attempt => attempt.moves)
   const averageSeriesConfig = getMixedAverageSeriesConfig(chartSettings.value.trimPercent)
@@ -490,8 +581,8 @@ const mixedChartOption = computed<ECOption>(() => {
     },
     yAxis: {
       type: 'value',
-      min: Math.min(...allSingles) - 1,
-      max: Math.max(...allSingles) + 1,
+      min: derived.value.minSingle - 1,
+      max: derived.value.maxSingle + 1,
       interval: 1,
     },
     legend: {
@@ -597,6 +688,54 @@ const mixedChartOption = computed<ECOption>(() => {
         </div>
       </label>
     </div>
+    <div v-if="chartSettings.expanded && maxMs > minMs" class="mb-4 flex flex-col gap-2 text-sm">
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          @click="setRangeMonths(3)"
+        >
+          过去3个月
+        </button>
+        <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          @click="setRangeMonths(12)"
+        >
+          过去一年
+        </button>
+        <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          @click="setRangeMonths(null)"
+        >
+          所有
+        </button>
+        <span class="font-mono text-gray-600">
+          {{ toDateStr(rangeStartMs) }} ~ {{ toDateStr(rangeEndMs) }}
+        </span>
+      </div>
+      <div class="range-slider relative h-6 w-full max-w-xl">
+        <div class="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 bg-gray-200" />
+        <div
+          class="absolute top-1/2 h-1 -translate-y-1/2 bg-indigo-500"
+          :style="{ left: rangeTrack.left, right: rangeTrack.right }"
+        />
+        <input
+          v-model.number="rangeStartMs"
+          type="range"
+          class="thumb"
+          :min="minMs"
+          :max="maxMs"
+          :step="DAY_MS"
+        >
+        <input
+          v-model.number="rangeEndMs"
+          type="range"
+          class="thumb"
+          :min="minMs"
+          :max="maxMs"
+          :step="DAY_MS"
+        >
+      </div>
+    </div>
     <div class="h-[480px]">
       <VChart :option="mixedChartOption" autoresize />
     </div>
@@ -626,3 +765,54 @@ const mixedChartOption = computed<ECOption>(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.range-slider .thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.range-slider .thumb:focus {
+  outline: none;
+}
+
+.range-slider .thumb::-webkit-slider-thumb {
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #6366f1;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 30%);
+  cursor: pointer;
+}
+
+.range-slider .thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #6366f1;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 30%);
+  cursor: pointer;
+}
+
+.range-slider .thumb::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.range-slider .thumb::-moz-range-track {
+  background: transparent;
+}
+</style>
