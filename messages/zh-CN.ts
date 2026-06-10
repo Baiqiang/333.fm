@@ -521,6 +521,11 @@ export default {
       wca: 'WCA',
     },
     moveCount: '步数统计',
+    chartOptions: {
+      includeDNF: '包含 DNF',
+      fillCounts: '补全空缺次数',
+      trim: '去尾',
+    },
   },
   chain: {
     title: '最少步链',

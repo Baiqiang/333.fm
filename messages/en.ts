@@ -521,6 +521,11 @@ export default {
       wca: 'WCA',
     },
     moveCount: 'Move Count',
+    chartOptions: {
+      includeDNF: 'Include DNF',
+      fillCounts: 'Fill empty counts',
+      trim: 'Trim',
+    },
   },
   chain: {
     title: 'FMC Chain',

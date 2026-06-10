@@ -89,8 +89,10 @@ const chartSettings = useLocalStorage('profile.wca.chartSettings', {
   trimPercent: 5,
   startDate: '',
   endDate: '',
+  fillCounts: true,
 }, {
   initOnMounted: true,
+  mergeDefaults: true,
 })
 
 const DAY_MS = 86400000
@@ -219,6 +221,32 @@ const derived = computed(() => {
     meanChartDataMap,
   }
 })
+
+function fillSingleCounts(counts: number[][]) {
+  if (counts.length < 2)
+    return counts
+  const countMap = new Map(counts.map(([single, count]) => [single, count]))
+  const min = counts[0][0]
+  const max = counts[counts.length - 1][0]
+  const filled: number[][] = []
+  for (let single = min; single <= max; single++)
+    filled.push([single, countMap.get(single) || 0])
+  return filled
+}
+
+function fillMeanCounts(counts: number[][]) {
+  if (counts.length < 2)
+    return counts
+  // Means are total/3 (stored as centi-moves), so iterate by 1/3-move steps.
+  const countByTotal = new Map(counts.map(([mean, count]) => [Math.round(mean * 3 / 100), count]))
+  const totals = [...countByTotal.keys()]
+  const min = Math.min(...totals)
+  const max = Math.max(...totals)
+  const filled: number[][] = []
+  for (let total = min; total <= max; total++)
+    filled.push([Math.round(total * 100 / 3), countByTotal.get(total) || 0])
+  return filled
+}
 
 function toChartValue(value: number) {
   return Number.isNaN(value) ? null : value
@@ -469,7 +497,7 @@ const movesCountOption = computed<ECOption>(() => ({
     {
       name: t('weekly.regular.label'),
       type: 'bar',
-      data: derived.value.movesCount,
+      data: chartSettings.value.fillCounts ? fillSingleCounts(derived.value.movesCount) : derived.value.movesCount,
     },
   ],
 }))
@@ -503,12 +531,15 @@ const meansCountOption = computed<ECOption>(() => ({
   },
   xAxis: {
     type: 'category',
+    axisLabel: {
+      formatter: (value: string | number) => formatResult(Number(value), 2),
+    },
   },
   series: [
     {
       name: t('result.mean'),
       type: 'bar',
-      data: derived.value.meansCount,
+      data: chartSettings.value.fillCounts ? fillMeanCounts(derived.value.meansCount) : derived.value.meansCount,
     },
   ],
 }))
@@ -667,7 +698,7 @@ const mixedChartOption = computed<ECOption>(() => {
     </div>
     <div v-if="chartSettings.expanded" class="mb-4 flex flex-wrap items-center gap-3 text-sm">
       <label class="flex items-center gap-2 text-gray-600">
-        <span>Include DNF</span>
+        <span>{{ t('result.chartOptions.includeDNF') }}</span>
         <input
           v-model="chartSettings.includeDNF"
           type="checkbox"
@@ -675,7 +706,15 @@ const mixedChartOption = computed<ECOption>(() => {
         >
       </label>
       <label class="flex items-center gap-2 text-gray-600">
-        <span>Trim</span>
+        <span>{{ t('result.chartOptions.fillCounts') }}</span>
+        <input
+          v-model="chartSettings.fillCounts"
+          type="checkbox"
+          class="border-gray-300 text-indigo-500 focus:ring-2 focus:ring-indigo-200/50"
+        >
+      </label>
+      <label class="flex items-center gap-2 text-gray-600">
+        <span>{{ t('result.chartOptions.trim') }}</span>
         <div class="relative w-20">
           <input
             v-model.number="chartSettings.trimPercent"
