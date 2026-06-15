@@ -86,6 +86,41 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
   const min = Math.min(...solutions.map(s => s.length))
   return solutions.filter(s => s.length === min)
 }
+
+type RoundCategory = 'optimal' | 'subOptimal' | 'other'
+function roundCategory(r: GameRound): RoundCategory {
+  if (r.timeBonus >= 10000)
+    return 'optimal'
+  if (r.timeBonus > 0)
+    return 'subOptimal'
+  return 'other'
+}
+
+const FILTER_STORAGE_KEY = 'drTrigger.history.filter'
+const filter = ref<Record<RoundCategory, boolean>>({
+  optimal: true,
+  subOptimal: true,
+  other: true,
+})
+
+onMounted(() => {
+  try {
+    const saved = localStorage.getItem(FILTER_STORAGE_KEY)
+    if (saved)
+      Object.assign(filter.value, JSON.parse(saved))
+  }
+  catch {}
+})
+
+watch(filter, (v) => {
+  localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(v))
+}, { deep: true })
+
+const filteredRounds = computed(() =>
+  rounds
+    .map((r, i) => ({ r, i }))
+    .filter(({ r }) => filter.value[roundCategory(r)]),
+)
 </script>
 
 <template>
@@ -134,35 +169,66 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
       </div>
     </div>
 
+    <!-- Filter -->
+    <div v-if="rounds.length > 0" class="flex flex-wrap gap-4 mb-3 text-sm">
+      <label class="inline-flex items-center gap-1.5 cursor-pointer">
+        <input v-model="filter.optimal" type="checkbox" class="text-green-600 focus:ring-green-200/50">
+        <span class="text-green-600">{{ $t('drTrigger.history.filter.optimal') }}</span>
+      </label>
+      <label class="inline-flex items-center gap-1.5 cursor-pointer">
+        <input v-model="filter.subOptimal" type="checkbox" class="text-blue-600 focus:ring-blue-200/50">
+        <span class="text-blue-600">{{ $t('drTrigger.history.filter.subOptimal') }}</span>
+      </label>
+      <label class="inline-flex items-center gap-1.5 cursor-pointer">
+        <input v-model="filter.other" type="checkbox" class="text-gray-500 focus:ring-gray-200/50">
+        <span class="text-gray-500">{{ $t('drTrigger.history.filter.other') }}</span>
+      </label>
+    </div>
+
     <!-- Rounds -->
-    <div v-if="rounds.length > 0" class="space-y-2">
+    <div
+      v-if="rounds.length > 0"
+      class="grid grid-cols-[2.5rem_auto_auto_1fr_auto_auto_1.25rem] gap-x-3 gap-y-2"
+    >
+      <!-- Header -->
+      <div class="grid grid-cols-subgrid col-span-full items-center px-3 py-2 text-xs text-gray-400 font-semibold">
+        <span>{{ $t('drTrigger.history.columns.index') }}</span>
+        <span>{{ $t('drTrigger.history.columns.moves') }}</span>
+        <span>{{ $t('drTrigger.history.columns.rzp') }}</span>
+        <span>{{ $t('drTrigger.history.columns.arm') }}</span>
+        <span class="text-right">{{ $t('drTrigger.history.columns.bonus') }}</span>
+        <span class="text-right">{{ $t('drTrigger.history.columns.time') }}</span>
+        <span />
+      </div>
+
       <div
-        v-for="(r, i) in rounds"
+        v-for="{ r, i } in filteredRounds"
         :key="r.id"
-        class="bg-white shadow-sm"
+        class="grid grid-cols-subgrid col-span-full bg-white shadow-sm"
       >
         <button
-          class="w-full flex items-center justify-between p-3 text-sm hover:bg-gray-50 transition-colors"
+          class="grid grid-cols-subgrid col-span-full items-center px-3 py-2 text-sm text-left hover:bg-gray-50 transition-colors"
           @click="toggleRound(i)"
         >
-          <span class="text-gray-400 w-8">{{ i + 1 }}</span>
-          <span class="font-mono">{{ (r.moves / 100).toFixed(0) }}</span>
-          <span class="text-gray-400">/ {{ (r.optimalMoves / 100).toFixed(0) }}</span>
+          <span class="text-gray-400">{{ i + 1 }}</span>
+          <span class="font-mono whitespace-nowrap">{{ (r.moves / 100).toFixed(0) }}<span class="text-gray-400">/{{ (r.optimalMoves / 100).toFixed(0) }}</span></span>
+          <span class="font-mono text-xs text-gray-500">{{ r.trigger?.rzp ?? '-' }}</span>
+          <span class="font-mono text-xs text-gray-500">{{ r.trigger ? formatArm(r.trigger.arm) : '-' }}</span>
           <span
-            class="text-xs"
+            class="text-xs text-right"
             :class="r.timeBonus >= 10000 ? 'text-green-600 font-semibold' : r.timeBonus > 0 ? 'text-blue-600' : 'text-gray-400'"
           >
             {{ r.timeBonus > 0 ? `+${(r.timeBonus / 1000).toFixed(0)}s` : '-' }}
           </span>
-          <span class="text-gray-400 text-xs">{{ (r.duration / 1000).toFixed(1) }}s</span>
+          <span class="text-gray-400 text-xs text-right">{{ (r.duration / 1000).toFixed(1) }}s</span>
           <Icon
             name="mdi:chevron-down"
-            class="transition-transform"
+            class="justify-self-end transition-transform"
             :class="{ 'rotate-180': expandedRound === i }"
           />
         </button>
 
-        <div v-if="expandedRound === i" class="border-t border-gray-100 p-3 text-sm space-y-3">
+        <div v-if="expandedRound === i" class="col-span-full border-t border-gray-100 p-3 text-sm space-y-3">
           <!-- Scramble -->
           <div>
             <div class="text-xs text-gray-400 mb-1">
@@ -225,7 +291,7 @@ function optimalSolutions(solutions: DRTriggerSolution[]) {
       </div>
 
       <!-- Last unsolved trigger -->
-      <div v-if="lastTrigger" class="bg-white shadow-sm border-l-4 border-red-400">
+      <div v-if="lastTrigger" class="col-span-full bg-white shadow-sm border-l-4 border-red-400">
         <div class="p-3 text-sm">
           <div class="text-red-500 font-semibold mb-2">
             {{ $t('drTrigger.history.unsolved') }}
