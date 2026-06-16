@@ -12,6 +12,8 @@ import {
   MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
+  Spherical,
+  Vector3,
   WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
@@ -28,6 +30,7 @@ const props = defineProps<{
   }
   filter?: 'dr'
   isStatic?: boolean
+  keyboardControls?: boolean
 }>()
 
 const cubeElement = ref<HTMLElement>()
@@ -41,10 +44,20 @@ let staticCanvas: HTMLCanvasElement | null = null
 let liveCanvas: HTMLCanvasElement | null = null
 let deactivateTimer: ReturnType<typeof setTimeout> | null = null
 const cubeMeshes: Mesh[] = []
+const keyboardRotationKeys = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'])
+const pressedKeyboardKeys = new Set<string>()
+const keyboardOffset = new Vector3()
+const keyboardSpherical = new Spherical()
+let keyboardThetaVelocity = 0
+let keyboardPhiVelocity = 0
 
 const BODY_HEX = colorToHex(BODY_COLOR)
 const CUBIE_SIZE = 1 - CUBIE_GAP
 const faceletPositions = getFaceletPositions()
+const KEYBOARD_ROTATE_SPEED = 0.035
+const KEYBOARD_ROTATE_ACCELERATION = 0.22
+const KEYBOARD_ROTATE_FRICTION = 0.82
+const KEYBOARD_ROTATE_EPSILON = 0.000_5
 
 const facelet = computed(() => {
   if (props.cubieCube)
@@ -275,11 +288,75 @@ function deactivate() {
   deactivateTimer = null
 }
 
+function handleKeyboardDown(e: KeyboardEvent) {
+  if (!props.keyboardControls || !keyboardRotationKeys.has(e.key) || e.altKey || e.ctrlKey || e.metaKey)
+    return
+  e.preventDefault()
+
+  if (props.isStatic && staticCanvas && !renderer)
+    activate()
+
+  if (renderer)
+    pressedKeyboardKeys.add(e.key)
+}
+
+function handleKeyboardUp(e: KeyboardEvent) {
+  if (!props.keyboardControls || !keyboardRotationKeys.has(e.key))
+    return
+  e.preventDefault()
+  pressedKeyboardKeys.delete(e.key)
+
+  if (props.isStatic && pressedKeyboardKeys.size === 0)
+    scheduleDeactivate()
+}
+
+function clearKeyboardRotation() {
+  pressedKeyboardKeys.clear()
+  keyboardThetaVelocity = 0
+  keyboardPhiVelocity = 0
+}
+
+function updateKeyboardRotation() {
+  if (!props.keyboardControls || !controls)
+    return
+
+  const thetaDirection = Number(pressedKeyboardKeys.has('ArrowRight')) - Number(pressedKeyboardKeys.has('ArrowLeft'))
+  const phiDirection = Number(pressedKeyboardKeys.has('ArrowDown')) - Number(pressedKeyboardKeys.has('ArrowUp'))
+
+  keyboardThetaVelocity += (thetaDirection * KEYBOARD_ROTATE_SPEED - keyboardThetaVelocity) * KEYBOARD_ROTATE_ACCELERATION
+  keyboardPhiVelocity += (phiDirection * KEYBOARD_ROTATE_SPEED - keyboardPhiVelocity) * KEYBOARD_ROTATE_ACCELERATION
+
+  if (thetaDirection === 0)
+    keyboardThetaVelocity *= KEYBOARD_ROTATE_FRICTION
+  if (phiDirection === 0)
+    keyboardPhiVelocity *= KEYBOARD_ROTATE_FRICTION
+
+  if (Math.abs(keyboardThetaVelocity) < KEYBOARD_ROTATE_EPSILON)
+    keyboardThetaVelocity = 0
+  if (Math.abs(keyboardPhiVelocity) < KEYBOARD_ROTATE_EPSILON)
+    keyboardPhiVelocity = 0
+  if (keyboardThetaVelocity === 0 && keyboardPhiVelocity === 0)
+    return
+
+  keyboardOffset.copy(camera.position).sub(controls.target)
+  keyboardSpherical.setFromVector3(keyboardOffset)
+  keyboardSpherical.theta -= keyboardThetaVelocity
+  keyboardSpherical.phi = Math.min(
+    controls.maxPolarAngle,
+    Math.max(controls.minPolarAngle, keyboardSpherical.phi + keyboardPhiVelocity),
+  )
+  keyboardSpherical.makeSafe()
+  keyboardOffset.setFromSpherical(keyboardSpherical)
+  camera.position.copy(controls.target).add(keyboardOffset)
+  camera.lookAt(controls.target)
+}
+
 function render() {
   if (!animating)
     return
   requestAnimationFrame(render)
   controls?.update()
+  updateKeyboardRotation()
   renderer?.render(scene, camera)
 }
 
@@ -299,6 +376,12 @@ watch(width, () => {
 
 onMounted(() => {
   const dom = cubeElement.value!
+  if (props.keyboardControls) {
+    window.addEventListener('keydown', handleKeyboardDown, { capture: true })
+    window.addEventListener('keyup', handleKeyboardUp, { capture: true })
+    window.addEventListener('blur', clearKeyboardRotation)
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -312,6 +395,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   animating = false
+  window.removeEventListener('keydown', handleKeyboardDown, { capture: true })
+  window.removeEventListener('keyup', handleKeyboardUp, { capture: true })
+  window.removeEventListener('blur', clearKeyboardRotation)
   if (deactivateTimer)
     clearTimeout(deactivateTimer)
   if (renderer)

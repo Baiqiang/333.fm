@@ -502,7 +502,7 @@ onUnmounted(() => {
       <!-- Scramble + Cube Display -->
       <div class="mb-2">
         <StickyScramble :scramble="trigger.scramble" :sticky="false" />
-        <Cube3d :moves="trigger.scramble + solution" />
+        <Cube3d :moves="trigger.scramble + solution" keyboard-controls />
         <div class="text-xs text-gray-400 font-mono mt-0.5">
           RZP: {{ trigger.rzp }} · {{ formatArm(trigger.arm) }}
         </div>
@@ -514,6 +514,7 @@ onUnmounted(() => {
           <input
             ref="solutionInput"
             v-model="solution"
+            autofocus
             class="block w-full font-mono shadow-sm border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50 p-2 border text-sm"
             placeholder="e.g. R U R'"
             @keydown="handleKeydown"
@@ -712,7 +713,9 @@ onUnmounted(() => {
             <span v-if="g.practice" class="bg-yellow-100 text-yellow-700 px-1 font-semibold ml-0.5">{{ $t('drTrigger.practice.badge') }}</span>
           </span>
           <span class="font-mono font-bold text-indigo-600 text-right">{{ g.levels }}</span>
-          <span class="text-green-600 text-xs text-right">{{ g.totalTimeBonus > 0 ? `+${(g.totalTimeBonus / 1000).toFixed(0)}s` : '' }}</span>
+          <span class="text-xs text-right" :class="g.remainingTime > 0 ? 'text-green-600' : 'text-gray-300'">
+            {{ g.remainingTime > 0 ? formatTime(g.remainingTime) : '' }}
+          </span>
         </NuxtLink>
       </div>
       <div v-if="myGamesTotal > 20" class="mt-2 flex gap-2">
