@@ -321,7 +321,7 @@ function updateKeyboardRotation() {
     return
 
   const thetaDirection = Number(pressedKeyboardKeys.has('ArrowRight')) - Number(pressedKeyboardKeys.has('ArrowLeft'))
-  const phiDirection = Number(pressedKeyboardKeys.has('ArrowDown')) - Number(pressedKeyboardKeys.has('ArrowUp'))
+  const phiDirection = Number(pressedKeyboardKeys.has('ArrowUp')) - Number(pressedKeyboardKeys.has('ArrowDown'))
 
   keyboardThetaVelocity += (thetaDirection * KEYBOARD_ROTATE_SPEED - keyboardThetaVelocity) * KEYBOARD_ROTATE_ACCELERATION
   keyboardPhiVelocity += (phiDirection * KEYBOARD_ROTATE_SPEED - keyboardPhiVelocity) * KEYBOARD_ROTATE_ACCELERATION
