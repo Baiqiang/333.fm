@@ -28,5 +28,6 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH }}
             git pull
             yarn install --frozen-lockfile
+            export NODE_OPTIONS="--max-old-space-size=4096"
             yarn build
             pm2 start ecosystem.config.cjs
