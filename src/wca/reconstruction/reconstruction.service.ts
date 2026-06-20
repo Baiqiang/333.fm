@@ -76,6 +76,14 @@ interface WcaApiScramblesResponse {
   }>
 }
 
+interface WcaApiEvent {
+  id: string
+  rounds?: Array<{
+    id: string
+    format: string
+  }>
+}
+
 interface WcaApiV1Registration {
   id: number
   registrant_id: number
@@ -561,10 +569,14 @@ export class WcaReconstructionService {
       }
     }
 
-    if (Object.keys(attemptsPerRound).length === 0) {
-      const wcifFormats = await this.getWcifAttemptsPerRound(wcaCompetitionId)
-      if (wcifFormats) {
-        Object.assign(attemptsPerRound, wcifFormats)
+    const scheduledAttempts =
+      (await this.getWcaEventAttemptsPerRound(wcaCompetitionId)) ??
+      (await this.getWcifAttemptsPerRound(wcaCompetitionId))
+    if (scheduledAttempts) {
+      for (const [rn, count] of Object.entries(scheduledAttempts)) {
+        if (!attemptsPerRound[Number(rn)]) {
+          attemptsPerRound[Number(rn)] = count
+        }
       }
     }
 
@@ -912,6 +924,23 @@ export class WcaReconstructionService {
   // endregion
 
   // region WCA API helpers
+
+  async getWcaEventAttemptsPerRound(wcaCompetitionId: string): Promise<Record<number, number> | null> {
+    try {
+      const url = `${WCA_API_BASE}/competitions/${wcaCompetitionId}/events`
+      const response = await firstValueFrom(this.httpService.get<WcaApiEvent[]>(url))
+      const fmEvent = response.data?.find(e => e.id === '333fm')
+      if (!fmEvent?.rounds?.length) return null
+
+      const result: Record<number, number> = {}
+      for (let i = 0; i < fmEvent.rounds.length; i++) {
+        result[i + 1] = formatIdToAttempts(fmEvent.rounds[i].format)
+      }
+      return result
+    } catch {
+      return null
+    }
+  }
 
   async getWcifAttemptsPerRound(wcaCompetitionId: string): Promise<Record<number, number> | null> {
     try {
