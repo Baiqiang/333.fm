@@ -525,6 +525,13 @@ export default {
       includeDNF: '包含 DNF',
       fillCounts: '补全空缺次数',
       trim: '去尾',
+      timeRange: '时间',
+      attemptRange: '次数',
+      last3Months: '过去3个月',
+      lastYear: '过去一年',
+      recentAttempts: '最近 {count} 次',
+      attemptRangeLabel: '已选 {selected} 次（第 {start} ~ {end} 次，共 {total} 次）',
+      allRange: '所有',
     },
   },
   chain: {

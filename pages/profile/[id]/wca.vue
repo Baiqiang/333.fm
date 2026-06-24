@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
+const colorMode = useColorMode()
 const user = inject(SYMBOL_USER)!
 const config = useRuntimeConfig().public
 const { data } = await useFetch<WCAResult[]>(`${config.wca.apiBaseURL}/persons/${user.value.wcaId}/results?event_id=333fm`)
@@ -87,8 +88,12 @@ const chartSettings = useLocalStorage('profile.wca.chartSettings', {
   expanded: false,
   includeDNF: true,
   trimPercent: 5,
+  rangeMode: 'time' as 'time' | 'attempt',
   startDate: '',
   endDate: '',
+  recentAttemptCount: null as number | null,
+  attemptStartIndex: 1,
+  attemptEndIndex: null as number | null,
   fillCounts: true,
 }, {
   initOnMounted: true,
@@ -111,6 +116,8 @@ function toDateStr(ms: number) {
 const rangeStartMs = computed<number>({
   get: () => (chartSettings.value.startDate ? Date.parse(chartSettings.value.startDate) : minMs),
   set: (value) => {
+    chartSettings.value.rangeMode = 'time'
+    chartSettings.value.recentAttemptCount = null
     const currentEnd = chartSettings.value.endDate ? Date.parse(chartSettings.value.endDate) : maxMs
     const clamped = Math.min(Math.max(value, minMs), currentEnd)
     chartSettings.value.startDate = clamped <= minMs ? '' : toDateStr(clamped)
@@ -119,6 +126,8 @@ const rangeStartMs = computed<number>({
 const rangeEndMs = computed<number>({
   get: () => (chartSettings.value.endDate ? Date.parse(chartSettings.value.endDate) : maxMs),
   set: (value) => {
+    chartSettings.value.rangeMode = 'time'
+    chartSettings.value.recentAttemptCount = null
     const currentStart = chartSettings.value.startDate ? Date.parse(chartSettings.value.startDate) : minMs
     const clamped = Math.max(Math.min(value, maxMs), currentStart)
     chartSettings.value.endDate = clamped >= maxMs ? '' : toDateStr(clamped)
@@ -134,6 +143,8 @@ const rangeTrack = computed(() => {
 })
 
 function setRangeMonths(months: number | null) {
+  chartSettings.value.rangeMode = 'time'
+  chartSettings.value.recentAttemptCount = null
   if (months == null) {
     chartSettings.value.startDate = ''
     chartSettings.value.endDate = ''
@@ -145,6 +156,15 @@ function setRangeMonths(months: number | null) {
   chartSettings.value.endDate = ''
 }
 
+function setRangeMode(mode: 'time' | 'attempt') {
+  chartSettings.value.rangeMode = mode
+  chartSettings.value.recentAttemptCount = null
+  if (mode === 'attempt') {
+    chartSettings.value.startDate = ''
+    chartSettings.value.endDate = ''
+  }
+}
+
 interface MixedChartAttempt {
   // index: number
   moves: number
@@ -152,7 +172,13 @@ interface MixedChartAttempt {
   attemptIndex: number
   competitionId: string
   competitionName: string
+  resultKey: string
+  resultAverage: number
+  resultAttemptCount: number
 }
+
+type NumericCountChartPoint = [number, number]
+type CountChartPoint = [number | 'DNF', number]
 
 const derived = computed(() => {
   const start = chartSettings.value.startDate
@@ -169,11 +195,15 @@ const derived = computed(() => {
   const singles: Record<number, [string, number][]> = {}
   const movesCountMap: Record<number, number> = {}
   const meansCountMap: Record<number, number> = {}
+  let dnfMovesCount = 0
+  let dnfMeansCount = 0
   const allSingles: number[] = []
   for (const result of resultsDesc) {
     const mean = result.average
     if (mean > 0)
       meansCountMap[mean] = (meansCountMap[mean] || 0) + 1
+    else if (mean === WCA_DNF)
+      dnfMeansCount++
     for (const [index, moves] of result.attempts.entries()) {
       if (moves > 0) {
         const scrambleNumber = index + 1
@@ -182,25 +212,32 @@ const derived = computed(() => {
         movesCountMap[moves] = (movesCountMap[moves] || 0) + 1
         allSingles.push(moves)
       }
+      else if (moves === WCA_DNF) {
+        dnfMovesCount++
+      }
     }
   }
 
-  const allAttempts: MixedChartAttempt[] = resultsAsc.flatMap(result =>
-    result.attempts
+  const allAttempts: MixedChartAttempt[] = resultsAsc.flatMap((result) => {
+    const resultAttemptCount = result.attempts.filter(moves => moves > 0 || moves === WCA_DNF).length
+    return result.attempts
       .map((moves, index) => ({
         moves,
         roundTypeId: result.round_type_id,
         attemptIndex: index + 1,
         competitionId: result.competition_id,
         competitionName: competitionMap.get(result.competition_id)?.name || result.competition_id,
+        resultKey: `${result.competition_id}:${result.round_type_id}`,
+        resultAverage: result.average,
+        resultAttemptCount,
       }))
-      .filter(({ moves }) => moves > 0 || moves === WCA_DNF),
-  )
+      .filter(({ moves }) => moves > 0 || moves === WCA_DNF)
+  })
   const nonDNFAttempts = allAttempts.filter(attempt => attempt.moves > 0)
 
-  const movesCount = Object.entries(movesCountMap).map(([m, count]) => [Number(m), count])
+  const movesCount: NumericCountChartPoint[] = Object.entries(movesCountMap).map(([m, count]) => [Number(m), count])
   movesCount.sort((a, b) => a[0] - b[0])
-  const meansCount = Object.entries(meansCountMap).map(([m, count]) => [Number(m), count])
+  const meansCount: NumericCountChartPoint[] = Object.entries(meansCountMap).map(([m, count]) => [Number(m), count])
   meansCount.sort((a, b) => a[0] - b[0])
 
   const meanChartData = resultsAsc.map((result, index) => ({
@@ -217,24 +254,26 @@ const derived = computed(() => {
     maxSingle: allSingles.length ? Math.max(...allSingles) : 0,
     movesCount,
     meansCount,
+    dnfMovesCount,
+    dnfMeansCount,
     meanChartData,
     meanChartDataMap,
   }
 })
 
-function fillSingleCounts(counts: number[][]) {
+function fillSingleCounts(counts: NumericCountChartPoint[]) {
   if (counts.length < 2)
     return counts
   const countMap = new Map(counts.map(([single, count]) => [single, count]))
   const min = counts[0][0]
   const max = counts[counts.length - 1][0]
-  const filled: number[][] = []
+  const filled: NumericCountChartPoint[] = []
   for (let single = min; single <= max; single++)
     filled.push([single, countMap.get(single) || 0])
   return filled
 }
 
-function fillMeanCounts(counts: number[][]) {
+function fillMeanCounts(counts: NumericCountChartPoint[]) {
   if (counts.length < 2)
     return counts
   // Means are total/3 (stored as centi-moves), so iterate by 1/3-move steps.
@@ -242,10 +281,20 @@ function fillMeanCounts(counts: number[][]) {
   const totals = [...countByTotal.keys()]
   const min = Math.min(...totals)
   const max = Math.max(...totals)
-  const filled: number[][] = []
+  const filled: NumericCountChartPoint[] = []
   for (let total = min; total <= max; total++)
     filled.push([Math.round(total * 100 / 3), countByTotal.get(total) || 0])
   return filled
+}
+
+function appendDNFCount(counts: NumericCountChartPoint[], count: number): CountChartPoint[] {
+  if (!chartSettings.value.includeDNF || count <= 0)
+    return counts
+  return [...counts, ['DNF', count]]
+}
+
+function getCountChartTotal(counts: CountChartPoint[]) {
+  return counts.reduce((total, [, count]) => total + count, 0)
 }
 
 function toChartValue(value: number) {
@@ -272,7 +321,120 @@ function trimmedAverage(results: number[], requiredCount: number, trimCount: num
   return Number((total / trimmed.length).toFixed(2))
 }
 
-const sourceAttempts = computed(() => chartSettings.value.includeDNF ? derived.value.allAttempts : derived.value.nonDNFAttempts)
+const availableAttempts = computed(() => chartSettings.value.includeDNF ? derived.value.allAttempts : derived.value.nonDNFAttempts)
+
+function setRecentAttemptCount(count: number) {
+  chartSettings.value.rangeMode = 'attempt'
+  chartSettings.value.startDate = ''
+  chartSettings.value.endDate = ''
+  chartSettings.value.recentAttemptCount = count
+  const end = availableAttempts.value.length
+  chartSettings.value.attemptStartIndex = Math.max(1, end - count + 1)
+  chartSettings.value.attemptEndIndex = null
+}
+
+function setAllAttemptsRange() {
+  chartSettings.value.rangeMode = 'attempt'
+  chartSettings.value.startDate = ''
+  chartSettings.value.endDate = ''
+  chartSettings.value.recentAttemptCount = null
+  chartSettings.value.attemptStartIndex = 1
+  chartSettings.value.attemptEndIndex = null
+}
+
+const attemptRangeStart = computed<number>({
+  get: () => {
+    const max = Math.max(availableAttempts.value.length, 1)
+    return Math.min(Math.max(chartSettings.value.attemptStartIndex || 1, 1), max)
+  },
+  set: (value) => {
+    chartSettings.value.rangeMode = 'attempt'
+    chartSettings.value.recentAttemptCount = null
+    const max = Math.max(availableAttempts.value.length, 1)
+    const currentEnd = chartSettings.value.attemptEndIndex || max
+    chartSettings.value.attemptStartIndex = Math.min(Math.max(value, 1), currentEnd)
+  },
+})
+
+const attemptRangeEnd = computed<number>({
+  get: () => {
+    const max = Math.max(availableAttempts.value.length, 1)
+    return Math.max(Math.min(chartSettings.value.attemptEndIndex || max, max), attemptRangeStart.value)
+  },
+  set: (value) => {
+    chartSettings.value.rangeMode = 'attempt'
+    chartSettings.value.recentAttemptCount = null
+    const max = Math.max(availableAttempts.value.length, 1)
+    const clamped = Math.max(Math.min(value, max), attemptRangeStart.value)
+    chartSettings.value.attemptEndIndex = clamped >= max ? null : clamped
+  },
+})
+
+const attemptRangeCount = computed(() => attemptRangeEnd.value - attemptRangeStart.value + 1)
+
+const attemptRangeTrack = computed(() => {
+  const max = Math.max(availableAttempts.value.length, 1)
+  const total = max - 1 || 1
+  return {
+    left: `${((attemptRangeStart.value - 1) / total) * 100}%`,
+    right: `${((max - attemptRangeEnd.value) / total) * 100}%`,
+  }
+})
+
+const sourceAttempts = computed(() => {
+  const attempts = availableAttempts.value
+  if (chartSettings.value.rangeMode !== 'attempt')
+    return attempts
+  return attempts.slice(attemptRangeStart.value - 1, attemptRangeEnd.value)
+})
+
+function buildMoveCountChartData(attempts: MixedChartAttempt[]) {
+  const countMap = new Map<number, number>()
+  let dnfCount = 0
+  for (const attempt of attempts) {
+    if (attempt.moves > 0)
+      countMap.set(attempt.moves, (countMap.get(attempt.moves) || 0) + 1)
+    else if (attempt.moves === WCA_DNF)
+      dnfCount++
+  }
+  const counts: NumericCountChartPoint[] = [...countMap.entries()].sort((a, b) => a[0] - b[0])
+  return appendDNFCount(chartSettings.value.fillCounts ? fillSingleCounts(counts) : counts, dnfCount)
+}
+
+function buildMeanCountChartData(attempts: MixedChartAttempt[]) {
+  const resultMap = new Map<string, {
+    average: number
+    attemptCount: number
+    selectedCount: number
+  }>()
+  for (const attempt of attempts) {
+    const item = resultMap.get(attempt.resultKey)
+    if (item) {
+      item.selectedCount++
+    }
+    else {
+      resultMap.set(attempt.resultKey, {
+        average: attempt.resultAverage,
+        attemptCount: attempt.resultAttemptCount,
+        selectedCount: 1,
+      })
+    }
+  }
+
+  const countMap = new Map<number, number>()
+  let dnfCount = 0
+  for (const item of resultMap.values()) {
+    if (item.selectedCount !== item.attemptCount)
+      continue
+    if (item.average > 0)
+      countMap.set(item.average, (countMap.get(item.average) || 0) + 1)
+    else if (item.average === WCA_DNF)
+      dnfCount++
+  }
+
+  const counts: NumericCountChartPoint[] = [...countMap.entries()].sort((a, b) => a[0] - b[0])
+  return appendDNFCount(chartSettings.value.fillCounts ? fillMeanCounts(counts) : counts, dnfCount)
+}
 
 function buildSingleSeries(sourceAttempts: MixedChartAttempt[]) {
   return sourceAttempts.map((attempt, index) => [index, attempt.moves === WCA_DNF ? null : attempt.moves])
@@ -463,90 +625,111 @@ const meanChartOption = computed<ECOption>(() => ({
     },
   ],
 }))
-const movesCountOption = computed<ECOption>(() => ({
-  title: {
-    text: `${localeName(user.value.name, locale.value)} - WCA`,
-  },
-  tooltip: {
-    trigger: 'axis',
-  },
-  toolbox: {
-    feature: {
-      saveAsImage: {
-        name: `${localeName(user.value.name, locale.value)}-WCA.png`,
-        title: t('common.saveAsImage'),
+const movesCountOption = computed<ECOption>(() => {
+  const data = buildMoveCountChartData(sourceAttempts.value)
+  return {
+    title: {
+      text: `${localeName(user.value.name, locale.value)} - WCA`,
+      subtext: `${t('common.total')}: ${getCountChartTotal(data)}`,
+    },
+    tooltip: {
+      trigger: 'axis',
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {
+          name: `${localeName(user.value.name, locale.value)}-WCA.png`,
+          title: t('common.saveAsImage'),
+        },
       },
     },
-  },
-  legend: {
-    bottom: '0%',
-  },
-  grid: {
-    left: '3%',
-    right: '3%',
-    containLabel: true,
-  },
-  yAxis: {
-    type: 'value',
-    minInterval: 1,
-  },
-  xAxis: {
-    type: 'category',
-  },
-  series: [
-    {
-      name: t('weekly.regular.label'),
-      type: 'bar',
-      data: chartSettings.value.fillCounts ? fillSingleCounts(derived.value.movesCount) : derived.value.movesCount,
+    legend: {
+      bottom: '0%',
     },
-  ],
-}))
+    grid: {
+      left: '3%',
+      right: '3%',
+      containLabel: true,
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+    },
+    xAxis: {
+      type: 'category',
+    },
+    series: [
+      {
+        name: t('weekly.regular.label'),
+        type: 'bar',
+        data,
+      },
+    ],
+  }
+})
 
-const meansCountOption = computed<ECOption>(() => ({
-  title: {
-    text: `${localeName(user.value.name, locale.value)} - WCA`,
-  },
-  tooltip: {
-    trigger: 'axis',
-  },
-  toolbox: {
-    feature: {
-      saveAsImage: {
-        name: `${localeName(user.value.name, locale.value)}-WCA.png`,
-        title: t('common.saveAsImage'),
+const meansCountOption = computed<ECOption>(() => {
+  const data = buildMeanCountChartData(sourceAttempts.value)
+  return {
+    title: {
+      text: `${localeName(user.value.name, locale.value)} - WCA`,
+      subtext: `${t('common.total')}: ${getCountChartTotal(data)}`,
+    },
+    tooltip: {
+      trigger: 'axis',
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {
+          name: `${localeName(user.value.name, locale.value)}-WCA.png`,
+          title: t('common.saveAsImage'),
+        },
       },
     },
-  },
-  legend: {
-    bottom: '0%',
-  },
-  grid: {
-    left: '3%',
-    right: '3%',
-    containLabel: true,
-  },
-  yAxis: {
-    type: 'value',
-    minInterval: 1,
-  },
-  xAxis: {
-    type: 'category',
-    axisLabel: {
-      formatter: (value: string | number) => formatResult(Number(value), 2),
+    legend: {
+      bottom: '0%',
     },
-  },
-  series: [
-    {
-      name: t('result.mean'),
-      type: 'bar',
-      data: chartSettings.value.fillCounts ? fillMeanCounts(derived.value.meansCount) : derived.value.meansCount,
+    grid: {
+      left: '3%',
+      right: '3%',
+      containLabel: true,
     },
-  ],
-}))
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+    },
+    xAxis: {
+      type: 'category',
+      axisLabel: {
+        formatter: (value: string | number) => value === 'DNF' ? value : formatResult(Number(value), 2),
+      },
+    },
+    series: [
+      {
+        name: t('result.mean'),
+        type: 'bar',
+        data,
+      },
+    ],
+  }
+})
+
+const mixedChartDarkColors = [
+  '#60a5fa',
+  '#34d399',
+  '#fbbf24',
+  '#fb7185',
+  '#a78bfa',
+  '#2dd4bf',
+  '#f97316',
+  '#f472b6',
+]
+
 const mixedChartOption = computed<ECOption>(() => {
   const sourceValues = sourceAttempts.value.map(attempt => attempt.moves)
   const averageSeriesConfig = getMixedAverageSeriesConfig(chartSettings.value.trimPercent)
   const sourceAttemptMap = new Map(sourceAttempts.value.map((attempt, index) => [index + 1, attempt]))
+  const isDark = colorMode.value === 'dark'
 
   function getMixedTooltipStatus(seriesName: string, dataIndex: number) {
     if (seriesName === t('result.single'))
@@ -564,6 +747,7 @@ const mixedChartOption = computed<ECOption>(() => {
   }
 
   return {
+    ...(isDark ? { color: mixedChartDarkColors } : {}),
     title: {
       text: `${localeName(user.value.name, locale.value)} - WCA - mixed`,
     },
@@ -730,28 +914,44 @@ const mixedChartOption = computed<ECOption>(() => {
     <div v-if="chartSettings.expanded && maxMs > minMs" class="mb-4 flex flex-col gap-2 text-sm">
       <div class="flex flex-wrap items-center gap-2">
         <button
+          class="px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          :class="chartSettings.rangeMode === 'time' ? 'bg-indigo-500 hover:bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'"
+          @click="setRangeMode('time')"
+        >
+          {{ t('result.chartOptions.timeRange') }}
+        </button>
+        <button
+          class="px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          :class="chartSettings.rangeMode === 'attempt' ? 'bg-indigo-500 hover:bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'"
+          @click="setRangeMode('attempt')"
+        >
+          {{ t('result.chartOptions.attemptRange') }}
+        </button>
+      </div>
+      <div v-if="chartSettings.rangeMode === 'time'" class="flex flex-wrap items-center gap-2">
+        <button
           class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
           @click="setRangeMonths(3)"
         >
-          过去3个月
+          {{ t('result.chartOptions.last3Months') }}
         </button>
         <button
           class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
           @click="setRangeMonths(12)"
         >
-          过去一年
+          {{ t('result.chartOptions.lastYear') }}
         </button>
         <button
           class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
           @click="setRangeMonths(null)"
         >
-          所有
+          {{ t('result.chartOptions.allRange') }}
         </button>
         <span class="font-mono text-gray-600">
           {{ toDateStr(rangeStartMs) }} ~ {{ toDateStr(rangeEndMs) }}
         </span>
       </div>
-      <div class="range-slider relative h-6 w-full max-w-xl">
+      <div v-if="chartSettings.rangeMode === 'time'" class="range-slider relative h-6 w-full max-w-xl">
         <div class="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 bg-gray-200" />
         <div
           class="absolute top-1/2 h-1 -translate-y-1/2 bg-indigo-500"
@@ -772,6 +972,52 @@ const mixedChartOption = computed<ECOption>(() => {
           :min="minMs"
           :max="maxMs"
           :step="DAY_MS"
+        >
+      </div>
+      <div v-if="chartSettings.rangeMode === 'attempt'" class="flex flex-wrap items-center gap-2">
+        <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          @click="setRecentAttemptCount(100)"
+        >
+          {{ t('result.chartOptions.recentAttempts', { count: 100 }) }}
+        </button>
+        <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          @click="setRecentAttemptCount(50)"
+        >
+          {{ t('result.chartOptions.recentAttempts', { count: 50 }) }}
+        </button>
+        <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-200 text-xs"
+          @click="setAllAttemptsRange"
+        >
+          {{ t('result.chartOptions.allRange') }}
+        </button>
+        <span class="font-mono text-gray-600">
+          {{ t('result.chartOptions.attemptRangeLabel', { selected: attemptRangeCount, start: attemptRangeStart, end: attemptRangeEnd, total: availableAttempts.length }) }}
+        </span>
+      </div>
+      <div v-if="chartSettings.rangeMode === 'attempt'" class="range-slider relative h-6 w-full max-w-xl">
+        <div class="absolute top-1/2 left-0 right-0 h-1 -translate-y-1/2 bg-gray-200" />
+        <div
+          class="absolute top-1/2 h-1 -translate-y-1/2 bg-indigo-500"
+          :style="{ left: attemptRangeTrack.left, right: attemptRangeTrack.right }"
+        />
+        <input
+          v-model.number="attemptRangeStart"
+          type="range"
+          class="thumb"
+          min="1"
+          :max="Math.max(availableAttempts.length, 1)"
+          step="1"
+        >
+        <input
+          v-model.number="attemptRangeEnd"
+          type="range"
+          class="thumb"
+          min="1"
+          :max="Math.max(availableAttempts.length, 1)"
+          step="1"
         >
       </div>
     </div>

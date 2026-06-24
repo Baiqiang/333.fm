@@ -525,6 +525,13 @@ export default {
       includeDNF: 'Include DNF',
       fillCounts: 'Fill empty counts',
       trim: 'Trim',
+      timeRange: 'Time',
+      attemptRange: 'Attempts',
+      last3Months: 'Last 3 months',
+      lastYear: 'Last year',
+      recentAttempts: 'Last {count} attempts',
+      attemptRangeLabel: 'Selected {selected} attempts (No. {start} - {end} of {total})',
+      allRange: 'All',
     },
   },
   chain: {
