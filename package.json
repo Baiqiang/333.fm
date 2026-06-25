@@ -1,0 +1,19 @@
+{
+  "name": "333.fm-monorepo",
+  "private": true,
+  "packageManager": "yarn@1.22.22",
+  "workspaces": [
+    "frontend",
+    "server"
+  ],
+  "scripts": {
+    "dev:frontend": "yarn --cwd frontend dev",
+    "dev:server": "yarn --cwd server start:dev",
+    "build": "yarn build:frontend && yarn build:server",
+    "build:frontend": "yarn --cwd frontend build",
+    "build:server": "yarn --cwd server build",
+    "lint": "yarn lint:frontend && yarn lint:server",
+    "lint:frontend": "yarn --cwd frontend lint",
+    "lint:server": "yarn --cwd server lint"
+  }
+}

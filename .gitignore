@@ -1,0 +1,43 @@
+# Local workspace state
+.git-legacy/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Build outputs
+dist/
+**/dist/
+.nuxt/
+**/.nuxt/
+.output/
+**/.output/
+.nitro/
+**/.nitro/
+.cache/
+**/.cache/
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+**/coverage/
+.nyc_output/
+**/.nyc_output/
+
+# OS and editor
+.DS_Store
+.idea/
+.fleet/
+
+# Local server scratch files

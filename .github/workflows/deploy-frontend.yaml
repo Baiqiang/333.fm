@@ -1,4 +1,4 @@
-name: deploy
+name: deploy frontend
 
 on:
   workflow_call:
@@ -11,15 +11,19 @@ on:
         required: true
       DEPLOY_PATH:
         required: true
+  workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [master]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/deploy-frontend.yaml"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Start
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Deploy frontend
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -27,6 +31,8 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git pull
+            cd frontend
             yarn install --frozen-lockfile
+            export NODE_OPTIONS="--max-old-space-size=4096"
             yarn build
-            pm2 start ecosystem.config.js
+            pm2 start ecosystem.config.cjs
