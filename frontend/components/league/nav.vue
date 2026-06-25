@@ -1,0 +1,108 @@
+<script setup lang="ts">
+const props = defineProps<{
+  season: LeagueSeason
+}>()
+const user = useUser()
+const route = useRoute()
+const { t } = useI18n()
+const isMobileMenuOpen = ref(false)
+
+const links = computed(() => {
+  const ret = [
+    {
+      label: t('league.nav.summary'),
+      to: `/league/${props.season.number}`,
+      icon: 'mdi:home',
+    },
+    {
+      label: t('league.nav.tiers'),
+      to: `/league/${props.season.number}/tiers`,
+      icon: 'mdi:account-group',
+    },
+    {
+      label: t('league.nav.schedules'),
+      to: `/league/${props.season.number}/schedules`,
+      icon: 'mdi:calendar',
+    },
+    {
+      label: t('league.nav.standings'),
+      to: `/league/${props.season.number}/standings`,
+      icon: 'mdi:trophy',
+    },
+  ]
+  if (props.season.eloHistories.length > 0) {
+    ret.push({
+      label: t('league.nav.elos'),
+      to: `/league/${props.season.number}/elos`,
+      icon: 'mdi:chart-box-outline',
+    })
+  }
+  ret.push(...[
+    {
+      label: t('league.nav.statistics'),
+      to: `/league/${props.season.number}/statistics`,
+      icon: 'mdi:chart-box-outline',
+    },
+    {
+      label: t('league.nav.rules'),
+      to: `/league/${props.season.number}/rules`,
+      icon: 'mdi:book-open',
+    },
+  ])
+  props.season.competitions.forEach((c) => {
+    ret.push({
+      label: t('league.nav.week', { week: leagueWeek(c) }),
+      to: `/league/${props.season.number}/week/${leagueWeek(c)}`,
+      icon: isInStatus(c, CompetitionStatus.ON_GOING) ? 'mdi:calendar-clock' : 'mdi:calendar-week',
+    })
+  })
+  if (user.isLeagueAdmin) {
+    ret.push({
+      label: 'Admin',
+      to: '/league/admin',
+      icon: 'mdi:shield-account',
+    })
+  }
+  return ret
+})
+
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+</script>
+
+<template>
+  <button
+    class="md:hidden fixed bottom-4 left-4 z-50 p-2 bg-indigo-500 text-white shadow-lg"
+    @click.prevent="toggleMobileMenu"
+  >
+    <Icon
+      :name="isMobileMenuOpen ? 'mdi:close' : 'mdi:menu'"
+      size="24"
+    />
+  </button>
+  <div class="relative">
+    <nav
+      class="fixed md:sticky top-0 left-0 h-screen w-full bg-gray-50 md:border-gray-200 md:border-r-2 transform transition-transform duration-300 ease-in-out z-40"
+      :class="{
+        '-translate-x-full md:translate-x-0': !isMobileMenuOpen,
+        'translate-x-0': isMobileMenuOpen,
+      }"
+    >
+      <NuxtLink
+        v-for="link in links"
+        :key="link.to"
+        :to="link.to"
+        class="flex items-center gap-2 px-2 my-1 py-2 text-sm transition-colors"
+        :class="{
+          'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300': route.path === link.to,
+          'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800': route.path !== link.to,
+        }"
+        @click="isMobileMenuOpen = false"
+      >
+        <Icon :name="link.icon" size="20" />
+        <span>{{ link.label }}</span>
+      </NuxtLink>
+    </nav>
+  </div>
+</template>

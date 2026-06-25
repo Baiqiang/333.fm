@@ -1,0 +1,204 @@
+<script setup lang="ts">
+const endless = inject<Ref<Endless>>(SYMBOL_ENDLESS)!
+const myProgress = inject<Ref<UserProgress>>(SYMBOL_ENDLESS_PROGRESS)!
+const { t } = useI18n()
+useSeoMeta({
+  title: `${t('endless.title')} ${endless.value.name}`,
+})
+const maxCompetitors = computed(() => Math.max(...endless.value.levels.map(l => l.competitors)) || 1)
+const isConditionMode = computed(() => endless.value.subType === CompetitionSubType.MYSTERY)
+
+const myLevel = computed(() => myProgress.value?.next?.level ?? 1)
+const highestLevel = computed(() => Math.max(...endless.value.levels.map(l => l.level)))
+const expanded = ref(false)
+const levels = computed(() => {
+  if (expanded.value)
+    return endless.value.levels
+  return endless.value.levels.filter(l =>
+    l.level === 1
+    || (l.level <= myLevel.value - 1 && l.level >= myLevel.value - 10)
+    || l.level === highestLevel.value
+    || l.level === myLevel.value,
+  )
+})
+const expandLevels = computed<number[]>(() => {
+  const levels: number[] = []
+  if (highestLevel.value - myLevel.value > 1 || myLevel.value >= highestLevel.value)
+    levels.push(highestLevel.value)
+  if (myLevel.value > 11)
+    levels.push(myLevel.value - 10)
+  return levels
+})
+
+function matchesChallengeLevel(challenge: Challenge, targetLevel: number) {
+  if (challenge.levels?.includes(targetLevel))
+    return true
+  if (challenge.startLevel === undefined || challenge.startLevel === null)
+    return false
+  if (targetLevel < challenge.startLevel)
+    return false
+  return challenge.endLevel === undefined || challenge.endLevel === null || targetLevel <= challenge.endLevel
+}
+
+function bossChallengeForLevel(targetLevel: number) {
+  return endless.value.challenges?.find(challenge =>
+    challenge.type === ChallengeType.BOSS && matchesChallengeLevel(challenge, targetLevel),
+  )
+}
+
+function isBossInstantKill(submission: Submission, targetLevel: number) {
+  return !!bossChallengeForLevel(targetLevel) && submission.bossInstantKill === true
+}
+
+function bossEffectLabel(submission: Submission, targetLevel: number) {
+  if (!bossChallengeForLevel(targetLevel))
+    return ''
+  if (isBossInstantKill(submission, targetLevel))
+    return t('endless.instantKill')
+  if (submission.damage && submission.damage > 0)
+    return t('endless.damageDealt', { damage: submission.damage })
+  return ''
+}
+</script>
+
+<template>
+  <div>
+    <p class="mb-2">
+      {{ $t('endless.description') }}<br>
+      {{ $t(`endless.type.${endless.subType}`) }}
+    </p>
+    <WeeklyStatus :competition="endless" />
+    <h2 class="font-bold my-2">
+      {{ $t('common.basicRules') }}
+    </h2>
+    <ol class="text-sm mb-2 list-decimal list-inside marker:text-blue-500">
+      <I18nT tag="li" keypath="weekly.rules.basic.rules.0" scope="global">
+        <template #notation>
+          <Notation />
+        </template>
+      </I18nT>
+      <li v-for="m, i in $tm('endless.rules')" :key="i">
+        {{ m }}
+        <template v-if="Number(i) === 2">
+          <EndlessChallenges :challenges="endless.challenges" />
+        </template>
+      </li>
+    </ol>
+    <div class="mt-4">
+      <template v-if="myProgress">
+        <NuxtLink v-if="myProgress.next && myProgress.next.scramble" :to="competitionPath(endless, myProgress.next.scramble)" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+          {{ $t('endless.continue') }}
+        </NuxtLink>
+        <NuxtLink v-else-if="myProgress.current" :to="competitionPath(endless, myProgress.current.scramble)" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+          {{ $t('endless.continue') }}
+        </NuxtLink>
+        <NuxtLink v-else :to="competitionPath(endless, { number: 1 })" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+          {{ $t('weekly.join') }}
+        </NuxtLink>
+      </template>
+      <NuxtLink v-else to="/sign-in" class="bg-indigo-500 text-white px-3 py-2 text-lg">
+        {{ $t('common.signingToJoin') }}
+      </NuxtLink>
+    </div>
+    <h2 class="font-bold my-2 md:text-lg">
+      {{ $t('endless.progress.title') }}
+    </h2>
+    <div class="grid grid-cols-auto md:grid-cols-[max-content_max-content_max-content_1fr] gap-x-2 gap-y-1 md:gap-y-2 mb-2">
+      <div class="font-bold">
+        Level
+      </div>
+      <div class="font-bold">
+        {{ $t('endless.kickedBy') }}
+      </div>
+      <div class="font-bold">
+        {{ $t('result.best') }}
+      </div>
+      <div class="col-span-3 md:col-span-1" />
+      <template v-for="{ level, competitors, bestSubmissions, kickedOffs, conditions } in levels" :key="level">
+        <div v-if="myLevel < level" class="flex items-center">
+          {{ $t('endless.level', { level }) }}
+        </div>
+        <NuxtLink v-else :to="competitionPath(endless, { number: level })" class="text-indigo-500 dark:text-indigo-400 flex items-center">
+          {{ $t('endless.level', { level }) }}
+        </NuxtLink>
+        <div class="flex items-center flex-wrap">
+          <Icon v-if="myLevel <= level" name="material-symbols:lock-outline-sharp" />
+          <UserAvatarName v-else-if="kickedOffs.length === 1" :user="kickedOffs[0].user">
+            <template v-if="kickedOffs[0].submission.moves > 0">
+              ({{ formatResult(kickedOffs[0].submission.moves) }})
+              <span
+                v-if="bossEffectLabel(kickedOffs[0].submission, level)"
+                class="ml-1 inline-flex items-center border px-1 text-xs font-bold"
+                :class="isBossInstantKill(kickedOffs[0].submission, level)
+                  ? 'border-orange-300 bg-red-600 text-white shadow-sm shadow-red-900/30 dark:border-orange-400 dark:bg-red-500'
+                  : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/40 dark:text-red-300'"
+              >
+                {{ bossEffectLabel(kickedOffs[0].submission, level) }}
+              </span>
+            </template>
+          </UserAvatarName>
+          <template v-else-if="kickedOffs.length > 1">
+            <div v-for="{ user, submission } in kickedOffs" :key="user.id" class="flex">
+              <UserAvatar :user="user" />
+              <template v-if="submission.moves > 0">
+                ({{ formatResult(submission.moves) }})
+                <span
+                  v-if="bossEffectLabel(submission, level)"
+                  class="ml-1 inline-flex items-center border px-1 text-xs font-bold"
+                  :class="isBossInstantKill(submission, level)
+                    ? 'border-orange-300 bg-red-600 text-white shadow-sm shadow-red-900/30 dark:border-orange-400 dark:bg-red-500'
+                    : 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/40 dark:text-red-300'"
+                >
+                  {{ bossEffectLabel(submission, level) }}
+                </span>
+              </template>
+            </div>
+          </template>
+        </div>
+        <div class="text-indigo-500 dark:text-indigo-400 font-semibold flex items-center">
+          <Icon v-if="myLevel <= level" name="material-symbols:lock-outline-sharp" class="text-black" />
+          <template v-else-if="bestSubmissions.length > 0">
+            <div class="mr-1">
+              {{ formatResult(bestSubmissions[0].moves) }}
+            </div>
+            <div class="flex flex-wrap">
+              <UserAvatar v-for="b in bestSubmissions" :key="b.id" :user="b.user" />
+            </div>
+          </template>
+        </div>
+        <div class="col-span-3 md:col-span-1">
+          <div class="whitespace-nowrap border px-1 relative">
+            <div class="bg-indigo-500 dark:bg-indigo-500/50 absolute -z-10 inset-0" :style="{ width: `${competitors / maxCompetitors * 100}%` }" />
+            {{ $t('endless.progress.competitors', { competitors }) }}
+          </div>
+        </div>
+        <div v-if="isConditionMode && conditions?.length" class="col-span-3 md:col-span-4 flex flex-wrap gap-1">
+          <div
+            v-for="condition in conditions"
+            :key="condition.id"
+            class="text-xs px-1.5 py-0.5 border"
+            :class="condition.revealed
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-700 dark:text-green-400'
+              : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400'"
+          >
+            <template v-if="condition.revealed">
+              ✓
+            </template>
+            <template v-else>
+              ?
+            </template>
+          </div>
+        </div>
+        <template v-if="!expanded && expandLevels.includes(level)">
+          <div class="col-span-3 md:col-span-4">
+            <button class="text-indigo-500 dark:text-indigo-400 flex items-center gap-2" @click="expanded = true">
+              <Icon name="mdi:arrow-expand-vertical" />
+              {{ $t('endless.showAll') }}
+            </button>
+          </div>
+        </template>
+      </template>
+    </div>
+    <EndlessStats :endless="endless" />
+  </div>
+</template>

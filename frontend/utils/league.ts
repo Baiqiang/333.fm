@@ -1,0 +1,154 @@
+export enum LeagueSeasonStatus {
+  NOT_STARTED,
+  ON_GOING,
+  ENDED,
+}
+
+export interface LeagueSeason {
+  id: number
+  number: number
+  title: string
+  startTime: Date
+  endTime: Date
+  status: LeagueSeasonStatus
+  tiers: LeagueTier[]
+  competitions: Competition[]
+  standings: LeagueStanding[]
+  // players: LeaguePlayer[]
+  eloHistories: LeagueEloHistory[]
+  elos: Record<number, number>
+}
+
+export interface LeagueEloHistory {
+  id: number
+  seasonId: number
+  competitionId: number
+  week: number
+  userId: number
+
+  points: number
+  delta: number
+  createdAt: Date
+}
+
+export interface LeagueStanding {
+  id: number
+  seasonId: number
+  tierId: number
+  userId: number
+  points: number
+  wins: number
+  losses: number
+  draws: number
+  bestMo3: number
+  season: LeagueSeason
+  tier: LeagueTier
+  user: User
+}
+
+export interface LeagueResult {
+  id: number
+  seasonId: number
+  competitionId: number
+  week: number
+  userId: number
+  points: number
+}
+
+export interface LeagueTier {
+  id: number
+  level: number
+  name: string
+  seasonId: number
+  season: LeagueSeason
+  players: LeaguePlayer[]
+  duels: LeagueDuel[]
+  standings: LeagueStanding[]
+}
+
+export interface LeagueStanding {
+  id: number
+  tierId: number
+  userId: number
+  position: number
+  points: number
+  createdAt: Date
+  updatedAt: Date
+  tier: LeagueTier
+  user: User
+}
+
+export interface LeagueDuel {
+  id: number
+  seasonId: number
+  competitionId: number
+  tierId: number
+  user1Id: number
+  user2Id: number
+  user1Points: number
+  user2Points: number
+  createdAt: Date
+  updatedAt: Date
+  season?: LeagueSeason
+  competition: Competition
+  tier: LeagueTier
+  user1?: User
+  user2?: User
+  user1Result?: Result
+  user2Result?: Result
+  ended: boolean
+}
+
+export interface TierSchedule {
+  tier: LeagueTier
+  schedules: LeagueDuel[]
+}
+
+export interface LeaguePlayer {
+  id: number
+  seasonId: number
+  tierId: number
+  userId: number
+  season: LeagueSeason
+  tier: LeagueTier
+  user: User
+  standings: LeagueStanding[]
+}
+
+export const SYMBOL_LEAGUE_SEASON: InjectionKey<Ref<LeagueSeason>> = Symbol('leagueSeason')
+
+export function leagueWeek(competition: Competition) {
+  return competition.alias.split('-')[2]
+}
+
+export function leagueWeekName(competition: Competition) {
+  return competition.alias.replace(/league-(\d+)-(\d+)/, 'S$1 W$2')
+}
+
+export function leagueWeekPoints(user1Points: number, user2Points: number) {
+  if (user1Points + user2Points === 0 || user1Points + user2Points !== 3) {
+    return '-'
+  }
+  if (user1Points > user2Points) {
+    return 2
+  }
+  if (user1Points === user2Points) {
+    return 1
+  }
+  return 0
+}
+
+export const tierBackgrounds = [
+  'bg-sky-200 dark:bg-sky-900/60',
+  'bg-red-200 dark:bg-red-900/60',
+  'bg-green-200 dark:bg-green-900/60',
+  'bg-purple-200 dark:bg-purple-900/60',
+  'bg-yellow-200 dark:bg-yellow-900/60',
+  'bg-orange-200 dark:bg-orange-900/60',
+]
+
+export const unassignedTier = {
+  id: 0,
+  name: '-',
+  level: 9999,
+} satisfies Partial<LeagueTier>

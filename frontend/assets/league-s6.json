@@ -1,0 +1,302 @@
+[
+  {
+    "level": 1,
+    "name": "Wong Chong Wen (黄崇文)",
+    "wcaId": "2014WENW01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2014WENW01/1441150556_thumb.jpg"
+  },
+  {
+    "level": 1,
+    "name": "Radomił Baran",
+    "wcaId": "2020BARA02",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2020BARA02/1701097003_thumb.jpg"
+  },
+  {
+    "level": 1,
+    "name": "Louis-Marie Ratto",
+    "wcaId": "2019RATT02",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/ypz6ta3okg8sfozcu8pzaf0e6pi3"
+  },
+  {
+    "level": 1,
+    "name": "Adrien Neveu",
+    "wcaId": "2018NEVE02",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/e3a86e3/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 1,
+    "name": "Carter Kucala",
+    "wcaId": "2015KUCA01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2015KUCA01/1715349156_thumb.png"
+  },
+  {
+    "level": 1,
+    "name": "Fabio Schwandt",
+    "wcaId": "2014SCHW02",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2014SCHW02/1665435104_thumb.jpg"
+  },
+  {
+    "level": 1,
+    "name": "Enrico Tenuti",
+    "wcaId": "2017TENU01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017TENU01/1660224792_thumb.jpg"
+  },
+  {
+    "level": 1,
+    "name": "Joseph Guzman",
+    "wcaId": "2015GUZM03",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/b84d28f/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 1,
+    "name": "Evan Brown",
+    "wcaId": "2013BROW04",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2013BROW04/1689824252_thumb.jpg"
+  },
+  {
+    "level": 1,
+    "name": "Mauro Moisés Ortega López",
+    "wcaId": "2016LOPE44",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2016LOPE44/1723461237_thumb.jpg"
+  },
+  {
+    "level": 2,
+    "name": "Max Parris",
+    "wcaId": "2022PARR10",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022PARR10/1705816150_thumb.jpg"
+  },
+  {
+    "level": 2,
+    "name": "Wojciech Rogoziński",
+    "wcaId": "2019ROGO04",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2019ROGO04/1705691107_thumb.jpg"
+  },
+  {
+    "level": 2,
+    "name": "Jayden McNeill",
+    "wcaId": "2012MCNE01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2012MCNE01/1728282431_thumb.png"
+  },
+  {
+    "level": 2,
+    "name": "Yurii Riabov (Юрій Рябов)",
+    "wcaId": "2018RIAB01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/qwwvft9ypr8jinust9rm4pdhpvgl"
+  },
+  {
+    "level": 2,
+    "name": "Janne Lehtimäki",
+    "wcaId": "2012LEHT01",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/7ecaa07/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 2,
+    "name": "Rayan Islam",
+    "wcaId": "2022ISLA08",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/e766043/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 2,
+    "name": "Louis Sarthou",
+    "wcaId": "2012SART01",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/48cec85/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 2,
+    "name": "Elliot Wiecek",
+    "wcaId": "2016WIEC02",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/ad80b95/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 2,
+    "name": "Dorian Chan",
+    "wcaId": "2023DORI01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2023DORI01/1699738413_thumb.jpeg"
+  },
+  {
+    "level": 2,
+    "name": "Gerard McGinley",
+    "wcaId": "2019MCGI01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2019MCGI01/1593574306_thumb.png"
+  },
+  {
+    "level": 3,
+    "name": "Krzysztof Pietrusiak",
+    "wcaId": "2019PIET01",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/ac82638/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 3,
+    "name": "Nông Quốc Duy",
+    "wcaId": "2022DUYN02",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022DUYN02/1721623636_thumb.jpg"
+  },
+  {
+    "level": 3,
+    "name": "Jan Riedl",
+    "wcaId": "2019RIED01",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/1bf017e/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 3,
+    "name": "Baiqiang Dong (董百强)",
+    "wcaId": "2008DONG06",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2008DONG06/1512307631_thumb.jpg"
+  },
+  {
+    "level": 3,
+    "name": "Szabolcs Szántai",
+    "wcaId": "2016SZAN01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2016SZAN01/1717868592_thumb.jpeg"
+  },
+  {
+    "level": 3,
+    "name": "Lewis Isom",
+    "wcaId": "2018ISOM02",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2018ISOM02/1699018762_thumb.jpeg"
+  },
+  {
+    "level": 3,
+    "name": "Radosław Opoka",
+    "wcaId": "2013OPOK01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2013OPOK01/1658485296_thumb.png"
+  },
+  {
+    "level": 3,
+    "name": "Quentin Rivault",
+    "wcaId": "2017RIVA09",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017RIVA09/1681064549_thumb.jpg"
+  },
+  {
+    "level": 3,
+    "name": "Lichi Fang (方力驰)",
+    "wcaId": "2018FANG03",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2018FANG03/1649808875_thumb.PNG"
+  },
+  {
+    "level": 3,
+    "name": "Xiwen Ruan (阮熙文)",
+    "wcaId": "2018RUAN04",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/yewxptainuw7hajncogjijchv2o6"
+  },
+  {
+    "level": 4,
+    "name": "Doug Li",
+    "wcaId": "2003LIDO01",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/a318dbe/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 4,
+    "name": "Walker Welch",
+    "wcaId": "2011WELC01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2011WELC01/1686688470_thumb.jpg"
+  },
+  {
+    "level": 4,
+    "name": "Deven Huard-Bernuy",
+    "wcaId": "2019HUAR04",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2019HUAR04/1714884944_thumb.jpeg"
+  },
+  {
+    "level": 4,
+    "name": "Brian Johnson",
+    "wcaId": "2013JOHN10",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/34d7g2jl1c4osjg8ohwn2i2hpvlu"
+  },
+  {
+    "level": 4,
+    "name": "Adam Marcellus Kelly",
+    "wcaId": "2016KELL10",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2016KELL10/1633976472_thumb.jpg"
+  },
+  {
+    "level": 4,
+    "name": "Trần Đăng Quang",
+    "wcaId": "2014QUAN03",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2014QUAN03/1607841537_thumb.jpeg"
+  },
+  {
+    "level": 4,
+    "name": "Daniel Perez",
+    "wcaId": "2022PERE46",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022PERE46/1724538227_thumb.jpg"
+  },
+  {
+    "level": 4,
+    "name": "Jibo Zhao (赵吉波)",
+    "wcaId": "2010ZHAO11",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2010ZHAO11/1717596565_thumb.jpg"
+  },
+  {
+    "level": 4,
+    "name": "Muhammad Hanif",
+    "wcaId": "2022HANI01",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/a318dbe/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 4,
+    "name": "Elijah La Porte",
+    "wcaId": "2022PORT01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2022PORT01/1712615323_thumb.jpg"
+  },
+  {
+    "level": 5,
+    "name": "Harsha Paladugu",
+    "wcaId": "2017PALA08",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017PALA08/1702954624_thumb.jpeg"
+  },
+  {
+    "level": 5,
+    "name": "Marcin Chmielewski",
+    "wcaId": "2023CHMI01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2023CHMI01/1722948828_thumb.jpeg"
+  },
+  {
+    "level": 5,
+    "name": "Benjamin Kyle",
+    "wcaId": "2016KYLE01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2016KYLE01/1710112447_thumb.png"
+  },
+  {
+    "level": 5,
+    "name": "Étienne Aubry",
+    "wcaId": "2018AUBR01",
+    "avatarThumb": "https://assets.worldcubeassociation.org/assets/110aeef/assets/missing_avatar_thumb-d77f478a307a91a9d4a083ad197012a391d5410f6dd26cb0b0e3118a5de71438.png"
+  },
+  {
+    "level": 5,
+    "name": "Nicolas Gertner Kilian",
+    "wcaId": "2013GERT01",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2013GERT01/1650739517_thumb.jpg"
+  },
+  {
+    "level": 5,
+    "name": "Sundararajan",
+    "wcaId": "2022SUND04",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/g6p7rk2zbelwmd83kdlnacrt0cul"
+  },
+  {
+    "level": 5,
+    "name": "Maosheng Chen (陈茂盛)",
+    "wcaId": "2012CHEN44",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2012CHEN44/1701369707_thumb.png"
+  },
+  {
+    "level": 5,
+    "name": "Igor Tarasov",
+    "wcaId": "2016TARA04",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2016TARA04/1677676831_thumb.jpg"
+  },
+  {
+    "level": 5,
+    "name": "Brandon Villadolid",
+    "wcaId": "2019VILL03",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/yn13z7yyrlbqtng5z49wt1biqghg"
+  },
+  {
+    "level": 5,
+    "name": "Shawn Lee Zhi Xuan (李致轩)",
+    "wcaId": "2017XUAN03",
+    "avatarThumb": "https://avatars.worldcubeassociation.org/uploads/user/avatar/2017XUAN03/1666673639_thumb.jpg"
+  }
+]

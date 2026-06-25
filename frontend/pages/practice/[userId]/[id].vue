@@ -1,0 +1,142 @@
+<script setup lang="ts">
+const { params } = useRoute()
+const { t, locale } = useI18n()
+const bus = useEventBus('submission')
+const user = useUser()
+const profile = inject(SYMBOL_USER)!
+if (!profile) {
+  throw createError({
+    statusCode: 404,
+  })
+}
+const index = params.id as string
+const basePath = `/practice/practice-${profile.value.id}-${index}`
+const { data, error } = await useApi<Practice>(basePath)
+if (error.value || !data.value) {
+  throw createError({
+    statusCode: error.value?.statusCode ?? 404,
+  })
+}
+const competition = ref<Practice>(data.value)
+const isOwner = computed(() => user.id === competition.value.user?.id)
+const submissions = reactive<Record<number, Submission[]>>({})
+const results: Ref<Result[]> = ref([])
+const mySubmissions = computed(() => {
+  const ret: Record<number, Submission[]> = {}
+  for (const { id } of competition.value.scrambles)
+    ret[id] = submissions[id]?.filter(submission => submission.user.id === user.id) ?? []
+
+  return ret
+})
+await fetchData()
+async function fetchData() {
+  await Promise.all([
+    fetchSubmissions(),
+    fetchResults(),
+  ])
+}
+async function fetchResults() {
+  const { data, refresh } = await useApi<Result[]>(`${basePath}/results`, {
+    immediate: false,
+  })
+  await refresh()
+  if (data.value)
+    results.value = data.value
+}
+async function fetchSubmissions() {
+  const { data, refresh } = await useApi<Record<number, Submission[]>>(`${basePath}/submissions`, {
+    immediate: false,
+  })
+  await refresh()
+  if (data.value)
+    Object.assign(submissions, data.value)
+}
+useSeoMeta({
+  title: computed(() => `${t('practice.index', { index })} - ${t('practice.user.title', {
+    name: localeName(profile.value.name, locale.value),
+  })}`),
+})
+useIntervalFn(fetchData, 5000)
+bus.on(fetchData)
+</script>
+
+<template>
+  <div>
+    <NuxtLink to="/practice/new" class="bg-indigo-500 text-white px-3 py-2 mb-2 inline-flex items-center gap-1">
+      <Icon name="ic:twotone-plus" />
+      {{ $t('common.new') }}
+    </NuxtLink>
+    <BackTo
+      :to="`/practice/${profile.wcaId || profile.id}`"
+      :label="$t('practice.user.title', {
+        name: localeName(profile.name, locale),
+      })"
+    />
+    <h2 class="font-semibold text-lg mt-2">
+      {{ $t('practice.index', { index }) }}
+    </h2>
+    <WeeklyStatus :competition="competition" />
+    <div v-if="competition.description && !isOwner" class="my-3">
+      <h3 class="font-bold text-sm mb-1">
+        {{ $t('practice.description') }}
+      </h3>
+      <ClientOnly>
+        <MdPreview :content="competition.description" />
+        <template #fallback>
+          <div class="whitespace-pre-wrap">
+            {{ competition.description }}
+          </div>
+        </template>
+      </ClientOnly>
+    </div>
+    <PracticeDescriptionForm
+      v-if="isOwner"
+      :alias="competition.alias"
+      :existing-description="competition.description"
+      @updated="desc => competition.description = desc"
+    />
+    <Tabs>
+      <Tab
+        v-for="scramble in competition.scrambles"
+        :key="scramble.id"
+        :name="$t('weekly.scramble', { number: scramble.number })"
+        :hash="`scramble-${scramble.number}`"
+      >
+        <ScrambleDisplay :scramble="scramble.scramble" />
+        <CompetitionForm
+          :scramble="scramble"
+          :competition="competition"
+          :submissions="mySubmissions[scramble.id]"
+          :allow-unlimited="false"
+          type="practice"
+          @submitted="fetchData"
+        />
+        <CompetitionSiblings :competition="competition" />
+        <h2 class="text-lg font-semibold my-2">
+          {{ $t('weekly.solutions') }}
+        </h2>
+        <div>
+          <div v-if="!submissions[scramble.id]">
+            {{ $t('weekly.noSolution') }}
+          </div>
+          <Spoiler
+            v-else
+            :spoiled="$t('weekly.solutions')"
+            :show="mySubmissions[scramble.id]?.length > 0"
+          >
+            <Submissions :submissions="submissions[scramble.id]" :competition="competition" :scramble="scramble" />
+          </Spoiler>
+        </div>
+      </Tab>
+      <Tab v-if="results.length > 0" :name="$t('weekly.results')" hash="results">
+        <Spoiler
+          :spoiled="$t('weekly.results')"
+          :show="competition.scrambles.every(scramble => mySubmissions[scramble.id]?.length > 0)"
+          class="my-2"
+        >
+          <WeeklyResults :results="results" />
+        </Spoiler>
+      </Tab>
+    </Tabs>
+  </div>
+</template>

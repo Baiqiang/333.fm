@@ -1,0 +1,615 @@
+<script setup lang="ts">
+import { Algorithm, Cube } from 'insertionfinder'
+import leagueS6 from '~/assets/league-s6.json'
+import { DNF, formatResult } from '~/utils/competition'
+import { formatAlgorithm, replaceQuote } from '~/utils/if'
+
+const config = useRuntimeConfig()
+const accessToken = useAccessToken()
+const user = useUser()
+const { t } = useI18n()
+const { number: seasonNumber } = useRoute().params
+const router = useRouter()
+const { data, error } = await useApi<LeagueSeason>(`/league/admin/season/${seasonNumber}`)
+if (error.value || !data.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Season not found',
+  })
+}
+
+const baseURL = `/league/admin/season/${seasonNumber}`
+const season = ref(data.value)
+const isDev = config.public.mode !== 'production'
+
+async function updateSeason() {
+  try {
+    const { data } = await useApi<LeagueSeason>(`/league/admin/season/${seasonNumber}`)
+    if (data.value) {
+      season.value = data.value
+    }
+  }
+  catch {
+
+  }
+}
+
+// tiers
+const weeks = computed(() => season.value.competitions.length + 1)
+const canEditTier = computed(() => season.value.status === LeagueSeasonStatus.NOT_STARTED && season.value.competitions.every(c => c.status === CompetitionStatus.NOT_STARTED))
+const tierPlayers = ref<Record<number, User[]>>(Object.fromEntries(season.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)])))
+const tierEdited = ref<Record<number, boolean>>(Object.fromEntries(season.value.tiers.map(tier => [tier.id, false])))
+const editingIndex = ref<string>('')
+const search = ref('')
+const searchInput = ref<HTMLInputElement[]>([])
+const searchResults = ref<User[]>([])
+const searchWCAPersonDebounced = debounce(searchWCAPerson)
+
+watch(editingIndex, (index) => {
+  if (index) {
+    nextTick(() => searchInput.value[0]?.focus())
+  }
+})
+
+function pickPlayer(tierId: number, index: number, user: User) {
+  tierPlayers.value[tierId][index] = user
+  tierEdited.value[tierId] = true
+  editingIndex.value = ''
+  searchResults.value = []
+  search.value = ''
+}
+
+async function importS6() {
+  if (!confirm('This will override current tier settings. Please confirm to import!')) {
+    return
+  }
+  for (const tier of season.value.tiers) {
+    const players = leagueS6.filter(s => s.level === tier.level).slice(0, weeks.value)
+    tierPlayers.value[tier.id] = players as any
+    await saveTierPlayers(tier.id)
+  }
+}
+
+async function searchWCAPerson() {
+  try {
+    const data = await $fetch<{ result: { wca_id: string, name: string, avatar: { thumb_url: string } }[] }>(`https://www.worldcubeassociation.org/api/v0/search/persons?q=${search.value}`)
+    searchResults.value = data.result.map(row => ({
+      wcaId: row.wca_id,
+      name: row.name,
+      avatarThumb: row.avatar.thumb_url,
+    } as User))
+  }
+  catch (error) {
+    console.error(error)
+    searchResults.value = []
+  }
+}
+
+async function saveTierPlayers(tierId: number) {
+  try {
+    await useApiPost(`${baseURL}/players`, {
+      body: {
+        tierId,
+        // drop empty slots so partially-filled tiers (fewer players than weeks) save cleanly
+        players: tierPlayers.value[tierId].filter(Boolean),
+      },
+    })
+    tierEdited.value[tierId] = false
+    editingIndex.value = ''
+    await updateSeason()
+    tierPlayers.value = Object.fromEntries(season.value.tiers.map(tier => [tier.id, tier.players.map(player => player.user)]))
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
+// schedules
+const tierSchedules = ref<TierSchedule[]>([])
+const generating = ref(false)
+const canGenerate = computed(() => {
+  return canEditTier.value
+    && Object.values(tierEdited.value).every(edited => !edited)
+    // tiers may have fewer players than weeks; missing slots are filled with byes.
+    // require at least 2 real players and no more than the number of weeks.
+    && Object.values(tierPlayers.value).every((players) => {
+      const count = players.filter(Boolean).length
+      return count >= 2 && count <= weeks.value
+    })
+})
+
+await updateSchedules()
+
+async function updateSchedules() {
+  try {
+    const { data } = await useApi<TierSchedule[]>(`${baseURL}/schedules`)
+    if (data.value) {
+      tierSchedules.value = data.value
+    }
+  }
+  catch {
+
+  }
+}
+
+async function generateSchedules() {
+  if (generating.value)
+    return
+  generating.value = true
+  try {
+    await useApiPost(`${baseURL}/schedules`)
+    await updateSchedules()
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    generating.value = false
+  }
+}
+
+// scrambles
+const editModal = ref(false)
+const editDialog = useConfirmDialog(editModal)
+const scramblesString = ref('')
+const scramblesValid = computed(() => {
+  const scrambles = scramblesString.value.trim().split('\n')
+  return scrambles.length === 3 && scrambles.every((s) => {
+    try {
+      const _ = new Algorithm(s)
+      return true
+    }
+    catch {
+      return false
+    }
+  })
+})
+async function generateScrambles(competition: Competition) {
+  try {
+    await useApiPost(`${baseURL}/${leagueWeek(competition)}/generate-scrambles`)
+    await updateSeason()
+  }
+  catch {
+  }
+}
+
+async function importScrambles(competition: Competition) {
+  const { isCanceled } = await editDialog.reveal()
+  if (isCanceled) {
+    return
+  }
+  try {
+    await useApiPost(`${baseURL}/${leagueWeek(competition)}/scrambles`, {
+      body: {
+        scrambles: scramblesString.value.trim().split('\n'),
+      },
+    })
+    await updateSeason()
+  }
+  catch {
+  }
+}
+
+async function startCompetition(competition: Competition) {
+  try {
+    await useApiPost(`${baseURL}/${leagueWeek(competition)}/start`)
+    await updateSeason()
+  }
+  catch {
+  }
+}
+
+async function endCompetition(competition: Competition) {
+  try {
+    await useApiPost(`${baseURL}/${leagueWeek(competition)}/end`)
+    await updateSeason()
+  }
+  catch {
+  }
+}
+
+// add submission
+const addSubmissionModal = ref(false)
+const addSubmissionWeek = ref<string>('')
+const addSubmissionScrambleId = ref<number | ''>('')
+const addSubmissionUserId = ref<number | ''>('')
+const addSubmissionSolution = ref('')
+const addSubmissionComment = ref('')
+const addSubmissionSubmitting = ref(false)
+
+const weekOptions = computed(() =>
+  season.value.competitions.map(c => ({
+    week: c.alias.split('-')[2],
+    label: `Week ${c.alias.split('-')[2]}`,
+  })),
+)
+const scramblesForSelectedWeek = computed(() => {
+  if (!addSubmissionWeek.value)
+    return []
+  const comp = season.value.competitions.find(c => c.alias.split('-')[2] === addSubmissionWeek.value)
+  return comp?.scrambles ?? []
+})
+const selectedScramble = computed(() => {
+  if (addSubmissionScrambleId.value === '')
+    return null
+  for (const c of season.value.competitions) {
+    const s = c.scrambles.find(sc => sc.id === addSubmissionScrambleId.value)
+    if (s)
+      return s
+  }
+  return null
+})
+
+watch(addSubmissionWeek, () => {
+  addSubmissionScrambleId.value = ''
+})
+// watch(addSubmissionModal, (v) => {
+//   if (v) {
+//     addSubmissionWeek.value = ''
+//     addSubmissionScrambleId.value = ''
+//     addSubmissionUserId.value = ''
+//     addSubmissionSolution.value = ''
+//     addSubmissionComment.value = ''
+//   }
+// })
+
+const addSubmissionValidation = computed(() => {
+  const scramble = selectedScramble.value
+  const solution = addSubmissionSolution.value.trim()
+  if (!scramble || !solution)
+    return { moves: DNF, isSolved: false, formattedSolution: '' }
+  let solutionAlg: Algorithm | null = null
+  try {
+    if (solution.includes('NISS') || solution.includes('('))
+      return { moves: DNF, isSolved: false, formattedSolution: '' }
+    solutionAlg = new Algorithm(replaceQuote(solution))
+  }
+  catch {
+    return { moves: DNF, isSolved: false, formattedSolution: '' }
+  }
+  let cube = scramble.cubieCube
+    ? Cube.fromCubieCube(scramble.cubieCube.corners, scramble.cubieCube.edges, scramble.cubieCube.placement)
+    : (() => {
+        const c = new Cube()
+        c.twist(new Algorithm(scramble.scramble))
+        return c
+      })()
+  cube = cube.clone()
+  cube.twist(solutionAlg)
+  const isSolved = cube.getBestPlacement().isSolved()
+  const moves = isSolved && solutionAlg.length <= 80 ? solutionAlg.length : DNF
+  const formattedSolution = solutionAlg ? formatAlgorithm(solution) : ''
+  return { moves, isSolved: moves !== DNF, formattedSolution }
+})
+
+const canSubmitAddSubmission = computed(() =>
+  addSubmissionScrambleId.value !== ''
+  && addSubmissionUserId.value !== ''
+  && addSubmissionSolution.value.trim() !== '',
+)
+async function submitAddSubmission() {
+  if (!canSubmitAddSubmission.value || addSubmissionSubmitting.value)
+    return
+  if (addSubmissionValidation.value.moves === DNF && !confirm(t('weekly.confirmDNF')))
+    return
+  addSubmissionSubmitting.value = true
+  try {
+    const { data, error } = await useApiPost<boolean>(`${baseURL}/add-submission`, {
+      body: {
+        scrambleId: addSubmissionScrambleId.value,
+        userId: addSubmissionUserId.value,
+        solution: addSubmissionSolution.value.trim(),
+        comment: addSubmissionComment.value.trim(),
+      },
+    })
+    if (error.value) {
+      alert(error.value.data?.message || error.value.message)
+    }
+    else if (data.value) {
+      addSubmissionModal.value = false
+      addSubmissionWeek.value = ''
+      addSubmissionScrambleId.value = ''
+      addSubmissionUserId.value = ''
+      addSubmissionSolution.value = ''
+      addSubmissionComment.value = ''
+    }
+  }
+  catch (e) {
+    console.error(e)
+    alert((e as Error).message)
+  }
+  finally {
+    addSubmissionSubmitting.value = false
+  }
+}
+
+// participants
+const { data: participants } = await useApi<{ user: User }[]>(`${baseURL}/participants`)
+const groupedParticipants = computed(() => {
+  const userTierMap: Record<number, number> = {}
+  for (const tier of season.value.tiers) {
+    for (const player of tier.players) {
+      userTierMap[player.userId] = tier.id
+    }
+  }
+  const ret: Record<number, User[]> = {}
+  for (const participant of participants.value || []) {
+    const tierId = userTierMap[participant.user.id] || 0
+    ret[tierId] = [...(ret[tierId] || []), participant.user]
+  }
+  return ret
+})
+
+// test functions
+async function deleteSeason() {
+  if (!confirm('Are you sure you want to delete this season?')) {
+    return
+  }
+  try {
+    await useApiDelete(`/league/admin/season/${seasonNumber}`)
+    router.push('/league/admin')
+  }
+  catch {
+  }
+}
+
+async function signInAs({ wcaId }: User) {
+  try {
+    const { data, error } = await useApiPost<{ accessToken: string, user: User }>('/league/admin/signin-as', {
+      body: {
+        wcaId,
+      },
+    })
+    if (!data.value || error.value) {
+      throw new Error('Failed to login')
+    }
+    user.signIn(data.value.user)
+    accessToken.value = data.value.accessToken
+    router.push('/league')
+  }
+  catch {
+
+  }
+}
+</script>
+
+<template>
+  <div>
+    <Heading1>
+      {{ season.title }}
+    </Heading1>
+    <h3 class="text-lg font-bold my-2 w-full clear-both">
+      Tiers
+    </h3>
+    <button v-if="canEditTier" class="bg-indigo-500 text-white text-sm mb-2 px-2 py-1" @click="importS6">
+      Import S6 tier preset
+    </button>
+    <div class="flex flex-wrap gap-3">
+      <div v-for="tier, index in season.tiers" :key="tier.id" :class="tierBackgrounds[index]">
+        <h4 class="font-bold p-2 border-b border-gray-500">
+          {{ tier.name }}
+        </h4>
+        <div class="flex flex-col gap-1 p-2">
+          <div v-for="week in weeks" :key="week">
+            <div v-if="editingIndex === `${tier.id}-${week}`" class="relative">
+              <div class="flex items-center gap-1">
+                <input
+                  ref="searchInput"
+                  v-model="search"
+                  class="w-full text-xs py-px px-1 placeholder:text-xs"
+                  placeholder="Search WCA ID or name"
+                  @input="searchWCAPersonDebounced"
+                >
+                <Icon name="heroicons:x-mark-16-solid" class="cursor-pointer" @click="editingIndex = ''" />
+              </div>
+              <div
+                v-if="searchResults.length > 0 && search"
+                class="absolute top-15 left-0 pl-2 pr-6 py-2 bg-white rounded-md shadow-md"
+              >
+                <UserAvatarName
+                  v-for="result in searchResults"
+                  :key="result.wcaId"
+                  :size="4"
+                  :user="result"
+                  :link="false"
+                  class="cursor-pointer"
+                  @click="pickPlayer(tier.id, week - 1, result)"
+                />
+              </div>
+            </div>
+            <div v-else-if="tierPlayers[tier.id][week - 1]" class="flex items-center gap-2">
+              <UserAvatarName :user="tierPlayers[tier.id][week - 1]" />
+              <Icon
+                v-if="canEditTier"
+                name="heroicons:pencil-16-solid"
+                class="cursor-pointer hover:text-indigo-500"
+                @click="editingIndex = `${tier.id}-${week}`"
+              />
+              <Icon
+                v-if="isDev"
+                name="material-symbols:person-alert"
+                class="cursor-pointer hover:text-red-500"
+                @click="signInAs(tierPlayers[tier.id][week - 1])"
+              />
+            </div>
+            <div v-else class="cursor-pointer hover:text-indigo-500" @click="editingIndex = `${tier.id}-${week}`">
+              <Icon name="heroicons:plus-16-solid" />
+            </div>
+          </div>
+        </div>
+        <div v-if="tierEdited[tier.id]" class="flex mt-2">
+          <button class="text-xs bg-indigo-500 text-white px-2 py-1" @click="saveTierPlayers(tier.id)">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+    <h3 class="text-lg font-bold my-2 w-full">
+      Weeks
+    </h3>
+    <div v-for="competition in season.competitions" :key="competition.id" class="py-2 border-t border-gray-300">
+      <div class="flex gap-2 items-center">
+        <div class="font-bold">
+          Week {{ competition.alias.split('-')[2] }}
+        </div>
+        <WeeklyStatus class="text-gray-600 text-sm" :competition="competition" />
+      </div>
+      <div v-for="{ scramble, number } in competition.scrambles" :key="number">
+        <Sequence :sequence="scramble" :source="scramble" :prefix="`No.${number} `" />
+      </div>
+      <div class="flex gap-2">
+        <button v-if="competition.status === CompetitionStatus.NOT_STARTED" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="generateScrambles(competition)">
+          Generate Scrambles
+        </button>
+        <button v-if="competition.status === CompetitionStatus.NOT_STARTED" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="importScrambles(competition)">
+          Import Scrambles
+        </button>
+        <button v-if="competition.status !== CompetitionStatus.ON_GOING && isDev" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="startCompetition(competition)">
+          Start
+        </button>
+        <button v-if="competition.status === CompetitionStatus.ON_GOING && isDev" class="text-white bg-indigo-500 px-2 py-1 text-sm" @click="endCompetition(competition)">
+          End
+        </button>
+      </div>
+    </div>
+    <h3 class="text-lg font-bold my-2 w-full">
+      Add Submission
+    </h3>
+    <button class="bg-indigo-500 text-white text-sm px-2 py-1 mb-2" @click="addSubmissionModal = true">
+      Add Submission
+    </button>
+    <h3 class="text-lg font-bold my-2 w-full">
+      Participants
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      <div v-for="tier, index in [...season.tiers, unassignedTier]" :key="tier.id" :class="tierBackgrounds[index]">
+        <h4 class="font-bold p-2 border-b border-gray-500">
+          {{ tier.name }}
+        </h4>
+        <div class="flex flex-col gap-1 p-2">
+          <UserAvatarName v-for="participant in groupedParticipants[tier.id]" :key="participant.id" :user="participant" />
+        </div>
+      </div>
+    </div>
+    <h3 class="text-lg font-bold my-2 w-full">
+      Schedules
+    </h3>
+    <LeagueSchedules :tier-schedules="tierSchedules" :tab="false" />
+    <div class="flex flex-wrap gap-2 my-2">
+      <button
+        class="bg-indigo-500 text-white px-2 py-1 text-sm"
+        :class="{
+          'cursor-not-allowed opacity-80': !canGenerate,
+        }"
+        :disabled="!canGenerate"
+        @click="generateSchedules"
+      >
+        {{ generating ? 'Generatring...' : 'Generate Schedules' }}
+      </button>
+    </div>
+    <button v-if="isDev" class="text-xs bg-red-500 text-white px-2 py-1 my-2" @click="deleteSeason">
+      <Icon name="heroicons:trash-16-solid" />
+    </button>
+    <Teleport to="body">
+      <Modal v-if="editModal" :cancel="editDialog.cancel">
+        <div class="mb-4">
+          <p class="mb-1">
+            One scramble per line
+          </p>
+          <textarea
+            v-model="scramblesString"
+            class="w-96"
+            rows="8"
+          />
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button
+            class="bg-indigo-500 text-white px-2 py-1"
+            :class="{
+              'cursor-pointer hover:bg-indigo-500/90': scramblesValid,
+              'cursor-not-allowed opacity-80': !scramblesValid,
+            }"
+            :disabled="!scramblesValid"
+            @click="editDialog.confirm"
+          >
+            {{ $t('form.submit') }}
+          </button>
+          <button class="bg-gray-300 hover:bg-gray-300/80 cursor-pointer px-2 py-1" @click="editDialog.cancel">
+            {{ $t('form.cancel') }}
+          </button>
+        </div>
+      </Modal>
+      <Modal v-if="addSubmissionModal" :cancel="() => addSubmissionModal = false">
+        <div class="mb-4 space-y-3 min-w-80">
+          <div>
+            <label class="block text-sm font-medium mb-1">Step 1: Week</label>
+            <select v-model="addSubmissionWeek" class="w-full border border-gray-300 px-2 py-1">
+              <option value="">
+                Select week
+              </option>
+              <option v-for="opt in weekOptions" :key="opt.week" :value="opt.week">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+          <div v-if="addSubmissionWeek">
+            <label class="block text-sm font-medium mb-1">Step 2: Scramble</label>
+            <select v-model="addSubmissionScrambleId" class="w-full border border-gray-300 px-2 py-1">
+              <option value="">
+                Select scramble
+              </option>
+              <option v-for="s in scramblesForSelectedWeek" :key="s.id" :value="s.id">
+                No.{{ s.number }}
+              </option>
+            </select>
+            <p v-if="selectedScramble" class="mt-1 text-sm text-gray-600 font-mono break-all">
+              {{ selectedScramble.scramble }}
+            </p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">User</label>
+            <select v-model="addSubmissionUserId" class="w-full border border-gray-300 px-2 py-1">
+              <option value="">
+                Select user
+              </option>
+              <optgroup v-for="tier in season.tiers" :key="tier.id" :label="tier.name">
+                <option v-for="p in tier.players" :key="p.user.id" :value="p.user.id">
+                  {{ p.user.name }} ({{ p.user.wcaId }})
+                </option>
+              </optgroup>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Solution</label>
+            <textarea v-model="addSubmissionSolution" class="w-full border border-gray-300 px-2 py-1" rows="4" placeholder="Solution" />
+            <div v-if="addSubmissionSolution.trim() && selectedScramble" class="mt-1 text-sm">
+              <span :class="addSubmissionValidation.isSolved ? 'text-green-600' : 'text-red-600'">
+                {{ addSubmissionValidation.isSolved ? $t('common.moves', { moves: addSubmissionValidation.moves }) : formatResult(addSubmissionValidation.moves) }}
+              </span>
+              <p v-if="addSubmissionValidation.formattedSolution" class="font-mono text-gray-700 mt-0.5">
+                {{ addSubmissionValidation.formattedSolution }}
+              </p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Comment</label>
+            <textarea v-model="addSubmissionComment" class="w-full border border-gray-300 px-2 py-1" rows="4" placeholder="Comment" />
+          </div>
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button
+            class="bg-indigo-500 text-white px-2 py-1"
+            :class="{ 'cursor-not-allowed opacity-80': !canSubmitAddSubmission || addSubmissionSubmitting }"
+            :disabled="!canSubmitAddSubmission || addSubmissionSubmitting"
+            @click="submitAddSubmission"
+          >
+            {{ addSubmissionSubmitting ? '...' : $t('form.submit') }}
+          </button>
+          <button class="bg-gray-300 hover:bg-gray-300/80 cursor-pointer px-2 py-1" @click="addSubmissionModal = false">
+            {{ $t('form.cancel') }}
+          </button>
+        </div>
+      </Modal>
+    </Teleport>
+  </div>
+</template>

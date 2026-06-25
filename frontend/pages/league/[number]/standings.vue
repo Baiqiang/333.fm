@@ -1,0 +1,146 @@
+<script setup lang="ts">
+const { t } = useI18n()
+const season = inject(SYMBOL_LEAGUE_SEASON)!
+const { data } = await useApi<LeagueStanding[]>(`/league/season/${season.value.number}/standings`)
+const { data: data2 } = await useApi<LeagueResult[]>(`/league/season/${season.value.number}/results`)
+const allStandings = ref<LeagueStanding[]>(data.value || [])
+const allResults = ref<LeagueResult[]>(data2.value || [])
+const tierStandings = computed(() => {
+  const tmp: Record<string, {
+    tier: LeagueTier
+    standings: LeagueStanding[]
+  }> = {}
+  allStandings.value.forEach((standing) => {
+    if (!tmp[standing.tier.id]) {
+      tmp[standing.tier.id] = {
+        tier: standing.tier,
+        standings: [],
+      }
+    }
+    tmp[standing.tier.id].standings.push(standing)
+  })
+  const ret = Object.values(tmp).sort((a, b) => a.tier.level - b.tier.level)
+  ret.forEach(t => t.standings.sort((a, b) => a.position - b.position))
+  return ret
+})
+const maxWeek = computed(() => {
+  return Math.max(...allResults.value.map(r => r.week))
+})
+const tierResults = computed(() => {
+  const ret: Record<string, Record<number, LeagueResult>> = {}
+  allResults.value.forEach((result) => {
+    if (!ret[result.userId]) {
+      ret[result.userId] = {}
+    }
+    ret[result.userId][result.week] = result
+  })
+  return ret
+})
+useSeoMeta({
+  title: `${t('league.nav.standings')} - ${season.value.title}`,
+})
+function getStandingClass(tierIndex: number, index: number) {
+  let ret = ''
+  if (tierIndex === 0 && index < 3) {
+    return [
+      'bg-linear-to-r from-[#ffd700] to-[#d4af37] text-white dark:from-[#b8960b] dark:to-[#9a7e1e]',
+      'bg-linear-to-r from-[#c0c0c0] to-[#a8a8a8] text-white dark:from-[#7a7a7a] dark:to-[#666]',
+      'bg-linear-to-r from-[#cd7f32] to-[#c79b56] text-white dark:from-[#8b5e23] dark:to-[#7a5a30]',
+    ][index]
+  }
+  const promotions = season.value.number < 6 ? 2 : 3
+  if (index < promotions) {
+    ret = 'bg-linear-to-r from-green-300 to-green-200 dark:from-green-900/60 dark:to-green-800/40'
+  }
+  if (index > tierStandings.value[0].standings.length - promotions - 1) {
+    ret = 'bg-linear-to-r from-red-300 to-red-200 dark:from-red-900/60 dark:to-red-800/40'
+    if (tierIndex === tierStandings.value.length - 1) {
+      ret = ''
+    }
+  }
+  return ret
+}
+function getResultClass(points?: number) {
+  switch (points) {
+    case 2:
+      return 'bg-linear-to-r from-green-500 to-green-400 text-white font-bold'
+    case 1:
+      return 'bg-linear-to-r from-yellow-500 to-yellow-400 text-white font-bold'
+    default:
+      return 'bg-linear-to-r from-red-500 to-red-400 text-white font-bold'
+  }
+}
+</script>
+
+<template>
+  <div class="px-2">
+    <Heading1>
+      {{ $t('league.nav.standings') }}
+    </Heading1>
+    <div class="shadow-sm">
+      <div class="grid grid-cols-[max-content_max-content_max-content_2rem_2rem_2rem_max-content_1fr] overflow-x-auto">
+        <template v-for="{ tier, standings }, tierIndex in tierStandings" :key="tier.id">
+          <div class="grid grid-cols-subgrid col-span-full bg-linear-to-r from-indigo-600 to-indigo-500 text-white mt-1 first:mt-0">
+            <div class="p-2 font-semibold tracking-wide">
+              {{ tier.name }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 font-medium">
+              {{ $t('league.standing.competitors') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 font-medium">
+              {{ $t('league.standing.pts') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 text-center font-medium">
+              {{ $t('league.standing.wins') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 text-center font-medium">
+              {{ $t('league.standing.draws') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 text-center font-medium">
+              {{ $t('league.standing.losses') }}
+            </div>
+            <div class="border-l border-indigo-400 p-2 font-medium text-xs w-16 break-words leading-none text-center">
+              {{ $t('league.standing.bestMo3') }}
+            </div>
+            <div v-if="maxWeek > 0" class="font-medium flex">
+              <div v-for="week in maxWeek" :key="week" class="w-10 border-l border-indigo-400 text-center p-2">
+                W{{ week }}
+              </div>
+            </div>
+          </div>
+          <div
+            v-for="(standing, index) in standings"
+            :key="standing.id"
+            class="grid grid-cols-subgrid col-span-full border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            :class="getStandingClass(tierIndex, index)"
+          >
+            <div class="text-right p-2 font-mono font-semibold">
+              No.{{ standing.position || index + 1 }}
+            </div>
+            <UserAvatarName :user="standing.user" class="p-2 border-l border-gray-200" />
+            <div class="p-2 border-l border-gray-200 text-center font-mono font-bold">
+              {{ standing.points }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ standing.wins }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ standing.draws }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ standing.losses }}
+            </div>
+            <div class="p-2 border-l border-gray-200 text-center font-mono">
+              {{ formatResult(standing.bestMo3, 2) }}
+            </div>
+            <div v-if="maxWeek > 0" class="text-center font-mono flex">
+              <div v-for="week in maxWeek" :key="week" class="w-10 border-l border-gray-200 text-center p-2" :class="getResultClass(tierResults[standing.userId]?.[week]?.points)">
+                {{ tierResults[standing.userId]?.[week]?.points || 0 }}
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
