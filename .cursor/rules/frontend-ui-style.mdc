@@ -1,0 +1,77 @@
+---
+description: Frontend UI styling conventions — sharp corners, indigo/blue palette, Tailwind utilities
+globs: frontend/**/*.vue, frontend/**/*.ts, frontend/**/*.css
+alwaysApply: false
+---
+
+# Frontend UI Style Guide
+
+## No Rounded Corners
+
+This project uses **sharp/square corners**. Do NOT add `rounded`, `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`, or `border-radius` to UI elements.
+
+Exceptions (the ONLY cases where rounded is allowed):
+- `rounded-full` for avatars, circular indicator dots, spinners, and badges that must be circular
+
+```html
+<!-- ❌ BAD -->
+<div class="bg-white shadow-md p-4 rounded-lg">
+<button class="bg-indigo-500 text-white px-4 py-2 rounded-md">
+
+<!-- ✅ GOOD -->
+<div class="bg-white shadow-md p-4">
+<button class="bg-indigo-500 text-white px-4 py-2">
+
+<!-- ✅ OK — circular avatar -->
+<img class="rounded-full" />
+```
+
+## Color Palette
+
+- Primary: indigo (`bg-indigo-500`, `hover:bg-indigo-600`, `text-indigo-500`)
+- Accent: blue (`bg-blue-500`, `text-blue-500`)
+- Neutral: gray (`bg-gray-50/100/200`, `text-gray-400/500/600`, `border-gray-300`)
+- Background: white (`bg-white`)
+- Gradients (header/footer): `bg-gradient-to-r from-blue-500 to-indigo-600`
+- Custom: `text-if` (#fc6396), `text-sf` (#52c3ef)
+
+## Typography
+
+- Headings: `font-poppins`
+- Body: `font-inter`
+- Code/solutions: `font-mono`
+
+## Buttons
+
+Primary button style (see `components/button/primary.vue`):
+- `bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white px-4 py-2`
+- Shadow: `shadow-md hover:shadow-lg`
+- Hover lift: `hover:-translate-y-0.5 hover:scale-105`
+- No border-radius
+
+Inline/small buttons:
+- `bg-indigo-500 hover:bg-opacity-90 text-white px-2 py-1`
+
+## Cards & Containers
+
+- `bg-white shadow-md p-4` — no rounded corners
+- Border accents: `border-l-2 md:border-l-4 border-blue-500`
+- Dividers: `border-t border-gray-300`
+
+## Form Inputs
+
+- `block w-full shadow-sm border-gray-300`
+- Focus: `focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50`
+- No border-radius
+
+## General Patterns
+
+- Framework: Nuxt 3 + Tailwind CSS (with `@tailwindcss/forms` base strategy)
+- Dark mode via `@nuxtjs/color-mode` — `.dark` class on `<html>`, system preference auto-detect
+- Global dark overrides in `assets/css/tailwind.css` handle `bg-white`, `bg-gray-*`, `text-gray-*`, `border-gray-*` automatically
+- For new components: prefer global overrides; add `dark:` utility only when the global rule doesn't cover the case (e.g. header/nav with custom indigo backgrounds)
+- Use `useColorMode()` composable for programmatic access
+- Shadows for depth: `shadow-sm` (inputs), `shadow-md` (cards), `shadow-lg` (dropdowns)
+- Transitions: `transition-all duration-200 ease-in-out`
+- Icons: Iconify via `<Icon name="..." />`
+- No UI component library — all custom components

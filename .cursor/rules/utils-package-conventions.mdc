@@ -1,0 +1,16 @@
+---
+description: Rules for the shared @333fm/utils workspace package
+globs: packages/utils/**/*.ts
+alwaysApply: false
+---
+
+# `@333fm/utils` Package Conventions
+
+- `packages/utils` is for framework-free pure logic shared by frontend and server.
+- Keep modules named by domain: `algorithm.ts`, `competition.ts`, `result.ts`, `elo.ts`.
+- Use singular domain names unless the domain is naturally plural; prefer `result.ts` over `results.ts`.
+- Do not import Nuxt, Vue, Nest, TypeORM, DOM APIs, or Node-only modules here.
+- Accept plain data shapes, not app entities. Use small `*Like` interfaces when a function only needs a few fields.
+- Keep browser and server compatibility in mind. If a function needs Node-only behavior, leave it in `server/src/utils`.
+- Export public APIs through `src/index.ts`; keep internal helpers unexported.
+- Build with `pnpm --filter @333fm/utils build` before relying on compiled server consumption.

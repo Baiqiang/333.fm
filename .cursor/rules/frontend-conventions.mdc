@@ -1,0 +1,16 @@
+---
+description: Nuxt frontend component, composable, and state conventions
+globs: frontend/**/*.vue, frontend/**/*.ts
+alwaysApply: false
+---
+
+# Frontend Conventions
+
+- Framework is Nuxt 3 + Vue + Tailwind. Prefer project utilities/components over adding a UI library.
+- Keep page files focused on data flow and layout. Extract repeated UI into `frontend/components/**`.
+- Put reusable Vue logic in `frontend/composables/**`; put pure reusable logic in `@333fm/utils`.
+- Keep `frontend/utils/**` as frontend-facing adapters, auto-import helpers, symbols, and UI-specific formatters.
+- Do not put browser, Vue, Nuxt, Tailwind class, or i18n logic into `packages/utils`.
+- Components should use existing button/card/form patterns before creating new variants.
+- Use auto-imported Nuxt helpers consistently with existing code; avoid unnecessary explicit imports for project auto-imports.
+- For styling details, follow `frontend-ui-style.mdc`.

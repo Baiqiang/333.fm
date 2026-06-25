@@ -1,0 +1,19 @@
+---
+description: Monorepo workspace, package manager, and dependency boundaries
+alwaysApply: true
+---
+
+# Monorepo Conventions
+
+- This repo is a pnpm monorepo. Use `pnpm@11.6.0`; do not add Yarn/npm lockfiles.
+- Workspaces are `frontend`, `server`, and `packages/*`. Add shared code as a workspace package, not by cross-importing app internals.
+- Use root scripts for broad checks: `pnpm -r build`, `pnpm -r lint`, or scoped commands such as `pnpm --filter 333.fm build`.
+- Keep app-specific dependencies in the app package. Only put framework-free dependencies in shared packages.
+- Do not commit local runtime state: `.env*`, `node_modules`, build outputs, logs, uploads, or local scratch scripts.
+- Prefer small, reviewable changes. Avoid refactors unrelated to the requested behavior.
+
+## Package Boundaries
+
+- `frontend/` may import from `@333fm/utils`; it must not import from `server/src`.
+- `server/` may import from `@333fm/utils`; it must not import from `frontend`.
+- `packages/utils` must stay framework-free: no Nuxt/Vue, Nest, TypeORM, browser DOM, or Node-only APIs unless the package is explicitly split.

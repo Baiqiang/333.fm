@@ -1,0 +1,16 @@
+---
+description: Nest server module, service, entity, and utility conventions
+globs: server/**/*.ts
+alwaysApply: false
+---
+
+# Server Conventions
+
+- Framework is NestJS with TypeORM entities under `server/src/entities`.
+- Keep controllers thin; put business behavior in services or command services.
+- Keep TypeORM decorators, transformers, and entity-specific behavior in `server/`, not in `packages/utils`.
+- Use `@/` imports for server-local source paths, matching `server/tsconfig.json`.
+- Use `@333fm/utils` for shared pure logic such as algorithms, competition paths, result math, and ELO.
+- Preserve existing command-service patterns under `server/src/cmd/**`.
+- For server utilities, keep Node-only helpers such as `crypto`, timezone scheduling, and DB transformers in `server/src/utils`.
+- After changing server imports, run targeted ESLint autofix or `pnpm --filter 333.fm-server build`.

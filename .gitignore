@@ -39,5 +39,3 @@ coverage/
 .DS_Store
 .idea/
 .fleet/
-
-# Local server scratch files

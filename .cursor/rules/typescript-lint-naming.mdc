@@ -1,0 +1,16 @@
+---
+description: TypeScript naming, linting, and formatting conventions
+globs: **/*.ts, **/*.vue
+alwaysApply: false
+---
+
+# TypeScript, Lint, and Naming
+
+- Follow the existing ESLint configs. Run the package lint command or targeted `eslint --fix` after touching imports.
+- Use TypeScript for all app and package code. Prefer explicit exported interfaces/types for shared package APIs.
+- Use `camelCase` for variables/functions, `PascalCase` for classes/types/enums, and `UPPER_SNAKE_CASE` only for true constants.
+- File names use kebab-case for multi-word utility files, components, services, and rules.
+- Prefer type-only imports where useful, but do not fight the local ESLint config.
+- Keep imports sorted. Server lint enforces `simple-import-sort` for imports and exports.
+- Avoid `any` in new shared APIs. It is tolerated in legacy app code only when matching existing patterns.
+- Keep functions small and pure where possible; move reusable pure logic to `@333fm/utils`.
