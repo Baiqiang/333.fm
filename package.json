@@ -1,19 +1,19 @@
 {
   "name": "333.fm-monorepo",
   "private": true,
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "pnpm@11.6.0",
   "workspaces": [
     "frontend",
     "server"
   ],
   "scripts": {
-    "dev:frontend": "yarn --cwd frontend dev",
-    "dev:server": "yarn --cwd server start:dev",
-    "build": "yarn build:frontend && yarn build:server",
-    "build:frontend": "yarn --cwd frontend build",
-    "build:server": "yarn --cwd server build",
-    "lint": "yarn lint:frontend && yarn lint:server",
-    "lint:frontend": "yarn --cwd frontend lint",
-    "lint:server": "yarn --cwd server lint"
+    "dev:frontend": "pnpm --filter 333.fm dev",
+    "dev:server": "pnpm --filter 333.fm-server start:dev",
+    "build": "pnpm -r build",
+    "build:frontend": "pnpm --filter 333.fm build",
+    "build:server": "pnpm --filter 333.fm-server build",
+    "lint": "pnpm -r lint",
+    "lint:frontend": "pnpm --filter 333.fm lint",
+    "lint:server": "pnpm --filter 333.fm-server lint"
   }
 }

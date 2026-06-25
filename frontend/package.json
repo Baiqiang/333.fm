@@ -2,7 +2,6 @@
   "name": "333.fm",
   "type": "module",
   "private": true,
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -27,7 +26,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
     "@freeloop/nuxt-transitions": "^0.1.8",
-    "@nuxt/devtools": "latest",
+    "@nuxt/devtools": "1.6.0",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@nuxtjs/eslint-module": "^4.1.0",
     "@nuxtjs/google-fonts": "^3.2.0",
@@ -36,7 +35,7 @@
     "@pinia-plugin-persistedstate/nuxt": "^1.2.1",
     "@pinia/nuxt": "^0.5.5",
     "@tailwindcss/forms": "^0.5.11",
-    "@tailwindcss/vite": "^4.2.1",
+    "@tailwindcss/vite": "4.2.1",
     "@types/three": "^0.169.0",
     "@vite-pwa/assets-generator": "^0.2.6",
     "@vite-pwa/nuxt": "^0.10.5",
@@ -45,12 +44,13 @@
     "dayjs-nuxt": "^2.1.11",
     "eslint": "^9.13.0",
     "less": "^4.5.1",
-    "nuxt": "^3.13.2",
+    "nuxt": "3.13.2",
     "nuxt-echarts": "^0.2.3",
     "nuxt-gtag": "^3.0.1",
     "nuxt-icon": "^0.6.10",
     "pinia": "^2.2.4",
-    "tailwindcss": "^4.2.1",
-    "typescript": "5.5"
+    "tailwindcss": "4.2.1",
+    "typescript": "5.5",
+    "vite": "5.4.10"
   }
 }
