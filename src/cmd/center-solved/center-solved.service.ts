@@ -100,6 +100,7 @@ export class CenterSolvedCommandService {
     centerSolvedEntries.sort((a, b) => a.moves - b.moves || a.submissionId - b.submissionId)
     const top20 = centerSolvedEntries
       .filter(entry => entry.competitionType !== CompetitionType.ENDLESS)
+      .sort((a, b) => a.moves - b.moves)
       .slice(0, 20)
     const valid = total - parseFailed
 
