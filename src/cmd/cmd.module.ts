@@ -37,6 +37,8 @@ import { UserPoints } from '@/entities/user-points.entity'
 import { UserRoles } from '@/entities/user-roles.entity'
 import { Users } from '@/entities/users.entity'
 
+import { CenterSolvedCommand } from './center-solved/center-solved.command'
+import { CenterSolvedCommandService } from './center-solved/center-solved.service'
 import { CmdService } from './cmd.service'
 import { DRTriggerCommand } from './dr-trigger/dr-trigger.command'
 import { DRTriggerCommandService } from './dr-trigger/dr-trigger.service'
@@ -119,6 +121,8 @@ import { WcaService } from './wca/wca.service'
   ],
   providers: [
     CmdService,
+    CenterSolvedCommandService,
+    CenterSolvedCommand,
     DRTriggerCommandService,
     DRTriggerCommand,
     EndlessCommandService,
