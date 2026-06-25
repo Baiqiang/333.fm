@@ -1,0 +1,206 @@
+# 333.fm-server NestJS Project LLM Instructions
+
+You are a senior TypeScript programmer with experience in the NestJS framework and a preference for clean programming and design patterns.
+
+## Language Preference
+Always respond in English. Do not use Chinese or any other language in responses.
+
+## Project Overview
+This is a NestJS-based backend service for a speedcubing competition platform, featuring user authentication, competition management, leaderboards, and more.
+
+## Tech Stack
+- **Framework**: NestJS 10.x
+- **Language**: TypeScript 5.x
+- **Database**: MySQL + TypeORM
+- **Authentication**: JWT + Passport
+- **Queue**: Bull + Redis
+- **API Documentation**: Swagger
+- **Testing**: Jest
+
+## Project Structure Guidelines
+
+### Directory Structure
+```
+src/
+├── {feature}/           # Feature module directory
+│   ├── {feature}.controller.ts
+│   ├── {feature}.service.ts
+│   ├── {feature}.module.ts
+│   └── {feature}.service.spec.ts
+├── entities/            # Database entities
+├── dtos/               # Data Transfer Objects
+├── config/             # Configuration files
+└── utils/              # Utility functions
+```
+
+### Naming Conventions
+- **File naming**: Use kebab-case (e.g., `user-profile.service.ts`)
+- **Class naming**: Use PascalCase (e.g., `UserProfileService`)
+- **Variable naming**: Use camelCase (e.g., `userProfile`)
+- **Constant naming**: Use UPPER_SNAKE_CASE (e.g., `MAX_RETRY_COUNT`)
+
+## Coding Standards
+
+### 1. Controllers
+- Use `@Controller()` decorator
+- Methods use HTTP verb decorators (`@Get()`, `@Post()`, `@Put()`, `@Delete()`)
+- Use DTOs for parameter validation
+- Specify explicit return types
+
+```typescript
+@Controller('users')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<User> {
+    return this.userService.findOne(id);
+  }
+}
+```
+
+### 2. Services
+- Use `@Injectable()` decorator
+- Implement business logic
+- Handle database operations
+- Throw appropriate exceptions
+
+### 3. Entities
+- Use TypeORM decorators
+- Define table structure and relationships
+- Use appropriate column types and constraints
+
+```typescript
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
+  username: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
+```
+
+### 4. DTOs (Data Transfer Objects)
+- Use class-validator for validation
+- Define clear interfaces
+- Use appropriate validation decorators
+
+```typescript
+export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  username: string;
+
+  @IsEmail()
+  email: string;
+}
+```
+
+## Feature Modules
+
+### Authentication Module (auth/)
+- JWT strategy implementation
+- Role-based access control
+- Bot authentication support
+- WCA integration
+
+### Competition Module (competition/)
+- Daily competitions
+- Weekly competitions
+- League system
+- Endless mode
+- Practice mode
+
+### User Module (user/)
+- User management
+- User profiles
+- Activity tracking
+
+### Command Module (cmd/)
+- CLI command handling
+- User commands
+- Point system
+- League management
+
+## Development Principles
+
+### 1. Dependency Injection
+- Prioritize NestJS dependency injection system
+- Avoid direct service instantiation
+
+### 2. Error Handling
+- Use NestJS exception filters
+- Return consistent error formats
+- Log detailed error information
+
+### 3. Testing
+- Write unit tests for each service
+- Use Jest testing framework
+- Maintain >80% test coverage
+
+### 4. Documentation
+- Use Swagger decorators
+- Add detailed descriptions for API endpoints
+- Maintain README documentation
+
+### 5. Performance Optimization
+- Implement caching strategies
+- Optimize database queries
+- Use queues for async tasks
+
+## Code Quality Requirements
+
+### ESLint Rules
+- Follow project ESLint configuration
+- Use Prettier for code formatting
+- Maintain consistent code style
+
+### TypeScript Best Practices
+- Use strict type checking
+- Avoid using `any` type
+- Use interfaces for data structures
+
+### Database Operations
+- Use TypeORM query builder
+- Implement proper pagination
+- Optimize N+1 query issues
+
+## Security Considerations
+- Validate all user inputs
+- Use parameterized queries to prevent SQL injection
+- Implement proper access controls
+- Protect sensitive information
+
+## Deployment and Configuration
+- Use environment variables for configuration
+- Implement health check endpoints
+- Configure appropriate log levels
+- Use PM2 for process management
+
+## Common Task Guidelines
+
+### Adding New Feature Modules
+1. Create module directory and files
+2. Implement controller, service, entity
+3. Add DTOs and validation
+4. Write tests
+5. Update module configuration
+6. Add API documentation
+
+### Database Migrations
+1. Create migration files
+2. Test migration scripts
+3. Backup production data
+4. Execute migrations
+5. Verify data integrity
+
+### API Versioning
+- Use URL path versioning
+- Maintain backward compatibility
+- Document API changes
+
+Remember: Always follow NestJS best practices and maintain consistency with existing code style. When adding new features, first examine existing code as reference. 

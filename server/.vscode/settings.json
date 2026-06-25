@@ -1,0 +1,11 @@
+{
+  "locale": "en",
+  "workbench.colorTheme": "Default Dark+",
+  "editor.language": "en",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
