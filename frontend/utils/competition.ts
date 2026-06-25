@@ -1,4 +1,14 @@
+import {
+  aoN,
+  competitionPath as sharedCompetitionPath,
+  DNF,
+  DNS,
+  formatResult,
+  submissionLink as sharedSubmissionLink,
+} from '@333fm/utils'
 import type { User } from './user'
+
+export { aoN, DNF, DNS, formatResult }
 
 export interface Time {
   createdAt: string
@@ -302,77 +312,8 @@ export const SYMBOL_ENDLESS_PROGRESS = Symbol('endless.progress')
 export const SYMBOL_ENDLESS_UPDATE_PROGRESS = Symbol('endless.progress.update')
 export const SYMBOL_ENDLESS_UPDATE = Symbol('endless.update')
 
-export const DNF = 99999998
-export const DNS = 99999999
-
-export function formatResult(result: number, precision = 0) {
-  if (Number.isNaN(result))
-    return 'N/A'
-
-  if (!result)
-    return ''
-  if (result === DNF)
-    return 'DNF'
-  if (result === DNS)
-    return 'DNS'
-  return (result / 100).toFixed(precision)
-}
-
-export function aoN(results: number[], n: number = 0, mean = false) {
-  if (n === 0)
-    n = results.length
-  if (results.length < n)
-    return Number.NaN
-
-  results = results.slice(-n)
-  let total = results.reduce((a, b) => a + b, 0)
-  if (!mean) {
-    const best = Math.min(...results)
-    const worst = Math.max(...results)
-    total -= best + worst
-    n -= 2
-  }
-  return Number((total / n).toFixed(2))
-}
-
 export function competitionPath(competition: Competition, scramble?: { number: number, roundNumber?: number }, submission?: Submission) {
-  const { alias, type, user } = competition
-  switch (type) {
-    case CompetitionType.WEEKLY:
-      if (scramble)
-        return `/weekly/${alias}#scramble-${scramble.number}`
-      return `/weekly/${alias}`
-    case CompetitionType.DAILY:
-      if (scramble)
-        return `/daily/${alias}#scramble-${scramble.number}`
-      return `/daily/${alias}`
-    case CompetitionType.ENDLESS:
-      if (scramble)
-        return `/endless/${alias}/${scramble.number}`
-      return `/endless/${alias}`
-    case CompetitionType.FMC_CHAIN:
-      if (!scramble)
-        return '/chain'
-      if (!submission)
-        return `/chain/${scramble.number}`
-      return `/chain/${scramble.number}/${submission.parentId}`
-    case CompetitionType.PERSONAL_PRACTICE:
-      if (!user)
-        return '/practice'
-      if (scramble)
-        return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}#scramble-${scramble.number}`
-      return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}`
-    case CompetitionType.LEAGUE:
-      if (scramble)
-        return `${competition.url}#scramble-${scramble.number}`
-      return competition.url
-    case CompetitionType.WCA_RECONSTRUCTION:
-      if (scramble)
-        return `${competition.url}#r${scramble.roundNumber}-a${scramble.number}`
-      return competition.url
-    default:
-      return competition.url
-  }
+  return sharedCompetitionPath(competition, scramble, submission)
 }
 
 export function competitionName(competition: Competition, scramble?: { number: number, roundNumber?: number }) {
@@ -401,14 +342,7 @@ export function competitionName(competition: Competition, scramble?: { number: n
 }
 
 export function submissionLink(competition: Competition, scramble?: { number: number }, submission?: Submission) {
-  const path = competitionPath(competition, scramble, submission)
-  if (!submission)
-    return path
-  const sid = `sid=${submission.id}`
-  const hashIndex = path.indexOf('#')
-  if (hashIndex >= 0)
-    return `${path.substring(0, hashIndex)}?${sid}${path.substring(hashIndex)}`
-  return `${path}?${sid}`
+  return sharedSubmissionLink(competition, scramble, submission)
 }
 
 export function isInStatus(competition: Competition, status: CompetitionStatus) {

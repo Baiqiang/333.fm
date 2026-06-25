@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@333fm/utils": "workspace:*",
     "@nuxtjs/apollo": "^5.0.0-alpha.15",
     "@nuxtjs/color-mode": "^4.0.0",
     "insertionfinder": "^0.5.0",

@@ -23,6 +23,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@333fm/utils": "workspace:*",
     "@nestjs/axios": "^3.0.3",
     "@nestjs/bull": "^10.2.1",
     "@nestjs/cache-manager": "^3.1.0",

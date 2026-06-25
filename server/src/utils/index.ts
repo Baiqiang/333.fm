@@ -1,3 +1,24 @@
+import {
+  betterThan,
+  calculateAverage,
+  calculateMean,
+  calculateTrimmedMean,
+  centerLength,
+  DNF,
+  DNS,
+  formatAlgorithm,
+  getCubieCube,
+  getTopDistinctN,
+  getTopN,
+  groupBy,
+  type Rankable,
+  removeComment,
+  replaceQuote,
+  reverseTwists,
+  setRanks,
+  setRanksOnly,
+  sortResult,
+} from '@333fm/utils'
 import { createHash } from 'crypto'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
@@ -8,8 +29,29 @@ import weekYear from 'dayjs/plugin/weekYear'
 import { Algorithm, Cube } from 'insertionfinder'
 
 import { SubmitSolutionDto } from '@/dtos/submit-solution.dto'
-import { DNF, DNS, Results } from '@/entities/results.entity'
 import { SolutionMode, SubmissionPhase, Submissions } from '@/entities/submissions.entity'
+
+export {
+  betterThan,
+  calculateAverage,
+  calculateMean,
+  calculateTrimmedMean,
+  centerLength,
+  DNF,
+  DNS,
+  formatAlgorithm,
+  getCubieCube,
+  getTopDistinctN,
+  getTopN,
+  groupBy,
+  type Rankable,
+  removeComment,
+  replaceQuote,
+  reverseTwists,
+  setRanks,
+  setRanksOnly,
+  sortResult,
+}
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -60,30 +102,6 @@ export const rotationString = [
   "z' y'",
 ]
 
-export function replaceQuote(string: string): string {
-  return string.replace(/[‘’`′]/g, "'")
-}
-
-export function removeComment(string: string | string[]): string {
-  if (Array.isArray(string)) {
-    string = string.join(' ')
-  }
-  // supports various types of quotes
-  string = replaceQuote(string)
-  return string
-    .split('\n')
-    .map(s => s.split('//')[0])
-    .join('')
-}
-
-export function formatAlgorithm(string: string, placement: number = 0): string {
-  string = removeComment(string)
-  const algorithm = new Algorithm(string)
-  algorithm.clearFlags(placement)
-  algorithm.normalize()
-  return algorithm.toString()
-}
-
 export function formatSkeleton(scramble: string, skeleton: string): { formattedSkeleton: string; bestCube: Cube } {
   const cube = new Cube()
   cube.twist(new Algorithm(scramble))
@@ -91,20 +109,6 @@ export function formatSkeleton(scramble: string, skeleton: string): { formattedS
   const bestCube = cube.getBestPlacement()
   const formattedSkeleton = formatAlgorithm(skeleton, bestCube.placement)
   return { formattedSkeleton, bestCube }
-}
-
-export function getCubieCube(scramble: string) {
-  const cube = new Cube()
-  cube.twist(new Algorithm(scramble))
-  return {
-    corners: cube.getRawCorners(),
-    edges: cube.getRawEdges(),
-    placement: cube.placement,
-  }
-}
-
-export function centerLength(centerCycles: number, placement: number): number {
-  return centerCycles === 3 ? 6 : centerCycles === 2 ? 4 : [2, 8, 10].includes(placement) ? 4 : 6
 }
 
 export function calculateHash(obj: object | Buffer | string): string {
@@ -153,14 +157,6 @@ export function transformWCAMoves(moves: number): number {
     return DNS
   }
   return 0
-}
-
-export function betterThan(a: number, b: number): boolean {
-  // DNF and DNS are same
-  if (a === DNF || a === DNS) {
-    return false
-  }
-  return a < b
 }
 
 export function countMoves(skeleton: string): number {
@@ -305,20 +301,6 @@ function isHalfTurn(twist: number) {
   return twist % 4 === 2
 }
 
-export function reverseTwists(twists: string) {
-  return twists
-    .split(' ')
-    .map(twist => {
-      if (twist.endsWith('2')) return twist
-
-      if (twist.endsWith("'")) return twist[0]
-
-      return `${twist}'`
-    })
-    .reverse()
-    .join(' ')
-}
-
 export function flattenSkeletons(submission: Submissions): string {
   let parent = submission
   const skeletons: string[] = []
@@ -335,115 +317,6 @@ export function parseWeek(week: string): dayjs.Dayjs {
     return null
   }
   return dayjs.tz(matches[1], COMPETITION_TIMEZONE).week(parseInt(matches[2])).day(1)
-}
-
-export function sortResult(a: Results, b: Results): number {
-  const nonZeroValuesA = a.values.filter(value => value > 0)
-  const nonZeroValuesB = b.values.filter(value => value > 0)
-  if (nonZeroValuesA.length !== nonZeroValuesB.length) {
-    return nonZeroValuesB.length - nonZeroValuesA.length
-  }
-  if (a.average === b.average) {
-    return a.best - b.best
-  }
-  return a.average - b.average
-}
-
-export function setRanks(results: Results[]): Results[] {
-  results.sort(sortResult)
-  return setRanksOnly(results)
-}
-
-export function setRanksOnly<T extends Rankable>(results: T[], rankKeys: string[] = ['average', 'best']): T[] {
-  results.forEach((result, index) => {
-    const previous = results[index - 1]
-    result.rank = index + 1
-    if (previous && rankKeys.every(key => result[key] === previous[key])) {
-      result.rank = previous.rank
-    }
-  })
-  return results
-}
-
-export function calculateMean(values: number[]): number {
-  const dnfResults = values.filter(v => v === DNF)
-  if (dnfResults.length > 0) {
-    return DNF
-  }
-  return Math.round(values.reduce((a, b) => a + b, 0) / values.length)
-}
-
-export function calculateTrimmedMean(values: number[], trimRatio = 0.05): number {
-  const validValues = values.filter(v => v > 0 && v !== DNF && v !== DNS).sort((a, b) => a - b)
-  if (validValues.length === 0) {
-    return DNF
-  }
-  const trimCount = Math.ceil(validValues.length * trimRatio)
-  const trimmedValues =
-    validValues.length > trimCount * 2 ? validValues.slice(trimCount, validValues.length - trimCount) : validValues
-  return Math.round(trimmedValues.reduce((a, b) => a + b, 0) / trimmedValues.length)
-}
-
-export function calculateAverage(values: number[]): number {
-  const dnfResults = values.filter(v => v === DNF)
-  if (dnfResults.length > 1) {
-    return DNF
-  }
-  const max = Math.max(...values)
-  const min = Math.min(...values)
-  return Math.round((values.reduce((a, b) => a + b, 0) - max - min) / (values.length - 2))
-}
-
-export function groupBy<T>(array: T[], key: string): T[] {
-  const map: Record<string, boolean> = {}
-  const grouped = []
-  for (const item of array) {
-    if (map[item[key]]) {
-      continue
-    }
-    map[item[key]] = true
-    grouped.push(item)
-  }
-  return grouped
-}
-
-export function getTopN<T extends Rankable>(results: T[], n: number, rankKeys: string[] = ['average', 'best']): T[] {
-  setRanksOnly(results, rankKeys)
-  if (results.length <= n) {
-    return results
-  }
-  return results.filter(result => result.rank <= n)
-}
-
-export function getTopDistinctN<T extends Rankable>(
-  results: T[] | Record<string, T>,
-  n: number,
-  rankKeys: string[] = ['average', 'best'],
-  sortDesc: boolean = false,
-  groupKey = 'userId',
-): T[] {
-  if (!Array.isArray(results)) {
-    results = Object.values(results)
-  }
-  results.sort((a, b) => {
-    for (const key of rankKeys) {
-      if (a[key] > b[key]) {
-        return 1
-      } else if (a[key] < b[key]) {
-        return -1
-      }
-    }
-    return 0
-  })
-  if (sortDesc) {
-    results.reverse()
-  }
-  const ret = groupBy(results, groupKey)
-  return getTopN(ret, n, rankKeys)
-}
-
-export interface Rankable {
-  rank: number
 }
 
 export class ColumnNumericTransformer {

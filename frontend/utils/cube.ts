@@ -1,5 +1,7 @@
 import { Algorithm, Cube } from 'insertionfinder'
 
+export { reverseTwists } from '@333fm/utils'
+
 export type Axis = 'x' | 'y' | 'z'
 
 export const FACE_COLORS: Record<string, string> = {
@@ -96,22 +98,6 @@ export function getFaceletPositions(): FaceletPosition[] {
 
 export function colorToHex(color: string): number {
   return Number.parseInt(color.slice(1), 16)
-}
-
-export function reverseTwists(twists: string) {
-  return twists
-    .split(' ')
-    .map((twist) => {
-      if (twist.endsWith('2'))
-        return twist
-
-      if (twist.endsWith('\''))
-        return twist[0]
-
-      return `${twist}'`
-    })
-    .reverse()
-    .join(' ')
 }
 
 // helper constants

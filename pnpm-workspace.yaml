@@ -1,6 +1,7 @@
 packages:
   - "frontend"
   - "server"
+  - "packages/*"
 
 overrides:
   "@intlify/core-base": "9.14.1"
