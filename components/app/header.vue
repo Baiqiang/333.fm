@@ -77,6 +77,10 @@ const navs = computed(() => [
         path: '/tools/dr-case-recognizer',
       },
       {
+        title: t('tools.frTrainer.title'),
+        path: '/tools/fr-trainer',
+      },
+      {
         title: t('wca.competitions'),
         path: '/wca/competitions',
       },

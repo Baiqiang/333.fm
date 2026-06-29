@@ -19,19 +19,23 @@ import {
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { BODY_COLOR, colorToHex, CUBIE_GAP, filterColor, getFaceletPositions } from '~/utils/cube'
 
-import type { Axis } from '~/utils/cube'
+import type { Axis, FrAxisKey, FrEmphasis } from '~/utils/cube'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   moves?: string
   cubieCube?: {
     corners: number[]
     edges: number[]
     placement: number
   }
-  filter?: 'dr'
+  filter?: 'dr' | 'fr'
+  frAxis?: FrAxisKey
+  frEmphasis?: FrEmphasis
   isStatic?: boolean
   keyboardControls?: boolean
-}>()
+}>(), {
+  frEmphasis: 'axis',
+})
 
 const cubeElement = ref<HTMLElement>()
 const { width } = useElementSize(cubeElement)
@@ -80,8 +84,11 @@ function buildFaceColors(fl: string) {
       colors[index][axis] = {}
     colors[index][axis][n] = color
   }
+  const frOptions = props.filter === 'fr' && props.frAxis
+    ? { axis: props.frAxis, emphasis: props.frEmphasis }
+    : undefined
   for (const { i, x, y, z, axis, dir } of faceletPositions)
-    push(x, y, z, axis, dir, colorToHex(filterColor(props.filter, fl[i], x, y, z, fl)))
+    push(x, y, z, axis, dir, colorToHex(filterColor(props.filter, fl[i], x, y, z, fl, frOptions)))
   return colors
 }
 
