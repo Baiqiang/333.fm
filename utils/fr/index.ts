@@ -1,5 +1,10 @@
+import { Algorithm, Cube, InvalidAlgorithmStringError } from 'insertionfinder'
+
+import { formatAlgorithm, removeComment } from '~/utils/if'
+
 import { classifyAxis, isFrShape, isHtrState } from './analysis'
-import { applyMoves, applyScramble, type AxisIndex, type CubeState, ScrambleParseError } from './cube'
+import { applyMoves, type AxisIndex, type CubeState, ScrambleParseError } from './cube'
+import { cubeStateFromInsertionfinder } from './if-state'
 import { isTrueFr, solveAxis, solveAxisShape } from './solver'
 import {
   AXIS_INDEX,
@@ -47,18 +52,56 @@ function decompose(
   return steps
 }
 
-/** Analyze an HTR scramble; return FR shape and reference steps for all three axes. */
-export function analyzeScramble(scramble: string): FrAnalysis {
-  const trimmed = scramble.trim()
-  let state
+function cubeStateFromInput(scramble: string, solution: string): CubeState {
+  const cube = new Cube()
+  if (scramble.trim())
+    cube.twist(new Algorithm(formatAlgorithm(scramble)))
+  if (solution.trim())
+    cube.twist(new Algorithm(removeComment(solution)))
+  return cubeStateFromInsertionfinder(cube)
+}
+
+function displayMoves(scramble: string, solution: string, formattedScramble: string): string {
+  return [formattedScramble, solution.trim()].filter(Boolean).join('\n')
+}
+
+/** Analyze an HTR state from optional scramble + solution (复原); return FR shape and reference steps. */
+export function analyzeScramble(scramble: string, solution: string = ''): FrAnalysis {
+  let formattedScramble = ''
+
   try {
-    state = applyScramble(trimmed)
+    if (scramble.trim())
+      formattedScramble = formatAlgorithm(scramble).trim()
+    if (solution.trim())
+      new Algorithm(removeComment(solution))
+    if (!scramble.trim() && !solution.trim())
+      throw new ScrambleParseError('')
   }
   catch (e) {
-    if (e instanceof ScrambleParseError) {
+    if (e instanceof ScrambleParseError || e instanceof InvalidAlgorithmStringError) {
+      const raw = [scramble, solution].map(s => s.trim()).filter(Boolean).join('\n')
       return {
         ok: false,
-        errorToken: e.message,
+        errorToken: e instanceof InvalidAlgorithmStringError ? raw : e.message,
+        isHtr: false,
+        scramble: raw,
+        axes: [],
+      }
+    }
+    throw e
+  }
+
+  const trimmed = displayMoves(scramble, solution, formattedScramble)
+
+  let state: CubeState
+  try {
+    state = cubeStateFromInput(scramble, solution)
+  }
+  catch (e) {
+    if (e instanceof InvalidAlgorithmStringError) {
+      return {
+        ok: false,
+        errorToken: trimmed,
         isHtr: false,
         scramble: trimmed,
         axes: [],

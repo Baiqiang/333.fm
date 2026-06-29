@@ -695,7 +695,7 @@ export default {
       description: '用于识别 3x3x3 最少步解法中的 DR 形态。',
     },
     frTrainer: {
-      title: 'FR Trainer',
+      title: 'FR 练习器',
       fullName: 'FR 即 Floppy Reduction',
       subtitle: '从 HTR 态进一步降群至 R2 L2 F2 B2，识别三个轴的 FR 形态并给出参考步骤',
       description: '从 HTR 态练习 Floppy Reduction（FR）。可分析 case、交互练习或阅读教程。',
@@ -705,7 +705,14 @@ export default {
         tutorial: '教程',
       },
       input: {
-        placeholder: '输入打乱到 HTR 状态的序列，例如 R2 U2 F2 L2 …（Cmd/Ctrl + Enter 分析）',
+        scramble: {
+          label: '打乱',
+          placeholder: '打乱',
+        },
+        solution: {
+          label: '复原',
+          placeholder: '到达 HTR 状态的复原步骤，例如 R2 U2 F2 L2 …（Cmd/Ctrl + Enter 分析）',
+        },
       },
       btn: {
         analyze: '分析',

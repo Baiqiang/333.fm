@@ -6,32 +6,44 @@ import type { AxisKey, FrAnalysis } from '~/utils/fr/types'
 
 const helpOpen = defineModel<boolean>('helpOpen', { default: false })
 
-const input = ref('')
+const scramble = ref('')
+const solution = ref('')
 const analysis = ref<FrAnalysis | null>(null)
 const activeAxis = ref<AxisKey>('ud')
 
-const localForm = useLocalStorage('tool.frTrainer.analyze', { scramble: '' })
-onMounted(() => {
-  if (localForm.value.scramble)
-    input.value = localForm.value.scramble
-})
-watch(input, (v) => {
-  localForm.value.scramble = v
+const localForm = useLocalStorage('tool.frTrainer.analyze', { scramble: '', solution: '' })
+
+watch([scramble, solution], ([s, sol]) => {
+  localForm.value = { scramble: s, solution: sol }
 })
 
-function runAnalyze(scramble: string) {
-  analysis.value = analyzeScramble(scramble)
+function runAnalyze() {
+  analysis.value = analyzeScramble(scramble.value, solution.value)
   activeAxis.value = 'ud'
 }
 
 function handleRandom() {
-  const s = generateHtrScramble()
-  input.value = s
-  runAnalyze(s)
+  solution.value = generateHtrScramble()
+  scramble.value = ''
+  runAnalyze()
 }
 
 onMounted(() => {
-  handleRandom()
+  const stored = localForm.value
+  if (!stored.solution && stored.scramble) {
+    solution.value = stored.scramble
+    scramble.value = ''
+    localForm.value = { scramble: '', solution: stored.scramble }
+  }
+  else {
+    scramble.value = stored.scramble
+    solution.value = stored.solution
+  }
+
+  if (solution.value.trim())
+    runAnalyze()
+  else
+    handleRandom()
 })
 
 const activeResult = computed(() => analysis.value?.axes.find(a => a.axisKey === activeAxis.value) ?? null)
@@ -41,8 +53,9 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
 <template>
   <div class="space-y-6">
     <FrScrambleInput
-      v-model="input"
-      @analyze="runAnalyze(input)"
+      v-model:scramble="scramble"
+      v-model:solution="solution"
+      @analyze="runAnalyze"
       @random="handleRandom"
       @help="helpOpen = true"
     />

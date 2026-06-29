@@ -705,7 +705,14 @@ export default {
         tutorial: 'Tutorial',
       },
       input: {
-        placeholder: 'Enter a scramble in HTR state, e.g. R2 U2 F2 L2 … (Cmd/Ctrl + Enter to analyze)',
+        scramble: {
+          label: 'Scramble',
+          placeholder: 'Scramble',
+        },
+        solution: {
+          label: 'Solution',
+          placeholder: 'Moves to HTR state, e.g. R2 U2 F2 L2 … (Cmd/Ctrl + Enter to analyze)',
+        },
       },
       btn: {
         analyze: 'Analyze',
