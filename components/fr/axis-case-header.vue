@@ -9,12 +9,12 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-indigo-50 rounded">
+  <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-indigo-50 dark:bg-gray-800 dark:border dark:border-gray-700 rounded">
     <p class="text-xl font-bold text-gray-900 leading-tight">
       {{ AXIS_TAB_LABEL[result.axisKey] }} {{ $t('tools.frTrainer.axisSuffix') }}
       <span
         v-if="!result.inputFalseFr && !result.alreadyFr"
-        class="text-indigo-600"
+        class="text-gray-600 dark:text-gray-300"
       >
         · {{ result.caseLabel }}
       </span>

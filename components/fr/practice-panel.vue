@@ -128,7 +128,7 @@ defineExpose({ replayFromHistory })
     <div class="flex flex-wrap gap-2">
       <button
         type="button"
-        class="px-3 py-1 border border-indigo-300 text-indigo-600 rounded text-sm hover:bg-indigo-50"
+        class="px-3 py-1 border border-gray-300 rounded text-sm hover:border-indigo-300"
         @click="handleRandom"
       >
         {{ $t('tools.frTrainer.btn.random') }}
@@ -176,7 +176,7 @@ defineExpose({ replayFromHistory })
           </button>
           <button
             type="button"
-            class="px-3 py-1 text-sm border border-indigo-300 text-indigo-600 rounded"
+            class="px-3 py-1 text-sm border border-gray-300 rounded hover:border-indigo-300"
             @click="handleRandomAxis"
           >
             {{ $t('tools.frTrainer.practice.randomAxis') }}

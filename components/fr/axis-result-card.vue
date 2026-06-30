@@ -79,7 +79,7 @@ const hasSteps = computed(() => {
       <div v-if="hasSteps" class="text-right">
         <button
           type="button"
-          class="text-xs px-2 py-1 border border-indigo-300 text-indigo-600 rounded hover:bg-indigo-50"
+          class="text-xs px-2 py-1 border border-gray-300 rounded hover:border-indigo-300"
           @click.stop="showSteps = !showSteps"
         >
           {{ $t('tools.frTrainer.steps.toggle') }}

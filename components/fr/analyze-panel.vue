@@ -22,10 +22,17 @@ function runAnalyze() {
   activeAxis.value = 'ud'
 }
 
+watchDebounced([scramble, solution], () => {
+  if (!scramble.value.trim() && !solution.value.trim()) {
+    analysis.value = null
+    return
+  }
+  runAnalyze()
+}, { debounce: 300 })
+
 function handleRandom() {
   solution.value = generateHtrScramble()
   scramble.value = ''
-  runAnalyze()
 }
 
 onMounted(() => {
@@ -40,9 +47,7 @@ onMounted(() => {
     solution.value = stored.solution
   }
 
-  if (solution.value.trim())
-    runAnalyze()
-  else
+  if (!solution.value.trim())
     handleRandom()
 })
 
@@ -54,7 +59,6 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
     <FrScrambleInput
       v-model:scramble="scramble"
       v-model:solution="solution"
-      @analyze="runAnalyze"
       @random="handleRandom"
       @help="helpOpen = true"
     />
