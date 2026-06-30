@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FrEmphasis } from '~/utils/cube'
 
-import { buildCubeMoves } from '~/utils/fr/display'
+import { buildCubeState } from '~/utils/fr/display'
 import type { AxisKey } from '~/utils/fr/types'
 
 const props = withDefaults(defineProps<{
@@ -10,12 +10,14 @@ const props = withDefaults(defineProps<{
   solution?: string[] | null
   previewMoves?: string[] | null
   emphasis?: FrEmphasis
+  fullCube?: boolean
   keyboardControls?: boolean
 }>(), {
   emphasis: 'axis',
+  fullCube: false,
 })
 
-const moves = computed(() => buildCubeMoves(
+const cubieCube = computed(() => buildCubeState(
   props.scramble,
   props.axisKey,
   props.previewMoves,
@@ -26,10 +28,10 @@ const moves = computed(() => buildCubeMoves(
 <template>
   <ClientOnly>
     <Cube3d
-      :moves="moves"
-      filter="fr"
-      :fr-axis="axisKey"
-      :fr-emphasis="emphasis"
+      :cubie-cube="cubieCube"
+      :filter="fullCube ? undefined : 'fr'"
+      :fr-axis="fullCube ? undefined : axisKey"
+      :fr-emphasis="fullCube ? undefined : emphasis"
       :keyboard-controls="keyboardControls"
       class="w-full max-w-xs mx-auto"
     />

@@ -367,11 +367,14 @@ function render() {
   renderer?.render(scene, camera)
 }
 
-watch(facelet, () => {
-  updateMaterials()
-  if (props.isStatic && staticCanvas && !renderer)
-    renderToStaticCanvas(staticCanvas)
-})
+watch(
+  () => [facelet.value, props.filter, props.frAxis, props.frEmphasis] as const,
+  () => {
+    updateMaterials()
+    if (props.isStatic && staticCanvas && !renderer)
+      renderToStaticCanvas(staticCanvas)
+  },
+)
 watch(width, () => {
   if (props.isStatic && staticCanvas && !renderer) {
     renderToStaticCanvas(staticCanvas)

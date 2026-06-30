@@ -1,3 +1,7 @@
+import { Algorithm, Cube } from 'insertionfinder'
+
+import { getCubieCube, removeComment } from '~/utils/if'
+
 import type { AxisKey } from './types'
 
 export const SETUP_ROTATION: Record<AxisKey, string> = {
@@ -6,10 +10,14 @@ export const SETUP_ROTATION: Record<AxisKey, string> = {
   rl: 'z\'',
 }
 
+// Moves are typed/solved in the original scramble frame, but applied after the
+// setup rotation when rendering. Each map conjugates a move by the inverse of
+// SETUP_ROTATION so that `rot relabel(M)` equals `M rot` (i.e. apply M in the
+// original frame, then rotate the whole cube for viewing).
 const FACE_RELABEL: Record<AxisKey, Record<string, string>> = {
   ud: {},
-  fb: { U: 'F', F: 'D', D: 'B', B: 'U', R: 'R', L: 'L' },
-  rl: { U: 'R', R: 'D', D: 'L', L: 'U', F: 'F', B: 'B' },
+  fb: { U: 'B', B: 'D', D: 'F', F: 'U', R: 'R', L: 'L' },
+  rl: { U: 'L', L: 'D', D: 'R', R: 'U', F: 'F', B: 'B' },
 }
 
 export function relabelSolution(moves: string[], axis: AxisKey): string {
@@ -33,6 +41,45 @@ export function buildCubeMoves(
   const previewStr = previewMoves?.length ? relabelSolution(previewMoves, axis) : ''
   const solutionStr = !previewStr && solution?.length ? relabelSolution(solution, axis) : ''
   return [scramble || '', rot, previewStr, solutionStr].filter(Boolean).join(' ')
+}
+
+/**
+ * Resolve the cube to a cubie state for rendering.
+ *
+ * The scramble may contain NISS (e.g. `(D2 L2 ...)`). Concatenating the setup
+ * rotation onto such a string would change the parsed `inversed` flag and yield
+ * the wrong state, so we twist the scramble as its own algorithm first and only
+ * then apply the rotation / preview / solution on top of the resolved state.
+ */
+export function buildCubeState(
+  scramble: string,
+  axis: AxisKey,
+  previewMoves?: string[] | null,
+  solution?: string[] | null,
+): { corners: number[], edges: number[], placement: number } {
+  const cube = new Cube()
+  const twist = (alg: string) => {
+    const cleaned = removeComment(alg)
+    if (cleaned.trim())
+      cube.twist(new Algorithm(cleaned))
+  }
+
+  try {
+    if (scramble?.trim())
+      twist(scramble)
+    if (SETUP_ROTATION[axis])
+      twist(SETUP_ROTATION[axis])
+
+    const previewStr = previewMoves?.length ? relabelSolution(previewMoves, axis) : ''
+    const solutionStr = !previewStr && solution?.length ? relabelSolution(solution, axis) : ''
+    if (previewStr)
+      twist(previewStr)
+    else if (solutionStr)
+      twist(solutionStr)
+  }
+  catch {}
+
+  return getCubieCube(cube)
 }
 
 export const AXIS_TAB_LABEL: Record<AxisKey, string> = {

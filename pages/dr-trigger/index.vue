@@ -77,12 +77,6 @@ const leaderboardDifficulty = ref(5)
 const leaderboardRzp = ref('')
 const leaderboardMerged = ref(true)
 
-const cubeKeys = [
-  ['U', 'U\'', 'U2', 'D', 'D\'', 'D2'],
-  ['R', 'R\'', 'R2', 'L', 'L\'', 'L2'],
-  ['F', 'F\'', 'F2', 'B', 'B\'', 'B2'],
-]
-
 let timerRaf: number | null = null
 let gameStartedAt = 0
 let serverRemainingAtSync = 0
@@ -319,25 +313,10 @@ async function resetToIdle() {
 }
 
 const solutionInput = ref<HTMLInputElement>()
+const { appendMove, deleteLastMove, clearSolution, handleSolutionKeydown } = useCubeMoveInput(solution)
+
 function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && canSubmit.value) {
-    e.preventDefault()
-    submitSolution()
-  }
-}
-
-function appendMove(move: string) {
-  solution.value = solution.value ? `${solution.value} ${move}` : move
-}
-
-function deleteLastMove() {
-  const parts = solution.value.trim().split(/\s+/)
-  parts.pop()
-  solution.value = parts.join(' ')
-}
-
-function clearSolution() {
-  solution.value = ''
+  handleSolutionKeydown(e, canSubmit.value, submitSolution)
 }
 
 async function loadMyGames(page = 1) {
@@ -556,43 +535,15 @@ onUnmounted(() => {
         {{ error }}
       </div>
 
-      <!-- Virtual Keyboard — fixed at bottom on mobile -->
-      <div v-if="showKeyboard" class="fixed bottom-0 left-0 right-0 z-20 bg-gray-100 border-t border-gray-300 p-2 md:static md:border-0 md:bg-transparent md:p-0 md:mt-2">
-        <div class="grid grid-cols-6 gap-1 max-w-lg mx-auto">
-          <template v-for="row in cubeKeys" :key="row[0]">
-            <button
-              v-for="key in row"
-              :key="key"
-              class="bg-white border border-gray-300 shadow-sm font-mono text-sm font-semibold py-2 active:bg-indigo-100 active:border-indigo-400 hover:bg-gray-50 transition-colors select-none"
-              @click="appendMove(key)"
-            >
-              {{ key }}
-            </button>
-          </template>
-        </div>
-        <div class="grid grid-cols-3 gap-1 mt-1 max-w-lg mx-auto">
-          <button
-            class="bg-gray-200 border border-gray-300 shadow-sm text-sm py-1.5 active:bg-gray-300 hover:bg-gray-100 transition-colors select-none"
-            @click="deleteLastMove"
-          >
-            <Icon name="mdi:backspace-outline" class="text-lg" />
-          </button>
-          <button
-            class="bg-gray-200 border border-gray-300 shadow-sm text-sm py-1.5 active:bg-gray-300 hover:bg-gray-100 transition-colors select-none"
-            @click="clearSolution"
-          >
-            Clear
-          </button>
-          <button
-            class="bg-indigo-500 text-white shadow-sm text-sm py-1.5 active:bg-indigo-700 hover:bg-indigo-600 transition-colors select-none"
-            :class="{ 'opacity-50': !canSubmit }"
-            :disabled="!canSubmit"
-            @click="submitSolution"
-          >
-            {{ $t('drTrigger.submit') }}
-          </button>
-        </div>
-      </div>
+      <CubeSolutionKeyboard
+        v-if="showKeyboard"
+        :can-submit="canSubmit"
+        :loading="loading"
+        @append="appendMove"
+        @delete-last="deleteLastMove"
+        @clear="clearSolution"
+        @submit="submitSolution"
+      />
     </div>
 
     <!-- Game Over -->

@@ -762,7 +762,7 @@ export default {
         randomAxis: 'Random axis',
         randomAxisHint: '(axis randomly assigned for this scramble)',
         solutionInput: 'Your FR solution',
-        solutionPlaceholder: 'Enter half-turn sequence, e.g. R2 F2 U2 (Cmd/Ctrl + Enter to submit)',
+        solutionPlaceholder: 'e.g. R2 F2 U2',
         liveInvalid: 'Invalid move: {token}',
         liveTrueFr: 'True FR reached',
         liveFalseFr: 'FR shape reached, but parity is off (false FR)',

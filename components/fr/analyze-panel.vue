@@ -46,7 +46,6 @@ onMounted(() => {
     handleRandom()
 })
 
-const activeResult = computed(() => analysis.value?.axes.find(a => a.axisKey === activeAxis.value) ?? null)
 const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
 </script>
 
@@ -81,11 +80,10 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
         <FrCube
           :scramble="analysis!.scramble"
           :axis-key="activeAxis"
-          :solution="activeResult?.solution"
         />
       </div>
 
-      <div class="space-y-3 lg:hidden">
+      <div class="space-y-3">
         <p class="text-sm text-gray-600">
           {{ $t('tools.frTrainer.highlightTip') }}
         </p>

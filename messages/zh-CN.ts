@@ -762,7 +762,7 @@ export default {
         randomAxis: '随机轴',
         randomAxisHint: '（本题轴已随机指定）',
         solutionInput: '你的 FR 解法',
-        solutionPlaceholder: '输入半转序列，如 R2 F2 U2（Cmd/Ctrl + Enter 提交）',
+        solutionPlaceholder: '例如 R2 F2 U2',
         liveInvalid: '无效步：{token}',
         liveTrueFr: '已达到真 FR',
         liveFalseFr: '已达到 FR 形态，但奇偶不对（假 FR）',

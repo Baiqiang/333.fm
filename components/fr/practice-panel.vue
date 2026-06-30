@@ -17,6 +17,9 @@ const axisMode = ref<FrAxisMode>('pick')
 const userSolution = ref('')
 const submitted = ref(false)
 const verifyResult = ref<VerifyFrResult | null>(null)
+const showKeyboard = ref(false)
+
+const { appendMove, deleteLastMove, clearSolution, handleSolutionKeydown } = useCubeMoveInput(userSolution)
 
 function pickRandomAxis(): AxisKey {
   return AXIS_TABS[Math.floor(Math.random() * AXIS_TABS.length)]!
@@ -78,17 +81,11 @@ const canSubmit = computed(() =>
   && liveInput.value?.status !== 'invalid',
 )
 
-const inputBorderClass = computed(() => {
-  if (!liveInput.value)
-    return 'border-gray-300'
-  if (liveInput.value.status === 'invalid')
-    return 'border-red-500'
-  if (liveInput.value.status === 'trueFr')
-    return 'border-green-500'
-  if (liveInput.value.status === 'falseFr')
-    return 'border-amber-500'
-  return 'border-gray-300'
-})
+const solutionMoveCount = computed(() => liveInput.value?.appliedMoves.length ?? 0)
+
+function handleKeydown(e: KeyboardEvent) {
+  handleSolutionKeydown(e, canSubmit.value, handleSubmit)
+}
 
 function handleSubmit() {
   if (!analysis.value?.ok || !analysis.value.isHtr)
@@ -160,10 +157,6 @@ defineExpose({ replayFromHistory })
     </div>
 
     <template v-if="showCube">
-      <p class="font-mono text-sm text-gray-600 break-all">
-        {{ analysis!.scramble }}
-      </p>
-
       <div class="bg-white shadow-md p-4 border-l-4 border-indigo-500">
         <p class="text-sm font-medium mb-3">
           {{ $t('tools.frTrainer.practice.axisPrompt') }}
@@ -194,11 +187,26 @@ defineExpose({ replayFromHistory })
         </div>
       </div>
 
-      <div class="grid lg:grid-cols-2 gap-6">
+      <div class="mb-2">
+        <p class="text-sm font-semibold text-gray-700 mb-1">
+          {{ $t('tools.frTrainer.input.scramble.label') }}：
+        </p>
+        <StickyScramble :scramble="analysis!.scramble" :sticky="false" />
+      </div>
+
+      <FrAxisCaseHeader
+        v-if="activeResult"
+        :result="activeResult"
+        class="mb-2"
+      />
+
+      <div class="grid lg:grid-cols-2 gap-6" :class="{ 'pb-52': showKeyboard && !submitted }">
         <div class="bg-white shadow-md p-4">
           <FrCube
             :scramble="analysis!.scramble"
             :axis-key="axisKey"
+            full-cube
+            keyboard-controls
             :preview-moves="!submitted && liveInput?.appliedMoves.length ? liveInput.appliedMoves : null"
             :solution="submitted ? activeResult?.solution : null"
           />
@@ -206,10 +214,10 @@ defineExpose({ replayFromHistory })
 
         <div class="space-y-4">
           <FrAxisResultCard
-            v-if="activeResult"
+            v-if="activeResult && submitted"
             :result="activeResult"
             active
-            :hide-solution="!submitted"
+            hide-header
             @select="() => {}"
           />
 
@@ -217,32 +225,54 @@ defineExpose({ replayFromHistory })
             <p class="text-sm font-medium mb-2">
               {{ $t('tools.frTrainer.practice.solutionInput') }}
             </p>
-            <textarea
-              v-model="userSolution"
-              class="w-full font-mono border-2 rounded p-2 focus:outline-none"
-              :class="inputBorderClass"
-              :placeholder="$t('tools.frTrainer.practice.solutionPlaceholder')"
-              rows="3"
-              @keydown.meta.enter="canSubmit && handleSubmit()"
-              @keydown.ctrl.enter="canSubmit && handleSubmit()"
+            <div class="flex gap-2">
+              <input
+                v-model="userSolution"
+                autofocus
+                class="block w-full font-mono shadow-sm border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50 p-2 border text-sm"
+                :placeholder="$t('tools.frTrainer.practice.solutionPlaceholder')"
+                @keydown="handleKeydown"
+              >
+              <button
+                type="button"
+                class="bg-indigo-500 text-white px-3 py-2 shadow-md hover:bg-indigo-600 transition-all duration-200 shrink-0"
+                :class="{ 'opacity-50 cursor-not-allowed': !canSubmit }"
+                :disabled="!canSubmit"
+                @click="handleSubmit"
+              >
+                <Icon name="material-symbols:send" />
+              </button>
+            </div>
+            <div class="mt-0.5 text-xs flex items-center justify-between">
+              <span>
+                <span v-if="liveInput?.status === 'trueFr'" class="text-green-600 font-semibold">
+                  {{ $t('tools.frTrainer.practice.liveTrueFr') }} · {{ $t('common.moves', { moves: solutionMoveCount }) }}
+                </span>
+                <span v-else-if="liveInput?.status === 'falseFr'" class="text-amber-600">
+                  {{ $t('tools.frTrainer.practice.liveFalseFr') }}
+                </span>
+                <span v-else-if="liveInput?.status === 'invalid' && liveInput.invalidToken" class="text-red-500">
+                  {{ $t('tools.frTrainer.practice.liveInvalid', { token: liveInput.invalidToken }) }}
+                </span>
+              </span>
+              <button
+                type="button"
+                class="px-1.5 py-0.5 transition-all duration-200"
+                :class="showKeyboard ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'"
+                @click="showKeyboard = !showKeyboard"
+              >
+                <Icon name="mdi:keyboard" />
+              </button>
+            </div>
+            <CubeSolutionKeyboard
+              v-if="showKeyboard"
+              :can-submit="canSubmit"
+              :submit-label="$t('tools.frTrainer.practice.submit')"
+              @append="appendMove"
+              @delete-last="deleteLastMove"
+              @clear="clearSolution"
+              @submit="handleSubmit"
             />
-            <p v-if="liveInput?.status === 'invalid' && liveInput.invalidToken" class="text-xs text-red-600 mt-1">
-              {{ $t('tools.frTrainer.practice.liveInvalid', { token: liveInput.invalidToken }) }}
-            </p>
-            <p v-if="liveInput?.status === 'trueFr'" class="text-xs text-green-600 mt-1 font-medium">
-              {{ $t('tools.frTrainer.practice.liveTrueFr') }}
-            </p>
-            <p v-if="liveInput?.status === 'falseFr'" class="text-xs text-amber-600 mt-1">
-              {{ $t('tools.frTrainer.practice.liveFalseFr') }}
-            </p>
-            <ButtonPrimary
-              type="button"
-              class="mt-3"
-              :disabled="!canSubmit"
-              @click="handleSubmit"
-            >
-              {{ $t('tools.frTrainer.practice.submit') }}
-            </ButtonPrimary>
           </div>
 
           <div v-else-if="verifyResult" class="space-y-3">

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { AXIS_TAB_LABEL } from '~/utils/fr/display'
-
 import type { AxisResult } from '~/utils/fr/types'
 
 const props = defineProps<{
   result: AxisResult
   active: boolean
   hideSolution?: boolean
+  hideHeader?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -29,38 +28,11 @@ const hasSteps = computed(() => {
     :class="active ? 'border-indigo-500' : 'border-gray-300'"
     @click="emit('select')"
   >
-    <div class="flex justify-between items-center mb-3">
-      <h3 class="font-bold text-lg">
-        {{ AXIS_TAB_LABEL[result.axisKey] }} {{ $t('tools.frTrainer.axisSuffix') }}
-      </h3>
-      <span
-        v-if="result.inputFalseFr"
-        class="inline-block px-2 py-0.5 text-xs rounded border border-red-500 text-red-600 bg-red-50"
-      >
-        {{ $t('tools.frTrainer.falseFr') }}
-      </span>
-      <span
-        v-else-if="result.alreadyFr"
-        class="inline-block px-2 py-0.5 text-xs rounded border border-green-500 text-green-600 bg-green-50"
-      >
-        {{ $t('tools.frTrainer.alreadyFr') }}
-      </span>
-      <span
-        v-else
-        class="inline-block px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700"
-      >
-        {{ result.caseLabel }}
-      </span>
-    </div>
-
-    <p class="text-sm text-gray-600 mb-1">
-      {{ $t('tools.frTrainer.badEdges') }}：
-      <span class="text-gray-900 font-medium">{{ result.badCount }} ({{ result.badTop }}-{{ result.badBottom }})</span>
-    </p>
-    <p class="text-sm text-gray-600 mb-3">
-      {{ $t('tools.frTrainer.corner') }}：
-      <span class="text-gray-900 font-medium">{{ result.cornerLabel }}</span>
-    </p>
+    <FrAxisCaseHeader
+      v-if="!hideHeader"
+      :result="result"
+      class="mb-3 -mx-1"
+    />
 
     <template v-if="!hideSolution">
       <div v-if="result.shapeIsFalseFr && result.shapeSolution && result.solution" class="mb-3">

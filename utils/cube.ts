@@ -55,23 +55,13 @@ function isCornerCubie(x: number, y: number, z: number): boolean {
   return x !== 0 && y !== 0 && z !== 0
 }
 
-const FR_AXIS_FACES: Record<FrAxisKey, [string, string]> = {
-  ud: ['U', 'D'],
-  fb: ['F', 'B'],
-  rl: ['R', 'L'],
-}
-
-/** E-slice edges for the FR axis: neither sticker belongs to that axis top/bottom (evaluated after setup rotation). */
-function isFrIgnoredSliceEdge(x: number, y: number, z: number, fl: string, axis: FrAxisKey): boolean {
-  if (!isEdge(x, y, z))
-    return false
-  const pair = EDGE_FACELET_PAIRS[`${x},${y},${z}`]
-  if (!pair)
-    return false
-  const [top, bottom] = FR_AXIS_FACES[axis]
-  const a = fl[pair[0]]
-  const b = fl[pair[1]]
-  return a !== top && a !== bottom && b !== top && b !== bottom
+/**
+ * E-slice edges to dim for FR axis emphasis.
+ * Setup rotation (x / z') is already applied in buildCubeMoves before rendering,
+ * so the FR axis is always vertical in the viewer — hide the physical equator (y = 0).
+ */
+function isFrIgnoredSliceEdge(x: number, y: number, z: number): boolean {
+  return isEdge(x, y, z) && y === 0
 }
 
 export function filterColor(
@@ -90,7 +80,7 @@ export function filterColor(
       return GRAY_COLOR
     if (frOptions.emphasis === 'edges' && isCornerCubie(x, y, z))
       return BODY_COLOR
-    if (frOptions.emphasis === 'axis' && isFrIgnoredSliceEdge(x, y, z, fl, frOptions.axis))
+    if (frOptions.emphasis === 'axis' && isFrIgnoredSliceEdge(x, y, z))
       return GRAY_COLOR
     return FACE_COLORS[face]
   }
