@@ -24,31 +24,36 @@ function sideFaces(axis: AxisIndex): Face[] {
   return ALL_FACES.filter(f => !af.includes(f))
 }
 
-/** Reduced state key: all corner stickers + top/bottom edge stickers for the axis (middle edges ignored). */
-function reducedKey(state: CubeState, axis: AxisIndex): string {
+/**
+ * Reduced state key: all corner stickers + edge stickers for the axis.
+ * In Leave-slice mode (default) the middle-layer edges are ignored; in full
+ * mode all edges are included so the goal requires fully restoring the slice.
+ */
+function reducedKey(state: CubeState, axis: AxisIndex, leaveSlice = true): string {
   const parts: string[] = []
   for (const cc of CORNER_CUBIES) {
     for (const si of cc.stickers) parts.push(state[si])
   }
   for (const ec of EDGE_CUBIES) {
-    if (ec.coord[axis] !== 0) {
+    if (!leaveSlice || ec.coord[axis] !== 0) {
       for (const si of ec.stickers) parts.push(state[si])
     }
   }
   return parts.join('')
 }
 
-const goalCache = new Map<AxisIndex, Set<string>>()
+const goalCache = new Map<string, Set<string>>()
 
 /** True FR goal set: all reduced states reachable from solved using only the four side half-turns of this axis. */
-function goalSet(axis: AxisIndex): Set<string> {
-  const cached = goalCache.get(axis)
+function goalSet(axis: AxisIndex, leaveSlice = true): Set<string> {
+  const cacheKey = `${axis}:${leaveSlice}`
+  const cached = goalCache.get(cacheKey)
   if (cached)
     return cached
 
   const set = new Set<string>()
   const seen = new Set<string>()
-  const start = reducedKey(SOLVED, axis)
+  const start = reducedKey(SOLVED, axis, leaveSlice)
   set.add(start)
   seen.add(start)
   let frontier: CubeState[] = [SOLVED]
@@ -58,7 +63,7 @@ function goalSet(axis: AxisIndex): Set<string> {
     for (const s of frontier) {
       for (const m of sides) {
         const ns = applyPerm(s, HALF_TURN[m])
-        const k = reducedKey(ns, axis)
+        const k = reducedKey(ns, axis, leaveSlice)
         if (!seen.has(k)) {
           seen.add(k)
           set.add(k)
@@ -68,13 +73,13 @@ function goalSet(axis: AxisIndex): Set<string> {
     }
     frontier = next
   }
-  goalCache.set(axis, set)
+  goalCache.set(cacheKey, set)
   return set
 }
 
 /** Whether the state is already true FR (the axis can be restored using only four side half-turns). */
-export function isTrueFr(state: CubeState, axis: AxisIndex): boolean {
-  return goalSet(axis).has(reducedKey(state, axis))
+export function isTrueFr(state: CubeState, axis: AxisIndex, leaveSlice = true): boolean {
+  return goalSet(axis, leaveSlice).has(reducedKey(state, axis, leaveSlice))
 }
 
 interface SearchNode {
@@ -89,10 +94,11 @@ interface SearchNode {
 export function solveAxis(
   start: CubeState,
   axis: AxisIndex,
+  leaveSlice = true,
   maxDepth = 14,
 ): string[] | null {
-  const goals = goalSet(axis)
-  const startKey = reducedKey(start, axis)
+  const goals = goalSet(axis, leaveSlice)
+  const startKey = reducedKey(start, axis, leaveSlice)
   if (goals.has(startKey))
     return []
 
@@ -106,7 +112,7 @@ export function solveAxis(
         if (m === last)
           continue // consecutive half-turns on the same face are redundant
         const ns = applyPerm(node.state, HALF_TURN[m])
-        const k = reducedKey(ns, axis)
+        const k = reducedKey(ns, axis, leaveSlice)
         if (goals.has(k))
           return [...node.path, m].map(f => `${f}2`)
         if (!seen.has(k)) {

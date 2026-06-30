@@ -37,11 +37,18 @@ function decompose(
   state: CubeState,
   moves: string[],
   axis: AxisIndex,
+  leaveSlice = true,
 ): SolutionStep[] {
   const stepOf = (cur: CubeState, move: string | null): SolutionStep => {
     const c = classifyAxis(cur, axis)
     const caseLabel = buildCaseLabel(c.edgeLabel, c.cornerLabel)
-    return { move, caseLabel, trueFr: isTrueFr(cur, axis), trigger: FR_TRIGGERS[caseLabel] }
+    return {
+      move,
+      caseLabel,
+      trueFr: isTrueFr(cur, axis, leaveSlice),
+      // Trigger formulas are Leave-slice finishing moves; they don't apply in full mode.
+      trigger: leaveSlice ? FR_TRIGGERS[caseLabel] : undefined,
+    }
   }
   const steps: SolutionStep[] = [stepOf(state, null)]
   let cur = state
@@ -66,7 +73,7 @@ function displayMoves(scramble: string, solution: string, formattedScramble: str
 }
 
 /** Analyze an HTR state from optional scramble + solution (复原); return FR shape and reference steps. */
-export function analyzeScramble(scramble: string, solution: string = ''): FrAnalysis {
+export function analyzeScramble(scramble: string, solution: string = '', leaveSlice: boolean = true): FrAnalysis {
   let formattedScramble = ''
 
   try {
@@ -116,6 +123,25 @@ export function analyzeScramble(scramble: string, solution: string = ''): FrAnal
   const axes: AxisResult[] = htr
     ? AXIS_LIST.map(({ key, axis }) => {
       const cls = classifyAxis(state, axis)
+
+      // Full-solve mode: shortest sequence to fully reduce the axis (true FR only,
+      // no false FR / shape distinction). Keep the classification header only.
+      if (!leaveSlice) {
+        const solution = solveAxis(state, axis, false)
+        return {
+          axisKey: key,
+          ...cls,
+          solution,
+          shapeSolution: null,
+          alreadyFr: solution !== null && solution.length === 0,
+          inputFalseFr: false,
+          shapeIsFalseFr: false,
+          caseLabel: buildCaseLabel(cls.edgeLabel, cls.cornerLabel),
+          decomposition: solution ? decompose(state, solution, axis, false) : [],
+          shapeDecomposition: null,
+        }
+      }
+
       const solution = solveAxis(state, axis)
       const shapeSolution = solveAxisShape(state, axis)
 

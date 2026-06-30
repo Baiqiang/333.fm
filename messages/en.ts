@@ -719,6 +719,8 @@ export default {
         random: 'Random',
         help: 'Reference',
       },
+      leaveSliceMode: 'Leave slice mode',
+      leaveSliceHint: 'Turn off to fully restore middle-layer edges (shortest true-FR solution, solvable by the four side half-turns)',
       falseFr: 'False FR',
       trueFr: 'True FR',
       inputFalseFrNote: 'The FR shape is met but the parity is off (false FR); one extra axis half-turn is needed to truly solve. The full true-FR solution is below.',

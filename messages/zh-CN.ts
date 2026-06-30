@@ -719,6 +719,8 @@ export default {
         random: '随机',
         help: '说明',
       },
+      leaveSliceMode: 'Leave slice 模式',
+      leaveSliceHint: '关闭后将完整还原中层棱块（最短真 FR 解，可用四个侧面半转复原）',
       falseFr: '假 FR',
       trueFr: '真 FR',
       inputFalseFrNote: '形态已满足 FR，但奇偶不对（假 FR），需补一个轴向半转才能真正还原。下方为真 FR 完整解。',

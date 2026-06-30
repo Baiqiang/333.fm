@@ -10,6 +10,7 @@ const scramble = ref('')
 const solution = ref('')
 const analysis = ref<FrAnalysis | null>(null)
 const activeAxis = ref<AxisKey>('ud')
+const leaveSlice = useLocalStorage('tool.frTrainer.analyze.leaveSlice', true)
 
 const localForm = useLocalStorage('tool.frTrainer.analyze', { scramble: '', solution: '' })
 
@@ -18,11 +19,11 @@ watch([scramble, solution], ([s, sol]) => {
 })
 
 function runAnalyze() {
-  analysis.value = analyzeScramble(scramble.value, solution.value)
+  analysis.value = analyzeScramble(scramble.value, solution.value, leaveSlice.value)
   activeAxis.value = 'ud'
 }
 
-watchDebounced([scramble, solution], () => {
+watchDebounced([scramble, solution, leaveSlice], () => {
   if (!scramble.value.trim() && !solution.value.trim()) {
     analysis.value = null
     return
@@ -62,6 +63,26 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
       @random="handleRandom"
       @help="helpOpen = true"
     />
+
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        role="switch"
+        :aria-checked="leaveSlice"
+        class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors"
+        :class="leaveSlice ? 'bg-indigo-500' : 'bg-gray-300'"
+        @click="leaveSlice = !leaveSlice"
+      >
+        <span
+          class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+          :class="leaveSlice ? 'translate-x-6' : 'translate-x-1'"
+        />
+      </button>
+      <div class="text-sm">
+        <span class="font-medium text-gray-700">{{ $t('tools.frTrainer.leaveSliceMode') }}</span>
+        <span class="ml-2 text-gray-500">{{ $t('tools.frTrainer.leaveSliceHint') }}</span>
+      </div>
+    </div>
 
     <FrHelpDialog v-model:open="helpOpen" />
 
