@@ -105,6 +105,7 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
         <FrCube
           :scramble="analysis!.scramble"
           :axis-key="activeAxis"
+          :leave-slice="leaveSlice"
         />
       </div>
 
