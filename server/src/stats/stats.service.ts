@@ -24,6 +24,9 @@ const excludePracticeSubTypes = [
 ]
 
 const excludeCompetitionTypes = [CompetitionType.FMC_CHAIN, CompetitionType.WCA_RECONSTRUCTION]
+const excludeCompetitionTypesForWeeklyActive = [CompetitionType.FMC_CHAIN]
+
+const DEFAULT_LIMIT = 20
 
 function ywToStr(yw: number) {
   const year = Math.floor(yw / 100)
@@ -82,14 +85,17 @@ export class StatsService {
     return monday.toDate()
   }
 
-  private submissionsBefore(currentWeekStart?: Date) {
+  private submissionsBefore(
+    currentWeekStart?: Date,
+    excludeTypes: CompetitionType[] = excludeCompetitionTypes,
+  ) {
     if (!currentWeekStart) {
       currentWeekStart = this.getCurrentWeekStart()
     }
     return this.submissionsRepository
       .createQueryBuilder('s')
       .leftJoin('s.competition', 'c')
-      .where('c.type NOT IN (:...excludeTypes)', { excludeTypes: excludeCompetitionTypes })
+      .where('c.type NOT IN (:...excludeTypes)', { excludeTypes })
       .andWhere('c.subType NOT IN (:...practiceSubTypes)', { practiceSubTypes: excludePracticeSubTypes })
       .andWhere('s.moves > 0')
       .andWhere('s.created_at < :currentWeekStart', { currentWeekStart })
@@ -108,7 +114,7 @@ export class StatsService {
     return ids.map(id => map.get(id)).filter(Boolean) as Submissions[]
   }
 
-  async getTopLiked(limit = 10) {
+  async getTopLiked(limit = DEFAULT_LIMIT) {
     const likeCountExpr = '(SELECT COUNT(*) FROM user_activities ua WHERE ua.submission_id = s.id AND ua.`like` = 1)'
     const ranked = await this.submissionsBefore()
       .select('s.id', 'id')
@@ -121,7 +127,7 @@ export class StatsService {
     return this.loadSubmissionsByIds(ranked.map(r => r.id))
   }
 
-  async getTopFavorited(limit = 10) {
+  async getTopFavorited(limit = DEFAULT_LIMIT) {
     const favCountExpr = '(SELECT COUNT(*) FROM user_activities ua WHERE ua.submission_id = s.id AND ua.favorite = 1)'
     const ranked = await this.submissionsBefore()
       .select('s.id', 'id')
@@ -134,7 +140,7 @@ export class StatsService {
     return this.loadSubmissionsByIds(ranked.map(r => r.id))
   }
 
-  async getTopCommented(limit = 10) {
+  async getTopCommented(limit = DEFAULT_LIMIT) {
     const currentWeekStart = this.getCurrentWeekStart()
     const ranked = await this.commentsRepository
       .createQueryBuilder('cm')
@@ -186,7 +192,7 @@ export class StatsService {
 
     const weekKeys = [...bestIdByWeek.entries()]
       .sort((a, b) => a[0] - b[0])
-      .slice(-10)
+      .slice(-DEFAULT_LIMIT)
       .reverse()
 
     return weekKeys
@@ -200,9 +206,9 @@ export class StatsService {
       .filter(item => item.submission !== null)
   }
 
-  /** 每周最活跃的选手：最近 10 周，每周按提交次数排序取前 10 名（排除 CHAIN、练习、当前周） */
-  async getWeeklyActiveSubmitters(weeksLimit = 10, topPerWeek = 10) {
-    const rows = await this.submissionsBefore()
+  /** 每周最活跃的选手：最近 20 周，每周按提交次数排序取前 20 名（含 WCA recon，排除 CHAIN、练习、当前周） */
+  async getWeeklyActiveSubmitters(weeksLimit = DEFAULT_LIMIT, topPerWeek = DEFAULT_LIMIT) {
+    const rows = await this.submissionsBefore(undefined, excludeCompetitionTypesForWeeklyActive)
       .select('YEARWEEK(s.created_at, 3)', 'yw')
       .addSelect('s.user_id', 'userId')
       .addSelect('COUNT(*)', 'cnt')
@@ -237,7 +243,7 @@ export class StatsService {
     }))
   }
 
-  async getTopSubmitters(limit = 10) {
+  async getTopSubmitters(limit = DEFAULT_LIMIT) {
     const results = await this.submissionsRepository
       .createQueryBuilder('s')
       .leftJoin('s.competition', 'c')
@@ -272,7 +278,7 @@ export class StatsService {
     }))
   }
 
-  async getTopWinners(limit = 10) {
+  async getTopWinners(limit = DEFAULT_LIMIT) {
     const results = await this.resultsRepository
       .createQueryBuilder('r')
       .leftJoin('r.competition', 'c')

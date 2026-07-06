@@ -44,6 +44,8 @@ import { DRTriggerCommand } from './dr-trigger/dr-trigger.command'
 import { DRTriggerCommandService } from './dr-trigger/dr-trigger.service'
 import { EndlessCommand } from './endless/endless.command'
 import { EndlessCommandService } from './endless/endless.service'
+import { FiveGenCommand } from './five-gen/five-gen.command'
+import { FiveGenCommandService } from './five-gen/five-gen.service'
 import { LeagueCommand } from './league/league.command'
 import { LeagueService } from './league/league.service'
 import { LeaveSliceCommand } from './leave-slice/leave-slice.command'
@@ -123,6 +125,8 @@ import { WcaService } from './wca/wca.service'
     CmdService,
     CenterSolvedCommandService,
     CenterSolvedCommand,
+    FiveGenCommandService,
+    FiveGenCommand,
     DRTriggerCommandService,
     DRTriggerCommand,
     EndlessCommandService,
