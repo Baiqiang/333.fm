@@ -50,7 +50,42 @@ function isESliceEdge(x: number, y: number, z: number, fl: string): boolean {
   return a !== 'U' && a !== 'D' && b !== 'U' && b !== 'D'
 }
 
-export function filterColor(filter: string | undefined, face: string, x: number, y: number, z: number, fl: string): string {
+export type FrAxisKey = 'ud' | 'fb' | 'rl'
+export type FrEmphasis = 'axis' | 'corners' | 'edges'
+
+function isCornerCubie(x: number, y: number, z: number): boolean {
+  return x !== 0 && y !== 0 && z !== 0
+}
+
+/**
+ * E-slice edges to dim for FR axis emphasis.
+ * Setup rotation (x / z') is already applied in buildCubeMoves before rendering,
+ * so the FR axis is always vertical in the viewer — hide the physical equator (y = 0).
+ */
+function isFrIgnoredSliceEdge(x: number, y: number, z: number): boolean {
+  return isEdge(x, y, z) && y === 0
+}
+
+export function filterColor(
+  filter: 'dr' | 'fr' | undefined,
+  face: string,
+  x: number,
+  y: number,
+  z: number,
+  fl: string,
+  frOptions?: { axis: FrAxisKey, emphasis: FrEmphasis },
+): string {
+  if (filter === 'fr' && frOptions) {
+    if (isCenter(x, y, z))
+      return FACE_COLORS[face]
+    if (frOptions.emphasis === 'corners' && isEdge(x, y, z))
+      return GRAY_COLOR
+    if (frOptions.emphasis === 'edges' && isCornerCubie(x, y, z))
+      return BODY_COLOR
+    if (frOptions.emphasis === 'axis' && isFrIgnoredSliceEdge(x, y, z))
+      return GRAY_COLOR
+    return FACE_COLORS[face]
+  }
   if (filter !== 'dr')
     return FACE_COLORS[face]
   if (isCenter(x, y, z))
