@@ -123,10 +123,10 @@ useSeoMeta({
     <!-- Weekly Active Submitters -->
     <div v-if="activeTab === 'weeklyActiveSubmitters'" class="bg-white shadow-md">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-max [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
+        <table class="w-full text-sm table-fixed">
           <thead class="bg-indigo-500 text-white">
             <tr>
-              <th class="p-2 text-left">
+              <th class="p-2 text-left w-28 whitespace-nowrap">
                 {{ $t('stats.week') }}
               </th>
               <th class="p-2 text-left">
@@ -140,13 +140,13 @@ useSeoMeta({
               :key="week"
               class="border-t border-gray-200 hover:bg-gray-50"
             >
-              <td class="p-2">
+              <td class="p-2 align-top whitespace-nowrap">
                 {{ week }}
               </td>
               <td class="p-2">
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <template v-for="(item, idx) in submitters" :key="item.user?.id ?? idx">
-                    <span v-if="item.user" class="flex items-center gap-1">
+                    <span v-if="item.user" class="inline-flex items-center gap-1 shrink-0">
                       <span class="font-mono text-gray-500 w-5">{{ idx + 1 }}.</span>
                       <UserAvatarName :user="item.user" :size="5" />
                       <span class="font-mono text-gray-600">({{ item.submissionCount }})</span>
