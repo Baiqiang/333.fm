@@ -1,6 +1,6 @@
+import { formatAlgorithm } from '@333fm/utils'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Algorithm } from 'insertionfinder'
 import { Repository } from 'typeorm'
 
 import { CompetitionSubType, CompetitionType } from '@/entities/competitions.entity'
@@ -20,6 +20,21 @@ const EXCLUDE_PRACTICE_SUB_TYPES = [
 ]
 
 const FACE_NAMES = ['U', 'R', 'F', 'D', 'L', 'B']
+const FACE_TURN_RE = /^([URFDLB])(['2]?)$/
+
+function getFacesUsed(sequence: string): Set<number> | null {
+  try {
+    const faces = new Set<number>()
+    for (const tok of removeComment(sequence).trim().split(/\s+/)) {
+      const m = FACE_TURN_RE.exec(tok)
+      if (!m) continue
+      faces.add(FACE_NAMES.indexOf(m[1]))
+    }
+    return faces
+  } catch {
+    return null
+  }
+}
 
 interface GenEntry {
   submissionId: number
@@ -28,22 +43,6 @@ interface GenEntry {
   facesUsed: string
   missingFaces: string
   url: string
-}
-
-function getFacesUsed(sequence: string): Set<number> | null {
-  try {
-    const alg = new Algorithm(removeComment(sequence))
-    alg.clearFlags(0)
-    const faces = new Set<number>()
-    for (const twist of alg.twists) {
-      const qt = twist % 4
-      if (qt === 0) continue
-      faces.add(twist >> 2)
-    }
-    return faces
-  } catch {
-    return null
-  }
 }
 
 function facesUsedLabel(faces: Set<number>): string {
@@ -56,11 +55,7 @@ function missingFacesLabel(faces: Set<number>): string | null {
   return missing.join('')
 }
 
-function toGenEntry(
-  submission: Submissions,
-  faces: Set<number>,
-  baseUrl: string,
-): GenEntry {
+function toGenEntry(submission: Submissions, faces: Set<number>, baseUrl: string): GenEntry {
   return {
     submissionId: submission.id,
     moves: submission.moves,
@@ -107,12 +102,13 @@ export class FiveGenCommandService {
     for (const submission of submissions) {
       let formattedSolution: string
       try {
-        const { formattedSkeleton, bestCube } = formatSkeleton(submission.scramble.scramble, submission.solution)
+        const { bestCube } = formatSkeleton(submission.scramble.scramble, submission.solution)
         if (!bestCube.isSolved()) {
           notSolved++
           continue
         }
-        formattedSolution = formattedSkeleton
+        // Normalize cancellations, but keep scramble orientation (placement 0).
+        formattedSolution = formatAlgorithm(submission.solution, 0)
       } catch {
         parseFailed++
         continue
@@ -138,13 +134,13 @@ export class FiveGenCommandService {
       if (!missingFaces) continue
 
       fiveGen++
-      missingFaceCounts[missingFaces] = (missingFaceCounts[missingFaces] ?? 0) + 1
+      missingFaceCounts[missingFaces[0]] = (missingFaceCounts[missingFaces[0]] ?? 0) + 1
       fiveGenEntries.push(toGenEntry(submission, faces, baseUrl))
     }
 
     fiveGenEntries.sort((a, b) => a.moves - b.moves || a.submissionId - b.submissionId)
     fourGenEntries.sort((a, b) => a.moves - b.moves || a.submissionId - b.submissionId)
-    const top20 = fiveGenEntries.slice(0, 20)
+    const top50 = fiveGenEntries.slice(0, 50)
     const valid = total - parseFailed - notSolved
 
     this.logger.log('=== 5gen submission stats ===')
@@ -188,8 +184,8 @@ export class FiveGenCommandService {
       )
     }
     this.logger.log('')
-    this.logger.log('=== Top 20 shortest 5gen submissions ===')
-    for (const [i, entry] of top20.entries()) {
+    this.logger.log('=== Top 50 shortest 5gen submissions ===')
+    for (const [i, entry] of top50.entries()) {
       this.logger.log(
         [
           `${(i + 1).toString().padStart(2)}.`,
