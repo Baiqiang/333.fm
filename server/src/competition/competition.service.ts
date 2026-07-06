@@ -64,6 +64,7 @@ export class CompetitionService {
           switch (competition.type) {
             case CompetitionType.WEEKLY:
             case CompetitionType.DAILY:
+            case CompetitionType.FUN_CHALLENGE:
               await this.weeklyService.calculateResults(competition)
               break
             case CompetitionType.LEAGUE:

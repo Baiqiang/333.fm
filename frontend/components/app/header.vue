@@ -1,8 +1,10 @@
 <script setup lang="ts">
 const { data: daily } = await useApi<Competition>('/daily/on-going')
 const { data: weekly } = await useApi<Competition>('/weekly/on-going')
+const { data: funChallenge } = await useApi<Competition>('/fun-challenges/on-going')
 const { setLocale, setLocaleCookie, finalizePendingLocaleChange, t } = useI18n()
 const router = useRouter()
+const user = useUser()
 
 async function navigateToDaily() {
   const { data } = await useApi<Competition>('/daily/on-going')
@@ -26,6 +28,17 @@ async function navigateToWeekly() {
   }
 }
 
+async function navigateToFunChallenge() {
+  const { data } = await useApi<Competition>('/fun-challenges/on-going')
+  if (data.value) {
+    funChallenge.value = data.value
+    router.push(competitionPath(data.value))
+  }
+  else {
+    router.push('/fun-challenges')
+  }
+}
+
 const navs = computed(() => [
   {
     title: t('weekly.shortTitle'),
@@ -37,6 +50,17 @@ const navs = computed(() => [
     path: daily.value ? competitionPath(daily.value) : '/daily',
     onClick: navigateToDaily,
   },
+  {
+    title: t('funChallenge.shortTitle'),
+    path: funChallenge.value ? competitionPath(funChallenge.value) : '/fun-challenges',
+    onClick: navigateToFunChallenge,
+  },
+  ...(user.isFunChallengeAdmin
+    ? [{
+        title: t('funChallenge.admin.shortTitle'),
+        path: '/fun-challenges/admin',
+      }]
+    : []),
   {
     title: t('endless.shortTitle'),
     path: '/endless',
@@ -99,7 +123,6 @@ const navs = computed(() => [
   //   path: '/chain',
   // },
 ])
-const user = useUser()
 const showMenu = ref(false)
 router.afterEach(() => {
   showMenu.value = false

@@ -76,13 +76,15 @@ watch(() => form.mode, (mode) => {
     form.solution = t('weekly.regular.unlimitedSubmitted')
 })
 const uploadingPromise = ref<Promise<any>>()
-const { moves, isSolved } = useComputedState(props, form)
+const { moves, htmMoves, isSolved, centersRestored, challengeMetric } = useComputedState(props, form)
 const isOnGoing = computed(() => isInStatus(props.competition, CompetitionStatus.ON_GOING))
 const canSubmit = computed(() => props.allowSubmit || isOnGoing.value)
 const solutionState = computed<boolean | null>(() => {
   if (form.solution.length === 0)
     return null
   if (!isSolved.value)
+    return false
+  if (centersRestored.value === false)
     return false
   return moves.value !== DNF
 })
@@ -184,7 +186,7 @@ async function turnToUnlimited() {
     const { isCanceled } = await reveal()
     if (isCanceled)
       return
-    const { data, refresh } = await useApiPost<Submission>(`/weekly/${props.competition.alias}/${submissionsMap.value[CompetitionMode.REGULAR].id}/unlimited`, {
+    const { data, refresh } = await useApiPost<Submission>(`/${props.type}/${props.competition.alias}/${submissionsMap.value[CompetitionMode.REGULAR].id}/unlimited`, {
       immediate: false,
     })
     await refresh()
@@ -250,7 +252,21 @@ function reset() {
           <div v-if="unlimitedWorse" class="text-red-500">
             {{ $t('weekly.unlimited.invalid') }}
           </div>
-          <div v-if="moves !== DNF" class="text-green-500 text-bold">
+          <div v-if="centersRestored === true" class="text-green-500 text-bold">
+            {{ $t('funChallenge.centerRestored') }}
+          </div>
+          <div v-else-if="centersRestored === false" class="text-red-500 text-bold">
+            {{ $t('funChallenge.centerNotRestored') }}
+          </div>
+          <div v-if="moves !== DNF && challengeMetric" class="text-green-500 text-bold">
+            <template v-if="challengeMetric === 'HTM'">
+              {{ $t('funChallenge.metricMoves', { metric: challengeMetric, moves }) }}
+            </template>
+            <template v-else>
+              {{ $t('funChallenge.metricMovesWithHtm', { metric: challengeMetric, moves, htm: htmMoves }) }}
+            </template>
+          </div>
+          <div v-else-if="moves !== DNF" class="text-green-500 text-bold">
             {{ $t('common.moves', { moves }) }}
           </div>
           <div v-else class="text-red-500 text-bold">

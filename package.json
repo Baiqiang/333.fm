@@ -4,7 +4,8 @@
   "packageManager": "pnpm@11.6.0",
   "workspaces": [
     "frontend",
-    "server"
+    "server",
+    "packages/*"
   ],
   "scripts": {
     "dev:frontend": "pnpm --filter 333.fm dev",

@@ -62,6 +62,13 @@ useRouter().afterEach(() => {
           <Icon name="mdi:bell-outline" size="18" class="mr-2 text-gray-400" />
           {{ $t('notification.title') }}
         </NuxtLink>
+        <template v-if="user.isFunChallengeAdmin">
+          <hr>
+          <NuxtLink to="/fun-challenges/admin" :class="menuClass">
+            <Icon name="mdi:trophy-award" size="18" class="mr-2 text-gray-400" />
+            {{ $t('funChallenge.admin.title') }}
+          </NuxtLink>
+        </template>
         <template v-if="user.isAdmin">
           <hr>
           <div class="text-gray-400 px-3 py-1 text-sm flex items-center gap-2">

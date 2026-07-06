@@ -28,6 +28,7 @@ export enum CompetitionType {
   DAILY,
   LEAGUE,
   WCA_RECONSTRUCTION,
+  FUN_CHALLENGE,
 }
 
 export enum CompetitionSubType {
@@ -39,6 +40,10 @@ export enum CompetitionSubType {
   HIDDEN_SCRAMBLE,
   JZP_PRACTICE,
   MYSTERY,
+  QTM_CHALLENGE,
+  STM_CHALLENGE,
+  ATM_CHALLENGE,
+  CENTER_SOLVED_CHALLENGE,
 }
 
 export enum CompetitionFormat {
@@ -191,6 +196,8 @@ export class Competitions {
       }
       case CompetitionType.WCA_RECONSTRUCTION:
         return `/wca/reconstruction/${alias}`
+      case CompetitionType.FUN_CHALLENGE:
+        return `/fun-challenges/${alias}`
       default:
         return ''
     }

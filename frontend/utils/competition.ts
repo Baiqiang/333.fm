@@ -141,6 +141,7 @@ export enum CompetitionType {
   DAILY,
   LEAGUE,
   WCA_RECONSTRUCTION,
+  FUN_CHALLENGE,
 }
 
 export enum CompetitionSubType {
@@ -152,6 +153,10 @@ export enum CompetitionSubType {
   HIDDEN_SCRAMBLE,
   JZP_PRACTICE,
   MYSTERY,
+  QTM_CHALLENGE,
+  STM_CHALLENGE,
+  ATM_CHALLENGE,
+  CENTER_SOLVED_CHALLENGE,
 }
 
 export enum CompetitionFormat {
@@ -336,6 +341,8 @@ export function competitionName(competition: Competition, scramble?: { number: n
       if (scramble)
         return `${competition.name} R${scramble.roundNumber}-A${scramble.number}`
       return `${competition.name}`
+    case CompetitionType.FUN_CHALLENGE:
+      return competition.name
     default:
       return competition.name
   }

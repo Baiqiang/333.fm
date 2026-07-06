@@ -7,6 +7,22 @@ export enum CompetitionType {
   DAILY,
   LEAGUE,
   WCA_RECONSTRUCTION,
+  FUN_CHALLENGE,
+}
+
+export enum CompetitionSubType {
+  REGULAR,
+  BOSS_CHALLENGE,
+  EO_PRACTICE,
+  DR_PRACTICE,
+  HTR_PRACTICE,
+  HIDDEN_SCRAMBLE,
+  JZP_PRACTICE,
+  MYSTERY,
+  QTM_CHALLENGE,
+  STM_CHALLENGE,
+  ATM_CHALLENGE,
+  CENTER_SOLVED_CHALLENGE,
 }
 
 export interface CompetitionPathLike {
@@ -49,6 +65,8 @@ function competitionBaseUrl(competition: CompetitionPathLike): string {
     }
     case CompetitionType.WCA_RECONSTRUCTION:
       return `/wca/reconstruction/${alias}`
+    case CompetitionType.FUN_CHALLENGE:
+      return `/fun-challenges/${alias}`
     default:
       return ''
   }
@@ -84,6 +102,9 @@ export function competitionPath(
     case CompetitionType.WCA_RECONSTRUCTION:
       if (scramble) return `${competitionBaseUrl(competition)}#r${scramble.roundNumber}-a${scramble.number}`
       return competitionBaseUrl(competition)
+    case CompetitionType.FUN_CHALLENGE:
+      if (scramble) return `/fun-challenges/${alias}#scramble-${scramble.number}`
+      return `/fun-challenges/${alias}`
     default:
       return competitionBaseUrl(competition)
   }

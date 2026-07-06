@@ -21,6 +21,8 @@ import { generateScrambles } from '@/utils/scramble'
 
 import { CompetitionService } from '../competition.service'
 
+type SolutionScorer = (scramble: Scrambles, solution: SubmitSolutionDto) => number | Promise<number>
+
 @Injectable()
 export class WeeklyService {
   constructor(
@@ -220,7 +222,12 @@ export class WeeklyService {
     return competition
   }
 
-  async submitSolution(competition: Competitions, user: Users, solution: SubmitSolutionDto) {
+  async submitSolution(
+    competition: Competitions,
+    user: Users,
+    solution: SubmitSolutionDto,
+    scorer: SolutionScorer = (scramble, dto) => calculateMoves(scramble.scramble, dto.solution),
+  ) {
     if (competition.hasEnded) {
       throw new BadRequestException('Competition has ended')
     }
@@ -249,7 +256,7 @@ export class WeeklyService {
         }
       }
       const preSubmission = preSubmissions.find(s => s.mode === solution.mode)
-      const moves = calculateMoves(scramble.scramble, solution.solution)
+      const moves = await scorer(scramble, solution)
       // check if moves is better than preSubmission
       if (solution.mode === CompetitionMode.UNLIMITED && preSubmissions.some(s => s.moves < moves)) {
         throw new BadRequestException('Solution is not better than previous submission')

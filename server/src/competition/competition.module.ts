@@ -34,6 +34,10 @@ import { DailyService } from './daily/daily.service'
 import { EndlessController } from './endless/endless.controller'
 import { EndlessService } from './endless/endless.service'
 import { EndlessProcessor } from './endless/processors/endless.processor'
+import { FunChallengeAdminController } from './fun-challenge/admin.controller'
+import { FunChallengeController } from './fun-challenge/fun-challenge.controller'
+import { FunChallengeService } from './fun-challenge/fun-challenge.service'
+import { FunChallengeAdminGuard } from './fun-challenge/fun-challenge-admin.guard'
 import { AdminController } from './league/admin/admin.controller'
 import { LeagueController } from './league/league.controller'
 import { LeagueService } from './league/league.service'
@@ -42,6 +46,7 @@ import { PracticeService } from './practice/practice.service'
 import { PracticeProcessor } from './practice/processors/practice.processor'
 import { WeeklyController } from './weekly/weekly.controller'
 import { WeeklyService } from './weekly/weekly.service'
+
 @Module({
   imports: [
     AttachmentModule,
@@ -91,6 +96,8 @@ import { WeeklyService } from './weekly/weekly.service'
     PracticeService,
     PracticeProcessor,
     LeagueService,
+    FunChallengeService,
+    FunChallengeAdminGuard,
   ],
   controllers: [
     CompetitionController,
@@ -101,6 +108,8 @@ import { WeeklyService } from './weekly/weekly.service'
     PracticeController,
     LeagueController,
     AdminController,
+    FunChallengeAdminController,
+    FunChallengeController,
   ],
 })
 export class CompetitionModule {}

@@ -1,6 +1,25 @@
+import {
+  calculateSolutionScore,
+  DNF,
+  funChallengeMetric,
+  isCenterSolvedChallenge,
+  isFunChallengeSubType,
+  MoveMetric,
+} from '@333fm/utils'
 import { Algorithm, Cube } from 'insertionfinder'
 
-export function useComputedState(props: { scramble: Scramble }, form: { solution: string }) {
+export function useComputedState(props: { scramble: Scramble, competition?: Competition }, form: { solution: string }) {
+  const challengeMetric = computed<MoveMetric | null>(() => {
+    const subType = props.competition?.subType
+    if (typeof subType !== 'number' || !isFunChallengeSubType(subType))
+      return null
+
+    return funChallengeMetric(subType)
+  })
+  const requireCentersRestored = computed<boolean>(() => {
+    const subType = props.competition?.subType
+    return typeof subType === 'number' && isCenterSolvedChallenge(subType)
+  })
   const solutionAlg = computed(() => {
     // check NISS and ()
     if (form.solution.includes('NISS') || form.solution.includes('('))
@@ -35,18 +54,46 @@ export function useComputedState(props: { scramble: Scramble }, form: { solution
     if (!isSolved.value || !solutionAlg.value)
       return DNF
     try {
-      const moves = solutionAlg.value.length
-      if (moves > 80)
+      const score = calculateSolutionScore(
+        props.scramble.scramble,
+        form.solution,
+        challengeMetric.value || MoveMetric.HTM,
+      )
+      if (score.moves === DNF)
         return DNF
-      return moves
+      return score.moves / 100
     }
     catch (e) {
       return DNF
     }
   })
+  const htmMoves = computed<number>(() => {
+    if (!challengeMetric.value || !isSolved.value || !solutionAlg.value)
+      return DNF
+    try {
+      const score = calculateSolutionScore(props.scramble.scramble, form.solution, MoveMetric.HTM)
+      if (score.moves === DNF)
+        return DNF
+      return score.moves / 100
+    }
+    catch (e) {
+      return DNF
+    }
+  })
+  const centersRestored = computed<boolean | null>(() => {
+    if (!requireCentersRestored.value)
+      return null
+
+    return calculateSolutionScore(props.scramble.scramble, form.solution, MoveMetric.HTM, {
+      requireCentersRestored: true,
+    }).centersRestored
+  })
   return {
     moves,
+    htmMoves,
     isSolved,
     solutionAlg,
+    centersRestored,
+    challengeMetric,
   }
 }
