@@ -31,8 +31,8 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git pull
-            cd frontend
-            yarn install --frozen-lockfile
+            pnpm install --frozen-lockfile
             export NODE_OPTIONS="--max-old-space-size=4096"
-            yarn build
+            pnpm --filter 333.fm build
+            cd frontend
             pm2 start ecosystem.config.cjs
