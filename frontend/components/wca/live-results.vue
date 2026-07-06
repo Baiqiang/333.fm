@@ -7,7 +7,7 @@ const format = computed(() => props.results.some(result => result.average > 0) ?
 
 <template>
   <div>
-    <div class="grid grid-cols-[max-content_max-content_4rem_2rem_1fr] gap-x-2">
+    <div class="grid grid-cols-[max-content_max-content_max-content_max-content_1fr] gap-x-2">
       <div class="grid grid-cols-subgrid col-span-full font-bold pb-2 border-b border-gray-300">
         <div class="text-right">
           {{ $t('result.rank') }}

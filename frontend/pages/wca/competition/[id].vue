@@ -28,12 +28,13 @@ const hasLiveData = computed(() => !!liveData.value?.competitions?.length)
 
 let liveCompetition: Ref<WCALiveCompetition | undefined>
 if (hasLiveData.value) {
-  const { result } = useQuery<{
+  const { data: liveCompetitionData, refresh: refreshLiveCompetition } = await useAsyncQuery<{
     competition: WCALiveCompetition
   }>(WCA_LIVE_COMPETITION_QUERY, {
     id: liveData.value!.competitions[0].id,
   })
-  liveCompetition = computed(() => result.value?.competition)
+  await refreshLiveCompetition()
+  liveCompetition = computed(() => liveCompetitionData.value?.competition)
 }
 else {
   liveCompetition = ref(undefined)
