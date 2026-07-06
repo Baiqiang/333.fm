@@ -50,17 +50,17 @@ const navs = computed(() => [
     path: daily.value ? competitionPath(daily.value) : '/daily',
     onClick: navigateToDaily,
   },
-  {
-    title: t('funChallenge.shortTitle'),
-    path: funChallenge.value ? competitionPath(funChallenge.value) : '/fun-challenges',
-    onClick: navigateToFunChallenge,
-  },
-  ...(user.isFunChallengeAdmin
-    ? [{
-        title: t('funChallenge.admin.shortTitle'),
-        path: '/fun-challenges/admin',
-      }]
-    : []),
+  // {
+  //   title: t('funChallenge.shortTitle'),
+  //   path: funChallenge.value ? competitionPath(funChallenge.value) : '/fun-challenges',
+  //   onClick: navigateToFunChallenge,
+  // },
+  // ...(user.isFunChallengeAdmin
+  //   ? [{
+  //       title: t('funChallenge.admin.shortTitle'),
+  //       path: '/fun-challenges/admin',
+  //     }]
+  //   : []),
   {
     title: t('endless.shortTitle'),
     path: '/endless',
