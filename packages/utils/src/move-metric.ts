@@ -1,6 +1,6 @@
 import { Algorithm, Cube } from 'insertionfinder'
 
-import { removeComment, replaceQuote } from './algorithm'
+import { removeComment } from './algorithm'
 import { CompetitionSubType } from './competition'
 import { DNF } from './result'
 
@@ -29,17 +29,6 @@ const FUN_CHALLENGE_SLUGS: Partial<Record<CompetitionSubType, string>> = {
   [CompetitionSubType.STM_CHALLENGE]: 'stm',
   [CompetitionSubType.ATM_CHALLENGE]: 'atm',
   [CompetitionSubType.CENTER_SOLVED_CHALLENGE]: 'center-solved',
-}
-
-const ROTATION_FACES = new Set(['X', 'Y', 'Z'])
-const X_AXIS_FACES = new Set(['R', 'L', 'M'])
-const Y_AXIS_FACES = new Set(['U', 'D', 'E'])
-const Z_AXIS_FACES = new Set(['F', 'B', 'S'])
-
-interface MoveToken {
-  face: string
-  halfTurn: boolean
-  rotation: boolean
 }
 
 export function isFunChallengeSubType(subType: number): subType is CompetitionSubType {
@@ -111,60 +100,34 @@ export function calculateSolutionScore(
 }
 
 export function calculateMoveMetric(sequence: string, metric = MoveMetric.HTM): number {
-  const tokens = tokenizeMoves(sequence)
+  const algorithm = new Algorithm(removeComment(sequence))
   switch (metric) {
     case MoveMetric.QTM:
-      return tokens.reduce((sum, token) => sum + (token.rotation ? 0 : token.halfTurn ? 2 : 1), 0)
+      return algorithm.twists.reduce((sum, twist) => sum + (isHalfTurn(twist) ? 2 : 1), 0)
     case MoveMetric.ATM:
-      return countAxialTurns(tokens)
+      return countAxialTurns(algorithm.twists)
     case MoveMetric.STM:
     case MoveMetric.HTM:
     default:
-      return tokens.filter(token => !token.rotation).length
+      return algorithm.length
   }
 }
 
-function tokenizeMoves(sequence: string): MoveToken[] {
-  const clean = removeComment(sequence)
-  if (!clean.trim()) return []
-
-  return clean
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((rawToken) => {
-      const token = replaceQuote(rawToken)
-      const match = token.match(/^([URFDLBMESxyzurfdlb])w?(2|'|2')?$/)
-      if (!match) throw new Error(`Unsupported move: ${rawToken}`)
-
-      const face = match[1].toUpperCase()
-      return {
-        face,
-        halfTurn: token.includes('2'),
-        rotation: ROTATION_FACES.has(face),
-      }
-    })
+function isHalfTurn(twist: number): boolean {
+  return twist % 4 === 2
 }
 
-function countAxialTurns(tokens: MoveToken[]): number {
+function countAxialTurns(twists: readonly number[]): number {
   let count = 0
-  let currentAxis: string | null = null
-  for (const token of tokens) {
-    if (token.rotation) continue
-
-    const axis = axisOf(token.face)
+  let currentAxis: number | null = null
+  for (const twist of twists) {
+    const axis = twist >>> 3
     if (axis !== currentAxis) {
       count++
       currentAxis = axis
     }
   }
   return count
-}
-
-function axisOf(face: string): string {
-  if (X_AXIS_FACES.has(face)) return 'x'
-  if (Y_AXIS_FACES.has(face)) return 'y'
-  if (Z_AXIS_FACES.has(face)) return 'z'
-  throw new Error(`Unsupported move face: ${face}`)
 }
 
 function getFaceTurnCounts(sequence: string): number[] | null {
