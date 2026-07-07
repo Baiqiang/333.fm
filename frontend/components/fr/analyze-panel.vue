@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { analyzeScramble, generateHtrScramble } from '~/utils/fr'
-import { AXIS_TAB_LABEL, AXIS_TABS } from '~/utils/fr/display'
-
 import type { AxisKey, FrAnalysis } from '~/utils/fr/types'
+import { analyzeScramble, generateHtrScramble } from '~/utils/fr'
+
+import { AXIS_TAB_LABEL, AXIS_TABS } from '~/utils/fr/display'
 
 const helpOpen = defineModel<boolean>('helpOpen', { default: false })
 
@@ -105,6 +105,7 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
         <FrCube
           :scramble="analysis!.scramble"
           :axis-key="activeAxis"
+          :leave-slice="leaveSlice"
         />
       </div>
 

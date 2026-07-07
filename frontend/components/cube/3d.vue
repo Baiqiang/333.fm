@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Axis, FrAxisKey, FrEmphasis } from '~/utils/cube'
 import { Algorithm, Cube } from 'insertionfinder'
 import {
   AmbientLight,
@@ -17,10 +18,24 @@ import {
   WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
 import { BODY_COLOR, colorToHex, CUBIE_GAP, filterColor, getFaceletPositions } from '~/utils/cube'
 
-import type { Axis, FrAxisKey, FrEmphasis } from '~/utils/cube'
-
+/**
+ * 3D cube renderer.
+ *
+ * WebGL context limit (browsers typically allow 8–16 active contexts):
+ * - Default mode (isStatic=false): persistent WebGL context + animation loop.
+ *   Use when the page has only one cube (analyze / practice / DR Trigger / Endless).
+ * - Static mode (isStatic=true): transparent 2D snapshot by default (no persistent WebGL);
+ *   click to temporarily activate interaction. For pages with many cubes on screen
+ *   (FR tutorial), combined with viewport release that keeps the last snapshot visible.
+ *   Single-cube pages must not use this mode.
+ *
+ * isStatic entry points:
+ * - components/fr/tutorial-cube-step.vue
+ * - components/fr/tutorial-case-card.vue (via FrCube)
+ */
 const props = withDefaults(defineProps<{
   moves?: string
   cubieCube?: {
@@ -31,10 +46,15 @@ const props = withDefaults(defineProps<{
   filter?: 'dr' | 'fr'
   frAxis?: FrAxisKey
   frEmphasis?: FrEmphasis
+  /** Static display mode; see file header. Required for multi-cube lists (tutorial). */
   isStatic?: boolean
+  /** When false (full FR), middle-layer edges are shown normally instead of dimmed. */
+  leaveSlice?: boolean
   keyboardControls?: boolean
 }>(), {
   frEmphasis: 'axis',
+  isStatic: false,
+  leaveSlice: true,
 })
 
 const cubeElement = ref<HTMLElement>()
@@ -44,9 +64,14 @@ let camera: PerspectiveCamera
 let renderer: WebGLRenderer | null = null
 let controls: OrbitControls | null = null
 let animating = false
+let sceneReady = false
+let isInViewport = false
+let visibilityObserver: IntersectionObserver | null = null
 let staticCanvas: HTMLCanvasElement | null = null
 let liveCanvas: HTMLCanvasElement | null = null
 let deactivateTimer: ReturnType<typeof setTimeout> | null = null
+let livePointerDown = false
+const awaitingRender = ref(props.isStatic)
 const cubeMeshes: Mesh[] = []
 const keyboardRotationKeys = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'])
 const pressedKeyboardKeys = new Set<string>()
@@ -85,7 +110,7 @@ function buildFaceColors(fl: string) {
     colors[index][axis][n] = color
   }
   const frOptions = props.filter === 'fr' && props.frAxis
-    ? { axis: props.frAxis, emphasis: props.frEmphasis }
+    ? { axis: props.frAxis, emphasis: props.frEmphasis, leaveSlice: props.leaveSlice }
     : undefined
   for (const { i, x, y, z, axis, dir } of faceletPositions)
     push(x, y, z, axis, dir, colorToHex(filterColor(props.filter, fl[i], x, y, z, fl, frOptions)))
@@ -103,6 +128,23 @@ const colorConditions: [Axis, 1 | -1][] = [
 const cubePositions = [-1, 0, 1]
 
 const matCache = new Map<number, MeshStandardMaterial>()
+
+/**
+ * The tutorial page keeps dozens of static cubes in the DOM at once.
+ * Creating a WebGLRenderer per cube (even with immediate dispose) can still
+ * briefly exceed the context limit when scrolling quickly.
+ * In isStatic mode, all instances share this offscreen renderer for 2D snapshots.
+ */
+let sharedStaticRenderer: WebGLRenderer | null = null
+
+function getSharedStaticRenderer() {
+  if (!sharedStaticRenderer) {
+    const canvas = document.createElement('canvas')
+    sharedStaticRenderer = new WebGLRenderer({ antialias: true, canvas, alpha: true })
+    sharedStaticRenderer.setClearColor(0x00_00_00, 0)
+  }
+  return sharedStaticRenderer
+}
 function getMat(hex: number) {
   if (!matCache.has(hex)) {
     matCache.set(hex, new MeshStandardMaterial({
@@ -145,6 +187,7 @@ function setSize() {
 }
 
 function buildScene() {
+  cubeMeshes.length = 0
   scene = new Scene()
   camera = new PerspectiveCamera(40, 1, 1, 100)
   camera.position.set(5.5, 4.5, 5.5)
@@ -177,9 +220,67 @@ function buildScene() {
   updateMaterials()
 }
 
+function ensureStaticCanvas(dom: HTMLElement) {
+  if (!staticCanvas) {
+    staticCanvas = document.createElement('canvas')
+    staticCanvas.style.width = '100%'
+    staticCanvas.style.height = '100%'
+    staticCanvas.style.display = 'block'
+    dom.appendChild(staticCanvas)
+    staticCanvas.addEventListener('pointerdown', onStaticPointerDown)
+  }
+  return staticCanvas
+}
+
+function unbindLivePointerHandlers() {
+  if (!liveCanvas)
+    return
+  liveCanvas.removeEventListener('pointerdown', onLivePointerDown)
+  liveCanvas.removeEventListener('pointerup', onLivePointerUp)
+  liveCanvas.removeEventListener('pointercancel', onLivePointerUp)
+}
+
+function bindLivePointerHandlers() {
+  if (!liveCanvas)
+    return
+  unbindLivePointerHandlers()
+  liveCanvas.addEventListener('pointerdown', onLivePointerDown)
+  liveCanvas.addEventListener('pointerup', onLivePointerUp)
+  liveCanvas.addEventListener('pointercancel', onLivePointerUp)
+}
+
+function onLivePointerDown() {
+  livePointerDown = true
+  if (deactivateTimer) {
+    clearTimeout(deactivateTimer)
+    deactivateTimer = null
+  }
+}
+
+function onLivePointerUp(e: PointerEvent) {
+  livePointerDown = false
+  if (e.buttons === 0)
+    scheduleDeactivate()
+}
+
+function forwardPointerToLiveCanvas(e: PointerEvent) {
+  if (!liveCanvas)
+    return
+  liveCanvas.dispatchEvent(new PointerEvent(e.type, {
+    pointerId: e.pointerId,
+    bubbles: true,
+    cancelable: true,
+    clientX: e.clientX,
+    clientY: e.clientY,
+    button: e.button,
+    buttons: e.buttons,
+    pointerType: e.pointerType,
+  }))
+}
+
 function renderToStaticCanvas(target?: HTMLCanvasElement): HTMLCanvasElement {
-  const tmpCanvas = document.createElement('canvas')
-  const tmpRenderer = new WebGLRenderer({ antialias: true, canvas: tmpCanvas, alpha: true })
+  // isStatic only: writes to a 2D canvas; no persistent WebGL context
+  const tmpRenderer = getSharedStaticRenderer()
   tmpRenderer.setPixelRatio(window.devicePixelRatio)
   tmpRenderer.setSize(width.value, width.value)
   camera.aspect = 1
@@ -187,26 +288,111 @@ function renderToStaticCanvas(target?: HTMLCanvasElement): HTMLCanvasElement {
   tmpRenderer.render(scene, camera)
 
   const out = target || document.createElement('canvas')
-  out.width = tmpCanvas.width
-  out.height = tmpCanvas.height
+  out.width = tmpRenderer.domElement.width
+  out.height = tmpRenderer.domElement.height
   out.style.width = '100%'
   out.style.height = '100%'
-  const ctx = out.getContext('2d')!
-  ctx.drawImage(tmpCanvas, 0, 0)
-  tmpRenderer.dispose()
+  out.style.display = 'block'
+  const ctx = out.getContext('2d', { alpha: true })!
+  ctx.clearRect(0, 0, out.width, out.height)
+  ctx.drawImage(tmpRenderer.domElement, 0, 0)
+  awaitingRender.value = false
   return out
 }
 
-function init() {
-  const dom = cubeElement.value!
-  buildScene()
+function disposeLiveRenderer(dom?: HTMLElement | null) {
+  if (!renderer)
+    return
 
+  animating = false
+  livePointerDown = false
+  unbindLivePointerHandlers()
+  if (props.isStatic && liveCanvas && staticCanvas && dom) {
+    renderToStaticCanvas(staticCanvas)
+    dom.replaceChild(staticCanvas, liveCanvas)
+    staticCanvas.addEventListener('pointerdown', onStaticPointerDown)
+  }
+  renderer.dispose()
+  renderer = null
+  controls?.dispose()
+  controls = null
+  liveCanvas = null
+}
+
+/** isStatic only: drop scene memory; keep last transparent 2D snapshot in the DOM */
+function releaseScene() {
+  if (!props.isStatic || renderer)
+    return
+
+  clearKeyboardRotation()
+  if (deactivateTimer) {
+    clearTimeout(deactivateTimer)
+    deactivateTimer = null
+  }
+  disposeLiveRenderer(cubeElement.value)
+  cubeMeshes.length = 0
+  sceneReady = false
+}
+
+function destroyAll() {
   if (props.isStatic) {
-    staticCanvas = renderToStaticCanvas()
-    dom.appendChild(staticCanvas)
-    staticCanvas.addEventListener('pointerdown', activate)
+    releaseScene()
+    if (staticCanvas) {
+      staticCanvas.removeEventListener('pointerdown', onStaticPointerDown)
+      staticCanvas = null
+    }
   }
   else {
+    // Single-cube pages: live WebGL only, no snapshot path
+    clearKeyboardRotation()
+    if (deactivateTimer) {
+      clearTimeout(deactivateTimer)
+      deactivateTimer = null
+    }
+    if (renderer) {
+      renderer.dispose()
+      renderer = null
+    }
+    controls?.dispose()
+    controls = null
+    liveCanvas = null
+    cubeMeshes.length = 0
+    sceneReady = false
+  }
+
+  const dom = cubeElement.value
+  if (dom)
+    dom.replaceChildren()
+  awaitingRender.value = props.isStatic
+}
+
+function tryInit() {
+  if (!isInViewport || !cubeElement.value)
+    return
+  if (!props.isStatic && renderer)
+    return
+  init()
+}
+
+function init() {
+  if (!cubeElement.value || width.value === 0)
+    return
+  if (!props.isStatic && renderer)
+    return
+
+  const dom = cubeElement.value
+
+  if (!sceneReady) {
+    buildScene()
+    sceneReady = true
+  }
+
+  if (props.isStatic) {
+    // Static mode: 2D snapshot by default; click upgrades to WebGL (one active context at a time)
+    renderToStaticCanvas(ensureStaticCanvas(dom))
+  }
+  else {
+    // Default mode: single-cube pages; creates a persistent WebGL context
     liveCanvas = document.createElement('canvas')
     liveCanvas.tabIndex = -1
     liveCanvas.style.outline = 'none'
@@ -214,6 +400,7 @@ function init() {
     liveCanvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false })
     dom.appendChild(liveCanvas)
     renderer = new WebGLRenderer({ antialias: true, canvas: liveCanvas, alpha: true })
+    renderer.setClearColor(0x00_00_00, 0)
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.shadowMap.enabled = false
     controls = new OrbitControls(camera, liveCanvas)
@@ -226,12 +413,20 @@ function init() {
     controls.dampingFactor = 0.12
     setSize()
     animating = true
+    awaitingRender.value = false
     render()
   }
 }
 
+function onStaticPointerDown(e: PointerEvent) {
+  if (renderer)
+    return
+  activate()
+  requestAnimationFrame(() => forwardPointerToLiveCanvas(e))
+}
+
 function activate() {
-  if (!props.isStatic || !scene || !staticCanvas)
+  if (!props.isStatic || !staticCanvas)
     return
   const dom = cubeElement.value!
   if (deactivateTimer) {
@@ -242,14 +437,19 @@ function activate() {
   if (renderer)
     return
 
+  if (!sceneReady) {
+    buildScene()
+    sceneReady = true
+  }
+
   liveCanvas = document.createElement('canvas')
   liveCanvas.tabIndex = -1
   liveCanvas.style.outline = 'none'
   liveCanvas.addEventListener('mousedown', e => e.preventDefault())
   liveCanvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false })
-  dom.replaceChild(liveCanvas, staticCanvas!)
 
   renderer = new WebGLRenderer({ antialias: true, canvas: liveCanvas, alpha: true })
+  renderer.setClearColor(0x00_00_00, 0)
   renderer.setPixelRatio(window.devicePixelRatio)
   renderer.shadowMap.enabled = false
   controls = new OrbitControls(camera, liveCanvas)
@@ -262,36 +462,30 @@ function activate() {
   controls.dampingFactor = 0.12
 
   setSize()
+  renderer.render(scene, camera)
+  dom.replaceChild(liveCanvas, staticCanvas!)
   animating = true
   render()
 
-  liveCanvas.addEventListener('pointerup', scheduleDeactivate)
-  liveCanvas.addEventListener('pointerleave', scheduleDeactivate)
+  bindLivePointerHandlers()
 }
 
 function scheduleDeactivate() {
+  if (livePointerDown || !renderer)
+    return
   if (deactivateTimer)
     clearTimeout(deactivateTimer)
   deactivateTimer = setTimeout(deactivate, 1500)
 }
 
 function deactivate() {
-  if (!renderer || !props.isStatic)
+  if (livePointerDown || !renderer || !props.isStatic)
     return
   const dom = cubeElement.value
-  if (!dom)
+  if (!dom || !staticCanvas || !liveCanvas)
     return
 
-  animating = false
-  renderToStaticCanvas(staticCanvas!)
-  dom.replaceChild(staticCanvas!, liveCanvas!)
-  staticCanvas!.addEventListener('pointerdown', activate)
-
-  renderer.dispose()
-  renderer = null
-  controls?.dispose()
-  controls = null
-  liveCanvas = null
+  disposeLiveRenderer(dom)
   deactivateTimer = null
 }
 
@@ -368,14 +562,20 @@ function render() {
 }
 
 watch(
-  () => [facelet.value, props.filter, props.frAxis, props.frEmphasis] as const,
+  () => [facelet.value, props.filter, props.frAxis, props.frEmphasis, props.leaveSlice] as const,
   () => {
+    if (!sceneReady)
+      return
     updateMaterials()
     if (props.isStatic && staticCanvas && !renderer)
       renderToStaticCanvas(staticCanvas)
   },
 )
 watch(width, () => {
+  if (isInViewport)
+    tryInit()
+  if (!sceneReady)
+    return
   if (props.isStatic && staticCanvas && !renderer) {
     renderToStaticCanvas(staticCanvas)
   }
@@ -392,30 +592,40 @@ onMounted(() => {
     window.addEventListener('blur', clearKeyboardRotation)
   }
 
-  const observer = new IntersectionObserver((entries) => {
+  visibilityObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
+      isInViewport = entry.isIntersecting
       if (entry.isIntersecting) {
-        init()
-        observer.disconnect()
+        tryInit()
+        // Single-cube pages: lazy-init once, then stop observing (no teardown on scroll-away)
+        if (!props.isStatic && renderer) {
+          visibilityObserver?.disconnect()
+          visibilityObserver = null
+        }
+      }
+      else if (props.isStatic && !renderer) {
+        // Multi-cube tutorial: release scene memory but keep the last 2D snapshot visible
+        releaseScene()
       }
     })
   }, { root: null })
-  observer.observe(dom)
+  visibilityObserver.observe(dom)
 })
 
 onUnmounted(() => {
-  animating = false
+  visibilityObserver?.disconnect()
+  visibilityObserver = null
   window.removeEventListener('keydown', handleKeyboardDown, { capture: true })
   window.removeEventListener('keyup', handleKeyboardUp, { capture: true })
   window.removeEventListener('blur', clearKeyboardRotation)
-  if (deactivateTimer)
-    clearTimeout(deactivateTimer)
-  if (renderer)
-    renderer.dispose()
-  controls?.dispose()
+  destroyAll()
 })
 </script>
 
 <template>
-  <div ref="cubeElement" class="max-w-xs" />
+  <div
+    ref="cubeElement"
+    class="max-w-xs aspect-square w-full relative overflow-hidden"
+    :class="{ 'opacity-40 animate-pulse': awaitingRender }"
+  />
 </template>

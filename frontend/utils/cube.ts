@@ -73,7 +73,7 @@ export function filterColor(
   y: number,
   z: number,
   fl: string,
-  frOptions?: { axis: FrAxisKey, emphasis: FrEmphasis },
+  frOptions?: { axis: FrAxisKey, emphasis: FrEmphasis, leaveSlice?: boolean },
 ): string {
   if (filter === 'fr' && frOptions) {
     if (isCenter(x, y, z))
@@ -82,7 +82,7 @@ export function filterColor(
       return GRAY_COLOR
     if (frOptions.emphasis === 'edges' && isCornerCubie(x, y, z))
       return BODY_COLOR
-    if (frOptions.emphasis === 'axis' && isFrIgnoredSliceEdge(x, y, z))
+    if (frOptions.emphasis === 'axis' && frOptions.leaveSlice !== false && isFrIgnoredSliceEdge(x, y, z))
       return GRAY_COLOR
     return FACE_COLORS[face]
   }
