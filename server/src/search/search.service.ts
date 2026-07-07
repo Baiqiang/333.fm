@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { parseSearchQuery, type SearchTerm } from '@333fm/utils'
 import { Algorithm } from 'insertionfinder'
 import { paginate } from 'nestjs-typeorm-paginate'
-import { Brackets, Repository } from 'typeorm'
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm'
 
 import { Competitions, CompetitionStatus, CompetitionSubType, CompetitionType } from '@/entities/competitions.entity'
 import { Scrambles } from '@/entities/scrambles.entity'
@@ -53,45 +54,91 @@ export class SearchService {
     return Submissions.withActivityCounts(qb)
   }
 
+  private applyLikeTerms(qb: SelectQueryBuilder<any>, terms: SearchTerm[], fields: string[]) {
+    terms.forEach((term, i) => {
+      const param = `t${i}like`
+      qb.andWhere(new Brackets(sub => {
+        fields.forEach((field, fi) => {
+          if (fi === 0)
+            sub.where(`${field} LIKE :${param}`, { [param]: `%${term.value}%` })
+          else
+            sub.orWhere(`${field} LIKE :${param}`, { [param]: `%${term.value}%` })
+        })
+      }))
+    })
+  }
+
+  private applySubmissionTerms(qb: SelectQueryBuilder<Submissions>, terms: SearchTerm[]) {
+    terms.forEach((term, i) => {
+      const prefix = `t${i}`
+      qb.andWhere(new Brackets(sub => {
+        if (!term.exact) {
+          let q = replaceQuote(term.value)
+          let isNotation = false
+          try {
+            new Algorithm(q)
+            isNotation = true
+            if (q.endsWith("'"))
+              q = q.slice(0, -1)
+          }
+          catch {}
+          if (isNotation) {
+            const notations: string[] = []
+            for (const rotation of rotationString)
+              notations.push(formatAlgorithm(`${rotation} ${q}`))
+            const param = `${prefix}regexp`
+            sub.where(`(s.solution REGEXP :${param} OR s.comment REGEXP :${param})`, {
+              [param]: `(${notations.join('|')})\\b`,
+            })
+            return
+          }
+        }
+        const param = `${prefix}like`
+        sub.where(`(s.solution LIKE :${param} OR s.comment LIKE :${param})`, {
+          [param]: `%${term.value}%`,
+        })
+      }))
+    })
+  }
+
   async searchAll(dto: SearchDto) {
-    const q = dto.q?.trim()
-    if (!q) {
+    const terms = parseSearchQuery(dto.q ?? '')
+    if (terms.length === 0) {
       return { users: [], submissions: [], scrambles: [], competitions: [] }
     }
 
     const limit = dto.limit ?? 5
-    const like = `%${q}%`
 
     const [users, submissions, scrambles, competitions] = await Promise.all([
-      this.usersRepository
-        .createQueryBuilder('u')
-        .where('u.source != :merged', { merged: 'MERGED' })
-        .andWhere('(u.name LIKE :like OR u.wca_id LIKE :like)', { like })
-        .orderBy('u.name', 'ASC')
-        .take(limit)
-        .getMany(),
+      (() => {
+        const qb = this.usersRepository
+          .createQueryBuilder('u')
+          .where('u.source != :merged', { merged: 'MERGED' })
+        this.applyLikeTerms(qb, terms, ['u.name', 'u.wca_id'])
+        return qb.orderBy('u.name', 'ASC').take(limit).getMany()
+      })(),
 
-      this.submissionBaseQuery()
-        .andWhere('(s.solution LIKE :like OR s.comment LIKE :like)', { like })
-        .orderBy('s.moves', 'ASC')
-        .take(limit)
-        .getMany(),
+      (() => {
+        const qb = this.submissionBaseQuery()
+        this.applyLikeTerms(qb, terms, ['s.solution', 's.comment'])
+        return qb.orderBy('s.moves', 'ASC').take(limit).getMany()
+      })(),
 
-      this.scramblesRepository
-        .createQueryBuilder('sc')
-        .leftJoinAndSelect('sc.competition', 'c')
-        .where('sc.scramble LIKE :like', { like })
-        .orderBy('sc.createdAt', 'DESC')
-        .take(limit)
-        .getMany(),
+      (() => {
+        const qb = this.scramblesRepository
+          .createQueryBuilder('sc')
+          .leftJoinAndSelect('sc.competition', 'c')
+        this.applyLikeTerms(qb, terms, ['sc.scramble'])
+        return qb.orderBy('sc.createdAt', 'DESC').take(limit).getMany()
+      })(),
 
-      this.competitionsRepository
-        .createQueryBuilder('c')
-        .leftJoinAndSelect('c.user', 'u')
-        .where('c.name LIKE :like', { like })
-        .orderBy('c.startTime', 'DESC')
-        .take(limit)
-        .getMany(),
+      (() => {
+        const qb = this.competitionsRepository
+          .createQueryBuilder('c')
+          .leftJoinAndSelect('c.user', 'u')
+        this.applyLikeTerms(qb, terms, ['c.name'])
+        return qb.orderBy('c.startTime', 'DESC').take(limit).getMany()
+      })(),
     ])
 
     return { users, submissions, scrambles, competitions }
@@ -100,28 +147,9 @@ export class SearchService {
   async searchSubmissions(dto: SearchSubmissionsDto) {
     const qb = this.submissionBaseQuery()
 
-    if (dto.q?.trim()) {
-      let q = replaceQuote(dto.q.trim())
-      let isNotation = false
-      try {
-        new Algorithm(q)
-        isNotation = true
-        if (q.endsWith("'")) {
-          q = q.slice(0, -1)
-        }
-      } catch {}
-      if (isNotation) {
-        const notations: string[] = []
-        for (const rotation of rotationString) {
-          notations.push(formatAlgorithm(`${rotation} ${q}`))
-        }
-        qb.andWhere('(s.solution REGEXP :regexp OR s.comment REGEXP :regexp)', {
-          regexp: `(${notations.join('|')})\\b`,
-        })
-      } else {
-        qb.andWhere('(s.solution LIKE :like OR s.comment LIKE :like)', { like: `%${dto.q.trim()}%` })
-      }
-    }
+    const terms = parseSearchQuery(dto.q ?? '')
+    if (terms.length > 0)
+      this.applySubmissionTerms(qb, terms)
     if (dto.minMoves !== undefined) {
       qb.andWhere('s.moves >= :minMoves', { minMoves: dto.minMoves })
     }
@@ -148,9 +176,9 @@ export class SearchService {
   async searchScrambles(dto: SearchScramblesDto) {
     const qb = this.scramblesRepository.createQueryBuilder('sc').leftJoinAndSelect('sc.competition', 'c')
 
-    if (dto.q?.trim()) {
-      qb.where('sc.scramble LIKE :like', { like: `%${dto.q.trim()}%` })
-    }
+    const terms = parseSearchQuery(dto.q ?? '')
+    if (terms.length > 0)
+      this.applyLikeTerms(qb, terms, ['sc.scramble'])
     if (dto.startDate) {
       qb.andWhere('sc.created_at >= :startDate', { startDate: dto.startDate })
     }
@@ -166,9 +194,9 @@ export class SearchService {
   async searchCompetitions(dto: SearchCompetitionsDto) {
     const qb = this.competitionsRepository.createQueryBuilder('c').leftJoinAndSelect('c.user', 'u')
 
-    if (dto.q?.trim()) {
-      qb.where('c.name LIKE :like', { like: `%${dto.q.trim()}%` })
-    }
+    const terms = parseSearchQuery(dto.q ?? '')
+    if (terms.length > 0)
+      this.applyLikeTerms(qb, terms, ['c.name'])
     if (dto.type !== undefined) {
       qb.andWhere('c.type = :type', { type: dto.type })
     }

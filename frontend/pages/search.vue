@@ -235,7 +235,7 @@ useSeoMeta({ title: t('search.title') })
       {{ $t('search.title') }}
     </h1>
 
-    <form class="flex gap-2 mb-6" @submit.prevent="handleSearch">
+    <form class="flex gap-2 mb-2" @submit.prevent="handleSearch">
       <input
         v-model="query"
         type="text"
@@ -246,6 +246,9 @@ useSeoMeta({ title: t('search.title') })
         <Icon name="heroicons:magnifying-glass" size="20" />
       </button>
     </form>
+    <p class="text-sm text-gray-500 mb-6">
+      {{ $t('search.quoteHint') }}
+    </p>
 
     <div class="flex gap-2 mb-6 border-b border-gray-300">
       <button

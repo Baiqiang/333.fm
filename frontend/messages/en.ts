@@ -938,6 +938,7 @@ export default {
   search: {
     title: 'Search',
     placeholder: 'Search users, solutions, scrambles, competitions...',
+    quoteHint: 'Use "quotes" for exact phrase matching',
     simple: 'Simple',
     advanced: 'Advanced',
     users: 'Users',

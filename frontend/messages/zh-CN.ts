@@ -938,6 +938,7 @@ export default {
   search: {
     title: '搜索',
     placeholder: '搜索用户、解法、打乱、比赛...',
+    quoteHint: '使用 "引号" 可精确匹配包含空格的短语',
     simple: '简单搜索',
     advanced: '高级搜索',
     users: '用户',
