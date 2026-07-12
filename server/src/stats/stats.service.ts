@@ -23,7 +23,7 @@ const excludePracticeSubTypes = [
   CompetitionSubType.HTR_PRACTICE,
 ]
 
-const excludeCompetitionTypes = [CompetitionType.FMC_CHAIN, CompetitionType.WCA_RECONSTRUCTION]
+const excludeCompetitionTypes = [CompetitionType.FMC_CHAIN]
 const excludeCompetitionTypesForWeeklyActive = [CompetitionType.FMC_CHAIN]
 
 const DEFAULT_LIMIT = 20
@@ -48,7 +48,7 @@ export class StatsService {
     private readonly commentsRepository: Repository<Comments>,
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
-  ) {}
+  ) { }
 
   async getAll() {
     const [topLiked, topFavorited, topCommented, weeklyBestSingles, weeklyActiveSubmitters, topSubmitters, topWinners] =
@@ -165,9 +165,9 @@ export class StatsService {
     return submissions.map(s => ({ ...s, commentCount: countMap[s.id] || 0 }))
   }
 
-  /** 每周全场最佳：按提交时间所在周，该周内步数最短的一条（排除 CHAIN、排除当前周） */
+  /** 每周全场最佳：按提交时间所在周，该周内步数最短的一条（排除 CHAIN、ENDLESS 和当前周） */
   async getWeeklyBestSingles() {
-    const rows = await this.submissionsBefore()
+    const rows = await this.submissionsBefore(undefined, [CompetitionType.FMC_CHAIN, CompetitionType.ENDLESS])
       .select('s.id', 'id')
       .addSelect('s.moves', 'moves')
       .addSelect('s.created_at', 'createdAt')
