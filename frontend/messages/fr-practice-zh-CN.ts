@@ -4,7 +4,7 @@ export default {
     corners: '角形',
     edges: '坏棱',
     howTo: '如何做 FR',
-    trueFr: '真 FR vs 假 FR',
+    trueFr: 'FR 与奇偶',
     tips: '实战建议',
     video: '视频教程',
   },
@@ -45,8 +45,8 @@ export default {
     specialCases: '特殊策略',
   },
   trueFr: {
-    body: '只把角形和坏棱都做成 0 可能是假 FR：若过程中 U2/D2 总数奇偶不对，形态满足但仍需一个轴向半转。例：还原态做 F R2 F2 R2 F2 R2 F。',
-    falseExampleTitle: '假 FR 示例',
+    body: '只把角形和坏棱都做成 0 不一定是 FR：若过程中 U2/D2 总数奇偶不对，形态满足但仍需一个轴向半转。例：还原态做 F R2 F2 R2 F2 R2 F。',
+    falseExampleTitle: '形态不满足 FR 示例',
     falseExampleBody: 'UD 层角棱形态均满足 FR，但无法仅用 R2 L2 F2 B2 还原。',
     parityTitle: '奇偶修补',
     parityBody: '在棱角状态为 2-2a / 2 时可插入 U2/D2 而不破坏进度。通用做法：在 FR trigger 处做 [F2 U2 F2] R2 U2。',
@@ -58,7 +58,7 @@ export default {
   tips: {
     0: '追求好解（如 sub-25）时，非简单 case 可放弃该 HTR，除非 HTR 步数很少（约 ≤15）。',
     1: '公式可换相对面（对称性），FR 后状态可能更优，可多试几种收尾。',
-    2: '本工具「正确解（真 FR）」已自动补齐奇偶，可在「解法解析」中对照形态解与真 FR 解。',
+    2: '本工具「正确解（FR）」已自动补齐奇偶，可在「解法解析」中对照形态解与 FR 解。',
   },
   specialNotes: '所有 0 / 2 / 6 / 8 坏棱：先转化为 4 坏棱，再参考上述 case。若直接落到简单 case 尚可接受。',
   videoIntro: '更完整的讲解与演示可参考原作者的 B 站专栏：',
