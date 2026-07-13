@@ -3,6 +3,11 @@ import type { SolutionStep } from '~/utils/fr/types'
 
 defineProps<{
   steps: SolutionStep[]
+  selectedIndex?: number | null
+}>()
+
+const emit = defineEmits<{
+  select: [index: number]
 }>()
 </script>
 
@@ -21,11 +26,17 @@ defineProps<{
       >
         {{ index + 1 }}
       </span>
-      <div
-        class="flex-1 border rounded-md px-3 py-2 text-sm"
-        :class="index === steps.length - 1
-          ? (step.trueFr ? 'border-green-400 bg-green-50 dark:bg-green-950/30' : 'border-amber-400 bg-amber-50 dark:bg-amber-950/30')
-          : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'"
+      <button
+        type="button"
+        class="flex-1 border rounded-md px-3 py-2 text-sm text-left transition-colors cursor-pointer"
+        :class="[
+          index === selectedIndex
+            ? 'ring-2 ring-indigo-500 border-indigo-400'
+            : index === steps.length - 1
+              ? (step.trueFr ? 'border-green-400 bg-green-50 dark:bg-green-950/30' : 'border-amber-400 bg-amber-50 dark:bg-amber-950/30')
+              : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:border-indigo-300',
+        ]"
+        @click="emit('select', index)"
       >
         <div class="grid grid-cols-[3.25rem_1fr] gap-3 items-center">
           <span
@@ -53,7 +64,7 @@ defineProps<{
             </p>
           </div>
         </div>
-      </div>
+      </button>
     </div>
   </div>
 </template>

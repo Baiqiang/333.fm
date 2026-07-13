@@ -31,15 +31,14 @@ const moves = computed(() => {
     <div class="flex flex-col sm:flex-row gap-3 items-center">
       <ClientOnly>
         <!--
-          Tutorial renders dozens of cubes on one page; is-static is required to avoid
-          exhausting WebGL contexts. Analyze/practice use single-cube pages, not this component.
+          Tutorial renders dozens of cubes on one page; css3d avoids exhausting
+          WebGL contexts (same approach as dr-trigger/cases grid).
         -->
-        <Cube3d
+        <CubeCss3d
           :moves="moves"
           filter="fr"
           fr-axis="ud"
           :fr-emphasis="emphasis ?? 'axis'"
-          is-static
           :class="TUTORIAL_CUBE_CLASS"
         />
         <template #fallback>

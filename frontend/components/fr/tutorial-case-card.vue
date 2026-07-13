@@ -11,12 +11,12 @@ const { tutorialCase } = useFrTrainerTutorialText()
 
 <template>
   <div class="border rounded p-3 flex flex-col sm:flex-row gap-3">
-    <!-- Tutorial case list: many cubes per page; static mode avoids WebGL context limit -->
+    <!-- Tutorial case list: many cubes per page; css3d avoids WebGL context limit -->
     <FrCube
       :scramble="item.setup"
       axis-key="ud"
       emphasis="axis"
-      is-static
+      css3d
       :cube-class="TUTORIAL_CUBE_CLASS"
       class="mx-auto sm:mx-0"
     />

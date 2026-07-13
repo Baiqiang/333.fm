@@ -23,7 +23,7 @@ defineProps<{
       v-if="result.inputFalseFr"
       class="inline-block px-2 py-0.5 text-xs rounded border border-red-500 text-red-600 bg-red-50 shrink-0"
     >
-      {{ $t('tools.frTrainer.falseFr') }}
+      {{ $t('tools.frTrainer.parityOff') }}
     </span>
     <span
       v-else-if="result.alreadyFr"

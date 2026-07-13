@@ -2,6 +2,10 @@ import type { AxisIndex } from './cube'
 
 export type AxisKey = 'ud' | 'fb' | 'rl'
 
+export type PreviewStepTrack = 'shape' | 'true'
+
+export type PreviewStep = { track: PreviewStepTrack, index: number }
+
 export const AXIS_LIST: { key: AxisKey, axis: AxisIndex, faces: string }[] = [
   { key: 'ud', axis: 1, faces: 'U/D' },
   { key: 'fb', axis: 2, faces: 'F/B' },

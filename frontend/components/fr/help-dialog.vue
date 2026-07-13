@@ -33,10 +33,16 @@ const { cornerCase, edgeCase } = useFrTrainerTutorialText()
           <div
             v-for="c in cornerCases"
             :key="c.label"
-            class="border rounded p-2 flex gap-2 items-center"
+            class="border rounded p-2 flex gap-3 items-start"
           >
-            <FrCube :scramble="c.setup" axis-key="ud" emphasis="corners" class="w-24 shrink-0" />
-            <div>
+            <FrCube
+              :scramble="c.setup"
+              axis-key="ud"
+              emphasis="corners"
+              css3d
+              cube-class="w-24 shrink-0"
+            />
+            <div class="min-w-0 flex-1">
               <span class="inline-block px-1.5 py-0.5 text-xs bg-indigo-100 text-indigo-700 rounded mb-1">{{ c.label }}</span>
               <p class="text-xs text-gray-600">
                 {{ cornerCase(c.label) }}
@@ -52,10 +58,16 @@ const { cornerCase, edgeCase } = useFrTrainerTutorialText()
           <div
             v-for="c in edgeCases"
             :key="c.label"
-            class="border rounded p-2 flex gap-2 items-center"
+            class="border rounded p-2 flex gap-3 items-start"
           >
-            <FrCube :scramble="c.setup" axis-key="ud" emphasis="edges" class="w-24 shrink-0" />
-            <div>
+            <FrCube
+              :scramble="c.setup"
+              axis-key="ud"
+              emphasis="edges"
+              css3d
+              cube-class="w-24 shrink-0"
+            />
+            <div class="min-w-0 flex-1">
               <span class="inline-block px-1.5 py-0.5 text-xs bg-indigo-100 text-indigo-700 rounded mb-1">{{ c.label }}</span>
               <p class="text-xs text-gray-600">
                 {{ edgeCase(c.label) }}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AxisKey, FrAnalysis } from '~/utils/fr/types'
+import type { AxisKey, FrAnalysis, PreviewStep } from '~/utils/fr/types'
 import { analyzeScramble, generateHtrScramble } from '~/utils/fr'
 
 import { AXIS_TAB_LABEL, AXIS_TABS } from '~/utils/fr/display'
@@ -10,6 +10,7 @@ const scramble = ref('')
 const solution = ref('')
 const analysis = ref<FrAnalysis | null>(null)
 const activeAxis = ref<AxisKey>('ud')
+const previewStep = ref<PreviewStep | null>(null)
 const leaveSlice = useLocalStorage('tool.frTrainer.analyze.leaveSlice', true)
 
 const localForm = useLocalStorage('tool.frTrainer.analyze', { scramble: '', solution: '' })
@@ -21,7 +22,12 @@ watch([scramble, solution], ([s, sol]) => {
 function runAnalyze() {
   analysis.value = analyzeScramble(scramble.value, solution.value, leaveSlice.value)
   activeAxis.value = 'ud'
+  previewStep.value = null
 }
+
+watch(activeAxis, () => {
+  previewStep.value = null
+})
 
 watchDebounced([scramble, solution, leaveSlice], () => {
   if (!scramble.value.trim() && !solution.value.trim()) {
@@ -53,6 +59,25 @@ onMounted(() => {
 })
 
 const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
+const activeResult = computed(() =>
+  analysis.value?.axes.find(a => a.axisKey === activeAxis.value) ?? null,
+)
+
+const previewMoves = computed((): string[] | null => {
+  if (!previewStep.value || !activeResult.value)
+    return null
+
+  const { track, index } = previewStep.value
+  if (index <= 0)
+    return []
+
+  const moves = track === 'shape'
+    ? activeResult.value.shapeSolution
+    : activeResult.value.solution
+  if (!moves)
+    return null
+  return moves.slice(0, index)
+})
 </script>
 
 <template>
@@ -106,6 +131,7 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
           :scramble="analysis!.scramble"
           :axis-key="activeAxis"
           :leave-slice="leaveSlice"
+          :preview-moves="previewMoves"
         />
       </div>
 
@@ -129,15 +155,14 @@ const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
         </div>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-4">
-        <FrAxisResultCard
-          v-for="res in analysis!.axes"
-          :key="res.axisKey"
-          :result="res"
-          :active="activeAxis === res.axisKey"
-          @select="activeAxis = res.axisKey"
-        />
-      </div>
+      <FrAxisResultCard
+        v-if="activeResult"
+        :key="activeAxis"
+        :result="activeResult"
+        active
+        :preview-step="previewStep"
+        @update:preview-step="previewStep = $event"
+      />
     </template>
   </div>
 </template>

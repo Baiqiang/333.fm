@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import type { AxisResult } from '~/utils/fr/types'
+import type { AxisResult, PreviewStep } from '~/utils/fr/types'
 
 const props = defineProps<{
   result: AxisResult
   active: boolean
   hideSolution?: boolean
   hideHeader?: boolean
+  previewStep?: PreviewStep | null
 }>()
 
 const emit = defineEmits<{
-  select: []
+  'select': []
+  'update:previewStep': [value: PreviewStep | null]
 }>()
 
 const showSteps = ref(false)
@@ -69,11 +71,19 @@ const hasSteps = computed(() => {
         </p>
       </template>
 
+      <p v-if="hasSteps && showSteps" class="text-xs text-gray-500 mb-2">
+        {{ $t('tools.frTrainer.steps.clickHint') }}
+      </p>
+
       <FrSolutionBreakdown
         v-if="hasSteps && showSteps"
         :steps="result.decomposition"
         :shape-steps="result.shapeDecomposition"
+        :selected-track="previewStep?.track ?? null"
+        :selected-index="previewStep?.index ?? null"
         class="mb-3"
+        @select="(track, index) => emit('update:previewStep', { track, index })"
+        @track-change="emit('update:previewStep', null)"
       />
 
       <div v-if="hasSteps" class="text-right">

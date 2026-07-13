@@ -4,7 +4,7 @@ export default {
     corners: 'Corner shapes',
     edges: 'Bad edges',
     howTo: 'How to do FR',
-    trueFr: 'True FR vs False FR',
+    trueFr: 'FR vs Fake FR',
     tips: 'Practical tips',
     video: 'Video tutorial',
   },
@@ -45,8 +45,8 @@ export default {
     specialCases: 'Special strategies',
   },
   trueFr: {
-    body: 'Reaching shape 0 for corners and edges may still be false FR if U2/D2 parity is wrong—you need one more axis half-turn. Example from solved: F R2 F2 R2 F2 R2 F.',
-    falseExampleTitle: 'False FR example',
+    body: 'Reaching shape 0 for corners and edges may still be Fake FR if U2/D2 parity is wrong—you need one more axis half-turn. Example from solved: F R2 F2 R2 F2 R2 F.',
+    falseExampleTitle: 'Fake FR example',
     falseExampleBody: 'U/D corners and edges look like FR, but R2 L2 F2 B2 alone cannot solve it.',
     parityTitle: 'Parity fix',
     parityBody: 'At 2-2a / 2 you can insert U2/D2 without breaking progress. General fix at the FR trigger: [F2 U2 F2] R2 U2.',
@@ -58,7 +58,7 @@ export default {
   tips: {
     0: 'Chasing a great solve (e.g. sub-25)? Drop non-simple HTR unless the HTR segment is very short (around ≤15 moves).',
     1: 'Symmetric algs on opposite faces may leave a better post-FR state—try variants.',
-    2: 'This tool\'s correct (true-FR) solution already fixes parity—compare shape vs true FR in Solution breakdown.',
+    2: 'This tool\'s correct FR solution already fixes parity—compare shape vs FR in Solution breakdown.',
   },
   specialNotes: 'For 0/2/6/8 bad edges: reduce to 4 bad first, then use the cases above. Landing on a simple case directly is fine.',
   videoIntro: 'For a fuller walkthrough, see the author\'s Bilibili post:',

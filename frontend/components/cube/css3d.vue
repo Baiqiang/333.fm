@@ -1,11 +1,23 @@
 <script setup lang="ts">
+import type { FrAxisKey, FrEmphasis } from '~/utils/cube'
 import { Algorithm, Cube } from 'insertionfinder'
 import { BODY_COLOR, CUBIE_GAP, filterColor, getFaceletPositions } from '~/utils/cube'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   moves?: string
-  filter?: 'dr'
-}>()
+  cubieCube?: {
+    corners: number[]
+    edges: number[]
+    placement: number
+  }
+  filter?: 'dr' | 'fr'
+  frAxis?: FrAxisKey
+  frEmphasis?: FrEmphasis
+  leaveSlice?: boolean
+}>(), {
+  frEmphasis: 'axis',
+  leaveSlice: true,
+})
 
 const container = ref<HTMLElement>()
 const canvas = ref<HTMLCanvasElement>()
@@ -19,6 +31,8 @@ let lastPy = 0
 const faceletPositions = getFaceletPositions()
 
 const facelet = computed(() => {
+  if (props.cubieCube)
+    return Cube.fromCubieCube(props.cubieCube.corners, props.cubieCube.edges, props.cubieCube.placement).toFaceletString()
   const cube = new Cube()
   try {
     cube.twist(new Algorithm(removeComment(props.moves || '')))
@@ -79,8 +93,11 @@ function buildQuads(): Quad[] {
     }
   }
 
+  const frOptions = props.filter === 'fr' && props.frAxis
+    ? { axis: props.frAxis, emphasis: props.frEmphasis, leaveSlice: props.leaveSlice }
+    : undefined
   for (const { i, x, y, z, axis, dir } of faceletPositions)
-    addSticker(x, y, z, axis, dir, filterColor(props.filter, fl[i], x, y, z, fl))
+    addSticker(x, y, z, axis, dir, filterColor(props.filter, fl[i], x, y, z, fl, frOptions))
   return quads
 }
 
