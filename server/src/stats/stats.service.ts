@@ -206,9 +206,14 @@ export class StatsService {
       .filter(item => item.submission !== null)
   }
 
-  /** 每周最活跃的选手：最近 20 周，每周按提交次数排序取前 20 名（含 WCA recon，排除 CHAIN、练习、当前周） */
+  /** 每周最活跃的选手：最近 20 周，每周按提交次数排序取前 20 名（含当前周和 WCA recon，排除 CHAIN、练习） */
   async getWeeklyActiveSubmitters(weeksLimit = DEFAULT_LIMIT, topPerWeek = DEFAULT_LIMIT) {
-    const rows = await this.submissionsBefore(undefined, excludeCompetitionTypesForWeeklyActive)
+    const rows = await this.submissionsRepository
+      .createQueryBuilder('s')
+      .leftJoin('s.competition', 'c')
+      .where('c.type NOT IN (:...excludeTypes)', { excludeTypes: excludeCompetitionTypesForWeeklyActive })
+      .andWhere('c.subType NOT IN (:...practiceSubTypes)', { practiceSubTypes: excludePracticeSubTypes })
+      .andWhere('s.moves > 0')
       .select('YEARWEEK(s.created_at, 3)', 'yw')
       .addSelect('s.user_id', 'userId')
       .addSelect('COUNT(*)', 'cnt')
