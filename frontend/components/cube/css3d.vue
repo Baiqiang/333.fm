@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FrAxisKey, FrEmphasis } from '~/utils/cube'
+import type { FrAxisKey, FrEmphasis, PensukeBrFacePair, PensukeLsAxis } from '~/utils/cube'
 import { Algorithm, Cube } from 'insertionfinder'
 import { BODY_COLOR, CUBIE_GAP, filterColor, getFaceletPositions } from '~/utils/cube'
 
@@ -10,13 +10,17 @@ const props = withDefaults(defineProps<{
     edges: number[]
     placement: number
   }
-  filter?: 'dr' | 'fr'
+  filter?: 'dr' | 'fr' | 'pensuke-br'
   frAxis?: FrAxisKey
   frEmphasis?: FrEmphasis
   leaveSlice?: boolean
+  lsAxis?: PensukeLsAxis
+  brFacePair?: PensukeBrFacePair
 }>(), {
   frEmphasis: 'axis',
   leaveSlice: true,
+  lsAxis: 'ud',
+  brFacePair: 'fb',
 })
 
 const container = ref<HTMLElement>()
@@ -96,8 +100,11 @@ function buildQuads(): Quad[] {
   const frOptions = props.filter === 'fr' && props.frAxis
     ? { axis: props.frAxis, emphasis: props.frEmphasis, leaveSlice: props.leaveSlice }
     : undefined
+  const pensukeOptions = props.filter === 'pensuke-br'
+    ? { lsAxis: props.lsAxis, brFacePair: props.brFacePair }
+    : undefined
   for (const { i, x, y, z, axis, dir } of faceletPositions)
-    addSticker(x, y, z, axis, dir, filterColor(props.filter, fl[i], x, y, z, fl, frOptions))
+    addSticker(x, y, z, axis, dir, filterColor(props.filter, fl[i], x, y, z, fl, frOptions, pensukeOptions))
   return quads
 }
 

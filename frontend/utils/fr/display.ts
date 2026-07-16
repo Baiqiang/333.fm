@@ -31,6 +31,22 @@ export function relabelSolution(moves: string[], axis: AxisKey): string {
     .join(' ')
 }
 
+/** Inverse of relabelSolution: oriented-frame moves back to physical notation. */
+export function unrelabelMove(move: string, axis: AxisKey): string {
+  if (axis === 'ud')
+    return move
+  const map = FACE_RELABEL[axis]
+  const inverse: Record<string, string> = {}
+  for (const [physical, oriented] of Object.entries(map))
+    inverse[oriented] = physical
+  const face = move[0]!
+  return `${inverse[face] ?? face}${move.slice(1)}`
+}
+
+export function unrelabelMoves(moves: string[], axis: AxisKey): string[] {
+  return moves.map(m => unrelabelMove(m, axis))
+}
+
 export function buildCubeMoves(
   scramble: string,
   axis: AxisKey,

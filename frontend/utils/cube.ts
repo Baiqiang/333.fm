@@ -52,6 +52,55 @@ function isESliceEdge(x: number, y: number, z: number, fl: string): boolean {
 
 export type FrAxisKey = 'ud' | 'fb' | 'rl'
 export type FrEmphasis = 'axis' | 'corners' | 'edges'
+export type PensukeBrFacePair = 'fb' | 'rl' | 'ud'
+export type PensukeLsAxis = FrAxisKey
+
+const BR_PAIR_AXIS: Record<PensukeBrFacePair, 'x' | 'y' | 'z'> = {
+  ud: 'y',
+  fb: 'z',
+  rl: 'x',
+}
+
+const LS_AXIS_MAP: Record<PensukeLsAxis, 'x' | 'y' | 'z'> = {
+  ud: 'y',
+  fb: 'z',
+  rl: 'x',
+}
+
+/** BR ring edge cubies for a given LS + BR face pair (after setup rotation, LS is Y). */
+function isPensukeBrRingSticker(
+  x: number,
+  y: number,
+  z: number,
+  lsAxis: PensukeLsAxis,
+  brPair: PensukeBrFacePair,
+): boolean {
+  const ls = LS_AXIS_MAP[lsAxis]
+  const br = BR_PAIR_AXIS[brPair]
+  const coord = { x, y, z }
+  const onLsLayer = Math.abs(coord[ls]) === 1
+  const onBrFace = Math.abs(coord[br]) === 1
+  if (ls === 'y')
+    return onLsLayer && onBrFace && x === 0
+  if (ls === 'z')
+    return onLsLayer && onBrFace && z === 0
+  return onLsLayer && onBrFace && y === 0
+}
+
+function isPensukeBrCornerSticker(
+  x: number,
+  y: number,
+  z: number,
+  lsAxis: PensukeLsAxis,
+  brPair: PensukeBrFacePair,
+): boolean {
+  if (!isCornerCubie(x, y, z))
+    return false
+  const ls = LS_AXIS_MAP[lsAxis]
+  const br = BR_PAIR_AXIS[brPair]
+  const coord = { x, y, z }
+  return Math.abs(coord[ls]) === 1 && Math.abs(coord[br]) === 1
+}
 
 function isCornerCubie(x: number, y: number, z: number): boolean {
   return x !== 0 && y !== 0 && z !== 0
@@ -67,14 +116,28 @@ function isFrIgnoredSliceEdge(x: number, y: number, z: number): boolean {
 }
 
 export function filterColor(
-  filter: 'dr' | 'fr' | undefined,
+  filter: 'dr' | 'fr' | 'pensuke-br' | undefined,
   face: string,
   x: number,
   y: number,
   z: number,
   fl: string,
   frOptions?: { axis: FrAxisKey, emphasis: FrEmphasis, leaveSlice?: boolean },
+  pensukeOptions?: { lsAxis: PensukeLsAxis, brFacePair: PensukeBrFacePair },
 ): string {
+  if (filter === 'pensuke-br' && pensukeOptions) {
+    if (isCenter(x, y, z))
+      return GRAY_COLOR
+    if (isPensukeBrRingSticker(x, y, z, pensukeOptions.lsAxis, pensukeOptions.brFacePair))
+      return FACE_COLORS[face]
+    if (isPensukeBrCornerSticker(x, y, z, pensukeOptions.lsAxis, pensukeOptions.brFacePair))
+      return FACE_COLORS[face]
+    if (isEdge(x, y, z))
+      return GRAY_COLOR
+    if (isCornerCubie(x, y, z))
+      return BODY_COLOR
+    return GRAY_COLOR
+  }
   if (filter === 'fr' && frOptions) {
     if (isCenter(x, y, z))
       return FACE_COLORS[face]
