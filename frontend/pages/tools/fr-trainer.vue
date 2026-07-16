@@ -37,9 +37,18 @@ function onHistoryReplay(record: FrPracticeRecord) {
     <p class="text-sm text-gray-600 mb-1">
       {{ $t('tools.frTrainer.fullName') }}
     </p>
-    <p class="text-sm text-gray-600 mb-4">
+    <p class="text-sm text-gray-600 mb-6">
       {{ $t('tools.frTrainer.subtitle') }}
     </p>
+
+    <div class="mb-4">
+      <NuxtLink
+        to="/tools/pensuke-trainer"
+        class="inline-block px-3 py-2 text-sm border border-indigo-300 text-indigo-600 hover:bg-indigo-50"
+      >
+        {{ $t('tools.pensukeTrainer.crossLinkPensuke') }}
+      </NuxtLink>
+    </div>
 
     <div class="my-4 overflow-x-auto pb-2">
       <div class="flex gap-2 flex-nowrap min-w-max">

@@ -1,4 +1,6 @@
 import frPracticeEn from './fr-practice-en'
+import pensukeHelpEn from './pensuke-help-en'
+import pensukePracticeEn from './pensuke-practice-en'
 
 export default {
   title: 'Fewest Moves',
@@ -813,6 +815,60 @@ export default {
         moves: 'moves',
       },
       tutorial: frPracticeEn,
+    },
+    pensukeTrainer: {
+      title: 'Pensuke Trainer',
+      fullName: 'Pensuke Method (Bars Reduction)',
+      subtitle: 'Search Leave Slice from HTR with BR and FR track labels',
+      crossLinkPensuke: '→ Pensuke Trainer',
+      mode: {
+        analyze: 'Analyze',
+        practice: 'Practice',
+        tutorial: 'Tutorial',
+      },
+      input: {
+        scramble: {
+          label: 'Scramble',
+          placeholder: 'Enter scramble',
+        },
+        solution: {
+          label: 'Solution to HTR',
+          placeholder: 'Moves to HTR; () inverse blocks supported',
+        },
+      },
+      btn: {
+        random: 'Random',
+      },
+      frAxis: 'FR axis',
+      brAxesHint: 'The other two axes are used automatically as Pensuke BR axes',
+      searching: 'Searching shortest LS…',
+      referenceSolution: 'Reference',
+      alreadyLs: 'Already Leave Slice',
+      noSolution: 'No LS solution found',
+      start: 'Start',
+      help: {
+        cases: pensukeHelpEn,
+      },
+      error: {
+        parse: 'Cannot parse: {token}',
+        notHtr: 'Input is not HTR.',
+      },
+      practice: {
+        randomAxis: 'Random axis',
+        solutionInput: 'Your LS solution',
+        solutionPlaceholder: 'e.g. R2 F2 L2',
+        liveLs: 'Leave Slice reached',
+        liveInvalid: 'Invalid move: {token}',
+        submit: 'Submit',
+        next: 'Next',
+        resultCorrect: 'Leave Slice ✓',
+        resultWrong: 'Not Leave Slice',
+        historyTitle: 'History',
+        historyClear: 'Clear',
+        historyEmpty: 'No records',
+        moves: 'moves',
+      },
+      tutorial: pensukePracticeEn,
     },
   },
   wca: {

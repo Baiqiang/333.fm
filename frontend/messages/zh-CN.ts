@@ -1,4 +1,6 @@
 import frPracticeZhCN from './fr-practice-zh-CN'
+import pensukeHelpZhCN from './pensuke-help-zh-CN'
+import pensukePracticeZhCN from './pensuke-practice-zh-CN'
 
 export default {
   title: '最少步',
@@ -813,6 +815,60 @@ export default {
         moves: '步',
       },
       tutorial: frPracticeZhCN,
+    },
+    pensukeTrainer: {
+      title: 'Pensuke 练习器',
+      fullName: 'Pensuke 法（Bars Reduction）',
+      subtitle: '从 HTR 态搜索 Leave Slice，展示 BR 与 FR 逐步形态',
+      crossLinkPensuke: '→ Pensuke 练习器',
+      mode: {
+        analyze: '分析',
+        practice: '练习',
+        tutorial: '教程',
+      },
+      input: {
+        scramble: {
+          label: '打乱',
+          placeholder: '请输入打乱',
+        },
+        solution: {
+          label: '复原至 HTR',
+          placeholder: '到达 HTR 的复原步骤，支持 () 逆序块',
+        },
+      },
+      btn: {
+        random: '随机',
+      },
+      frAxis: 'FR 轴',
+      brAxesHint: '另两个轴自动作为 Pensuke 的 BR 操作轴',
+      searching: '正在搜索最短 LS 解…',
+      referenceSolution: '参考解',
+      alreadyLs: '已是 Leave Slice',
+      noSolution: '未找到 LS 解',
+      start: '起始',
+      help: {
+        cases: pensukeHelpZhCN,
+      },
+      error: {
+        parse: '无法解析步骤：{token}',
+        notHtr: '输入未到达 HTR 状态，无法分析。',
+      },
+      practice: {
+        randomAxis: '随机轴',
+        solutionInput: '你的 LS 解法',
+        solutionPlaceholder: '例如 R2 F2 L2',
+        liveLs: '已达到 Leave Slice',
+        liveInvalid: '无效步：{token}',
+        submit: '提交',
+        next: '下一题',
+        resultCorrect: 'Leave Slice ✓',
+        resultWrong: '未达到 Leave Slice',
+        historyTitle: '练习历史',
+        historyClear: '清空',
+        historyEmpty: '暂无记录',
+        moves: '步',
+      },
+      tutorial: pensukePracticeZhCN,
     },
   },
   wca: {

@@ -105,6 +105,10 @@ const navs = computed(() => [
         path: '/tools/fr-trainer',
       },
       {
+        title: t('tools.pensukeTrainer.title'),
+        path: '/tools/pensuke-trainer',
+      },
+      {
         title: t('wca.competitions'),
         path: '/wca/competitions',
       },
