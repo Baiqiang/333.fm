@@ -19,7 +19,7 @@ export class CommentService {
     private readonly submissionsRepository: Repository<Submissions>,
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
-  ) {}
+  ) { }
 
   async getComments(submissionId: number, limit: number, offset: number) {
     const [items, total] = await this.commentsRepository.findAndCount({

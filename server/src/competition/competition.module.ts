@@ -112,4 +112,4 @@ import { WeeklyService } from './weekly/weekly.service'
     FunChallengeController,
   ],
 })
-export class CompetitionModule {}
+export class CompetitionModule { }

@@ -14,7 +14,7 @@ export class LeaveSliceCommand extends CommandRunner {
   async run(passedParam: string[]): Promise<void> {
     switch (passedParam[0]) {
       case 'seed':
-        await this.service.seed(parseInt(passedParam[1]) || 13)
+        await this.service.seed(parseInt(passedParam[1]) || 8)
         break
       case 'reset':
         await this.service.reset()

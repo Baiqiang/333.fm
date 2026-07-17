@@ -80,6 +80,7 @@ export class FiveGenCommandService {
       .createQueryBuilder('s')
       .innerJoinAndSelect('s.scramble', 'sc')
       .innerJoinAndSelect('s.competition', 'c')
+      .leftJoinAndSelect('c.user', 'cUser')
       .where("s.solution != ''")
       .andWhere("sc.scramble != ''")
       .andWhere('s.phase = :phase', { phase: SubmissionPhase.FINISHED })

@@ -1162,6 +1162,65 @@ function normalizeSolution(sol: string, equivFaces: Set<string>): string {
   return tokens.join(' ')
 }
 
+function isMoveInStepGroup(move: string, stepMoves: string[], conjMoves: string): boolean {
+  const parsed = parseMoveStr(move)
+  if (!parsed) return false
+  const axis = conjMoves.indexOf(move[0])
+  if (axis < 0) return false
+  const allowedPow = "0 2'".indexOf(stepMoves[axis][1])
+  return allowedPow === 1 || parsed.pow === allowedPow
+}
+
+function solutionToScramble(scramble: string, moves: string[]): string {
+  const sol = moves.join(' ')
+  return sol.includes('@') ? sol.replace('@', scramble) : `${scramble} ${sol}`
+}
+
+function isPhaseSolvedAfterMoves(step: number, scramble: string, moves: string[], trans: number[] | null): boolean {
+  const state = parseScramble(solutionToScramble(scramble, moves))
+  if (!trans) return solvers![step].checkPerm(state) === 1
+  const transi = permInv(trans)
+  return solvers![step].checkPerm(permMult(trans, permMult(state, transi))) === 1
+}
+
+function hasRedundantTargetGroupTail(
+  step: number,
+  scramble: string,
+  moves: string[],
+  trans: number[] | null,
+  conjMoves: string,
+): boolean {
+  if (step + 1 >= STEP_MOVE_DEFS.length || moves.length <= 1) return false
+
+  const targetMoves = STEP_MOVE_DEFS[step + 1]
+  const atIdx = moves.indexOf('@')
+  const normalStart = atIdx >= 0 ? atIdx + 1 : 0
+
+  for (let split = normalStart + 1; split < moves.length; split++) {
+    const tail = moves.slice(split)
+    if (
+      tail.every(move => isMoveInStepGroup(move, targetMoves, conjMoves)) &&
+      isPhaseSolvedAfterMoves(step, scramble, moves.slice(0, split), trans)
+    ) {
+      return true
+    }
+  }
+
+  if (atIdx > 0) {
+    for (let split = 1; split <= atIdx; split++) {
+      const leadingPreMoves = moves.slice(0, split)
+      if (
+        leadingPreMoves.every(move => isMoveInStepGroup(move, targetMoves, conjMoves)) &&
+        isPhaseSolvedAfterMoves(step, scramble, moves.slice(split), trans)
+      ) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
 // ================================================================
 // Public API
 // ================================================================
@@ -1229,6 +1288,7 @@ export function solveStep(step: number, scramble: string, options: SolveOptions 
         depth,
         sol => {
           const moves = formatSolution(sol, stepMoves, conjM, useNiss)
+          if (hasRedundantTargetGroupTail(step, scramble, moves, trans, conjM)) return undefined
           const moveCount = moves.filter(m => m !== '@').length
           const cancel = calculateCancellation(lastMoveInfo, moves)
           allSols.push({ moves, effective: moveCount - cancel })

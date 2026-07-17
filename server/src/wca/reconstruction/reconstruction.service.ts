@@ -10,7 +10,7 @@ import { Repository } from 'typeorm'
 
 import { AttachmentService } from '@/attachment/attachment.service'
 import { CompetitionService } from '@/competition/competition.service'
-import { SubmitWcaReconstructionDto, UpdateWcaReconstructionDescriptionDto } from '@/dtos/wca-reconstruction.dto'
+import { SubmitScrambleDto, SubmitWcaReconstructionDto, UpdateWcaReconstructionDescriptionDto } from '@/dtos/wca-reconstruction.dto'
 import {
   CompetitionFormat,
   CompetitionMode,
@@ -24,7 +24,7 @@ import { SubmissionPhase, Submissions } from '@/entities/submissions.entity'
 import { Users } from '@/entities/users.entity'
 import { type WcaOfficialRoundResult, WcaReconstructions } from '@/entities/wca-reconstructions.entity'
 import { UserService } from '@/user/user.service'
-import { calculateMoves, transformWCAMoves } from '@/utils'
+import { calculateMoves, isValidScramble, transformWCAMoves } from '@/utils'
 
 const WCA_API_BASE = 'https://www.worldcubeassociation.org/api/v0'
 const WCA_API_V1_BASE = 'https://www.worldcubeassociation.org/api/v1'
@@ -271,6 +271,44 @@ export class WcaReconstructionService {
     await this.tryVerifyScramble(scrambleRecord, wcaCompetitionId)
 
     return { reconstruction, submission, scramble: scrambleRecord }
+  }
+
+  async submitScramble(user: Users, dto: SubmitScrambleDto) {
+    const { wcaCompetitionId, roundNumber, scrambleNumber } = dto
+    const scramble = dto.scramble.trim()
+    if (!isValidScramble(scramble)) {
+      throw new BadRequestException('Invalid scramble')
+    }
+    const competition = await this.getOrCreateCompetition(wcaCompetitionId)
+
+    let scrambleRecord = await this.scramblesRepository.findOne({
+      where: { competitionId: competition.id, roundNumber, number: scrambleNumber },
+    })
+    if (scrambleRecord) {
+      if (scrambleRecord.verified) {
+        if (scrambleRecord.scramble !== scramble) {
+          throw new BadRequestException('Scramble does not match the verified scramble')
+        }
+        return { scramble: scrambleRecord }
+      }
+      scrambleRecord.scramble = scramble
+      scrambleRecord.submittedById = user.id
+      await this.scramblesRepository.save(scrambleRecord)
+    } else {
+      scrambleRecord = this.scramblesRepository.create({
+        competitionId: competition.id,
+        roundNumber,
+        number: scrambleNumber,
+        scramble,
+        submittedById: user.id,
+        verified: false,
+      })
+      await this.scramblesRepository.save(scrambleRecord)
+    }
+
+    await this.tryVerifyScramble(scrambleRecord, wcaCompetitionId)
+
+    return { scramble: scrambleRecord }
   }
 
   async updateDescription(user: Users, wcaCompetitionId: string, dto: UpdateWcaReconstructionDescriptionDto) {

@@ -47,7 +47,7 @@ export class PracticeService {
     private readonly queue: Queue<PracticeJob>,
     @Inject(forwardRef(() => CompetitionService))
     private readonly competitionService: CompetitionService,
-  ) {}
+  ) { }
 
   async getByAlias(alias: string) {
     return this.competitionService.findOne({

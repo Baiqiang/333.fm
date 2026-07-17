@@ -5,7 +5,7 @@ import { CurrentUser } from '@/auth/decorators/current-user.decorator'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { JwtRequiredGuard } from '@/auth/guards/jwt-required.guard'
 import { PaginationDto } from '@/dtos/pagination.dto'
-import { SubmitWcaReconstructionDto, UpdateWcaReconstructionDescriptionDto } from '@/dtos/wca-reconstruction.dto'
+import { SubmitScrambleDto, SubmitWcaReconstructionDto, UpdateWcaReconstructionDescriptionDto } from '@/dtos/wca-reconstruction.dto'
 import { Users } from '@/entities/users.entity'
 import { UserService } from '@/user/user.service'
 
@@ -61,6 +61,12 @@ export class WcaReconstructionController {
   @UseGuards(JwtRequiredGuard)
   async submit(@CurrentUser() user: Users, @Body() dto: SubmitWcaReconstructionDto) {
     return this.reconstructionService.submit(user, dto)
+  }
+
+  @Post('submit-scramble')
+  @UseGuards(JwtRequiredGuard)
+  async submitScramble(@CurrentUser() user: Users, @Body() dto: SubmitScrambleDto) {
+    return this.reconstructionService.submitScramble(user, dto)
   }
 
   @Put(':competitionId/description')

@@ -32,6 +32,22 @@ export class SubmitWcaReconstructionDto {
   attachments?: number[]
 }
 
+export class SubmitScrambleDto {
+  @IsString()
+  wcaCompetitionId: string
+
+  @IsInt()
+  @Min(1)
+  roundNumber: number
+
+  @IsInt()
+  @Min(1)
+  scrambleNumber: number
+
+  @IsString()
+  scramble: string
+}
+
 export class UpdateWcaReconstructionDescriptionDto {
   @IsString()
   @MaxLength(10000)

@@ -25,8 +25,35 @@ const comment = ref(props.existingSolution?.comment ?? '')
 const attachments = ref<Attachment[]>(props.existingSolution?.attachments ?? [])
 const uploadingPromise = ref<Promise<any>>()
 const submitting = ref(false)
+const submittingScramble = ref(false)
 const error = ref('')
+
+const canSubmitScrambleOnly = computed(() => !props.scrambleDisabled && !props.existingScramble)
 const { confirm, cancel, reveal, isRevealed } = useConfirmDialog()
+
+const scrambleValidation = computed<{ valid: boolean, normalized: string, message: string }>(() => {
+  const raw = replaceQuote(scramble.value.trim())
+  if (!raw)
+    return { valid: false, normalized: '', message: '' }
+  let normalized: string
+  try {
+    normalized = formatAlgorithm(raw)
+  }
+  catch {
+    return { valid: false, normalized: '', message: t('wca.recon.invalidScramble') }
+  }
+  if (!normalized)
+    return { valid: false, normalized: '', message: t('wca.recon.invalidScramble') }
+  if (!normalized.startsWith('R\' U\' F') || !normalized.endsWith('R\' U\' F'))
+    return { valid: false, normalized, message: t('wca.recon.scrambleMustWrap') }
+  return { valid: true, normalized, message: '' }
+})
+
+const scrambleState = computed<boolean | null>(() => {
+  if (props.scrambleDisabled || !scramble.value.trim())
+    return null
+  return scrambleValidation.value.valid
+})
 
 const clientValidation = computed(() => {
   if (!scramble.value.trim() || !solution.value.trim()) {
@@ -56,10 +83,26 @@ const clientValidation = computed(() => {
 const isDNF = computed(() => !clientValidation.value.valid)
 
 const canSubmit = computed(() => {
-  if (submitting.value)
+  if (submitting.value || submittingScramble.value)
     return false
   return true
 })
+
+const canSubmitScrambleOnlyNow = computed(() => canSubmit.value && scrambleValidation.value.valid)
+
+const isScrambleOnlyMode = computed(() =>
+  canSubmitScrambleOnly.value && !!scramble.value.trim() && !solution.value.trim(),
+)
+const submitLabel = computed(() =>
+  isScrambleOnlyMode.value ? t('wca.recon.submitScrambleOnly') : t('form.submit'),
+)
+const canSubmitNow = computed(() =>
+  isScrambleOnlyMode.value ? canSubmitScrambleOnlyNow.value : canSubmit.value,
+)
+
+function onSubmit() {
+  return isScrambleOnlyMode.value ? submitScrambleOnly() : submit()
+}
 
 const solutionState = computed<boolean | null>(() => {
   if (!solution.value.trim())
@@ -81,8 +124,8 @@ const movesMatch = computed(() => {
 })
 
 async function submit() {
-  if (!scramble.value.trim() && !props.scrambleDisabled) {
-    error.value = `${t('wca.recon.scramble')} *`
+  if (!props.scrambleDisabled && !scrambleValidation.value.valid) {
+    error.value = scrambleValidation.value.message || `${t('wca.recon.scramble')} *`
     return
   }
   if (isDNF.value && !officialDNF.value) {
@@ -100,7 +143,7 @@ async function submit() {
         wcaCompetitionId: props.wcaCompetitionId,
         roundNumber: props.roundNumber,
         scrambleNumber: props.scrambleNumber,
-        scramble: props.scrambleDisabled ? undefined : scramble.value.trim(),
+        scramble: props.scrambleDisabled ? undefined : scrambleValidation.value.normalized,
         solution: solution.value.trim() || undefined,
         comment: comment.value.trim(),
         attachments: attachments.value.map(a => a.id),
@@ -116,6 +159,33 @@ async function submit() {
   }
 }
 
+async function submitScrambleOnly() {
+  if (!scrambleValidation.value.valid) {
+    error.value = scrambleValidation.value.message || `${t('wca.recon.scramble')} *`
+    return
+  }
+  error.value = ''
+  submittingScramble.value = true
+  try {
+    await useClientApi('wca/reconstruction/submit-scramble', {
+      method: 'POST',
+      body: {
+        wcaCompetitionId: props.wcaCompetitionId,
+        roundNumber: props.roundNumber,
+        scrambleNumber: props.scrambleNumber,
+        scramble: scrambleValidation.value.normalized,
+      },
+    })
+    emit('submitted')
+  }
+  catch (e: any) {
+    error.value = e?.data?.message || e?.message || t('weekly.solution.invalid')
+  }
+  finally {
+    submittingScramble.value = false
+  }
+}
+
 function reset() {
   if (!props.existingSolution)
     solution.value = ''
@@ -127,7 +197,7 @@ function reset() {
 
 <template>
   <div class="mt-6">
-    <FormWrapper class="relative" @submit="submit" @reset="reset">
+    <FormWrapper class="relative" @submit="onSubmit" @reset="reset">
       <FormSignInRequired />
 
       <FormInput
@@ -135,9 +205,20 @@ function reset() {
         v-model="scramble"
         type="text"
         :label="t('wca.recon.scramble')"
-        :state="null"
-        :attrs="{ disabled: scrambleDisabled }"
-      />
+        :state="scrambleState"
+      >
+        <template #description>
+          <p v-if="scramble.trim() && scrambleValidation.message" class="py-1 text-red-500">
+            {{ scrambleValidation.message }}
+          </p>
+          <p v-else-if="scramble.trim() && scrambleValidation.valid" class="py-1 text-green-600">
+            {{ $t('wca.recon.scrambleValid') }}
+          </p>
+          <p v-else-if="canSubmitScrambleOnly" class="py-1 text-gray-500">
+            {{ $t('wca.recon.scrambleOnlyHint') }}
+          </p>
+        </template>
+      </FormInput>
 
       <FormInput
         v-model="solution"
@@ -193,14 +274,17 @@ function reset() {
 
       <div class="col-span-full mt-4">
         <button
-          class="px-2 py-1 text-white bg-blue-500 focus:outline-hidden"
-          :class="{ 'opacity-50 cursor-not-allowed': !canSubmit }"
-          :disabled="!canSubmit"
-          @click.prevent="submit"
+          class="px-2 py-1 text-white focus:outline-hidden"
+          :class="[
+            isScrambleOnlyMode ? 'bg-emerald-500' : 'bg-blue-500',
+            { 'opacity-50 cursor-not-allowed': !canSubmitNow },
+          ]"
+          :disabled="!canSubmitNow"
+          @click.prevent="onSubmit"
         >
-          <Spinner v-if="submitting" class="w-4 h-4 text-white border-[3px]" />
+          <Spinner v-if="submitting || submittingScramble" class="w-4 h-4 text-white border-[3px]" />
           <template v-else>
-            {{ $t('form.submit') }}
+            {{ submitLabel }}
           </template>
         </button>
         <button class="px-2 py-1 text-white bg-gray-500 focus:outline-hidden ml-2" @click.prevent="reset">

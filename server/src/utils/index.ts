@@ -111,6 +111,20 @@ export function formatSkeleton(scramble: string, skeleton: string): { formattedS
   return { formattedSkeleton, bestCube }
 }
 
+export function isValidScramble(scramble: string): boolean {
+  const trimmed = scramble.trim()
+  if (!trimmed) {
+    return false
+  }
+  try {
+    const cube = new Cube()
+    cube.twist(new Algorithm(trimmed))
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function calculateHash(obj: object | Buffer | string): string {
   if (Buffer.isBuffer(obj)) {
     return createHash('md5').update(obj).digest('hex')
