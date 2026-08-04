@@ -17,6 +17,7 @@ import { LeagueResults } from '@/entities/league-results.entity'
 import { LeagueSeasons } from '@/entities/league-seasons.entity'
 import { LeagueStandings } from '@/entities/league-standings.entity'
 import { LeagueTiers } from '@/entities/league-tiers.entity'
+import { Notifications } from '@/entities/notifications.entity'
 import { Results } from '@/entities/results.entity'
 import { Scrambles } from '@/entities/scrambles.entity'
 import { Submissions } from '@/entities/submissions.entity'
@@ -69,6 +70,7 @@ import { WeeklyService } from './weekly/weekly.service'
       LeagueParticipants,
       LeagueElos,
       LeagueEloHistories,
+      Notifications,
     ]),
     BullModule.registerQueue(
       {
@@ -112,4 +114,4 @@ import { WeeklyService } from './weekly/weekly.service'
     FunChallengeController,
   ],
 })
-export class CompetitionModule { }
+export class CompetitionModule {}

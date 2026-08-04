@@ -13,6 +13,7 @@ import {
   CompetitionStatus,
   CompetitionType,
 } from '@/entities/competitions.entity'
+import { Notifications, NotificationType } from '@/entities/notifications.entity'
 import { DNF, DNS, Results } from '@/entities/results.entity'
 import { Scrambles } from '@/entities/scrambles.entity'
 import { Submissions } from '@/entities/submissions.entity'
@@ -41,13 +42,15 @@ export class PracticeService {
     private readonly submissionsRepository: Repository<Submissions>,
     @InjectRepository(Results)
     private readonly resultsRepository: Repository<Results>,
+    @InjectRepository(Notifications)
+    private readonly notificationsRepository: Repository<Notifications>,
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
     @InjectQueue('practice')
     private readonly queue: Queue<PracticeJob>,
     @Inject(forwardRef(() => CompetitionService))
     private readonly competitionService: CompetitionService,
-  ) { }
+  ) {}
 
   async getByAlias(alias: string) {
     return this.competitionService.findOne({
@@ -303,7 +306,19 @@ export class PracticeService {
       submissionId: submission.id,
       moves: submission.moves,
     })
+    await this.createSubmissionNotification(competition, user, submission)
     return submission
+  }
+
+  private async createSubmissionNotification(competition: Competitions, sourceUser: Users, submission: Submissions) {
+    if (competition.userId === sourceUser.id) return
+
+    const notification = new Notifications()
+    notification.type = NotificationType.PRACTICE_SUBMISSION
+    notification.userId = competition.userId
+    notification.sourceUserId = sourceUser.id
+    notification.submissionId = submission.id
+    await this.notificationsRepository.save(notification)
   }
 
   async update(

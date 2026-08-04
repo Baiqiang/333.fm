@@ -19,7 +19,7 @@ export class CommentService {
     private readonly submissionsRepository: Repository<Submissions>,
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
-  ) { }
+  ) {}
 
   async getComments(submissionId: number, limit: number, offset: number) {
     const [items, total] = await this.commentsRepository.findAndCount({
@@ -153,6 +153,26 @@ export class CommentService {
         notification.commentId = comment.id
         notifications.push(notification)
         notifiedUserIds.add(mentionUser.id)
+      }
+    }
+
+    if (!replyTo) {
+      const commenters = await this.commentsRepository
+        .createQueryBuilder('c')
+        .select('DISTINCT c.user_id', 'userId')
+        .where('c.submission_id = :submissionId', { submissionId })
+        .andWhere('c.user_id NOT IN (:...notifiedUserIds)', { notifiedUserIds: [...notifiedUserIds] })
+        .getRawMany<{ userId: number }>()
+
+      for (const commenter of commenters) {
+        const notification = new Notifications()
+        notification.type = NotificationType.FOLLOWUP_COMMENT
+        notification.userId = Number(commenter.userId)
+        notification.sourceUserId = sourceUser.id
+        notification.submissionId = submissionId
+        notification.commentId = comment.id
+        notifications.push(notification)
+        notifiedUserIds.add(notification.userId)
       }
     }
 

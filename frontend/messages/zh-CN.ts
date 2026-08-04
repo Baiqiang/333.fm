@@ -86,6 +86,8 @@ export default {
     },
     wca: {
       competitionNotFound: '比赛未找到',
+      rateLimited: 'WCA API 请求过于频繁，请稍后再试。',
+      fetchFailed: 'WCA API 数据加载失败，请稍后再试。',
     },
   },
   loading: '加载中...',
@@ -940,6 +942,8 @@ export default {
     mentioned: '在评论中提及了你',
     liked: '赞了你的提交',
     favorited: '收藏了你的提交',
+    practiceSubmitted: '在你的练习本提交了解法',
+    followupCommented: '评论了你参与评论过的解法',
     prev: '上一页',
     next: '下一页',
   },

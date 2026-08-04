@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { renderMentions } from '~/utils/comment'
 import type { AppNotification, NotificationListResponse } from '~/utils/notification'
+import { renderMentions } from '~/utils/comment'
 
 const user = useUser()
 const unreadCount = ref(0)
@@ -76,6 +76,10 @@ function getNotificationText(notification: AppNotification) {
       return t('notification.liked')
     case NotificationType.FAVORITE:
       return t('notification.favorited')
+    case NotificationType.PRACTICE_SUBMISSION:
+      return t('notification.practiceSubmitted')
+    case NotificationType.FOLLOWUP_COMMENT:
+      return t('notification.followupCommented')
     default:
       return ''
   }
@@ -104,7 +108,7 @@ if (user.signedIn) {
 
 <template>
   <div v-if="user.signedIn" ref="bellRef" class="md:relative">
-    <button class="nav !px-1 relative" @click="toggleDropdown">
+    <button class="nav px-1! relative" @click="toggleDropdown">
       <Icon name="mdi:bell-outline" size="20" />
       <span
         v-if="unreadCount > 0"

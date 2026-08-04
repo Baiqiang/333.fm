@@ -1,22 +1,9 @@
 <script setup lang="ts">
-const config = useRuntimeConfig().public
 const route = useRoute()
-const { t } = useI18n()
 
-const wcaCompetitionsCache = useWCACompetitionsCache()
-const wcaCompetition = ref<WCACompetition | null>(wcaCompetitionsCache.competitions[route.params.id as string] ?? null)
-if (!wcaCompetition.value) {
-  const { data, error } = await useApi<WCACompetition>(`${config.wca.apiBaseURL}/competitions/${route.params.id}`)
-  if (error.value || !data.value) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: t('error.wca.competitionNotFound'),
-    })
-  }
-  wcaCompetition.value = data.value
-}
+const wcaCompetition = ref<WCACompetition>(await useWCACompetition(() => route.params.id as string))
 
-provide(SYMBOL_WCA_COMPETITION, computed(() => wcaCompetition.value!))
+provide(SYMBOL_WCA_COMPETITION, computed(() => wcaCompetition.value))
 
 const { data: liveData, refresh } = await useAsyncQuery<{ competitions: { id: string, name: string }[] }>(WCA_LIVE_COMPETITIONS_QUERY, {
   filter: wcaCompetition.value.name,

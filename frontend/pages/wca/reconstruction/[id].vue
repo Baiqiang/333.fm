@@ -1,26 +1,13 @@
 <script setup lang="ts">
-const config = useRuntimeConfig().public
 const route = useRoute()
-const router = useRouter()
 const { t } = useI18n()
 
 const wcaCompetitionId = computed(() => route.params.id as string)
 const isPersonPage = computed(() => !!route.params.uId)
 
-const wcaCompetitionsCache = useWCACompetitionsCache()
-const wcaCompetition = ref<WCACompetition | null>(wcaCompetitionsCache.competitions[wcaCompetitionId.value] ?? null)
-if (!wcaCompetition.value) {
-  const { data, error } = await useApi<WCACompetition>(`${config.wca.apiBaseURL}/competitions/${wcaCompetitionId.value}`)
-  if (error.value || !data.value) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: t('error.wca.competitionNotFound'),
-    })
-  }
-  wcaCompetition.value = data.value
-}
+const wcaCompetition = ref<WCACompetition>(await useWCACompetition(wcaCompetitionId))
 
-provide(SYMBOL_WCA_COMPETITION, computed(() => wcaCompetition.value!))
+provide(SYMBOL_WCA_COMPETITION, computed(() => wcaCompetition.value))
 
 const hasPreviousRoute = ref(false)
 if (import.meta.client) {

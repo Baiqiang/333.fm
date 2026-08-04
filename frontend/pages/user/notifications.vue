@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { renderMentions } from '~/utils/comment'
 import type { AppNotification, NotificationListResponse } from '~/utils/notification'
+import { renderMentions } from '~/utils/comment'
 
 definePageMeta({
   middleware: 'auth',
@@ -60,6 +60,10 @@ function getNotificationText(notification: AppNotification) {
       return t('notification.liked')
     case NotificationType.FAVORITE:
       return t('notification.favorited')
+    case NotificationType.PRACTICE_SUBMISSION:
+      return t('notification.practiceSubmitted')
+    case NotificationType.FOLLOWUP_COMMENT:
+      return t('notification.followupCommented')
     default:
       return ''
   }

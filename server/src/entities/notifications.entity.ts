@@ -10,6 +10,8 @@ export enum NotificationType {
   MENTION = 'mention',
   LIKE = 'like',
   FAVORITE = 'favorite',
+  PRACTICE_SUBMISSION = 'practice_submission',
+  FOLLOWUP_COMMENT = 'followup_comment',
 }
 
 @Entity()

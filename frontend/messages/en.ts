@@ -86,6 +86,8 @@ export default {
     },
     wca: {
       competitionNotFound: 'Competition not found',
+      rateLimited: 'Too many requests to the WCA API. Please try again in a moment.',
+      fetchFailed: 'Failed to load data from the WCA API. Please try again later.',
     },
   },
   loading: 'Loading...',
@@ -940,6 +942,8 @@ export default {
     mentioned: 'mentioned you in a comment',
     liked: 'liked your submission',
     favorited: 'favorited your submission',
+    practiceSubmitted: 'submitted a solution in your practice',
+    followupCommented: 'commented on a submission you commented on',
     prev: 'Previous',
     next: 'Next',
   },
