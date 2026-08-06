@@ -42,10 +42,23 @@ export interface SubmissionPathLike {
   parentId?: number | null
 }
 
+/**
+ * Personal practice aliases are `practice-<userId>-<index>`, so the path can be rebuilt
+ * even when the `user` relation was not loaded.
+ */
+function practicePath(competition: CompetitionPathLike): string {
+  const { alias, user } = competition
+  const matches = alias.match(/^practice-(\d+)-(\d+)$/)
+  if (!matches) return user ? `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}` : '/practice'
+
+  const [, aliasUserId, index] = matches
+  return `/practice/${user?.wcaId || user?.id || aliasUserId}/${index}`
+}
+
 function competitionBaseUrl(competition: CompetitionPathLike): string {
   if (competition.url) return competition.url
 
-  const { alias, type, user } = competition
+  const { alias, type } = competition
   switch (type) {
     case CompetitionType.WEEKLY:
       return `/weekly/${alias}`
@@ -56,8 +69,7 @@ function competitionBaseUrl(competition: CompetitionPathLike): string {
     case CompetitionType.FMC_CHAIN:
       return '/chain'
     case CompetitionType.PERSONAL_PRACTICE:
-      if (!user) return '/practice'
-      return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}`
+      return practicePath(competition)
     case CompetitionType.LEAGUE: {
       const matches = alias.match(/^league-(\d+)-(\d+)$/)
       if (matches) return `/league/${matches[1]}/week/${matches[2]}`
@@ -77,7 +89,7 @@ export function competitionPath(
   scramble?: ScramblePathLike,
   submission?: SubmissionPathLike,
 ): string {
-  const { alias, type, user } = competition
+  const { alias, type } = competition
   switch (type) {
     case CompetitionType.WEEKLY:
       if (scramble) return `/weekly/${alias}#scramble-${scramble.number}`
@@ -92,10 +104,11 @@ export function competitionPath(
       if (!scramble) return '/chain'
       if (!submission) return `/chain/${scramble.number}`
       return `/chain/${scramble.number}/${submission.parentId}`
-    case CompetitionType.PERSONAL_PRACTICE:
-      if (!user) return '/practice'
-      if (scramble) return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}#scramble-${scramble.number}`
-      return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}`
+    case CompetitionType.PERSONAL_PRACTICE: {
+      const path = practicePath(competition)
+      if (scramble) return `${path}#scramble-${scramble.number}`
+      return path
+    }
     case CompetitionType.LEAGUE:
       if (scramble) return `${competitionBaseUrl(competition)}#scramble-${scramble.number}`
       return competitionBaseUrl(competition)

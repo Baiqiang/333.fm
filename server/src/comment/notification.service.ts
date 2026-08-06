@@ -19,6 +19,7 @@ export class NotificationService {
         'sourceUser',
         'submission',
         'submission.competition',
+        'submission.competition.user',
         'submission.scramble',
         'comment',
         'comment.mentions',

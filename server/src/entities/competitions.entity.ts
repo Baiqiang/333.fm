@@ -184,9 +184,11 @@ export class Competitions {
         return `/endless/${alias}`
       case CompetitionType.FMC_CHAIN:
         return `/chain`
-      case CompetitionType.PERSONAL_PRACTICE:
-        if (!user) return '/practice'
-        return `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}`
+      case CompetitionType.PERSONAL_PRACTICE: {
+        const matches = alias.match(/^practice-(\d+)-(\d+)$/)
+        if (!matches) return user ? `/practice/${user.wcaId || user.id}/${alias.split('-').pop()}` : '/practice'
+        return `/practice/${user?.wcaId || user?.id || matches[1]}/${matches[2]}`
+      }
       case CompetitionType.LEAGUE: {
         const matches = alias.match(/^league-(\d+)-(\d+)$/)
         if (matches) {
