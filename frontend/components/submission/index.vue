@@ -16,6 +16,7 @@ const props = withDefaults(defineProps<{
 const route = useRoute()
 const { hash } = route
 const location = useBrowserLocation()
+const { t } = useI18n()
 const { format: formatDateTime } = useDateTime()
 const el = ref<HTMLElement>()
 const showComment = ref(props.alwaysExpanded || props.submission.competition !== undefined || props.expanded)
@@ -88,18 +89,20 @@ const formattedSolution = computed<string>(() => {
   const scramble = props.scramble || props.submission.scramble
   const competition = props.competition || props.submission.competition
   const user = props.user || props.submission.user
-  const competitionInfo = [competition.name]
-  if (competition.type === CompetitionType.WEEKLY)
-    competitionInfo.push(`Scramble ${scramble?.number}`)
-  if (competition.type === CompetitionType.ENDLESS)
-    competitionInfo.push(`Level ${scramble?.number}`)
+  const competitionInfo = [competitionName(competition, scramble)]
+  // endless and reconstruction names already carry the level/round info
+  const nameHasScramble = competition.type === CompetitionType.ENDLESS
+    || competition.type === CompetitionType.WCA_RECONSTRUCTION
+  if (scramble && !nameHasScramble)
+    competitionInfo.push(t('weekly.scramble', { number: scramble.number }))
   solution.push(competitionInfo.join(' - '))
   solution.push(`Scramble:\n${scramble?.scramble}`)
   solution.push(`Solution:\n${props.submission.solution} (${formatResult(props.submission.moves)})`)
   solution.push(props.submission.comment)
   solution.push(`By ${user?.name}\n${formatDateTime(props.submission.createdAt)}`)
-  if (location.value.href)
-    solution.push(location.value.href)
+  const link = submissionLink(competition, scramble, props.submission, location.value.origin ?? '')
+  if (link)
+    solution.push(link)
   return solution.join('\n\n')
 })
 function expandAndShowAttachment() {

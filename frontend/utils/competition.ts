@@ -348,8 +348,8 @@ export function competitionName(competition: Competition, scramble?: { number: n
   }
 }
 
-export function submissionLink(competition: Competition, scramble?: { number: number }, submission?: Submission) {
-  return sharedSubmissionLink(competition, scramble, submission)
+export function submissionLink(competition: Competition, scramble?: { number: number, roundNumber?: number }, submission?: Submission, baseUrl = '') {
+  return sharedSubmissionLink(competition, scramble, submission, baseUrl)
 }
 
 export function isInStatus(competition: Competition, status: CompetitionStatus) {
