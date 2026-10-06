@@ -2,7 +2,7 @@ import type { Cube } from 'insertionfinder'
 
 import { getFaceletPositions } from '~/utils/cube'
 
-import { LOCS, type CubeState } from './cube'
+import { type CubeState, LOCS } from './cube'
 
 /** Map FR sticker indices to insertionfinder facelet indices (same physical sticker). */
 export const FR_TO_IF_FACELET = buildFrToIfFaceletMap()

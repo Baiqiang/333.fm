@@ -16,23 +16,63 @@ on:
     branches: [master]
     paths:
       - "frontend/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
       - ".github/workflows/deploy-frontend.yaml"
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy frontend
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter "333.fm..."
+
+      - name: Build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+        run: pnpm --filter 333.fm build
+
+      - name: Pack
+        run: tar -czf frontend-output.tgz -C frontend .output
+
+      - name: Upload
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: frontend-output.tgz
+          target: /tmp/333fm-deploy
+
+      - name: Release
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd ${{ secrets.DEPLOY_PATH }}
             git pull
-            pnpm install --frozen-lockfile
-            export NODE_OPTIONS="--max-old-space-size=4096"
-            pnpm --filter 333.fm build
             cd frontend
-            pm2 start ecosystem.config.cjs
+            rm -rf .output.new .output.old
+            mkdir .output.new
+            tar -xzf /tmp/333fm-deploy/frontend-output.tgz -C .output.new --strip-components=1
+            if [ -d .output ]; then mv .output .output.old; fi
+            mv .output.new .output
+            pm2 startOrReload ecosystem.config.cjs
+            rm -rf .output.old /tmp/333fm-deploy/frontend-output.tgz

@@ -79,8 +79,10 @@ export function analyzeScramble(scramble: string, solution: string = '', leaveSl
   try {
     if (scramble.trim())
       formattedScramble = formatAlgorithm(scramble).trim()
-    if (solution.trim())
+    if (solution.trim()) {
+      // eslint-disable-next-line no-new -- the constructor throws on invalid moves
       new Algorithm(removeComment(solution))
+    }
     if (!scramble.trim() && !solution.trim())
       throw new ScrambleParseError('')
   }
@@ -122,56 +124,56 @@ export function analyzeScramble(scramble: string, solution: string = '', leaveSl
   // Corner shape / bad-edge classification is only meaningful in HTR states
   const axes: AxisResult[] = htr
     ? AXIS_LIST.map(({ key, axis }) => {
-      const cls = classifyAxis(state, axis)
+        const cls = classifyAxis(state, axis)
 
-      // Full-solve mode: shortest sequence to fully reduce the axis (true FR only,
-      // no false FR / shape distinction). Keep the classification header only.
-      if (!leaveSlice) {
-        const solution = solveAxis(state, axis, false)
+        // Full-solve mode: shortest sequence to fully reduce the axis (true FR only,
+        // no false FR / shape distinction). Keep the classification header only.
+        if (!leaveSlice) {
+          const solution = solveAxis(state, axis, false)
+          return {
+            axisKey: key,
+            ...cls,
+            solution,
+            shapeSolution: null,
+            alreadyFr: solution !== null && solution.length === 0,
+            inputFalseFr: false,
+            shapeIsFalseFr: false,
+            caseLabel: buildCaseLabel(cls.edgeLabel, cls.cornerLabel),
+            decomposition: solution ? decompose(state, solution, axis, false) : [],
+            shapeDecomposition: null,
+          }
+        }
+
+        const solution = solveAxis(state, axis)
+        const shapeSolution = solveAxisShape(state, axis)
+
+        // Input is already FR shape but not true FR => false FR
+        const inputFalseFr
+          = isFrShape(state, axis) && !isTrueFr(state, axis)
+
+        // Whether finishing via shortest shape solution yields false FR
+        let shapeIsFalseFr = false
+        if (shapeSolution && shapeSolution.length > 0) {
+          const shaped = applyMoves(state, shapeSolution)
+          shapeIsFalseFr = !isTrueFr(shaped, AXIS_INDEX[key])
+        }
+
         return {
           axisKey: key,
           ...cls,
           solution,
-          shapeSolution: null,
+          shapeSolution,
           alreadyFr: solution !== null && solution.length === 0,
-          inputFalseFr: false,
-          shapeIsFalseFr: false,
+          inputFalseFr,
+          shapeIsFalseFr,
           caseLabel: buildCaseLabel(cls.edgeLabel, cls.cornerLabel),
-          decomposition: solution ? decompose(state, solution, axis, false) : [],
-          shapeDecomposition: null,
-        }
-      }
-
-      const solution = solveAxis(state, axis)
-      const shapeSolution = solveAxisShape(state, axis)
-
-      // Input is already FR shape but not true FR => false FR
-      const inputFalseFr
-          = isFrShape(state, axis) && !isTrueFr(state, axis)
-
-      // Whether finishing via shortest shape solution yields false FR
-      let shapeIsFalseFr = false
-      if (shapeSolution && shapeSolution.length > 0) {
-        const shaped = applyMoves(state, shapeSolution)
-        shapeIsFalseFr = !isTrueFr(shaped, AXIS_INDEX[key])
-      }
-
-      return {
-        axisKey: key,
-        ...cls,
-        solution,
-        shapeSolution,
-        alreadyFr: solution !== null && solution.length === 0,
-        inputFalseFr,
-        shapeIsFalseFr,
-        caseLabel: buildCaseLabel(cls.edgeLabel, cls.cornerLabel),
-        decomposition: solution ? decompose(state, solution, axis) : [],
-        shapeDecomposition:
+          decomposition: solution ? decompose(state, solution, axis) : [],
+          shapeDecomposition:
             shapeIsFalseFr && shapeSolution
               ? decompose(state, shapeSolution, axis)
               : null,
-      }
-    })
+        }
+      })
     : []
 
   return { ok: true, isHtr: htr, scramble: trimmed, axes }

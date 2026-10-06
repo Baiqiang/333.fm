@@ -3,11 +3,6 @@ packages:
   - "server"
   - "packages/*"
 
-overrides:
-  "@intlify/core-base": "9.14.1"
-  "@intlify/shared": "9.14.1"
-  vue-i18n: "9.14.1"
-
 allowBuilds:
   "@nestjs/core": true
   "@parcel/watcher": true

@@ -56,4 +56,3 @@ export function groupBrCasesBySlice(cases: BrCaseItem[] = brCases): BrCaseSliceG
     .sort(([a], [b]) => a - b)
     .map(([bound, groupCases]) => ({ bound, cases: groupCases }))
 }
-

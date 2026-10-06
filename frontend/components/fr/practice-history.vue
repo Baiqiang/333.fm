@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { clearFrPracticeHistory, getFrPracticeHistory } from '~/composables/fr-practice-history'
 import type { FrPracticeRecord } from '~/composables/fr-practice-history'
+import { clearFrPracticeHistory, getFrPracticeHistory } from '~/composables/fr-practice-history'
 
 import { AXIS_TAB_LABEL } from '~/utils/fr/display'
 

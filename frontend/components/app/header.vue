@@ -142,7 +142,7 @@ const colorMode = useColorMode()
 const locales = [
   { code: 'en', label: 'English' },
   { code: 'zh-CN', label: '简体中文' },
-]
+] as const
 const colorModes = [
   { value: 'system', icon: 'mdi:monitor' },
   { value: 'light', icon: 'mdi:white-balance-sunny' },
@@ -165,7 +165,7 @@ onClickOutside(langButton, () => {
 onClickOutside(colorModeButton, () => {
   dropdowns.colorMode = false
 })
-async function changeLocale(code: string) {
+async function changeLocale(code: typeof locales[number]['code']) {
   setLocaleCookie(code)
   await setLocale(code)
   await finalizePendingLocaleChange()

@@ -84,16 +84,24 @@ async function submit() {
               <tbody>
                 <tr>
                   <td class="text-gray-400" />
-                  <td class="text-gray-400 text-xs">Local</td>
-                  <td class="text-gray-400 text-xs">UTC</td>
+                  <td class="text-gray-400 text-xs">
+                    Local
+                  </td>
+                  <td class="text-gray-400 text-xs">
+                    UTC
+                  </td>
                 </tr>
                 <tr>
-                  <td class="text-gray-400">Start</td>
+                  <td class="text-gray-400">
+                    Start
+                  </td>
                   <td>{{ start.format('YYYY-MM-DD HH:mm') }}</td>
                   <td>{{ start.utc().format('YYYY-MM-DD HH:mm') }}</td>
                 </tr>
                 <tr>
-                  <td class="text-gray-400">End</td>
+                  <td class="text-gray-400">
+                    End
+                  </td>
                   <td>{{ end!.format('YYYY-MM-DD HH:mm') }}</td>
                   <td>{{ end!.utc().format('YYYY-MM-DD HH:mm') }}</td>
                 </tr>

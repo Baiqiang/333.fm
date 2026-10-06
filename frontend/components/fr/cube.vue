@@ -38,7 +38,6 @@ const cubieCube = computed(() => buildCubeState(
   props.previewMoves,
   props.solution,
 ))
-
 </script>
 
 <template>

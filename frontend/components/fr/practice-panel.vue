@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { appendFrPracticeRecord } from '~/composables/fr-practice-history'
 import type { FrAxisMode, FrPracticeRecord } from '~/composables/fr-practice-history'
-import { analyzeScramble, generateHtrScramble, parsePracticeSolutionInput, verifyFrSolution } from '~/utils/fr'
+import type { VerifyFrResult } from '~/utils/fr'
+import type { AxisKey, FrAnalysis } from '~/utils/fr/types'
 
+import { appendFrPracticeRecord } from '~/composables/fr-practice-history'
+import { analyzeScramble, generateHtrScramble, parsePracticeSolutionInput, verifyFrSolution } from '~/utils/fr'
 import { AXIS_TAB_LABEL, AXIS_TABS } from '~/utils/fr/display'
-import type { AxisKey, FrAnalysis, VerifyFrResult } from '~/utils/fr/types'
 
 const emit = defineEmits<{
   historyChange: []
@@ -66,7 +67,7 @@ function handleAxisPick(ax: AxisKey) {
 }
 
 const activeResult = computed(() => analysis.value?.axes.find(a => a.axisKey === axisKey.value) ?? null)
-const showCube = computed(() => analysis.value?.ok && analysis.value.isHtr)
+const showCube = computed(() => !!analysis.value?.ok && analysis.value.isHtr)
 
 const liveInput = computed(() => {
   if (!analysis.value?.ok || !analysis.value.isHtr || submitted.value)

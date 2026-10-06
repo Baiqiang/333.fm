@@ -43,13 +43,12 @@ export function parseContentSegments(content: string, mentions?: User[]): Mentio
   const segments: MentionSegment[] = []
   let lastIndex = 0
   const regex = /@\[(\d+)\]/g
-  let match: RegExpExecArray | null
 
-  while ((match = regex.exec(content)) !== null) {
+  for (const match of content.matchAll(regex)) {
     if (match.index > lastIndex)
       segments.push({ type: 'text', text: content.substring(lastIndex, match.index) })
 
-    const user = mentions.find(u => u.id === Number.parseInt(match![1], 10))
+    const user = mentions.find(u => u.id === Number.parseInt(match[1], 10))
     if (user)
       segments.push({ type: 'mention', text: user.name, user })
     else

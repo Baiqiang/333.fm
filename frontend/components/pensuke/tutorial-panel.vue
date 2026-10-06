@@ -32,7 +32,7 @@ function caseBody(label: string): string {
           :key="i"
           class="flex gap-2 text-sm text-gray-600 leading-relaxed"
         >
-          <span class="text-indigo-500 font-semibold shrink-0">{{ i + 1 }}.</span>
+          <span class="text-indigo-500 font-semibold shrink-0">{{ Number(i) + 1 }}.</span>
           <span>{{ item }}</span>
         </li>
       </ul>

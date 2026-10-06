@@ -28,12 +28,12 @@ export default defineNuxtConfig({
     '@nuxtjs/mdc',
     '@nuxtjs/apollo',
     '@nuxtjs/color-mode',
-    'nuxt-icon',
+    '@nuxt/icon',
     'nuxt-gtag',
     'nuxt-echarts',
     '@vueuse/nuxt',
     '@pinia/nuxt',
-    '@pinia-plugin-persistedstate/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
     '@freeloop/nuxt-transitions',
     'dayjs-nuxt',
     process.env.NODE_ENV === 'development'
@@ -109,6 +109,13 @@ export default defineNuxtConfig({
     },
   },
 
+  icon: {
+    clientBundle: {
+      scan: true,
+    },
+    serverBundle: false,
+  },
+
   gtag: {
     id: 'G-4DDRHC6TDB',
   },
@@ -168,9 +175,13 @@ export default defineNuxtConfig({
 
   experimental: {
     asyncContext: true,
-    headNext: true,
     // disable this to run in QQ browser for iOS
     appManifest: false,
+    defaults: {
+      useAsyncData: {
+        deep: true,
+      },
+    },
   },
 
   $development: {
@@ -189,7 +200,16 @@ export default defineNuxtConfig({
   },
 
   typescript: {
-    shim: false,
+    tsConfig: {
+      compilerOptions: {
+        noUncheckedIndexedAccess: false,
+      },
+    },
+  },
+
+  sourcemap: {
+    server: false,
+    client: false,
   },
 
   compatibilityDate: '2024-10-26',

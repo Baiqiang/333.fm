@@ -5,7 +5,4 @@ export default defineAppConfig({
       authorizationUrl: 'https://www.worldcubeassociation.org/oauth/authorize',
     },
   },
-  nuxtIcon: {
-
-  },
 })

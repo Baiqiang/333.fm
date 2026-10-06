@@ -5,9 +5,9 @@ import { applyMoves, isValidToken } from '~/utils/fr/cube'
 import { isLeaveSliceGoal } from './ls'
 import { parsePensukeInput } from './parse'
 
-export { generateHtrScramble } from '~/utils/fr/scramble'
 export { parsePensukeInput } from './parse'
 export { solveLeaveSlice } from './solver'
+export { generateHtrScramble } from '~/utils/fr/scramble'
 
 export function verifyLsSolutionSync(
   scramble: string,

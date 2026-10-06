@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Frontend Conventions
 
-- Framework is Nuxt 3 + Vue + Tailwind. Prefer project utilities/components over adding a UI library.
+- Framework is Nuxt 4 + Vue + Tailwind. The app keeps the root-level directory layout (no `app/` dir). Prefer project utilities/components over adding a UI library.
 - Keep page files focused on data flow and layout. Extract repeated UI into `frontend/components/**`.
 - Put reusable Vue logic in `frontend/composables/**`; put pure reusable logic in `@333fm/utils`.
 - Keep `frontend/utils/**` as frontend-facing adapters, auto-import helpers, symbols, and UI-specific formatters.

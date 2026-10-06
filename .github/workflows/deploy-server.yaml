@@ -16,7 +16,14 @@ on:
     branches: [master]
     paths:
       - "server/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
       - ".github/workflows/deploy-server.yaml"
+
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -29,9 +36,10 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd ${{ secrets.DEPLOY_PATH }}
             git pull
-            pnpm install --frozen-lockfile
+            pnpm install --frozen-lockfile --filter "333.fm-server..."
             pnpm --filter 333.fm-server build
             cd server
-            pm2 start ecosystem.config.js
+            pm2 startOrReload ecosystem.config.js

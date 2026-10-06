@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { AXIS_TAB_LABEL } from '~/utils/fr/display'
-
 import type { AxisResult } from '~/utils/fr/types'
+
+import { AXIS_TAB_LABEL } from '~/utils/fr/display'
 
 defineProps<{
   result: AxisResult

@@ -3,7 +3,7 @@ export const useAccessToken = defineStore('accessToken', {
     value: '',
   }),
   persist: {
-    storage: persistedState.cookiesWithOptions({
+    storage: piniaPluginPersistedstate.cookies({
       // 30 days
       maxAge: 30 * 24 * 60 * 60,
     }),

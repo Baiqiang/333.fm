@@ -1,7 +1,7 @@
 import type { BrCaseLabel, BrClassification, BrFacePairKey } from './types'
 import type { AxisKey } from '~/utils/fr/types'
 
-import { LOCS, type CubeState, type Face } from '~/utils/fr/cube'
+import { type CubeState, type Face, LOCS } from '~/utils/fr/cube'
 
 import { PENSUKE_BR_SUBSETS } from './br-subsets-data'
 
@@ -13,7 +13,7 @@ const PENSUKE_TO_FR: readonly number[] = buildPensukeToFrMap()
 function buildPensukeToFrMap(): number[] {
   const key = (c: readonly number[], n: readonly number[]) => `${c.join(',')}|${n.join(',')}`
   const locIndex = new Map(LOCS.map((l, i) => [key(l.coord, l.normal), i]))
-  const map: number[] = new Array(54)
+  const map: number[] = Array.from({ length: 54 })
   for (let pi = 0; pi < 54; pi++) {
     const face = PENSUKE_FACE[Math.floor(pi / 9)]!
     const local = pi % 9

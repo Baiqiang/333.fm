@@ -4,7 +4,7 @@ export type AxisKey = 'ud' | 'fb' | 'rl'
 
 export type PreviewStepTrack = 'shape' | 'true'
 
-export type PreviewStep = { track: PreviewStepTrack, index: number }
+export interface PreviewStep { track: PreviewStepTrack, index: number }
 
 export const AXIS_LIST: { key: AxisKey, axis: AxisIndex, faces: string }[] = [
   { key: 'ud', axis: 1, faces: 'U/D' },

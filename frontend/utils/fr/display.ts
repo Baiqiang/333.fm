@@ -1,8 +1,8 @@
+import type { AxisKey } from './types'
+
 import { Algorithm, Cube } from 'insertionfinder'
 
 import { getCubieCube, removeComment } from '~/utils/if'
-
-import type { AxisKey } from './types'
 
 export const SETUP_ROTATION: Record<AxisKey, string> = {
   ud: '',

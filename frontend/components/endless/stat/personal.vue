@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Payload } from 'echarts/core'
+
 import { twMerge } from 'tailwind-merge'
 
 const props = defineProps<{
@@ -442,9 +444,9 @@ function getClass(value: number, best: number, worst: number, unlimited = false)
     cls.push('hover:bg-indigo-500')
   return cls.join(' ')
 }
-function setDataRange(event: { start: number, end: number }) {
-  dataRange.start = Math.floor(event.start / 100 * stats.value.results.length)
-  dataRange.end = Math.ceil(event.end / 100 * stats.value.results.length)
+function setDataRange(event: Payload) {
+  dataRange.start = Math.floor(Number(event.start ?? 0) / 100 * stats.value.results.length)
+  dataRange.end = Math.ceil(Number(event.end ?? 100) / 100 * stats.value.results.length)
 }
 </script>
 

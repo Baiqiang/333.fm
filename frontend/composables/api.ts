@@ -1,4 +1,6 @@
-import type { UseFetchOptions } from 'nuxt/app'
+import type { NuxtError, UseFetchOptions } from 'nuxt/app'
+
+export type ApiError = NuxtError<{ message?: string }>
 
 export async function useApi<DataT>(url: string | (() => string), options?: UseFetchOptions<DataT>) {
   const config = useRuntimeConfig()
@@ -8,7 +10,7 @@ export async function useApi<DataT>(url: string | (() => string), options?: UseF
   if (accessToken.value)
     headers.Authorization = `Bearer ${accessToken.value}`
 
-  const res = await useFetch<DataT>(url, {
+  const res = await useFetch<DataT, ApiError>(url, {
     baseURL: config.public.baseURL,
     // credentials: 'include',
     ...options as any,

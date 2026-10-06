@@ -1,12 +1,12 @@
+import type { User } from './user'
 import {
   aoN,
-  competitionPath as sharedCompetitionPath,
   DNF,
   DNS,
   formatResult,
+  competitionPath as sharedCompetitionPath,
   submissionLink as sharedSubmissionLink,
 } from '@333fm/utils'
-import type { User } from './user'
 
 export { aoN, DNF, DNS, formatResult }
 

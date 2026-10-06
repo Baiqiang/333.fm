@@ -18,6 +18,10 @@ const competitions = ref<WCACompetition[]>([])
 const loading = ref(true)
 const wcaCompetitionsCache = useWCACompetitionsCache()
 
+function wcaCompetitionUrl(id: string) {
+  return `https://www.worldcubeassociation.org/competitions/${id}`
+}
+
 onMounted(async () => {
   competitions.value = await fetchCompetitions(query)
 })
@@ -108,11 +112,7 @@ useSeoMeta({
               <DateTime :value="competition.start_date" intent="date" /> - <DateTime :value="competition.end_date" intent="date" />
             </div>
           </div>
-          <NuxtLink
-            :to="`https://www.worldcubeassociation.org/competitions/${competition.id}`"
-            target="_blank"
-            class=""
-          >
+          <NuxtLink :to="wcaCompetitionUrl(competition.id)" target="_blank">
             <WcaLogo class="w-6" />
           </NuxtLink>
         </div>

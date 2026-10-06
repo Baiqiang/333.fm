@@ -12,7 +12,11 @@ const emit = defineEmits<{
   toggle: [optionIndex: number]
 }>()
 
+const { tm } = useI18n()
+
 const showAnswers = computed(() => props.isFinished || props.isReviewOnly)
+
+const negativeTitle = computed(() => tm(`quiz.questionTypeNegative.${props.question.type}`) as string[])
 
 const isCorrect = computed(() => {
   if (!props.isFinished)
@@ -68,7 +72,7 @@ function getLabelClass(oi: number, option: QuizOptionData) {
       <div>
         <span class="font-bold text-indigo-600 mr-2">{{ $t('quiz.question', { index: index + 1 }) }}</span>
         <span v-if="question.negative" class="text-sm text-gray-600">
-          {{ $tm(`quiz.questionTypeNegative.${question.type}`)[0] }}<span :class="isFinished ? 'text-red-500 font-bold underline decoration-2' : ''">{{ $tm(`quiz.questionTypeNegative.${question.type}`)[1] }}</span>{{ $tm(`quiz.questionTypeNegative.${question.type}`)[2] }}
+          {{ negativeTitle[0] }}<span :class="isFinished ? 'text-red-500 font-bold underline decoration-2' : ''">{{ negativeTitle[1] }}</span>{{ negativeTitle[2] }}
         </span>
         <span v-else class="text-sm text-gray-600">
           {{ $t(`quiz.questionType.${question.type}`) }}

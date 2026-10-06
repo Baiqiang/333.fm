@@ -38,14 +38,17 @@ const FACE_DIRECTION: Record<Face, 1 | 3> = {
 
 export function faceByAxisSign(axis: AxisIndex, sign: number): Face {
   const f = FACES.find(x => x.axis === axis && x.sign === sign)
-  if (!f) throw new Error(`invalid face axis=${axis} sign=${sign}`)
+  if (!f)
+    throw new Error(`invalid face axis=${axis} sign=${sign}`)
   return f.letter
 }
 
 /** Axis that a face-letter color belongs to. */
 export function colorAxis(color: Face): AxisIndex {
-  if (color === 'U' || color === 'D') return 1
-  if (color === 'R' || color === 'L') return 0
+  if (color === 'U' || color === 'D')
+    return 1
+  if (color === 'R' || color === 'L')
+    return 0
   return 2
 }
 
@@ -53,8 +56,10 @@ type Vec3 = [number, number, number]
 
 function rot90(v: Vec3, axis: AxisIndex): Vec3 {
   const [x, y, z] = v
-  if (axis === 0) return [x, -z, y]
-  if (axis === 1) return [z, y, -x]
+  if (axis === 0)
+    return [x, -z, y]
+  if (axis === 1)
+    return [z, y, -x]
   return [-y, x, z]
 }
 function rotN(v: Vec3, axis: AxisIndex, times: number): Vec3 {
@@ -90,8 +95,9 @@ function buildLocations(): StickerLoc[] {
 }
 
 export const LOCS: StickerLoc[] = buildLocations()
-const keyOf = (coord: Vec3, normal: Vec3) =>
-  `${coord.join(',')}|${normal.join(',')}`
+function keyOf(coord: Vec3, normal: Vec3) {
+  return `${coord.join(',')}|${normal.join(',')}`
+}
 const LOC_INDEX = new Map<string, number>(
   LOCS.map((l, i) => [keyOf(l.coord, l.normal), i]),
 )
@@ -101,7 +107,7 @@ export const SOLVED: CubeState = LOCS.map(l => l.color)
 type Perm = number[]
 
 function buildFacePerm(face: FaceDef, dir: 1 | 3): Perm {
-  const perm: Perm = new Array(54)
+  const perm: Perm = Array.from({ length: 54 })
   for (let i = 0; i < 54; i++) {
     const l = LOCS[i]
     if (l.coord[face.axis] !== face.sign) {
@@ -112,14 +118,15 @@ function buildFacePerm(face: FaceDef, dir: 1 | 3): Perm {
     const preCoord = rotN(l.coord, face.axis, inv)
     const preNormal = rotN(l.normal, face.axis, inv)
     const idx = LOC_INDEX.get(keyOf(preCoord, preNormal))
-    if (idx === undefined) throw new Error('perm build failed')
+    if (idx === undefined)
+      throw new Error('perm build failed')
     perm[i] = idx
   }
   return perm
 }
 
 function composePerm(p1: Perm, p2: Perm): Perm {
-  const out: Perm = new Array(54)
+  const out: Perm = Array.from({ length: 54 })
   for (let i = 0; i < 54; i++) out[i] = p1[p2[i]]
   return out
 }
@@ -133,7 +140,7 @@ for (const f of FACES)
   HALF_TURN[f.letter] = composePerm(FACE_PERM[f.letter], FACE_PERM[f.letter])
 
 export function applyPerm(state: CubeState, perm: Perm): CubeState {
-  const out: CubeState = new Array(54)
+  const out: CubeState = Array.from({ length: 54 })
   for (let i = 0; i < 54; i++) out[i] = state[perm[i]]
   return out
 }
@@ -144,12 +151,15 @@ export class ScrambleParseError extends Error {}
 
 function permForToken(token: string): Perm {
   const m = MOVE_TOKEN.exec(token)
-  if (!m) throw new ScrambleParseError(token)
+  if (!m)
+    throw new ScrambleParseError(token)
   const base = m[1] as Face
   const suffix = m[2]
   const p = FACE_PERM[base]
-  if (suffix === '2') return composePerm(p, p)
-  if (suffix === '\'') return composePerm(p, composePerm(p, p))
+  if (suffix === '2')
+    return composePerm(p, p)
+  if (suffix === '\'')
+    return composePerm(p, composePerm(p, p))
   return p
 }
 
