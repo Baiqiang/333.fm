@@ -88,8 +88,10 @@ const solutionState = computed<boolean | null>(() => {
     return false
   return moves.value !== DNF
 })
+// without mode choices, the user has at most one submission per scramble, whatever its mode
+const singleSubmission = computed<boolean>(() => props.allowChangeMode || !props.allowUnlimited)
 const solutionSubmitted = computed<boolean>(() => {
-  if (props.allowChangeMode)
+  if (singleSubmission.value)
     return props.submissions.length > 0
   return submissionsMap.value[form.mode] !== undefined
 })
@@ -111,7 +113,7 @@ const unlimitedWorse = computed<boolean>(() => {
 const formState = computed<boolean>(() => {
   if (!props.allowDnf && !solutionState.value)
     return false
-  if (!props.allowChangeMode
+  if (!singleSubmission.value
     && form.mode === CompetitionMode.REGULAR
     && !submissionsMap.value[CompetitionMode.REGULAR]
     && submissionsMap.value[CompetitionMode.UNLIMITED]
@@ -120,7 +122,7 @@ const formState = computed<boolean>(() => {
   }
   if (unlimitedWorse.value)
     return false
-  if (!canSubmit.value && !submissionsMap.value[form.mode]) {
+  if (!canSubmit.value && !(props.allowUnlimited ? submissionsMap.value[form.mode] : props.submissions[0])) {
     return false
   }
   return solutionState.value !== null
@@ -135,7 +137,7 @@ async function submit() {
   await uploadingPromise.value
   try {
     const submission = submissionsMap.value[CompetitionMode.REGULAR] || props.submissions[0]
-    if ((form.mode === CompetitionMode.REGULAR && submissionsMap.value[CompetitionMode.REGULAR]) || (props.allowChangeMode && submission)) {
+    if ((form.mode === CompetitionMode.REGULAR && submissionsMap.value[CompetitionMode.REGULAR]) || (singleSubmission.value && submission)) {
       const { data, refresh } = await useApiPost<Submission>(`/${props.type}/${props.competition.alias}/${submission.id}`, {
         body: {
           mode: props.allowChangeMode ? form.mode : undefined,
