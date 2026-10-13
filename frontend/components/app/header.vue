@@ -6,11 +6,20 @@ const { setLocale, setLocaleCookie, finalizePendingLocaleChange, t } = useI18n()
 const router = useRouter()
 const user = useUser()
 
+async function fetchOnGoing(url: string) {
+  try {
+    return await useClientApi<Competition | null>(url)
+  }
+  catch {
+    return null
+  }
+}
+
 async function navigateToDaily() {
-  const { data } = await useApi<Competition>('/daily/on-going')
-  if (data.value) {
-    daily.value = data.value
-    router.push(competitionPath(data.value))
+  const competition = await fetchOnGoing('/daily/on-going')
+  if (competition) {
+    daily.value = competition
+    router.push(competitionPath(competition))
   }
   else {
     router.push('/daily')
@@ -18,10 +27,10 @@ async function navigateToDaily() {
 }
 
 async function navigateToWeekly() {
-  const { data } = await useApi<Competition>('/weekly/on-going')
-  if (data.value) {
-    weekly.value = data.value
-    router.push(competitionPath(data.value))
+  const competition = await fetchOnGoing('/weekly/on-going')
+  if (competition) {
+    weekly.value = competition
+    router.push(competitionPath(competition))
   }
   else {
     router.push('/weekly')
@@ -29,10 +38,10 @@ async function navigateToWeekly() {
 }
 
 async function navigateToFunChallenge() {
-  const { data } = await useApi<Competition>('/fun-challenges/on-going')
-  if (data.value) {
-    funChallenge.value = data.value
-    router.push(competitionPath(data.value))
+  const competition = await fetchOnGoing('/fun-challenges/on-going')
+  if (competition) {
+    funChallenge.value = competition
+    router.push(competitionPath(competition))
   }
   else {
     router.push('/fun-challenges')
