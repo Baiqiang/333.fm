@@ -34,6 +34,7 @@ export interface WCACompetition {
   latitude_degrees: number
   longitude_degrees: number
   announced_at: string
+  cancelled_at?: string | null
   championship_types: string[]
 }
 export interface WCACompetitionsQuery {

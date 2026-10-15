@@ -44,6 +44,7 @@ async function fetchCompetitions(query: WCACompetitionsQuery) {
     const data = await $fetch<WCACompetition[]>(`${config.wca.apiBaseURL}/competition_index`, {
       query: {
         'event_ids[]': '333fm',
+        'include_cancelled': false,
         ...query,
         'start': query.start && !query.q?.trim() ? dayjs(query.start).format('YYYY-MM-DD') : undefined,
         'end': query.end && !query.q?.trim() ? dayjs(query.end).format('YYYY-MM-DD') : undefined,

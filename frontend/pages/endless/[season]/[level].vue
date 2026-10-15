@@ -133,14 +133,25 @@ async function syncAfterSubmission() {
   const previousKickoffs = progress.kickedBy.length
   for (let attempt = 0; attempt < 4; attempt++) {
     await refreshLevelProgress()
-    if (challenge.value?.type !== ChallengeType.BOSS)
-      return
     if (progress.kickedBy.length > previousKickoffs)
       return
-    if ((progress.scramble.currentHP || 0) !== previousHp)
+    if (challenge.value?.type === ChallengeType.BOSS) {
+      if ((progress.scramble.currentHP || 0) !== previousHp)
+        return
+    }
+    else if (level.value < endless.value.levels.length) {
       return
+    }
     await sleep(250 * (attempt + 1))
   }
+}
+
+function levelCleared() {
+  if (isConditionMode.value)
+    return allTriggered.value
+  if (challenge.value?.type === ChallengeType.BOSS)
+    return bossCurrentHp.value <= 0
+  return progress.kickedBy.length > 0
 }
 
 async function updateData(submission: Submission) {
@@ -148,8 +159,18 @@ async function updateData(submission: Submission) {
   fetchSubmissions()
   await updateMyProgress()
   await syncAfterSubmission()
-  if ((myProgress.value.next?.level ?? 0) > level.value || endless.value.levels.length === level.value)
+  if ((myProgress.value.next?.level ?? 0) <= level.value && endless.value.levels.length !== level.value)
+    return
+  for (let attempt = 0; attempt < 4; attempt++) {
+    await updateMyProgress()
     await updateEndless()
+    if ((myProgress.value.next?.level ?? 0) > level.value && level.value < endless.value.levels.length)
+      return
+    if (!levelCleared())
+      return
+    await sleep(250 * (attempt + 1))
+    await refreshLevelProgress()
+  }
 }
 </script>
 

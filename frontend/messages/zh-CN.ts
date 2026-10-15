@@ -876,6 +876,7 @@ export default {
   wca: {
     competitions: 'WCA 比赛',
     noResults: '暂无成绩。',
+    cancelled: '该比赛已被 WCA 取消。',
     recon: {
       title: '复盘',
       scramble: '打乱',

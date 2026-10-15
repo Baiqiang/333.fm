@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { params } = useRoute()
-const { data, error } = await useApi<Endless>(`/endless/${params.season}`)
+const { data, error, refresh: refreshEndless } = await useApi<Endless>(`/endless/${params.season}`)
 if (!data.value || error.value) {
   throw createError({
     statusCode: 404,
@@ -8,14 +8,18 @@ if (!data.value || error.value) {
 }
 const endless = ref<Endless>(data.value)
 const myProgress = ref<UserProgress>()
+const { data: progressData, refresh: refreshProgress } = await useApi<UserProgress>(`/endless/${endless.value.alias}/progress`, {
+  immediate: false,
+})
 async function updateMyProgress() {
-  const { data } = await useApi<UserProgress>(`/endless/${endless.value.alias}/progress`)
-  myProgress.value = data.value!
+  await refreshProgress()
+  if (progressData.value)
+    myProgress.value = progressData.value
 }
 async function updateEndless() {
-  const { data, error } = await useApi<Endless>(`/endless/${endless.value.alias}`)
-  if (!error.value)
-    endless.value = data.value!
+  await refreshEndless()
+  if (!error.value && data.value)
+    endless.value = data.value
 }
 await updateMyProgress()
 provide<Ref<Endless>>(SYMBOL_ENDLESS, endless)

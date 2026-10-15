@@ -876,6 +876,7 @@ export default {
   wca: {
     competitions: 'WCA Competitions',
     noResults: 'No results available yet.',
+    cancelled: 'This competition has been cancelled by the WCA.',
     recon: {
       title: 'Reconstructions',
       scramble: 'Scramble',

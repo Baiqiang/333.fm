@@ -15,6 +15,8 @@ const isEnded = computed(() => {
   return endDate < new Date()
 })
 
+const isCancelled = computed(() => !!wcaCompetition?.value?.cancelled_at)
+
 const hasStarted = computed(() => {
   if (!wcaCompetition?.value?.start_date)
     return false
@@ -157,8 +159,13 @@ const displayName = computed(() => liveCompetition?.value?.name ?? wcaCompetitio
       </a>
     </div>
 
+    <div v-if="isCancelled" class="my-2 p-4 border-l-4 border-red-500 bg-red-50 text-red-700 text-sm flex items-center gap-2">
+      <Icon name="heroicons:exclamation-triangle-16-solid" size="16" />
+      {{ t('wca.cancelled') }}
+    </div>
+
     <NuxtLink
-      v-if="hasStarted"
+      v-if="hasStarted && !isCancelled"
       :to="`/wca/reconstruction/${wcaCompetitionId}`"
       class="inline-flex items-center gap-2 my-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium shadow-xs transition-colors"
     >
