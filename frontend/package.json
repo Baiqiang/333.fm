@@ -16,6 +16,7 @@
     "@333fm/utils": "workspace:*",
     "@nuxtjs/apollo": "5.0.0-alpha.16",
     "@nuxtjs/color-mode": "^4.0.1",
+    "dayjs": "^1.11.21",
     "insertionfinder": "^0.5.0",
     "md-editor-v3": "^6.3.1",
     "tailwind-merge": "^2.5.4",

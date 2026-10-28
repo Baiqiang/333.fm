@@ -110,6 +110,10 @@ const navs = computed(() => [
         path: '/tools/dr-case-recognizer',
       },
       {
+        title: t('tools.htrSubsetStats.title'),
+        path: '/tools/htr-subset-stats',
+      },
+      {
         title: t('tools.frTrainer.title'),
         path: '/tools/fr-trainer',
       },

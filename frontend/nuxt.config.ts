@@ -4,6 +4,15 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: [
+        'dayjs',
+        'dayjs/locale/en',
+        'dayjs/locale/zh-cn',
+        ...['updateLocale', 'relativeTime', 'utc', 'timezone', 'advancedFormat', 'weekOfYear', 'localizedFormat']
+          .map(p => `dayjs/plugin/${p}`),
+      ],
+    },
   },
   app: {
     head: {

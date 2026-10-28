@@ -19,6 +19,9 @@ importers:
       '@nuxtjs/color-mode':
         specifier: ^4.0.1
         version: 4.0.1(magic-string@1.4.3)(magicast@0.5.5)(oxc-parser@0.141.0)(rolldown@1.2.12)(unplugin@3.4.0(esbuild@0.28.1)(rolldown@1.2.12)(rollup@4.62.2)(vite@8.3.2(@types/node@22.7.5)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(terser@5.48.0)(yaml@2.9.0))(webpack@5.97.1(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.28)))
+      dayjs:
+        specifier: ^1.11.21
+        version: 1.11.21
       insertionfinder:
         specifier: ^0.5.0
         version: 0.5.0
