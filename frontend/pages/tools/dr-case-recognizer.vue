@@ -49,6 +49,7 @@ const htrSubset = computed(() => {
     return null
   const { subset, edge } = getHTRSubsetOf(info)
   return {
+    subset: subset.name,
     name: `${subset.name} ${edge.edges}`,
     share: `${(drWeightToProbability(edge.weight) * 100).toFixed(3)}%`,
     solution: info.solution.join(' '),
@@ -103,7 +104,7 @@ function reset() {
           <div v-if="htrSubset" class="mt-2 p-3 border-l-4 border-indigo-500 bg-gray-50 text-gray-900">
             <div class="flex flex-wrap items-baseline justify-between gap-2">
               <span>{{ $t('tools.htrSubsetStats.recognized', { name: htrSubset.name, share: htrSubset.share }) }}</span>
-              <NuxtLink to="/tools/htr-subset-stats" class="text-sm text-indigo-500 hover:text-indigo-600">
+              <NuxtLink :to="{ path: '/tools/htr-subset-stats', query: { subset: htrSubset.subset } }" class="text-sm text-indigo-500 hover:text-indigo-600">
                 {{ $t('tools.htrSubsetStats.viewStats') }} →
               </NuxtLink>
             </div>

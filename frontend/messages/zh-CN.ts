@@ -741,6 +741,7 @@ export default {
       htrHint: '每格为该行状态中，最优 HTR（HTM，不用 NISS）恰好需要对应步数的占比（%）。',
       all: '全部',
       average: '平均',
+      range: '范围',
       transitions: 'QT 转移',
       transitionHint: '先用 HT 调整，再转一个 QT 可以到达的 subset。图中只画 QT 减少的方向，点击节点查看详情。',
       reachable: 'HT 调整后转一个 QT 可到达',

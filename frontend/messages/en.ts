@@ -741,6 +741,7 @@ export default {
       htrHint: 'Each cell is the share (%) of states in the row whose optimal HTR (HTM, no NISS) takes exactly that many moves.',
       all: 'All',
       average: 'Avg',
+      range: 'Range',
       transitions: 'QT Transitions',
       transitionHint: 'Subsets reachable with one quarter turn after half-turn setup moves. Only QT-reducing arrows are drawn; click a node for details.',
       reachable: 'One QT after half-turn setup reaches',

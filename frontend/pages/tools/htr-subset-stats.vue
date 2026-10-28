@@ -6,8 +6,16 @@ useSeoMeta({
 
 const { subsets, groups, qt, distances } = getHTRSubsetStats()
 
+const route = useRoute()
+const router = useRouter()
 const view = ref<'grouped' | 'sorted'>('grouped')
-const selectedName = ref<string>()
+const selectedName = computed({
+  get: () => typeof route.query.subset === 'string' ? route.query.subset : undefined,
+  set: subset => router.replace({ query: { ...route.query, subset } }),
+})
+const narrowScreen = useMediaQuery('(max-width: 639px)')
+const isMobile = ref(false)
+onMounted(() => watch(narrowScreen, value => isMobile.value = value, { immediate: true }))
 const selected = computed(() => subsets.find(s => s.name === selectedName.value))
 
 const averageQT = qt.reduce((sum, r) => sum + r.qt * drWeightToProbability(r.weight), 0)
@@ -94,7 +102,7 @@ function count(weight: number) {
           <div class="w-20 text-right tabular-nums">
             {{ percent(r.weight) }}
           </div>
-          <div class="w-28 text-right text-gray-500 tabular-nums">
+          <div class="hidden sm:block w-28 text-right text-gray-500 tabular-nums">
             {{ count(r.weight) }}
           </div>
         </div>
@@ -122,7 +130,7 @@ function count(weight: number) {
           <div class="w-20 text-right tabular-nums">
             {{ percent(g.weight) }}
           </div>
-          <div class="w-28 text-right text-gray-500 tabular-nums">
+          <div class="hidden sm:block w-28 text-right text-gray-500 tabular-nums">
             {{ count(g.weight) }}
           </div>
         </div>
@@ -140,7 +148,7 @@ function count(weight: number) {
         {{ $t('tools.htrSubsetStats.transitionHint') }}
       </p>
       <div class="overflow-x-auto">
-        <HtrSubsetTransitionGraph :subsets="subsets" @select="selectedName = $event" />
+        <HtrSubsetTransitionGraph :subsets="subsets" :vertical="isMobile" @select="selectedName = $event" />
       </div>
     </div>
 
@@ -151,11 +159,48 @@ function count(weight: number) {
       <p class="text-xs text-gray-500 mb-2">
         {{ $t('tools.htrSubsetStats.htrHint') }}
       </p>
-      <div class="overflow-x-auto">
+      <div class="sm:hidden">
+        <div
+          v-for="r in htrRows"
+          :key="r.name"
+          class="flex items-end gap-2 py-1.5 border-t border-gray-100 text-xs"
+          :class="r.name ? 'cursor-pointer' : 'font-semibold'"
+          @click="r.name && (selectedName = r.name)"
+        >
+          <div class="w-20 shrink-0 font-semibold whitespace-nowrap self-center">
+            <span v-if="r.group" class="inline-block w-2 h-2 rounded-full mr-1" :class="HTR_GROUP_STYLES[r.group].bg" />
+            {{ r.name || $t('tools.htrSubsetStats.all') }}
+          </div>
+          <div class="flex-1 flex items-end gap-px h-8">
+            <div
+              v-for="n in htrLengths"
+              :key="n"
+              class="flex-1"
+              :class="r.group ? HTR_GROUP_STYLES[r.group].bg : 'bg-indigo-500'"
+              :style="{ height: `${(r.distances[n] ?? 0) / Math.max(...r.distances) * 100}%` }"
+            />
+          </div>
+          <div class="w-20 shrink-0 text-right tabular-nums self-center">
+            <span class="text-gray-500">{{ r.distances.findIndex(x => x > 0) }}–{{ r.distances.length - 1 }}</span>
+            <span class="ml-1 font-semibold">{{ htrDistanceMean(r.distances).toFixed(2) }}</span>
+          </div>
+        </div>
+        <div class="flex gap-2 text-[10px] text-gray-400">
+          <div class="w-20 shrink-0" />
+          <div class="flex-1 flex justify-between">
+            <span>0</span>
+            <span>{{ htrLengths.length - 1 }}</span>
+          </div>
+          <div class="w-20 shrink-0 text-right">
+            {{ $t('tools.htrSubsetStats.range') }} · {{ $t('tools.htrSubsetStats.average') }}
+          </div>
+        </div>
+      </div>
+      <div class="hidden sm:block overflow-x-auto">
         <table class="w-full text-xs tabular-nums">
           <thead>
             <tr class="text-gray-500">
-              <th class="p-1 text-left">
+              <th class="p-1 text-left sticky left-0 bg-white">
                 {{ $t('tools.htrSubsetStats.column.subset') }}
               </th>
               <th v-for="n in htrLengths" :key="n" class="p-1 text-center min-w-8">
@@ -174,7 +219,7 @@ function count(weight: number) {
               :class="r.name ? 'cursor-pointer hover:bg-gray-50' : 'font-semibold'"
               @click="r.name && (selectedName = r.name)"
             >
-              <td class="p-1 font-semibold whitespace-nowrap">
+              <td class="p-1 font-semibold whitespace-nowrap sticky left-0 bg-white">
                 <span v-if="r.group" class="inline-block w-2 h-2 rounded-full mr-1.5" :class="HTR_GROUP_STYLES[r.group].bg" />
                 {{ r.name || $t('tools.htrSubsetStats.all') }}
               </td>
@@ -197,7 +242,7 @@ function count(weight: number) {
       </div>
     </div>
 
-    <div class="flex items-center justify-between mb-2">
+    <div class="flex flex-wrap items-end justify-between gap-2 mb-2">
       <div>
         <h2 class="font-poppins font-semibold text-lg">
           {{ $t('tools.htrSubsetStats.subsets') }}
@@ -279,8 +324,8 @@ function count(weight: number) {
             <th class="p-2 text-right">
               {{ $t('tools.htrSubsetStats.column.probability') }}
             </th>
-            <th class="p-2 w-1/4" />
-            <th class="p-2 text-right">
+            <th class="p-2 w-1/4 hidden sm:table-cell" />
+            <th class="p-2 text-right hidden sm:table-cell">
               {{ $t('tools.htrSubsetStats.column.count') }}
             </th>
             <th class="p-2 text-right">
@@ -308,12 +353,12 @@ function count(weight: number) {
             <td class="px-2 py-1 text-right tabular-nums font-semibold">
               {{ percent(r.edge.weight, 4) }}
             </td>
-            <td class="px-2 py-1">
+            <td class="px-2 py-1 hidden sm:table-cell">
               <div class="bg-gray-100 h-2.5">
                 <div class="h-full" :class="HTR_GROUP_STYLES[r.subset.group].bg" :style="{ width: `${r.edge.weight / maxRowWeight * 100}%` }" />
               </div>
             </td>
-            <td class="px-2 py-1 text-right tabular-nums text-gray-500">
+            <td class="px-2 py-1 text-right tabular-nums text-gray-500 hidden sm:table-cell">
               {{ count(r.edge.weight) }}
             </td>
             <td class="px-2 py-1 text-right tabular-nums">
@@ -324,11 +369,13 @@ function count(weight: number) {
       </table>
     </div>
 
-    <HtrSubsetDetail
-      v-if="selected"
-      :subset="selected"
-      @close="selectedName = undefined"
-      @select="selectedName = $event"
-    />
+    <ClientOnly>
+      <HtrSubsetDetail
+        v-if="selected"
+        :subset="selected"
+        @close="selectedName = undefined"
+        @select="selectedName = $event"
+      />
+    </ClientOnly>
   </div>
 </template>
