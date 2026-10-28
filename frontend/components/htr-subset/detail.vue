@@ -12,13 +12,14 @@ const emit = defineEmits<{
 
 const bucket = ref(-1)
 const example = ref<ReturnType<typeof randomHTRExample>>()
+const mode = ref<'normal' | 'niss'>('normal')
 
 const rows = computed(() => [
-  { label: '', distances: props.subset.distances, weight: props.subset.weight },
-  ...props.subset.edges.map(e => ({ label: e.edges, distances: e.distances, weight: e.weight })),
-])
+  { label: '', weight: props.subset.weight, distances: props.subset.distances, nissDistances: props.subset.nissDistances },
+  ...props.subset.edges.map(e => ({ label: e.edges, weight: e.weight, distances: e.distances, nissDistances: e.nissDistances })),
+].map(r => ({ ...r, distances: mode.value === 'niss' ? r.nissDistances : r.distances })))
 const lengths = computed(() => {
-  const first = props.subset.distances.findIndex(n => n > 0)
+  const first = Math.min(...[props.subset.distances, props.subset.nissDistances].map(d => d.findIndex(n => n > 0)))
   return Array.from({ length: props.subset.distances.length - first }, (_, i) => first + i)
 })
 
@@ -48,7 +49,7 @@ onUnmounted(() => scrollLock.value = false)
 
 <template>
   <div class="fixed inset-0 z-[60] flex md:items-center justify-center bg-black/50 md:p-6" @click="emit('close')">
-    <div class="bg-white shadow-lg w-full md:max-w-3xl h-dvh md:h-auto md:max-h-[90dvh] overflow-y-auto overscroll-contain border-t-4" :class="HTR_GROUP_STYLES[subset.group].border" @click.stop>
+    <div class="htr-detail-panel bg-white shadow-lg w-full md:max-w-3xl h-dvh md:h-auto md:max-h-[90dvh] overflow-y-auto overscroll-contain border-t-4" :class="HTR_GROUP_STYLES[subset.group].border" @click.stop>
       <div class="sticky top-0 z-10 bg-white flex items-start justify-between gap-4 px-4 md:px-5 pt-3 pb-2 mb-2 border-b border-gray-100">
         <div class="min-w-0">
           <div class="font-poppins font-semibold text-xl">
@@ -58,6 +59,7 @@ onUnmounted(() => scrollLock.value = false)
           <div class="text-xs md:text-sm text-gray-500 tabular-nums">
             {{ (drWeightToProbability(subset.weight) * 100).toFixed(3) }}% · {{ drWeightToCount(subset.weight).toLocaleString() }}
             · {{ $t('tools.htrSubsetStats.averageHTRShort', { n: htrDistanceMean(subset.distances).toFixed(2) }) }}
+            · {{ $t('tools.htrSubsetStats.averageNISSShort', { n: htrDistanceMean(subset.nissDistances).toFixed(2) }) }}
           </div>
         </div>
         <button class="shrink-0 w-9 h-9 -mr-2 text-gray-400 hover:text-gray-600 text-3xl leading-none" @click="emit('close')">
@@ -65,9 +67,12 @@ onUnmounted(() => scrollLock.value = false)
         </button>
       </div>
       <div class="px-4 md:px-5 pb-6">
-        <h3 class="font-poppins font-semibold mb-2">
-          {{ $t('tools.htrSubsetStats.htrDistribution') }}
-        </h3>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <h3 class="font-poppins font-semibold">
+            {{ $t('tools.htrSubsetStats.htrDistribution') }}
+          </h3>
+          <HtrSubsetModeToggle v-model="mode" />
+        </div>
         <div class="overflow-x-auto mb-5">
           <table class="w-full text-xs tabular-nums">
             <thead>
@@ -95,7 +100,7 @@ onUnmounted(() => scrollLock.value = false)
                   :style="r.distances[n] ? { background: `rgba(99, 102, 241, ${Math.sqrt(share(r.distances[n], r.weight)) * 0.9})` } : {}"
                   :class="share(r.distances[n] ?? 0, r.weight) > 0.3 ? 'text-white' : ''"
                 >
-                  {{ r.distances[n] ? `${(share(r.distances[n], r.weight) * 100).toFixed(1)}` : '' }}
+                  {{ r.distances[n] ? formatSharePercent(share(r.distances[n], r.weight), 1) : '' }}
                 </td>
                 <td class="p-1 text-right font-semibold">
                   {{ htrDistanceMean(r.distances).toFixed(2) }}
@@ -104,7 +109,7 @@ onUnmounted(() => scrollLock.value = false)
             </tbody>
           </table>
           <p class="text-xs text-gray-500 mt-1">
-            {{ $t('tools.htrSubsetStats.htrHint') }}
+            {{ mode === 'niss' ? $t('tools.htrSubsetStats.nissHint', { n: HTR_NISS_SAMPLES_PER_COSET }) : $t('tools.htrSubsetStats.htrHint') }}
           </p>
         </div>
 
@@ -159,9 +164,45 @@ onUnmounted(() => scrollLock.value = false)
                 {{ example.solution || '-' }}
               </div>
             </Spoiler>
+            <Spoiler :key="`niss ${example.scramble}`" class="mt-2" :spoiled="$t('tools.htrSubsetStats.optimalNISS', { n: example.niss.length })">
+              <div class="text-gray-500 text-xs mb-1">
+                {{ $t('tools.htrSubsetStats.optimalNISS', { n: example.niss.length }) }}
+                <span v-if="example.niss.inverse.length">· {{ $t('tools.htrSubsetStats.nissNote') }}</span>
+              </div>
+              <div class="font-mono break-words py-2">
+                {{ formatNISSSolution(example.niss) }}
+              </div>
+            </Spoiler>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style>
+.htr-detail-enter-active,
+.htr-detail-leave-active {
+  transition: opacity 0.2s ease;
+}
+.htr-detail-enter-active .htr-detail-panel,
+.htr-detail-leave-active .htr-detail-panel {
+  transition: transform 0.2s ease;
+}
+.htr-detail-enter-from,
+.htr-detail-leave-to {
+  opacity: 0;
+}
+.htr-detail-enter-from .htr-detail-panel,
+.htr-detail-leave-to .htr-detail-panel {
+  transform: translateY(1.5rem) scale(0.98);
+}
+@media (prefers-reduced-motion: reduce) {
+  .htr-detail-enter-active,
+  .htr-detail-leave-active,
+  .htr-detail-enter-active .htr-detail-panel,
+  .htr-detail-leave-active .htr-detail-panel {
+    transition: none;
+  }
+}
+</style>

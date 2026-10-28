@@ -1,5 +1,6 @@
-import type { DRCosetInfo } from './htr-coset'
-import { getHTRCosetTable } from './htr-coset'
+import type { DRCosetInfo, NISSSolution } from './htr-coset'
+import { getDRCosetInfo, getHTRCosetTable } from './htr-coset'
+import { HTR_NISS_DISTANCES, HTR_NISS_SAMPLES_PER_COSET } from './htr-niss-data'
 
 /** DR-UD states: 8! corners × 8! U/D edges × 4! E-slice edges, halved by parity. */
 export const DR_STATE_COUNT = 40320 * 40320 * 24 / 2
@@ -12,6 +13,8 @@ export interface HTRSubsetEdgeStat {
   weight: number
   /** Coset count per optimal HTR length. */
   distances: number[]
+  /** Sampled coset share per optimal NISS HTR length, scaled to sum to `weight`. */
+  nissDistances: number[]
   cosets: number[]
 }
 
@@ -26,6 +29,7 @@ export interface HTRSubsetStat {
   qt: number
   weight: number
   distances: number[]
+  nissDistances: number[]
   edges: HTRSubsetEdgeStat[]
   /** Subsets reachable with one quarter turn after half-turn setup moves. */
   transitions: HTRSubsetTransition[]
@@ -89,9 +93,18 @@ function buildStats() {
     qt: def.qt,
     weight: 0,
     distances: [],
-    edges: def.edgeBuckets.map(bucket => ({ edges: bucket.map(e => `${e}e`).join('/'), weight: 0, distances: [], cosets: [] })),
+    nissDistances: [],
+    edges: def.edgeBuckets.map((bucket, i) => ({
+      edges: bucket.map(e => `${e}e`).join('/'),
+      weight: 0,
+      distances: [],
+      nissDistances: (HTR_NISS_DISTANCES[def.name]?.[i] ?? []).map(n => n / HTR_NISS_SAMPLES_PER_COSET),
+      cosets: [],
+    })),
     transitions: [],
   }))
+  for (const s of subsets)
+    s.nissDistances = sumDistances(s.edges.map(e => e.nissDistances))
   const byName = new Map(subsets.map(s => [s.name, s]))
   const transitions = new Map(subsets.map(s => [s.name, new Set<string>()]))
 
@@ -124,7 +137,16 @@ function buildStats() {
   const distances: number[] = []
   for (let coset = 0; coset < t.size; coset++)
     addDistance(distances, t.distance[coset])
-  return { subsets, groups, qt, distances, total: t.size }
+  const nissDistances = sumDistances(subsets.map(s => s.nissDistances))
+  return { subsets, groups, qt, distances, nissDistances, total: t.size }
+}
+
+function sumDistances(lists: number[][]) {
+  const out: number[] = []
+  for (const list of lists) {
+    list.forEach((n, d) => out[d] = (out[d] ?? 0) + (n ?? 0))
+  }
+  return Array.from(out, n => n ?? 0)
 }
 
 export function drWeightToProbability(weight: number): number {
@@ -138,6 +160,12 @@ export function drWeightToCount(weight: number): number {
 export function htrDistanceMean(distances: number[]): number {
   const total = distances.reduce((sum, n) => sum + n, 0)
   return distances.reduce((sum, n, d) => sum + n * d, 0) / total
+}
+
+/** Share as a percentage, with tiny non-zero shares shown as "<0.1" instead of "0.0". */
+export function formatSharePercent(share: number, digits: number): string {
+  const min = 10 ** -digits
+  return share * 100 < min / 2 ? `<${min}` : (share * 100).toFixed(digits)
 }
 
 /** Merged subset and edge bucket of a located DR coset. */
@@ -171,9 +199,21 @@ export function randomHTRExample(cosets: number[]) {
   const suffix = randomHalfTurns(4 + Math.floor(Math.random() * 4), path.at(-1))
   for (const move of suffix)
     coset = t.next(coset, t.moves.indexOf(move))
+  const scramble = [...randomHalfTurns(12), ...path, ...suffix].join(' ')
   return {
-    scramble: [...randomHalfTurns(12), ...path, ...suffix].join(' '),
+    scramble,
     solution: t.solve(coset).join(' '),
     moves: t.distance[coset],
+    niss: getDRCosetInfo(scramble)!.niss,
   }
+}
+
+/** NISS solution in FMC notation, inverse moves in parentheses. */
+export function formatNISSSolution(niss: NISSSolution): string {
+  const parts = []
+  if (niss.normal.length)
+    parts.push(niss.normal.join(' '))
+  if (niss.inverse.length)
+    parts.push(`(${niss.inverse.join(' ')})`)
+  return parts.join(' ') || '-'
 }

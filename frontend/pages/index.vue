@@ -16,6 +16,10 @@ const { data: weekly } = await useApi<Competition>('/weekly/on-going')
 const { data: daily } = await useApi<Competition>('/daily/on-going')
 const { data: league } = await useApi<LeagueSeason>('/league/season/next')
 const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
+const logoColors = ref(Array.from({ length: 9 }, (_, i) => bgs[i % bgs.length]))
+onMounted(() => {
+  logoColors.value = logoColors.value.map(() => bgs[Math.floor(Math.random() * bgs.length)])
+})
 </script>
 
 <template>
@@ -25,12 +29,10 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
         <h1 class="text-4xl font-bold mb-4 flex items-center gap-2">
           <div class="grid grid-cols-3 gap-px">
             <div
-              v-for="i in 9"
+              v-for="color, i in logoColors"
               :key="i"
               class="w-3 h-3 transition-all duration-500"
-              :style="{
-                backgroundColor: bgs[Math.floor(Math.random() * 6)],
-              }"
+              :style="{ backgroundColor: color }"
             />
           </div>
           <Icon name="material-symbols:edit" class="-ml-8" />
@@ -70,7 +72,7 @@ const bgs = ['#FF4B4B', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#FF9800']
             v-for="item in [...tutorials.slice(0, 5), { id: 0, title: $t('tutorial.htrDiagram.title'), url: '/tutorial/htr-diagram', category: 'HTR' }]"
             :key="item.id"
             :href="item.url"
-            target="_blank"
+            :target="item.url.startsWith('/') ? undefined : '_blank'"
             class="flex items-center gap-2 text-sm text-blue-500 hover:text-blue-700 truncate"
           >
             <span class="text-gray-300">·</span>

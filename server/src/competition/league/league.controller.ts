@@ -29,6 +29,15 @@ export class LeagueController {
     return this.leagueService.getPastSeasons()
   }
 
+  @Get('on-going')
+  async getOnGoingCompetition() {
+    const competition = await this.leagueService.getOnGoingCompetition()
+    if (!competition) {
+      throw new NotFoundException()
+    }
+    return competition
+  }
+
   @Get('season/on-going')
   async getOnGoingSeason() {
     const season = await this.leagueService.getOnGoing()

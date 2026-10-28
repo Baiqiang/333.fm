@@ -63,8 +63,42 @@ export function readDRPieces(facelets: string, reference: string): DRPieces | nu
   return corners && edges ? { corners, edges } : null
 }
 
+const SLICE_EDGE_BITS = SLICE_EDGES.reduce((bits, e) => bits | (1 << e), 0)
+
 function edgeMask(edges: number[]) {
-  return edges.reduce((mask, piece, pos) => SLICE_EDGES.includes(piece) ? mask | (1 << pos) : mask, 0)
+  let mask = 0
+  for (let pos = 0; pos < 8; pos++) {
+    if ((SLICE_EDGE_BITS >> edges[pos]) & 1)
+      mask |= 1 << pos
+  }
+  return mask
+}
+
+function permRank(perm: number[]) {
+  let rank = 0
+  for (let i = 0; i < 8; i++) {
+    let smaller = 0
+    for (let j = i + 1; j < 8; j++) {
+      if (perm[j] < perm[i])
+        smaller++
+    }
+    rank = rank * (8 - i) + smaller
+  }
+  return rank
+}
+
+function invertPerm(perm: number[]) {
+  const out = Array.from<number>({ length: perm.length })
+  perm.forEach((p, i) => out[p] = i)
+  return out
+}
+
+export interface NISSSolution {
+  length: number
+  /** Moves on the normal scramble. */
+  normal: string[]
+  /** Moves on the inverse scramble. */
+  inverse: string[]
 }
 
 function invertMove(move: string) {
@@ -90,6 +124,9 @@ export interface HTRCosetTable {
   /** Optimal HTR solution from any state of the coset. */
   solve: (coset: number) => string[]
   cosetOf: (pieces: DRPieces) => number
+  /** Optimal HTR with NISS: any split of the solution between the normal and the inverse scramble. */
+  nissSolve: (pieces: DRPieces) => NISSSolution
+  nissLength: (pieces: DRPieces) => number
   moves: string[]
   quarterTurnIndexes: number[]
 }
@@ -204,6 +241,49 @@ function buildTable(): HTRCosetTable {
     return d.corners === 4 ? `4${d.cornerState.normal === 1 ? 'a' : 'b'}${d.qt}` : `${d.corners}c${d.qt}`
   })
 
+  const cornerCosetByRank = new Int16Array(40320)
+  for (const [key, corner] of cornerCosetOfPerm)
+    cornerCosetByRank[permRank([...key].map(Number))] = corner
+  const maskIndexes = new Int8Array(256).fill(-1)
+  masks.forEach((mask, i) => maskIndexes[mask] = i)
+  const cosetOf = (corners: number[], edges: number[]) =>
+    cornerCosetByRank[permRank(corners)] * masks.length + maskIndexes[edgeMask(edges)]
+  const solve = (coset: number) => pathTo(coset).reverse().map(invertMove)
+
+  // With premoves p and moves q, s is solved when p·s·q is in HTR, so only the coset of p matters.
+  // The shorter of p and q is at most half the solution, so scanning short premoves on s and s⁻¹ suffices.
+  const maxDistance = Math.max(...distance)
+  let premoves: { coset: number, length: number, corners: number[], edges: number[] }[] | undefined
+  const getPremoves = () => premoves ??= queue.filter(c => 2 * distance[c] < maxDistance).map((coset) => {
+    let corners = [0, 1, 2, 3, 4, 5, 6, 7]
+    let edges = [0, 1, 2, 3, 4, 5, 6, 7]
+    for (const move of pathTo(coset)) {
+      const m = moveTables[DR_MOVES.indexOf(move)]
+      corners = apply(corners, m.corners)
+      edges = apply(edges, m.edges)
+    }
+    return { coset, length: distance[coset], corners, edges }
+  })
+  const nissSearch = (pieces: DRPieces) => {
+    const sides = [pieces, { corners: invertPerm(pieces.corners), edges: invertPerm(pieces.edges) }]
+    let best = { length: Infinity, side: 0, premove: start, coset: start }
+    sides.forEach((s, side) => {
+      const coset = cosetOf(s.corners, s.edges)
+      if (distance[coset] < best.length)
+        best = { length: distance[coset], side, premove: start, coset }
+    })
+    for (const p of getPremoves()) {
+      if (2 * p.length >= best.length)
+        break
+      sides.forEach((s, side) => {
+        const coset = cosetOf(s.corners.map(x => p.corners[x]), s.edges.map(x => p.edges[x]))
+        if (p.length + distance[coset] < best.length)
+          best = { length: p.length + distance[coset], side, premove: p.coset, coset }
+      })
+    }
+    return best
+  }
+
   return {
     size: capacity,
     distance,
@@ -213,8 +293,17 @@ function buildTable(): HTRCosetTable {
     badEdges,
     next,
     pathTo,
-    solve: coset => pathTo(coset).reverse().map(invertMove),
-    cosetOf: pieces => encode(cornerCosetOf(pieces.corners), edgeMask(pieces.edges)),
+    solve,
+    cosetOf: pieces => cosetOf(pieces.corners, pieces.edges),
+    nissSolve: (pieces) => {
+      const best = nissSearch(pieces)
+      const premove = solve(best.premove)
+      const moves = solve(best.coset)
+      return best.side === 0
+        ? { length: best.length, normal: moves, inverse: premove }
+        : { length: best.length, normal: premove, inverse: moves }
+    },
+    nissLength: pieces => nissSearch(pieces).length,
     moves: DR_MOVES,
     quarterTurnIndexes: QUARTER_TURN_INDEXES,
   }
@@ -227,6 +316,8 @@ export interface DRCosetInfo {
   badEdges: number
   /** Optimal HTR solution in the original orientation. */
   solution: string[]
+  /** Optimal HTR with NISS in the original orientation. */
+  niss: NISSSolution
 }
 
 /** Locate the HTR coset of the DR reached by `algorithm`, on any DR axis. */
@@ -254,10 +345,13 @@ export function getDRCosetInfo(algorithm: string): DRCosetInfo | null {
     return null
   const t = getHTRCosetTable()
   const coset = t.cosetOf(pieces)
+  const toOriginal = (moves: string[]) => moves.map(move => reference[CENTER_FACELETS[move[0]]] + move.slice(1))
+  const niss = t.nissSolve(pieces)
   return {
     coset,
     subset: t.cornerSubsets[t.cornerCoset[coset]],
     badEdges: t.badEdges[coset],
-    solution: t.solve(coset).map(move => reference[CENTER_FACELETS[move[0]]] + move.slice(1)),
+    solution: toOriginal(t.solve(coset)),
+    niss: { length: niss.length, normal: toOriginal(niss.normal), inverse: toOriginal(niss.inverse) },
   }
 }

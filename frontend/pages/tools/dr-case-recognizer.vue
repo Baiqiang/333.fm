@@ -54,6 +54,7 @@ const htrSubset = computed(() => {
     share: `${(drWeightToProbability(edge.weight) * 100).toFixed(3)}%`,
     solution: info.solution.join(' '),
     moves: info.solution.length,
+    niss: info.niss,
   }
 })
 function reset() {
@@ -114,6 +115,15 @@ function reset() {
               </div>
               <div class="font-mono py-1">
                 {{ htrSubset.solution }}
+              </div>
+            </Spoiler>
+            <Spoiler :key="`niss ${htrSubset.solution} ${formatNISSSolution(htrSubset.niss)}`" class="mt-2" :spoiled="$t('tools.htrSubsetStats.optimalNISS', { n: htrSubset.niss.length })">
+              <div class="text-xs text-gray-500">
+                {{ $t('tools.htrSubsetStats.optimalNISS', { n: htrSubset.niss.length }) }}
+                <span v-if="htrSubset.niss.inverse.length">· {{ $t('tools.htrSubsetStats.nissNote') }}</span>
+              </div>
+              <div class="font-mono py-1">
+                {{ formatNISSSolution(htrSubset.niss) }}
               </div>
             </Spoiler>
           </div>

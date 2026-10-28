@@ -104,6 +104,18 @@ export class LeagueService {
     })
   }
 
+  async getOnGoingCompetition() {
+    return this.competitionsRepository.findOne({
+      where: {
+        type: CompetitionType.LEAGUE,
+        status: CompetitionStatus.ON_GOING,
+      },
+      order: {
+        id: 'DESC',
+      },
+    })
+  }
+
   async getNext() {
     return this.findSeason({
       where: {

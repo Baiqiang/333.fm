@@ -106,6 +106,8 @@ onMounted(async () => {
   observer.observe(dom)
   two = new Two({
     type: Two.Types.canvas,
+    width: dom.clientWidth,
+    height: dom.clientWidth * 3 / 4,
   }).appendTo(dom)
   group = two.makeGroup()
 })

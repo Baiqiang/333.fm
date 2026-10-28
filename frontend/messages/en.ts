@@ -7,6 +7,10 @@ export default {
   header: {
     signIn: 'Sign in',
     signOut: 'Sign out',
+    training: 'Training',
+    language: 'Language',
+    appearance: 'Appearance',
+    resources: 'Resources',
   },
   colorMode: {
     system: 'System',
@@ -739,6 +743,14 @@ export default {
       averageHTRShort: 'Optimal HTR avg {n}',
       htrDistribution: 'Optimal HTR Length',
       htrHint: 'Each cell is the share (%) of states in the row whose optimal HTR (HTM, no NISS) takes exactly that many moves.',
+      nissHint: 'Each cell is the share (%) of states in the row whose optimal HTR with NISS (any mix of normal and inverse) takes exactly that many moves. NISS length depends on the full state rather than the coset, so these are sampled ({n} states per coset).',
+      mode: {
+        normal: 'No NISS',
+        niss: 'NISS',
+      },
+      averageNISSShort: 'NISS avg {n}',
+      optimalNISS: 'Optimal HTR with NISS ({n} moves)',
+      nissNote: 'Moves in parentheses are on the inverse scramble',
       all: 'All',
       average: 'Avg',
       range: 'Range',
@@ -766,6 +778,7 @@ export default {
         probability: 'Share',
         count: 'Count',
         htr: 'Avg HTR',
+        niss: 'NISS',
       },
     },
     frTrainer: {

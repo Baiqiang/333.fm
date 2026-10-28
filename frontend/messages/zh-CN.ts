@@ -7,6 +7,10 @@ export default {
   header: {
     signIn: '登录',
     signOut: '退出',
+    training: '训练',
+    language: '语言',
+    appearance: '外观',
+    resources: '资料',
   },
   colorMode: {
     system: '跟随系统',
@@ -739,6 +743,14 @@ export default {
       averageHTRShort: '平均最优 HTR {n} 步',
       htrDistribution: '最优 HTR 步数分布',
       htrHint: '每格为该行状态中，最优 HTR（HTM，不用 NISS）恰好需要对应步数的占比（%）。',
+      nissHint: '每格为该行状态中，用 NISS（正逆向任意混合）的最优 HTR 恰好需要对应步数的占比（%）。NISS 步数取决于完整状态而非 coset，为抽样估计（每个 coset 抽 {n} 个状态）。',
+      mode: {
+        normal: '不用 NISS',
+        niss: 'NISS',
+      },
+      averageNISSShort: 'NISS {n} 步',
+      optimalNISS: '最优 NISS HTR（{n} 步）',
+      nissNote: '括号内为逆向步骤',
       all: '全部',
       average: '平均',
       range: '范围',
@@ -766,6 +778,7 @@ export default {
         probability: '占比',
         count: '个数',
         htr: '平均 HTR',
+        niss: 'NISS',
       },
     },
     frTrainer: {
