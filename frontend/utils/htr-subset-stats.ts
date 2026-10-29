@@ -72,6 +72,17 @@ export const HTR_GROUP_STYLES: Record<string, { bg: string, border: string, hex:
 
 const DEF_OF_RAW = new Map(SUBSET_DEFS.flatMap(def => def.members.map(m => [m, def])))
 
+/** xc ye = (8-x)c (8-y)e: 6c/8c cases are bucketed by the bad edges of their 2c/0c counterpart. */
+function canonicalBadEdges(rawSubset: string, badEdges: number) {
+  return rawSubset.startsWith('6c') || rawSubset.startsWith('8c') ? 8 - badEdges : badEdges
+}
+
+function edgeBucketOf(rawSubset: string, badEdges: number) {
+  const def = DEF_OF_RAW.get(rawSubset)!
+  const edges = canonicalBadEdges(rawSubset, badEdges)
+  return { def, bucket: def.edgeBuckets.findIndex(b => b.includes(edges)) }
+}
+
 function addDistance(list: number[], distance: number) {
   while (list.length <= distance)
     list.push(0)
@@ -109,9 +120,8 @@ function buildStats() {
   const transitions = new Map(subsets.map(s => [s.name, new Set<string>()]))
 
   for (let coset = 0; coset < t.size; coset++) {
-    const def = DEF_OF_RAW.get(t.cornerSubsets[t.cornerCoset[coset]])!
+    const { def, bucket } = edgeBucketOf(t.cornerSubsets[t.cornerCoset[coset]], t.badEdges[coset])
     const subset = byName.get(def.name)!
-    const bucket = def.edgeBuckets.findIndex(b => b.includes(t.badEdges[coset]))
     const edge = subset.edges[bucket]
     subset.weight++
     edge.weight++
@@ -170,10 +180,9 @@ export function formatSharePercent(share: number, digits: number): string {
 
 /** Merged subset and edge bucket of a located DR coset. */
 export function getHTRSubsetOf(info: DRCosetInfo) {
-  const def = DEF_OF_RAW.get(info.subset)!
+  const { def, bucket } = edgeBucketOf(info.subset, info.badEdges)
   const subset = getHTRSubsetStats().subsets.find(s => s.name === def.name)!
-  const edge = subset.edges[def.edgeBuckets.findIndex(b => b.includes(info.badEdges))]
-  return { subset, edge }
+  return { subset, edge: subset.edges[bucket] }
 }
 
 const HALF_TURNS = ['U2', 'D2', 'R2', 'L2', 'F2', 'B2']
