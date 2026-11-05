@@ -1,29 +1,47 @@
 <script setup lang="ts">
-import type { PensukeAxisMode, PensukePracticeRecord } from '~/composables/pensuke-practice-history'
+import type { DsSecondSlice, Slice, SliceGoal } from '@333fm/utils'
+import type { PensukeAxisMode, PensukePracticeMode, PensukePracticeRecord } from '~/composables/pensuke-practice-history'
 import type { AxisKey } from '~/utils/pensuke/types'
+import { drSlice, dsSecondSlices, sliceGoalMaxDistance } from '@333fm/utils'
 import { appendPensukePracticeRecord } from '~/composables/pensuke-practice-history'
 import {
-  generateHtrScramble,
   parsePensukeInput,
   parsePensukePracticeInput,
-  solveLeaveSlice,
-  verifyLsSolutionSync,
+  verifySliceSolutionSync,
 } from '~/utils/pensuke'
 import { AXIS_TAB_LABEL, AXIS_TABS } from '~/utils/pensuke/display'
+import { generateSlicePracticeProblem, solveSlicePracticeScramble } from '~/utils/pensuke/practice-generator'
 
+const props = withDefaults(defineProps<{ practiceMode?: PensukePracticeMode }>(), { practiceMode: 'ls' })
 const emit = defineEmits<{
   historyChange: []
 }>()
+const goalLabel = computed(() => props.practiceMode.toUpperCase())
+const goalName = computed(() => props.practiceMode === 'ds' ? 'Double Slice' : 'Leave Slice')
 
 const scramble = ref('')
 const frAxis = ref<AxisKey>('ud')
 const frAxisMode = ref<PensukeAxisMode>('pick')
 const userSolution = ref('')
 const submitted = ref(false)
-const verifyResult = ref<ReturnType<typeof verifyLsSolutionSync> | null>(null)
+const verifyResult = ref<ReturnType<typeof verifySliceSolutionSync> | null>(null)
 const showKeyboard = ref(false)
 const isHtr = ref(false)
 const parseOk = ref(true)
+const maxOptimalMoves = ref<number | null>(null)
+const loading = ref(true)
+const generationError = ref(false)
+const referenceSolution = ref<string[] | null>(null)
+const referenceTargets = ref<Slice[]>([])
+const problemVersion = ref(0)
+const secondSlice = ref<DsSecondSlice>('either')
+const secondSliceOptions = computed(() => dsSecondSlices(frAxis.value))
+const goal = computed<SliceGoal>(() => props.practiceMode === 'ls'
+  ? { mode: 'ls', axis: frAxis.value }
+  : { mode: 'ds', axis: frAxis.value, secondSlice: secondSlice.value })
+const maximumDistance = computed(() => sliceGoalMaxDistance(goal.value))
+const distanceOptions = computed(() => Array.from({ length: maximumDistance.value + 1 }, (_, i) => i))
+const referenceTargetText = computed(() => referenceTargets.value.map(slice => `${drSlice(frAxis.value)} + ${slice}`).join(' / '))
 
 const lsAxis = computed(() => frAxis.value)
 
@@ -33,7 +51,7 @@ function pickRandomAxis(): AxisKey {
   return AXIS_TABS[Math.floor(Math.random() * AXIS_TABS.length)]!
 }
 
-function loadScramble(s: string, randomFrAxis = false) {
+function loadScramble(s: string) {
   const parsed = parsePensukeInput(s, '')
   parseOk.value = parsed.ok
   isHtr.value = parsed.ok && parsed.isHtr
@@ -41,38 +59,59 @@ function loadScramble(s: string, randomFrAxis = false) {
   userSolution.value = ''
   submitted.value = false
   verifyResult.value = null
-  if (randomFrAxis) {
-    frAxisMode.value = 'random'
-    frAxis.value = pickRandomAxis()
-  }
+  problemVersion.value++
 }
 
 function handleRandom() {
-  loadScramble(generateHtrScramble(16), true)
+  loading.value = true
+  generationError.value = false
+  isHtr.value = false
+  referenceSolution.value = null
+  referenceTargets.value = []
+  if (props.practiceMode === 'ls' && frAxisMode.value === 'random')
+    frAxis.value = pickRandomAxis()
+  if (props.practiceMode === 'ds' && secondSlice.value === drSlice(frAxis.value))
+    secondSlice.value = 'either'
+  if (maxOptimalMoves.value !== null)
+    maxOptimalMoves.value = Math.min(maxOptimalMoves.value, maximumDistance.value)
+  try {
+    const problem = generateSlicePracticeProblem(goal.value, maxOptimalMoves.value ?? maximumDistance.value)
+    loadScramble(problem.scramble)
+    referenceSolution.value = problem.solution
+    referenceTargets.value = problem.dsTargets
+  }
+  catch {
+    generationError.value = true
+  }
+  finally {
+    loading.value = false
+  }
 }
 
-onMounted(() => {
+function selectAxis(axis: AxisKey) {
+  frAxisMode.value = 'pick'
+  frAxis.value = axis
   handleRandom()
-})
+}
 
-const referenceSolution = computed(() => {
-  const parsed = parsePensukeInput(scramble.value, '')
-  if (!parsed.ok || !parsed.state)
-    return null
-  const sols = solveLeaveSlice(parsed.state, lsAxis.value, frAxis.value, 14, parsed.scrambleMoves)
-  return sols[0]?.moves ?? null
-})
+function selectRandomAxis() {
+  frAxisMode.value = 'random'
+  handleRandom()
+}
+
+onMounted(handleRandom)
 
 const liveInput = computed(() => {
   if (!isHtr.value || submitted.value)
     return null
-  return parsePensukePracticeInput(scramble.value, userSolution.value, lsAxis.value)
+  return parsePensukePracticeInput(scramble.value, userSolution.value, goal.value)
 })
 
 const canSubmit = computed(() =>
   isHtr.value
+  && !loading.value
   && !submitted.value
-  && userSolution.value.trim().length > 0
+  && (userSolution.value.trim().length > 0 || referenceSolution.value?.length === 0)
   && liveInput.value?.status !== 'invalid',
 )
 
@@ -83,13 +122,16 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 function handleSubmit() {
-  verifyResult.value = verifyLsSolutionSync(scramble.value, userSolution.value, frAxis.value)
+  verifyResult.value = verifySliceSolutionSync(scramble.value, userSolution.value, goal.value)
   submitted.value = true
   appendPensukePracticeRecord({
     scramble: scramble.value,
     lsAxis: frAxis.value,
     frAxis: frAxis.value,
     axisMode: frAxisMode.value,
+    practiceMode: props.practiceMode,
+    secondSlice: props.practiceMode === 'ds' ? secondSlice.value : undefined,
+    maxOptimalMoves: maxOptimalMoves.value,
     userSolution: userSolution.value.trim(),
     correct: verifyResult.value.ok && verifyResult.value.correct,
     userMoveCount: verifyResult.value.userMoves.length,
@@ -99,70 +141,146 @@ function handleSubmit() {
 }
 
 function replayFromHistory(record: PensukePracticeRecord) {
+  if ((record.practiceMode ?? 'ls') !== props.practiceMode)
+    return
+  loading.value = true
+  generationError.value = false
+  referenceSolution.value = null
+  referenceTargets.value = []
   loadScramble(record.scramble)
   frAxis.value = record.frAxis
-  frAxisMode.value = record.axisMode
+  frAxisMode.value = props.practiceMode === 'ds' ? 'pick' : record.axisMode
+  secondSlice.value = record.secondSlice ?? 'either'
+  maxOptimalMoves.value = record.maxOptimalMoves ?? null
   userSolution.value = record.userSolution
-  verifyResult.value = verifyLsSolutionSync(record.scramble, record.userSolution, record.frAxis)
+  verifyResult.value = verifySliceSolutionSync(record.scramble, record.userSolution, goal.value)
   submitted.value = true
+  try {
+    const problem = solveSlicePracticeScramble(record.scramble, goal.value)
+    referenceSolution.value = problem.solution
+    referenceTargets.value = problem.dsTargets
+  }
+  catch {
+    generationError.value = true
+  }
+  finally {
+    loading.value = false
+  }
 }
 
 defineExpose({ replayFromHistory })
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" :aria-busy="loading">
     <div class="flex flex-wrap gap-2">
       <button
         type="button"
         class="px-3 py-1 border border-gray-300 text-sm hover:border-indigo-300"
+        :disabled="loading"
         @click="handleRandom"
       >
         {{ $t('tools.pensukeTrainer.btn.random') }}
       </button>
     </div>
 
-    <div v-if="!parseOk" class="p-3 border border-red-400 text-red-600 text-sm">
-      {{ $t('tools.pensukeTrainer.error.parse', { token: '' }) }}
+    <div class="bg-white shadow-md p-4 border-l-4 border-indigo-500 space-y-4">
+      <div>
+        <p class="text-sm font-medium mb-1">
+          {{ $t('tools.pensukeTrainer.practice.drAxis') }}
+        </p>
+        <p class="text-xs text-gray-500 mb-2">
+          {{ $t('tools.pensukeTrainer.practice.drSliceHint', { slice: drSlice(frAxis) }) }}
+        </p>
+        <div class="flex flex-wrap gap-2 items-center">
+          <button
+            v-for="ax in AXIS_TABS"
+            :key="`fr-${ax}`"
+            type="button"
+            class="px-3 py-1 text-sm border"
+            :class="frAxis === ax && frAxisMode === 'pick'
+              ? 'bg-indigo-500 text-white border-indigo-500'
+              : 'border-gray-300'"
+            :disabled="loading"
+            @click="selectAxis(ax)"
+          >
+            {{ AXIS_TAB_LABEL[ax] }}
+          </button>
+          <button
+            v-if="practiceMode === 'ls'"
+            type="button"
+            class="px-3 py-1 text-sm border"
+            :class="frAxisMode === 'random' ? 'bg-indigo-500 text-white border-indigo-500' : 'border-gray-300'"
+            :disabled="loading"
+            @click="selectRandomAxis"
+          >
+            {{ $t('tools.pensukeTrainer.practice.randomAxis') }}
+          </button>
+        </div>
+      </div>
+      <div v-if="practiceMode === 'ds'">
+        <label for="pensuke-ds-second-slice" class="text-sm font-medium block mb-1">
+          {{ $t('tools.pensukeTrainer.practice.secondSlice') }}
+        </label>
+        <select
+          id="pensuke-ds-second-slice"
+          v-model="secondSlice"
+          class="block w-full max-w-xs shadow-sm border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50 p-2 border text-sm"
+          :disabled="loading"
+          @change="handleRandom"
+        >
+          <option v-for="slice in secondSliceOptions" :key="slice" :value="slice">
+            {{ slice }}
+          </option>
+          <option value="either">
+            {{ $t('tools.pensukeTrainer.practice.eitherSlice') }}
+          </option>
+        </select>
+        <p class="text-xs text-gray-500 mt-1">
+          {{ $t('tools.pensukeTrainer.practice.dsGoalHint') }}
+        </p>
+        <p v-if="secondSlice === 'either'" class="text-xs text-gray-500 mt-1">
+          {{ $t('tools.pensukeTrainer.practice.eitherHint') }}
+        </p>
+      </div>
+      <div>
+        <label :for="`pensuke-${practiceMode}-distance`" class="text-sm font-medium block mb-1">
+          {{ $t('tools.pensukeTrainer.practice.maxOptimalMoves', { goal: goalLabel }) }}
+        </label>
+        <select
+          :id="`pensuke-${practiceMode}-distance`"
+          v-model="maxOptimalMoves"
+          class="block w-full max-w-xs shadow-sm border-gray-300 focus:ring-2 focus:border-indigo-300 focus:ring-indigo-200/50 p-2 border text-sm"
+          :disabled="loading"
+          @change="handleRandom"
+        >
+          <option :value="null">
+            {{ $t('tools.pensukeTrainer.practice.unlimited') }}
+          </option>
+          <option v-for="n in distanceOptions" :key="n" :value="n">
+            ≤ {{ n }}
+          </option>
+        </select>
+        <p class="text-xs text-gray-500 mt-1">
+          {{ $t('tools.pensukeTrainer.practice.distanceHint', { goal: goalLabel }) }}
+        </p>
+      </div>
     </div>
 
-    <div v-if="parseOk && !isHtr" class="p-3 border border-amber-400 text-amber-700 text-sm">
+    <p v-if="loading" role="status" class="text-sm text-gray-500">
+      {{ $t('tools.pensukeTrainer.practice.generating') }}
+    </p>
+    <p v-if="generationError" role="alert" class="p-3 border border-red-400 text-red-600 text-sm">
+      {{ $t('tools.pensukeTrainer.practice.generationError') }}
+    </p>
+    <div v-if="!loading && !generationError && !parseOk" class="p-3 border border-red-400 text-red-600 text-sm">
+      {{ $t('tools.pensukeTrainer.error.parse', { token: '' }) }}
+    </div>
+    <div v-if="!loading && !generationError && parseOk && !isHtr" class="p-3 border border-amber-400 text-amber-700 text-sm">
       {{ $t('tools.pensukeTrainer.error.notHtr') }}
     </div>
 
     <template v-if="isHtr">
-      <div class="bg-white shadow-md p-4 border-l-4 border-indigo-500 space-y-4">
-        <div>
-          <p class="text-sm font-medium mb-1">
-            {{ $t('tools.pensukeTrainer.frAxis') }}
-          </p>
-          <p class="text-xs text-gray-500 mb-2">
-            {{ $t('tools.pensukeTrainer.brAxesHint') }}
-          </p>
-          <div class="flex flex-wrap gap-2 items-center">
-            <button
-              v-for="ax in AXIS_TABS"
-              :key="`fr-${ax}`"
-              type="button"
-              class="px-3 py-1 text-sm border"
-              :class="frAxis === ax && frAxisMode === 'pick'
-                ? 'bg-indigo-500 text-white border-indigo-500'
-                : 'border-gray-300'"
-              @click="frAxis = ax; frAxisMode = 'pick'"
-            >
-              {{ AXIS_TAB_LABEL[ax] }}
-            </button>
-            <button
-              type="button"
-              class="px-3 py-1 text-sm border border-gray-300"
-              @click="frAxis = pickRandomAxis(); frAxisMode = 'random'"
-            >
-              {{ $t('tools.pensukeTrainer.practice.randomAxis') }}
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div class="mb-2">
         <p class="text-sm font-semibold text-gray-700 mb-1">
           {{ $t('tools.pensukeTrainer.input.scramble.label') }}：
@@ -183,7 +301,7 @@ defineExpose({ replayFromHistory })
         <div class="space-y-4">
           <div v-if="!submitted">
             <p class="text-sm font-medium mb-2">
-              {{ $t('tools.pensukeTrainer.practice.solutionInput') }}
+              {{ $t('tools.pensukeTrainer.practice.solutionInput', { goal: goalLabel }) }}
             </p>
             <div class="flex gap-2">
               <input
@@ -205,8 +323,8 @@ defineExpose({ replayFromHistory })
             </div>
             <div class="mt-0.5 text-xs flex items-center justify-between">
               <span>
-                <span v-if="liveInput?.status === 'ls'" class="text-green-600 font-semibold">
-                  {{ $t('tools.pensukeTrainer.practice.liveLs') }} · {{ $t('common.moves', { moves: solutionMoveCount }) }}
+                <span v-if="liveInput?.status === 'reached'" class="text-green-600 font-semibold">
+                  {{ $t('tools.pensukeTrainer.practice.liveReached', { goal: goalName }) }} · {{ $t('common.moves', { moves: solutionMoveCount }) }}
                 </span>
                 <span v-else-if="liveInput?.status === 'invalid' && liveInput.invalidToken" class="text-red-500">
                   {{ $t('tools.pensukeTrainer.practice.liveInvalid', { token: liveInput.invalidToken }) }}
@@ -230,6 +348,27 @@ defineExpose({ replayFromHistory })
               @clear="clearSolution"
               @submit="handleSubmit"
             />
+            <Spoiler
+              v-if="referenceSolution"
+              :key="problemVersion"
+              class="mt-4"
+              :spoiled="$t('tools.pensukeTrainer.referenceSolution')"
+            >
+              <template #label>
+                {{ $t('tools.pensukeTrainer.practice.revealReference') }}
+              </template>
+              <div class="border border-indigo-300 p-4">
+                <p class="text-sm text-gray-600 mb-1">
+                  {{ $t('tools.pensukeTrainer.referenceSolution') }}：
+                </p>
+                <p class="font-mono font-semibold">
+                  {{ referenceSolution.join(' ') || $t('tools.pensukeTrainer.practice.alreadyGoal', { goal: goalName }) }}
+                </p>
+                <p v-if="referenceTargets.length" class="text-xs text-gray-500 mt-1">
+                  {{ $t('tools.pensukeTrainer.practice.referenceTargets', { slices: referenceTargetText }) }}
+                </p>
+              </div>
+            </Spoiler>
           </div>
 
           <div v-else-if="verifyResult" class="space-y-3">
@@ -243,10 +382,10 @@ defineExpose({ replayFromHistory })
                 {{ $t('tools.pensukeTrainer.error.parse', { token: verifyResult.errorToken ?? '' }) }}
               </template>
               <template v-else-if="verifyResult.correct">
-                {{ $t('tools.pensukeTrainer.practice.resultCorrect') }}
+                {{ $t('tools.pensukeTrainer.practice.resultCorrect', { goal: goalName }) }}
               </template>
               <template v-else>
-                {{ $t('tools.pensukeTrainer.practice.resultWrong') }}
+                {{ $t('tools.pensukeTrainer.practice.resultWrong', { goal: goalName }) }}
               </template>
             </div>
 
@@ -255,13 +394,17 @@ defineExpose({ replayFromHistory })
                 {{ $t('tools.pensukeTrainer.referenceSolution') }}：
               </p>
               <p class="font-mono font-semibold">
-                {{ referenceSolution.join(' ') || $t('tools.pensukeTrainer.alreadyLs') }}
+                {{ referenceSolution.join(' ') || $t('tools.pensukeTrainer.practice.alreadyGoal', { goal: goalName }) }}
+              </p>
+              <p v-if="referenceTargets.length" class="text-xs text-gray-500 mt-1">
+                {{ $t('tools.pensukeTrainer.practice.referenceTargets', { slices: referenceTargetText }) }}
               </p>
             </div>
 
             <button
               type="button"
               class="mt-3 px-3 py-1 border border-indigo-300 text-indigo-600 text-sm"
+              :disabled="loading"
               @click="handleRandom"
             >
               {{ $t('tools.pensukeTrainer.practice.next') }}

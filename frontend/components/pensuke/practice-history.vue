@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import type { PensukePracticeRecord } from '~/composables/pensuke-practice-history'
+import type { PensukePracticeMode, PensukePracticeRecord } from '~/composables/pensuke-practice-history'
+import { drSlice } from '@333fm/utils'
 import {
   clearPensukePracticeHistory,
   getPensukePracticeHistory,
 } from '~/composables/pensuke-practice-history'
 import { AXIS_TAB_LABEL } from '~/utils/pensuke/display'
 
+const props = withDefaults(defineProps<{ practiceMode?: PensukePracticeMode }>(), { practiceMode: 'ls' })
 const emit = defineEmits<{
   replay: [record: PensukePracticeRecord]
 }>()
-
 const records = ref<PensukePracticeRecord[]>([])
 
 function refresh() {
-  records.value = getPensukePracticeHistory()
+  records.value = getPensukePracticeHistory(props.practiceMode)
 }
 
 onMounted(refresh)
@@ -21,7 +22,7 @@ onMounted(refresh)
 defineExpose({ refresh })
 
 function handleClear() {
-  clearPensukePracticeHistory()
+  clearPensukePracticeHistory(props.practiceMode)
   refresh()
 }
 </script>
@@ -57,7 +58,10 @@ function handleClear() {
           {{ r.correct ? '✓' : '✗' }}
         </span>
         <span class="text-gray-500 text-xs">
-          FR {{ AXIS_TAB_LABEL[r.frAxis] }}
+          {{ $t('tools.pensukeTrainer.practice.drAxis') }} {{ AXIS_TAB_LABEL[r.frAxis] }}
+        </span>
+        <span v-if="r.practiceMode === 'ds'" class="text-gray-500 text-xs">
+          {{ drSlice(r.frAxis) }} + {{ r.secondSlice === 'either' ? $t('tools.pensukeTrainer.practice.eitherSlice') : r.secondSlice }}
         </span>
         <span class="font-mono text-xs truncate flex-1">
           {{ r.scramble }}
