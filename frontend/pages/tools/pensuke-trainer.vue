@@ -8,13 +8,14 @@ useSeoMeta({
   title: t('tools.pensukeTrainer.title'),
 })
 
-const MODES = ['analyze', 'practice', 'tutorial'] as const
+const MODES = ['analyze', 'practice', 'ds-practice', 'tutorial'] as const
 type PensukeMode = typeof MODES[number]
 
 const activeMode = computed<PensukeMode>(() => {
   const q = route.query.mode
   return (typeof q === 'string' && MODES.includes(q as PensukeMode)) ? q as PensukeMode : 'analyze'
 })
+const practiceMode = computed(() => activeMode.value === 'ds-practice' ? 'ds' as const : 'ls' as const)
 
 const historyRef = ref<{ refresh: () => void } | null>(null)
 const practiceRef = ref<{ replayFromHistory: (record: PensukePracticeRecord) => void } | null>(null)
@@ -60,9 +61,9 @@ function onHistoryReplay(record: PensukePracticeRecord) {
 
     <PensukeAnalyzePanel v-if="activeMode === 'analyze'" />
 
-    <template v-if="activeMode === 'practice'">
-      <PensukePracticePanel ref="practiceRef" @history-change="onHistoryChange" />
-      <PensukePracticeHistory ref="historyRef" @replay="onHistoryReplay" />
+    <template v-if="activeMode === 'practice' || activeMode === 'ds-practice'">
+      <PensukePracticePanel :key="`panel-${practiceMode}`" ref="practiceRef" :practice-mode="practiceMode" @history-change="onHistoryChange" />
+      <PensukePracticeHistory :key="`history-${practiceMode}`" ref="historyRef" :practice-mode="practiceMode" @replay="onHistoryReplay" />
     </template>
 
     <PensukeTutorialPanel v-if="activeMode === 'tutorial'" />

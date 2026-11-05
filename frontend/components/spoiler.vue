@@ -16,13 +16,15 @@ const showSpoiler = ref(false)
       class="absolute inset-0 z-50 bg-indigo-500 text-white flex flex-col items-center justify-center cursor-pointer"
       @click="showSpoiler = true"
     >
-      <I18nT keypath="common.spoiler" tag="div" scope="global" class="flex items-center">
-        <template #for>
-          <span class="text-lg font-bold">
-            {{ spoiled }}
-          </span>
-        </template>
-      </I18nT>
+      <slot name="label">
+        <I18nT keypath="common.spoiler" tag="div" scope="global" class="flex items-center">
+          <template #for>
+            <span class="text-lg font-bold">
+              {{ spoiled }}
+            </span>
+          </template>
+        </I18nT>
+      </slot>
     </div>
     <slot />
   </div>

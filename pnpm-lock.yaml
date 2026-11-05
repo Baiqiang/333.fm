@@ -28,6 +28,9 @@ importers:
       md-editor-v3:
         specifier: ^6.3.1
         version: 6.5.3(vue@3.5.43(typescript@5.9.3))
+      min2phase.js:
+        specifier: ^0.0.4
+        version: 0.0.4
       tailwind-merge:
         specifier: ^2.5.4
         version: 2.6.1
