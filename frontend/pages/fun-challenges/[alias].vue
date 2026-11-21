@@ -70,7 +70,7 @@ bus.on(fetchSubmissions)
         :name="$t('weekly.scramble', { number: scramble.number })"
         :hash="`scramble-${scramble.number}`"
       >
-        <ScrambleDisplay :scramble="scramble.scramble" />
+        <ScrambleDisplay :scramble="scramble.scramble" :optional-cube="isOnGoing && !mySubmissions[scramble.id]?.length" />
         <CompetitionForm
           v-if="isOnGoing || mySubmissions[scramble.id]?.length"
           :scramble="scramble"

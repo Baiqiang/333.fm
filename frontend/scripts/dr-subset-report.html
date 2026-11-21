@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>DR Subset 概率分布报告</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e5e7eb; font: 10px/1.35 Inter, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif; color: #1f2937; }
+  .page { width: 210mm; height: 297mm; margin: 0 auto; padding: 7mm 9mm; background: #fff; overflow: hidden; display: flex; flex-direction: column; gap: 2.4mm; }
+  header { background: linear-gradient(90deg, #3b82f6, #4f46e5); color: #fff; padding: 7px 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+  h1 { margin: 0; font: 600 18px Poppins, Inter, sans-serif; }
+  header .meta { text-align: right; opacity: .9; font-size: 9px; }
+  h2 { margin: 0 0 4px; font: 600 11px Poppins, Inter, sans-serif; color: #312e81; border-left: 3px solid #3b82f6; padding-left: 6px; }
+  .cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .card { border: 1px solid #e5e7eb; border-left: 3px solid #6366f1; padding: 3px 8px; }
+  .card .v { font: 600 14px Poppins, Inter, sans-serif; color: #312e81; }
+  .card .k { color: #6b7280; font-size: 8.5px; }
+  .row { display: grid; gap: 8px; }
+  .box { border: 1px solid #e5e7eb; padding: 5px 8px; }
+  svg text { font-family: Inter, sans-serif; }
+  .grid { stroke: #e5e7eb; stroke-width: 1; }
+  .axis { font-size: 8px; fill: #9ca3af; }
+  .label { font-size: 8.5px; fill: #374151; font-weight: 600; }
+  .value { font-size: 7.5px; fill: #4b5563; }
+  .sample { stroke: #111827; stroke-width: 1.6; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { padding: 1px 4px; text-align: right; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
+  th { color: #6b7280; font-weight: 600; font-size: 8.5px; border-bottom: 1px solid #d1d5db; }
+  td:first-child, th:first-child { text-align: left; }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 9999px; margin-right: 5px; vertical-align: middle; }
+  .warn { color: #b45309; }
+  .bad { color: #dc2626; font-weight: 600; }
+  .heat th, .heat td { text-align: center; padding: 2px 0; font-size: 7.5px; border: 1px solid #fff; }
+  .heat th { border-bottom: 1px solid #fff; }
+  .legend { color: #6b7280; font-size: 8.5px; }
+  .legend i { display: inline-block; width: 14px; height: 7px; vertical-align: middle; margin: 0 3px 0 8px; }
+  .notes { color: #4b5563; font-size: 8.8px; }
+  .notes p { margin: 0 0 2px; }
+  .ratios div { padding: 1.5px 0; font-variant-numeric: tabular-nums; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 8.5px; background: #f3f4f6; padding: 0 3px; }
+  @media print { body { background: #fff; } .page { margin: 0; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>DR Subset 概率分布报告</h1>
+      <div>DR-UD 状态下 QT 数、角块 subset 与坏棱数的精确概率及抽样验证</div>
+    </div>
+    <div class="meta">
+      精确：枚举 40,320 种角块状态<br>
+      抽样：1,000,000 个随机 DR 状态（随机步数 300）<br>
+      生成于 2026/10/28 11:57:36 · 耗时 104.6s
+    </div>
+  </header>
+
+  <div class="cards">
+    <div class="card"><div class="v">3.519</div><div class="k">平均 QT 数</div></div>
+    <div class="card"><div class="v">17.62%</div><div class="k">QT ≤ 2 的概率</div></div>
+    <div class="card"><div class="v">1/420</div><div class="k">0c0（含 HTR 角块）概率</div></div>
+    <div class="card"><div class="v">4QT</div><div class="k">最常见 QT（35.24%）</div></div>
+    <div class="card"><div class="v">2.36σ</div><div class="k">抽样与精确值最大偏差</div></div>
+  </div>
+
+  <div class="row" style="grid-template-columns: 1fr 1fr;">
+    <div class="box">
+      <h2>QT 数分布</h2>
+      <svg viewBox="0 0 360 118" width="100%"><line x1="30" x2="354" y1="100" y2="100" class="grid"/><text x="26" y="103" class="axis" text-anchor="end">0%</text><line x1="30" x2="354" y1="79" y2="79" class="grid"/><text x="26" y="82" class="axis" text-anchor="end">10%</text><line x1="30" x2="354" y1="58" y2="58" class="grid"/><text x="26" y="61" class="axis" text-anchor="end">20%</text><line x1="30" x2="354" y1="36.99999999999999" y2="36.99999999999999" class="grid"/><text x="26" y="39.99999999999999" class="axis" text-anchor="end">30%</text><line x1="30" x2="354" y1="16" y2="16" class="grid"/><text x="26" y="19" class="axis" text-anchor="end">40%</text><rect x="38.1" y="99" width="37.8" height="1" fill="#6366f1" opacity="0.85"><title>0QT: 0.4762%</title></rect><line x1="36.1" x2="77.9" y1="99.00145" y2="99.00145" class="sample"/><text x="57" y="96" class="value" text-anchor="middle">0.48</text><text x="57" y="113" class="label" text-anchor="middle">0QT</text><rect x="92.1" y="94" width="37.8" height="6" fill="#6366f1" opacity="0.85"><title>1QT: 2.8571%</title></rect><line x1="90.1" x2="131.9" y1="94.03516" y2="94.03516" class="sample"/><text x="111" y="91" class="value" text-anchor="middle">2.9</text><text x="111" y="113" class="label" text-anchor="middle">1QT</text><rect x="146.1" y="70" width="37.8" height="30" fill="#6366f1" opacity="0.85"><title>2QT: 14.2857%</title></rect><line x1="144.1" x2="185.9" y1="70.15501" y2="70.15501" class="sample"/><text x="165" y="67" class="value" text-anchor="middle">14.3</text><text x="165" y="113" class="label" text-anchor="middle">2QT</text><rect x="200.1" y="41.00000000000001" width="37.8" height="58.99999999999999" fill="#6366f1" opacity="0.85"><title>3QT: 28.0952%</title></rect><line x1="198.1" x2="239.9" y1="40.94254000000001" y2="40.94254000000001" class="sample"/><text x="219" y="37.94254000000001" class="value" text-anchor="middle">28.1</text><text x="219" y="113" class="label" text-anchor="middle">3QT</text><rect x="254.1" y="26" width="37.8" height="74" fill="#6366f1" opacity="0.85"><title>4QT: 35.2381%</title></rect><line x1="252.1" x2="293.9" y1="25.887850000000014" y2="25.887850000000014" class="sample"/><text x="273" y="22.887850000000014" class="value" text-anchor="middle">35.2</text><text x="273" y="113" class="label" text-anchor="middle">4QT</text><rect x="308.1" y="60" width="37.8" height="40" fill="#6366f1" opacity="0.85"><title>5QT: 19.0476%</title></rect><line x1="306.1" x2="347.9" y1="59.97799" y2="59.97799" class="sample"/><text x="327" y="56.97799" class="value" text-anchor="middle">19.0</text><text x="327" y="113" class="label" text-anchor="middle">5QT</text></svg>
+    </div>
+    <div class="box">
+      <h2>角块组分布</h2>
+      <svg viewBox="0 0 360 118" width="100%"><line x1="30" x2="354" y1="100" y2="100" class="grid"/><text x="26" y="103" class="axis" text-anchor="end">0%</text><line x1="30" x2="354" y1="79" y2="79" class="grid"/><text x="26" y="82" class="axis" text-anchor="end">10%</text><line x1="30" x2="354" y1="58" y2="58" class="grid"/><text x="26" y="61" class="axis" text-anchor="end">20%</text><line x1="30" x2="354" y1="36.99999999999999" y2="36.99999999999999" class="grid"/><text x="26" y="39.99999999999999" class="axis" text-anchor="end">30%</text><line x1="30" x2="354" y1="16" y2="16" class="grid"/><text x="26" y="19" class="axis" text-anchor="end">40%</text><rect x="38.1" y="97" width="37.8" height="3" fill="#0ea5e9" opacity="0.85"><title>0c: 1.4286%</title></rect><line x1="36.1" x2="77.9" y1="96.98356" y2="96.98356" class="sample"/><text x="57" y="93.98356" class="value" text-anchor="middle">1.4</text><text x="57" y="113" class="label" text-anchor="middle">0c</text><rect x="92.1" y="52" width="37.8" height="48" fill="#6366f1" opacity="0.85"><title>2c: 22.8571%</title></rect><line x1="90.1" x2="131.9" y1="51.89929" y2="51.89929" class="sample"/><text x="111" y="48.89929" class="value" text-anchor="middle">22.9</text><text x="111" y="113" class="label" text-anchor="middle">2c</text><rect x="146.1" y="64" width="37.8" height="36" fill="#a855f7" opacity="0.85"><title>4a: 17.1429%</title></rect><line x1="144.1" x2="185.9" y1="64.09336" y2="64.09336" class="sample"/><text x="165" y="61" class="value" text-anchor="middle">17.1</text><text x="165" y="113" class="label" text-anchor="middle">4a</text><rect x="200.1" y="28" width="37.8" height="72" fill="#ec4899" opacity="0.85"><title>4b: 34.2857%</title></rect><line x1="198.1" x2="239.9" y1="28.050430000000006" y2="28.050430000000006" class="sample"/><text x="219" y="25" class="value" text-anchor="middle">34.3</text><text x="219" y="113" class="label" text-anchor="middle">4b</text><rect x="254.1" y="52" width="37.8" height="48" fill="#f97316" opacity="0.85"><title>6c: 22.8571%</title></rect><line x1="252.1" x2="293.9" y1="51.972370000000005" y2="51.972370000000005" class="sample"/><text x="273" y="48.972370000000005" class="value" text-anchor="middle">22.9</text><text x="273" y="113" class="label" text-anchor="middle">6c</text><rect x="308.1" y="97" width="37.8" height="3" fill="#14b8a6" opacity="0.85"><title>8c: 1.4286%</title></rect><line x1="306.1" x2="347.9" y1="97.00099" y2="97.00099" class="sample"/><text x="327" y="94" class="value" text-anchor="middle">1.4</text><text x="327" y="113" class="label" text-anchor="middle">8c</text></svg>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>各 Subset 概率</h2>
+    <svg viewBox="0 0 740 128" width="100%"><line x1="30" x2="734" y1="110" y2="110" class="grid"/><text x="26" y="113" class="axis" text-anchor="end">0%</text><line x1="30" x2="734" y1="94.33333333333333" y2="94.33333333333333" class="grid"/><text x="26" y="97.33333333333333" class="axis" text-anchor="end">2%</text><line x1="30" x2="734" y1="78.66666666666666" y2="78.66666666666666" class="grid"/><text x="26" y="81.66666666666666" class="axis" text-anchor="end">4%</text><line x1="30" x2="734" y1="63" y2="63" class="grid"/><text x="26" y="66" class="axis" text-anchor="end">6%</text><line x1="30" x2="734" y1="47.33333333333333" y2="47.33333333333333" class="grid"/><text x="26" y="50.33333333333333" class="axis" text-anchor="end">8%</text><line x1="30" x2="734" y1="31.666666666666657" y2="31.666666666666657" class="grid"/><text x="26" y="34.66666666666666" class="axis" text-anchor="end">10%</text><line x1="30" x2="734" y1="15.999999999999986" y2="15.999999999999986" class="grid"/><text x="26" y="18.999999999999986" class="axis" text-anchor="end">12%</text><rect x="35.28" y="108.13492063492063" width="24.64" height="1.8650793650793673" fill="#0ea5e9" opacity="0.85"><title>0c0: 0.2381%</title></rect><line x1="33.28" x2="61.92" y1="108.12626666666667" y2="108.12626666666667" class="sample"/><text x="47.6" y="105.12626666666667" class="value" text-anchor="middle">0.24</text><text x="47.6" y="123" class="label" text-anchor="middle">0c0</text><rect x="70.48000000000002" y="104.4047619047619" width="24.64" height="5.595238095238102" fill="#0ea5e9" opacity="0.85"><title>0c3: 0.7143%</title></rect><line x1="68.48000000000002" x2="97.12" y1="104.33336666666666" y2="104.33336666666666" class="sample"/><text x="82.80000000000001" y="101.33336666666666" class="value" text-anchor="middle">0.71</text><text x="82.80000000000001" y="123" class="label" text-anchor="middle">0c3</text><rect x="105.68" y="106.26984126984127" width="24.64" height="3.7301587301587347" fill="#0ea5e9" opacity="0.85"><title>0c4: 0.4762%</title></rect><line x1="103.68" x2="132.32" y1="106.28856666666667" y2="106.28856666666667" class="sample"/><text x="118" y="103.26984126984127" class="value" text-anchor="middle">0.48</text><text x="118" y="123" class="label" text-anchor="middle">0c4</text><rect x="140.88000000000002" y="50.31746031746031" width="24.64" height="59.68253968253969" fill="#6366f1" opacity="0.85"><title>2c3: 7.6190%</title></rect><line x1="138.88000000000002" x2="167.52" y1="50.176833333333335" y2="50.176833333333335" class="sample"/><text x="153.20000000000002" y="47.176833333333335" class="value" text-anchor="middle">7.6</text><text x="153.20000000000002" y="123" class="label" text-anchor="middle">2c3</text><rect x="176.08" y="20.476190476190467" width="24.64" height="89.52380952380953" fill="#6366f1" opacity="0.85"><title>2c4: 11.4286%</title></rect><line x1="174.08" x2="202.72" y1="20.405466666666655" y2="20.405466666666655" class="sample"/><text x="188.4" y="17.405466666666655" class="value" text-anchor="middle">11.4</text><text x="188.4" y="123" class="label" text-anchor="middle">2c4</text><rect x="211.28" y="80.15873015873015" width="24.64" height="29.84126984126985" fill="#6366f1" opacity="0.85"><title>2c5: 3.8095%</title></rect><line x1="209.28" x2="237.92" y1="79.99441666666667" y2="79.99441666666667" class="sample"/><text x="223.6" y="76.99441666666667" class="value" text-anchor="middle">3.8</text><text x="223.6" y="123" class="label" text-anchor="middle">2c5</text><rect x="246.48000000000002" y="87.61904761904762" width="24.64" height="22.38095238095238" fill="#a855f7" opacity="0.85"><title>4a1: 2.8571%</title></rect><line x1="244.48000000000002" x2="273.12" y1="87.7502" y2="87.7502" class="sample"/><text x="258.8" y="84.61904761904762" class="value" text-anchor="middle">2.9</text><text x="258.8" y="123" class="label" text-anchor="middle">4a1</text><rect x="281.68000000000006" y="87.61904761904762" width="24.64" height="22.38095238095238" fill="#a855f7" opacity="0.85"><title>4a2: 2.8571%</title></rect><line x1="279.68000000000006" x2="308.32000000000005" y1="87.92566666666667" y2="87.92566666666667" class="sample"/><text x="294.00000000000006" y="84.61904761904762" class="value" text-anchor="middle">2.9</text><text x="294.00000000000006" y="123" class="label" text-anchor="middle">4a2</text><rect x="316.88000000000005" y="65.23809523809524" width="24.64" height="44.76190476190476" fill="#a855f7" opacity="0.85"><title>4a3: 5.7143%</title></rect><line x1="314.88000000000005" x2="343.52000000000004" y1="65.26774999999999" y2="65.26774999999999" class="sample"/><text x="329.20000000000005" y="62.23809523809524" class="value" text-anchor="middle">5.7</text><text x="329.20000000000005" y="123" class="label" text-anchor="middle">4a3</text><rect x="352.08000000000004" y="65.23809523809524" width="24.64" height="44.76190476190476" fill="#a855f7" opacity="0.85"><title>4a4: 5.7143%</title></rect><line x1="350.08000000000004" x2="378.72" y1="65.11891666666668" y2="65.11891666666668" class="sample"/><text x="364.40000000000003" y="62.11891666666668" class="value" text-anchor="middle">5.7</text><text x="364.40000000000003" y="123" class="label" text-anchor="middle">4a4</text><rect x="387.28000000000003" y="20.476190476190467" width="24.64" height="89.52380952380953" fill="#ec4899" opacity="0.85"><title>4b2: 11.4286%</title></rect><line x1="385.28000000000003" x2="413.92" y1="20.74778333333333" y2="20.74778333333333" class="sample"/><text x="399.6" y="17.476190476190467" class="value" text-anchor="middle">11.4</text><text x="399.6" y="123" class="label" text-anchor="middle">4b2</text><rect x="422.4800000000001" y="65.23809523809524" width="24.64" height="44.76190476190476" fill="#ec4899" opacity="0.85"><title>4b3: 5.7143%</title></rect><line x1="420.4800000000001" x2="449.12000000000006" y1="65.41031666666666" y2="65.41031666666666" class="sample"/><text x="434.80000000000007" y="62.23809523809524" class="value" text-anchor="middle">5.7</text><text x="434.80000000000007" y="123" class="label" text-anchor="middle">4b3</text><rect x="457.68000000000006" y="65.23809523809524" width="24.64" height="44.76190476190476" fill="#ec4899" opacity="0.85"><title>4b4: 5.7143%</title></rect><line x1="455.68000000000006" x2="484.32000000000005" y1="65.14633333333333" y2="65.14633333333333" class="sample"/><text x="470.00000000000006" y="62.14633333333333" class="value" text-anchor="middle">5.7</text><text x="470.00000000000006" y="123" class="label" text-anchor="middle">4b4</text><rect x="492.88000000000005" y="20.476190476190467" width="24.64" height="89.52380952380953" fill="#ec4899" opacity="0.85"><title>4b5: 11.4286%</title></rect><line x1="490.88000000000005" x2="519.5200000000001" y1="20.312250000000006" y2="20.312250000000006" class="sample"/><text x="505.20000000000005" y="17.312250000000006" class="value" text-anchor="middle">11.4</text><text x="505.20000000000005" y="123" class="label" text-anchor="middle">4b5</text><rect x="528.08" y="50.31746031746031" width="24.64" height="59.68253968253969" fill="#f97316" opacity="0.85"><title>6c3: 7.6190%</title></rect><line x1="526.08" x2="554.7200000000001" y1="50.1502" y2="50.1502" class="sample"/><text x="540.4000000000001" y="47.1502" class="value" text-anchor="middle">7.6</text><text x="540.4000000000001" y="123" class="label" text-anchor="middle">6c3</text><rect x="563.28" y="20.476190476190467" width="24.64" height="89.52380952380953" fill="#f97316" opacity="0.85"><title>6c4: 11.4286%</title></rect><line x1="561.28" x2="589.9200000000001" y1="20.294233333333324" y2="20.294233333333324" class="sample"/><text x="575.6" y="17.294233333333324" class="value" text-anchor="middle">11.4</text><text x="575.6" y="123" class="label" text-anchor="middle">6c4</text><rect x="598.48" y="80.15873015873015" width="24.64" height="29.84126984126985" fill="#f97316" opacity="0.85"><title>6c5: 3.8095%</title></rect><line x1="596.48" x2="625.1200000000001" y1="80.40488333333333" y2="80.40488333333333" class="sample"/><text x="610.8000000000001" y="77.15873015873015" class="value" text-anchor="middle">3.8</text><text x="610.8000000000001" y="123" class="label" text-anchor="middle">6c5</text><rect x="633.6800000000001" y="108.13492063492063" width="24.64" height="1.8650793650793673" fill="#14b8a6" opacity="0.85"><title>8c0: 0.2381%</title></rect><line x1="631.6800000000001" x2="660.3200000000002" y1="108.14898333333333" y2="108.14898333333333" class="sample"/><text x="646.0000000000001" y="105.13492063492063" class="value" text-anchor="middle">0.24</text><text x="646.0000000000001" y="123" class="label" text-anchor="middle">8c0</text><rect x="668.88" y="104.4047619047619" width="24.64" height="5.595238095238102" fill="#14b8a6" opacity="0.85"><title>8c3: 0.7143%</title></rect><line x1="666.88" x2="695.5200000000001" y1="104.36783333333334" y2="104.36783333333334" class="sample"/><text x="681.2" y="101.36783333333334" class="value" text-anchor="middle">0.71</text><text x="681.2" y="123" class="label" text-anchor="middle">8c3</text><rect x="704.08" y="106.26984126984127" width="24.64" height="3.7301587301587347" fill="#14b8a6" opacity="0.85"><title>8c4: 0.4762%</title></rect><line x1="702.08" x2="730.7200000000001" y1="106.2964" y2="106.2964" class="sample"/><text x="716.4000000000001" y="103.26984126984127" class="value" text-anchor="middle">0.48</text><text x="716.4000000000001" y="123" class="label" text-anchor="middle">8c4</text></svg>
+    <div class="legend">柱子 = 精确概率（柱顶数字为 %），<b style="color:#111827">黑线</b> = 抽样频率
+      <i style="background:#0ea5e9"></i>0c<i style="background:#6366f1"></i>2c<i style="background:#a855f7"></i>4a<i style="background:#ec4899"></i>4b<i style="background:#f97316"></i>6c<i style="background:#14b8a6"></i>8c
+    </div>
+  </div>
+
+  <div class="row" style="grid-template-columns: 1.45fr 1fr;">
+    <div class="box">
+      <h2>Subset 明细</h2>
+      <table>
+        <thead><tr><th>Subset</th><th>角块状态</th><th>分数</th><th>精确</th><th>约</th><th>组内占比</th><th>抽样</th><th>偏差 σ</th></tr></thead>
+        <tbody><tr>
+      <td><span class="dot" style="background:#0ea5e9"></span>0c0</td>
+      <td>96</td>
+      <td>1/420</td>
+      <td><b>0.238%</b></td>
+      <td>1/420.0</td>
+      <td>16.7%</td>
+      <td>0.239%</td>
+      <td class="">+0.23</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#0ea5e9"></span>0c3</td>
+      <td>288</td>
+      <td>1/140</td>
+      <td><b>0.714%</b></td>
+      <td>1/140.0</td>
+      <td>50.0%</td>
+      <td>0.723%</td>
+      <td class="">+1.08</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#0ea5e9"></span>0c4</td>
+      <td>192</td>
+      <td>1/210</td>
+      <td><b>0.476%</b></td>
+      <td>1/210.0</td>
+      <td>33.3%</td>
+      <td>0.474%</td>
+      <td class="">-0.35</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#6366f1"></span>2c3</td>
+      <td>3072</td>
+      <td>8/105</td>
+      <td><b>7.619%</b></td>
+      <td>1/13.1</td>
+      <td>33.3%</td>
+      <td>7.637%</td>
+      <td class="">+0.68</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#6366f1"></span>2c4</td>
+      <td>4608</td>
+      <td>4/35</td>
+      <td><b>11.429%</b></td>
+      <td>1/8.8</td>
+      <td>50.0%</td>
+      <td>11.438%</td>
+      <td class="">+0.28</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#6366f1"></span>2c5</td>
+      <td>1536</td>
+      <td>4/105</td>
+      <td><b>3.810%</b></td>
+      <td>1/26.2</td>
+      <td>16.7%</td>
+      <td>3.830%</td>
+      <td class="">+1.10</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#a855f7"></span>4a1</td>
+      <td>1152</td>
+      <td>1/35</td>
+      <td><b>2.857%</b></td>
+      <td>1/35.0</td>
+      <td>16.7%</td>
+      <td>2.840%</td>
+      <td class="">-1.00</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#a855f7"></span>4a2</td>
+      <td>1152</td>
+      <td>1/35</td>
+      <td><b>2.857%</b></td>
+      <td>1/35.0</td>
+      <td>16.7%</td>
+      <td>2.818%</td>
+      <td class="warn">-2.35</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#a855f7"></span>4a3</td>
+      <td>2304</td>
+      <td>2/35</td>
+      <td><b>5.714%</b></td>
+      <td>1/17.5</td>
+      <td>33.3%</td>
+      <td>5.711%</td>
+      <td class="">-0.16</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#a855f7"></span>4a4</td>
+      <td>2304</td>
+      <td>2/35</td>
+      <td><b>5.714%</b></td>
+      <td>1/17.5</td>
+      <td>33.3%</td>
+      <td>5.729%</td>
+      <td class="">+0.66</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#ec4899"></span>4b2</td>
+      <td>4608</td>
+      <td>4/35</td>
+      <td><b>11.429%</b></td>
+      <td>1/8.8</td>
+      <td>33.3%</td>
+      <td>11.394%</td>
+      <td class="">-1.09</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#ec4899"></span>4b3</td>
+      <td>2304</td>
+      <td>2/35</td>
+      <td><b>5.714%</b></td>
+      <td>1/17.5</td>
+      <td>16.7%</td>
+      <td>5.692%</td>
+      <td class="">-0.95</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#ec4899"></span>4b4</td>
+      <td>2304</td>
+      <td>2/35</td>
+      <td><b>5.714%</b></td>
+      <td>1/17.5</td>
+      <td>16.7%</td>
+      <td>5.726%</td>
+      <td class="">+0.50</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#ec4899"></span>4b5</td>
+      <td>4608</td>
+      <td>4/35</td>
+      <td><b>11.429%</b></td>
+      <td>1/8.8</td>
+      <td>33.3%</td>
+      <td>11.450%</td>
+      <td class="">+0.66</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#f97316"></span>6c3</td>
+      <td>3072</td>
+      <td>8/105</td>
+      <td><b>7.619%</b></td>
+      <td>1/13.1</td>
+      <td>33.3%</td>
+      <td>7.640%</td>
+      <td class="">+0.80</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#f97316"></span>6c4</td>
+      <td>4608</td>
+      <td>4/35</td>
+      <td><b>11.429%</b></td>
+      <td>1/8.8</td>
+      <td>50.0%</td>
+      <td>11.452%</td>
+      <td class="">+0.73</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#f97316"></span>6c5</td>
+      <td>1536</td>
+      <td>4/105</td>
+      <td><b>3.810%</b></td>
+      <td>1/26.2</td>
+      <td>16.7%</td>
+      <td>3.778%</td>
+      <td class="">-1.64</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#14b8a6"></span>8c0</td>
+      <td>96</td>
+      <td>1/420</td>
+      <td><b>0.238%</b></td>
+      <td>1/420.0</td>
+      <td>16.7%</td>
+      <td>0.236%</td>
+      <td class="">-0.37</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#14b8a6"></span>8c3</td>
+      <td>288</td>
+      <td>1/140</td>
+      <td><b>0.714%</b></td>
+      <td>1/140.0</td>
+      <td>50.0%</td>
+      <td>0.719%</td>
+      <td class="">+0.56</td>
+    </tr><tr>
+      <td><span class="dot" style="background:#14b8a6"></span>8c4</td>
+      <td>192</td>
+      <td>1/210</td>
+      <td><b>0.476%</b></td>
+      <td>1/210.0</td>
+      <td>33.3%</td>
+      <td>0.473%</td>
+      <td class="">-0.49</td>
+    </tr></tbody>
+      </table>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div class="box">
+        <h2>QT 数</h2>
+        <table><thead><tr><th>QT</th><th>分数</th><th>精确</th><th>抽样</th><th>σ</th></tr></thead><tbody><tr><td>0QT</td><td>1/210</td><td><b>0.476%</b></td><td>0.475%</td><td class="">-0.10</td></tr><tr><td>1QT</td><td>1/35</td><td><b>2.857%</b></td><td>2.840%</td><td class="">-1.00</td></tr><tr><td>2QT</td><td>1/7</td><td><b>14.286%</b></td><td>14.212%</td><td class="warn">-2.11</td></tr><tr><td>3QT</td><td>59/210</td><td><b>28.095%</b></td><td>28.123%</td><td class="">+0.61</td></tr><tr><td>4QT</td><td>37/105</td><td><b>35.238%</b></td><td>35.291%</td><td class="">+1.12</td></tr><tr><td>5QT</td><td>4/21</td><td><b>19.048%</b></td><td>19.058%</td><td class="">+0.27</td></tr></tbody></table>
+      </div>
+      <div class="box">
+        <h2>坏棱数</h2>
+        <table><thead><tr><th>坏棱</th><th>分数</th><th>精确</th><th>抽样</th><th>σ</th></tr></thead><tbody><tr><td>0e</td><td>1/70</td><td><b>1.429%</b></td><td>1.414%</td><td class="">-1.23</td></tr><tr><td>2e</td><td>8/35</td><td><b>22.857%</b></td><td>22.875%</td><td class="">+0.42</td></tr><tr><td>4e</td><td>18/35</td><td><b>51.429%</b></td><td>51.398%</td><td class="">-0.61</td></tr><tr><td>6e</td><td>8/35</td><td><b>22.857%</b></td><td>22.877%</td><td class="">+0.46</td></tr><tr><td>8e</td><td>1/70</td><td><b>1.429%</b></td><td>1.437%</td><td class="">+0.69</td></tr></tbody></table>
+      </div>
+      <div class="box ratios">
+        <h2>组内 QT 比例</h2>
+        <div><b style="color:#0ea5e9">0c</b> 0 : 3 : 4 = 1 : 3 : 2</div><div><b style="color:#6366f1">2c</b> 3 : 4 : 5 = 2 : 3 : 1</div><div><b style="color:#a855f7">4a</b> 1 : 2 : 3 : 4 = 1 : 1 : 2 : 2</div><div><b style="color:#ec4899">4b</b> 2 : 3 : 4 : 5 = 2 : 1 : 1 : 2</div><div><b style="color:#f97316">6c</b> 3 : 4 : 5 = 2 : 3 : 1</div><div><b style="color:#14b8a6">8c</b> 0 : 3 : 4 = 1 : 3 : 2</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>Subset × 坏棱数 联合概率（%）</h2>
+    <table class="heat"><thead><tr><th></th><th style="color:#0ea5e9">0c0</th><th style="color:#0ea5e9">0c3</th><th style="color:#0ea5e9">0c4</th><th style="color:#6366f1">2c3</th><th style="color:#6366f1">2c4</th><th style="color:#6366f1">2c5</th><th style="color:#a855f7">4a1</th><th style="color:#a855f7">4a2</th><th style="color:#a855f7">4a3</th><th style="color:#a855f7">4a4</th><th style="color:#ec4899">4b2</th><th style="color:#ec4899">4b3</th><th style="color:#ec4899">4b4</th><th style="color:#ec4899">4b5</th><th style="color:#f97316">6c3</th><th style="color:#f97316">6c4</th><th style="color:#f97316">6c5</th><th style="color:#14b8a6">8c0</th><th style="color:#14b8a6">8c3</th><th style="color:#14b8a6">8c4</th></tr></thead><tbody><tr><th>0e</th><td style="background:rgba(79,70,229,0.024);color:#1e1b4b" title="0c0 0e: 0.0034%, sampled 0.0029%">0.003</td><td style="background:rgba(79,70,229,0.042);color:#1e1b4b" title="0c3 0e: 0.0102%, sampled 0.0087%">0.010</td><td style="background:rgba(79,70,229,0.034);color:#1e1b4b" title="0c4 0e: 0.0068%, sampled 0.0073%">0.007</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="2c3 0e: 0.1088%, sampled 0.1090%">0.109</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="2c4 0e: 0.1633%, sampled 0.1644%">0.163</td><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="2c5 0e: 0.0544%, sampled 0.0547%">0.054</td><td style="background:rgba(79,70,229,0.083);color:#1e1b4b" title="4a1 0e: 0.0408%, sampled 0.0414%">0.041</td><td style="background:rgba(79,70,229,0.083);color:#1e1b4b" title="4a2 0e: 0.0408%, sampled 0.0394%">0.041</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4a3 0e: 0.0816%, sampled 0.0824%">0.082</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4a4 0e: 0.0816%, sampled 0.0847%">0.082</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="4b2 0e: 0.1633%, sampled 0.1609%">0.163</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4b3 0e: 0.0816%, sampled 0.0821%">0.082</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4b4 0e: 0.0816%, sampled 0.0794%">0.082</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="4b5 0e: 0.1633%, sampled 0.1600%">0.163</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="6c3 0e: 0.1088%, sampled 0.1052%">0.109</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="6c4 0e: 0.1633%, sampled 0.1594%">0.163</td><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="6c5 0e: 0.0544%, sampled 0.0514%">0.054</td><td style="background:rgba(79,70,229,0.024);color:#1e1b4b" title="8c0 0e: 0.0034%, sampled 0.0037%">0.003</td><td style="background:rgba(79,70,229,0.042);color:#1e1b4b" title="8c3 0e: 0.0102%, sampled 0.0098%">0.010</td><td style="background:rgba(79,70,229,0.034);color:#1e1b4b" title="8c4 0e: 0.0068%, sampled 0.0072%">0.007</td></tr><tr><th>2e</th><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="0c0 2e: 0.0544%, sampled 0.0545%">0.054</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="0c3 2e: 0.1633%, sampled 0.1650%">0.163</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="0c4 2e: 0.1088%, sampled 0.1042%">0.109</td><td style="background:rgba(79,70,229,0.544);color:#1e1b4b" title="2c3 2e: 1.7415%, sampled 1.7475%">1.74</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="2c4 2e: 2.6122%, sampled 2.6166%">2.61</td><td style="background:rgba(79,70,229,0.385);color:#1e1b4b" title="2c5 2e: 0.8707%, sampled 0.8720%">0.871</td><td style="background:rgba(79,70,229,0.333);color:#1e1b4b" title="4a1 2e: 0.6531%, sampled 0.6588%">0.653</td><td style="background:rgba(79,70,229,0.333);color:#1e1b4b" title="4a2 2e: 0.6531%, sampled 0.6406%">0.653</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4a3 2e: 1.3061%, sampled 1.3008%">1.31</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4a4 2e: 1.3061%, sampled 1.3301%">1.31</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="4b2 2e: 2.6122%, sampled 2.6046%">2.61</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4b3 2e: 1.3061%, sampled 1.3052%">1.31</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4b4 2e: 1.3061%, sampled 1.3329%">1.31</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="4b5 2e: 2.6122%, sampled 2.6043%">2.61</td><td style="background:rgba(79,70,229,0.544);color:#1e1b4b" title="6c3 2e: 1.7415%, sampled 1.7483%">1.74</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="6c4 2e: 2.6122%, sampled 2.6046%">2.61</td><td style="background:rgba(79,70,229,0.385);color:#1e1b4b" title="6c5 2e: 0.8707%, sampled 0.8520%">0.871</td><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="8c0 2e: 0.0544%, sampled 0.0571%">0.054</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="8c3 2e: 0.1633%, sampled 0.1719%">0.163</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="8c4 2e: 0.1088%, sampled 0.1038%">0.109</td></tr><tr><th>4e</th><td style="background:rgba(79,70,229,0.144);color:#1e1b4b" title="0c0 4e: 0.1224%, sampled 0.1240%">0.122</td><td style="background:rgba(79,70,229,0.250);color:#1e1b4b" title="0c3 4e: 0.3673%, sampled 0.3738%">0.367</td><td style="background:rgba(79,70,229,0.204);color:#1e1b4b" title="0c4 4e: 0.2449%, sampled 0.2507%">0.245</td><td style="background:rgba(79,70,229,0.816);color:#fff" title="2c3 4e: 3.9184%, sampled 3.9332%">3.92</td><td style="background:rgba(79,70,229,1.000);color:#fff" title="2c4 4e: 5.8776%, sampled 5.8863%">5.88</td><td style="background:rgba(79,70,229,0.577);color:#fff" title="2c5 4e: 1.9592%, sampled 1.9669%">1.96</td><td style="background:rgba(79,70,229,0.500);color:#1e1b4b" title="4a1 4e: 1.4694%, sampled 1.4585%">1.47</td><td style="background:rgba(79,70,229,0.500);color:#1e1b4b" title="4a2 4e: 1.4694%, sampled 1.4566%">1.47</td><td style="background:rgba(79,70,229,0.707);color:#fff" title="4a3 4e: 2.9388%, sampled 2.9159%">2.94</td><td style="background:rgba(79,70,229,0.707);color:#fff" title="4a4 4e: 2.9388%, sampled 2.9295%">2.94</td><td style="background:rgba(79,70,229,1.000);color:#fff" title="4b2 4e: 5.8776%, sampled 5.8507%">5.88</td><td style="background:rgba(79,70,229,0.707);color:#fff" title="4b3 4e: 2.9388%, sampled 2.9093%">2.94</td><td style="background:rgba(79,70,229,0.707);color:#fff" title="4b4 4e: 2.9388%, sampled 2.9464%">2.94</td><td style="background:rgba(79,70,229,1.000);color:#fff" title="4b5 4e: 5.8776%, sampled 5.8781%">5.88</td><td style="background:rgba(79,70,229,0.816);color:#fff" title="6c3 4e: 3.9184%, sampled 3.9267%">3.92</td><td style="background:rgba(79,70,229,1.000);color:#fff" title="6c4 4e: 5.8776%, sampled 5.8982%">5.88</td><td style="background:rgba(79,70,229,0.577);color:#fff" title="6c5 4e: 1.9592%, sampled 1.9686%">1.96</td><td style="background:rgba(79,70,229,0.144);color:#1e1b4b" title="8c0 4e: 0.1224%, sampled 0.1206%">0.122</td><td style="background:rgba(79,70,229,0.250);color:#1e1b4b" title="8c3 4e: 0.3673%, sampled 0.3596%">0.367</td><td style="background:rgba(79,70,229,0.204);color:#1e1b4b" title="8c4 4e: 0.2449%, sampled 0.2443%">0.245</td></tr><tr><th>6e</th><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="0c0 6e: 0.0544%, sampled 0.0550%">0.054</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="0c3 6e: 0.1633%, sampled 0.1657%">0.163</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="0c4 6e: 0.1088%, sampled 0.1048%">0.109</td><td style="background:rgba(79,70,229,0.544);color:#1e1b4b" title="2c3 6e: 1.7415%, sampled 1.7386%">1.74</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="2c4 6e: 2.6122%, sampled 2.6057%">2.61</td><td style="background:rgba(79,70,229,0.385);color:#1e1b4b" title="2c5 6e: 0.8707%, sampled 0.8853%">0.871</td><td style="background:rgba(79,70,229,0.333);color:#1e1b4b" title="4a1 6e: 0.6531%, sampled 0.6446%">0.653</td><td style="background:rgba(79,70,229,0.333);color:#1e1b4b" title="4a2 6e: 0.6531%, sampled 0.6384%">0.653</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4a3 6e: 1.3061%, sampled 1.3295%">1.31</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4a4 6e: 1.3061%, sampled 1.3042%">1.31</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="4b2 6e: 2.6122%, sampled 2.6111%">2.61</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4b3 6e: 1.3061%, sampled 1.3091%">1.31</td><td style="background:rgba(79,70,229,0.471);color:#1e1b4b" title="4b4 6e: 1.3061%, sampled 1.2853%">1.31</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="4b5 6e: 2.6122%, sampled 2.6456%">2.61</td><td style="background:rgba(79,70,229,0.544);color:#1e1b4b" title="6c3 6e: 1.7415%, sampled 1.7523%">1.74</td><td style="background:rgba(79,70,229,0.667);color:#fff" title="6c4 6e: 2.6122%, sampled 2.6229%">2.61</td><td style="background:rgba(79,70,229,0.385);color:#1e1b4b" title="6c5 6e: 0.8707%, sampled 0.8512%">0.871</td><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="8c0 6e: 0.0544%, sampled 0.0509%">0.054</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="8c3 6e: 0.1633%, sampled 0.1660%">0.163</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="8c4 6e: 0.1088%, sampled 0.1103%">0.109</td></tr><tr><th>8e</th><td style="background:rgba(79,70,229,0.024);color:#1e1b4b" title="0c0 8e: 0.0034%, sampled 0.0028%">0.003</td><td style="background:rgba(79,70,229,0.042);color:#1e1b4b" title="0c3 8e: 0.0102%, sampled 0.0102%">0.010</td><td style="background:rgba(79,70,229,0.034);color:#1e1b4b" title="0c4 8e: 0.0068%, sampled 0.0068%">0.007</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="2c3 8e: 0.1088%, sampled 0.1087%">0.109</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="2c4 8e: 0.1633%, sampled 0.1646%">0.163</td><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="2c5 8e: 0.0544%, sampled 0.0516%">0.054</td><td style="background:rgba(79,70,229,0.083);color:#1e1b4b" title="4a1 8e: 0.0408%, sampled 0.0371%">0.041</td><td style="background:rgba(79,70,229,0.083);color:#1e1b4b" title="4a2 8e: 0.0408%, sampled 0.0430%">0.041</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4a3 8e: 0.0816%, sampled 0.0819%">0.082</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4a4 8e: 0.0816%, sampled 0.0810%">0.082</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="4b2 8e: 0.1633%, sampled 0.1666%">0.163</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4b3 8e: 0.0816%, sampled 0.0866%">0.082</td><td style="background:rgba(79,70,229,0.118);color:#1e1b4b" title="4b4 8e: 0.0816%, sampled 0.0820%">0.082</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="4b5 8e: 0.1633%, sampled 0.1615%">0.163</td><td style="background:rgba(79,70,229,0.136);color:#1e1b4b" title="6c3 8e: 0.1088%, sampled 0.1079%">0.109</td><td style="background:rgba(79,70,229,0.167);color:#1e1b4b" title="6c4 8e: 0.1633%, sampled 0.1667%">0.163</td><td style="background:rgba(79,70,229,0.096);color:#1e1b4b" title="6c5 8e: 0.0544%, sampled 0.0549%">0.054</td><td style="background:rgba(79,70,229,0.024);color:#1e1b4b" title="8c0 8e: 0.0034%, sampled 0.0040%">0.003</td><td style="background:rgba(79,70,229,0.042);color:#1e1b4b" title="8c3 8e: 0.0102%, sampled 0.0117%">0.010</td><td style="background:rgba(79,70,229,0.034);color:#1e1b4b" title="8c4 8e: 0.0068%, sampled 0.0072%">0.007</td></tr></tbody></table>
+  </div>
+
+  <div class="box notes">
+    <p><b>方法：</b>角块 subset 只取决于角块排列（<code>getDRDescription</code> 只读角块贴纸和奇偶性，DR 下奇偶性由角块排列决定），因此用 BFS 在 <code>&lt;U, D, R2, L2, F2, B2&gt;</code> 下枚举全部 8! 种角块状态得到精确值。坏棱数与角块独立：8 个 U/D 层棱块中哪 4 个位于 R/L 侧，P(2k e) = C(4,k)² / 70，联合概率 = 两者相乘。</p>
+    <p><b>说明：</b>这是<b>均匀随机 DR 状态</b>的分布；实际 FMC 中会主动挑选 QT 少的 DR，真实分布偏向低 QT。0c0 包含已 HTR 与已复原的状态。偏差 σ = (抽样 − 精确) / √(p(1−p)/N)，|σ| ≥ 2 标橙、≥ 3 标红。</p>
+  </div>
+</div>
+</body>
+</html>

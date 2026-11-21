@@ -19,6 +19,7 @@ export const useUser = defineStore('user', {
     avatar: '',
     avatarThumb: '',
     roles: [] as Role[],
+    preferences: {} as UserPreferences,
   }),
   getters: {
     localName(): string {
@@ -53,6 +54,7 @@ export const useUser = defineStore('user', {
       this.avatar = user.avatar
       this.avatarThumb = user.avatarThumb
       this.roles = user.roles
+      this.preferences = user.preferences ?? {}
     },
     signOut() {
       useAccessToken().value = ''

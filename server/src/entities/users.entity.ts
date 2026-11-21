@@ -7,6 +7,10 @@ import { Submissions } from './submissions.entity'
 import { UserInsertionFinders } from './user-insertion-finders.entity'
 import { UserRoles } from './user-roles.entity'
 
+export interface UserPreferences {
+  scrambleCube?: boolean
+}
+
 @Entity()
 @Index(['source', 'sourceId'])
 @Index(['source', 'wcaId'])
@@ -38,6 +42,10 @@ export class Users {
 
   @Column({ nullable: true })
   primaryUserId: number
+
+  @Column({ type: 'json', nullable: true })
+  @Exclude()
+  preferences: UserPreferences | null
 
   @CreateDateColumn()
   createdAt: Date

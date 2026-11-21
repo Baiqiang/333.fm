@@ -43,56 +43,16 @@ const primaryNavs = computed(() => [
   //     }]
   //   : []),
 ])
+const trainingNavs = useTrainingNavs()
+const toolNavs = useToolNavs()
 const menuNavs = computed(() => [
   {
     title: t('header.training'),
-    children: [
-      {
-        title: t('endless.shortTitle'),
-        path: '/endless',
-      },
-      {
-        title: t('drTrigger.shortTitle'),
-        path: '/dr-trigger',
-      },
-      {
-        title: t('tools.frTrainer.title'),
-        path: '/tools/fr-trainer',
-      },
-      {
-        title: t('tools.pensukeTrainer.title'),
-        path: '/tools/pensuke-trainer',
-      },
-      {
-        title: t('quiz.shortTitle'),
-        path: '/quiz',
-      },
-      // {
-      //   title: t('chain.title'),
-      //   path: '/chain',
-      // },
-    ],
+    children: trainingNavs.value,
   },
   {
     title: t('tools.title'),
-    children: [
-      {
-        title: t('if.title'),
-        path: '/if',
-      },
-      {
-        title: t('sf.title'),
-        path: '/sf',
-      },
-      {
-        title: t('tools.drCaseRecognizer.title'),
-        path: '/tools/dr-case-recognizer',
-      },
-      {
-        title: t('tools.htrSubsetStats.title'),
-        path: '/tools/htr-subset-stats',
-      },
-    ],
+    children: toolNavs.value,
   },
   {
     title: t('header.resources'),

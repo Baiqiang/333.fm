@@ -8,6 +8,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -18,6 +19,7 @@ import { Pagination } from 'nestjs-typeorm-paginate'
 import { CurrentUser } from '@/auth/decorators/current-user.decorator'
 import { JwtRequiredGuard } from '@/auth/guards/jwt-required.guard'
 import { PaginationDto } from '@/dtos/pagination.dto'
+import { UpdatePreferencesDto } from '@/dtos/update-preferences.dto'
 import { CompetitionType } from '@/entities/competitions.entity'
 import { UserInsertionFinders } from '@/entities/user-insertion-finders.entity'
 import { Users } from '@/entities/users.entity'
@@ -105,5 +107,10 @@ export class UserController {
   @Get('bot-token')
   public async getBotToken(@CurrentUser() user: Users) {
     return this.userService.getBotToken(user)
+  }
+
+  @Patch('preferences')
+  public async updatePreferences(@CurrentUser() user: Users, @Body() dto: UpdatePreferencesDto) {
+    return this.userService.updatePreferences(user, dto)
   }
 }

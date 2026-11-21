@@ -11,7 +11,7 @@ import { Submissions } from '@/entities/submissions.entity'
 import { UserActivities } from '@/entities/user-activities.entity'
 import { UserInsertionFinders } from '@/entities/user-insertion-finders.entity'
 import { UserRoles } from '@/entities/user-roles.entity'
-import { Users } from '@/entities/users.entity'
+import { UserPreferences, Users } from '@/entities/users.entity'
 
 @Injectable()
 export class UserService {
@@ -380,5 +380,14 @@ export class UserService {
 
   async getBotToken(user: Users) {
     return this.botService.getOrGenerateToken(user)
+  }
+
+  async updatePreferences(user: Users, preferences: UserPreferences) {
+    user.preferences = {
+      ...user.preferences,
+      ...(preferences.scrambleCube !== undefined && { scrambleCube: preferences.scrambleCube }),
+    }
+    await this.usersRepository.update(user.id, { preferences: user.preferences })
+    return user.preferences
   }
 }

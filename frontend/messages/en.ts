@@ -244,6 +244,15 @@ export default {
     fewestmoves: 'Fewest Moves',
     duration: 'Calculation Duration',
   },
+  home: {
+    showCube: 'Show scramble images',
+    leagueBreak: 'The league is between seasons and the next one starts soon. Check out past seasons in the meantime.',
+  },
+  settings: {
+    title: 'Settings',
+    scrambleCube: 'Show scramble images',
+    scrambleCubeDescription: 'Show the unfolded cube of each scramble on homepage cards and in competitions you haven\'t submitted to. Competitions you have submitted to or that have ended always show it.',
+  },
   user: {
     profile: 'My Profile',
     if: 'My IF',

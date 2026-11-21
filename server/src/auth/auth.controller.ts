@@ -1,4 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common'
+import { instanceToPlain } from 'class-transformer'
 
 import { Users } from '@/entities/users.entity'
 
@@ -20,6 +21,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   public async me(@CurrentUser() user: Users) {
-    return user ?? null
+    if (!user) return null
+    return { ...instanceToPlain(user), preferences: user.preferences ?? {} }
   }
 }

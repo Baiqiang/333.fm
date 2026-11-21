@@ -1,3 +1,8 @@
+export interface UserPreferences {
+  /** Show scramble images on the homepage and in competitions not yet submitted to. */
+  scrambleCube?: boolean
+}
+
 export interface User {
   id: number
   wcaId: string
@@ -7,6 +12,7 @@ export interface User {
   avatarThumb: string
   roles: Role[]
   practices: number
+  preferences?: UserPreferences
 }
 
 export interface AdminUser extends User {

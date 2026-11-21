@@ -244,6 +244,15 @@ export default {
     fewestmoves: '最少步数',
     duration: '计算耗时',
   },
+  home: {
+    showCube: '显示打乱展开图',
+    leagueBreak: '赛季间歇期，下个赛季即将开始。可以先看看往届赛季的战况。',
+  },
+  settings: {
+    title: '设置',
+    scrambleCube: '显示打乱展开图',
+    scrambleCubeDescription: '在首页卡片和尚未提交的比赛中显示打乱展开图。已提交或已结束的比赛始终显示。',
+  },
   user: {
     profile: '我的主页',
     if: '我的插入',
