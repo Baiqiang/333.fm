@@ -250,8 +250,22 @@ export default {
   },
   settings: {
     title: '设置',
-    scrambleCube: '显示打乱展开图',
-    scrambleCubeDescription: '在首页卡片和尚未提交的比赛中显示打乱展开图。已提交或已结束的比赛始终显示。',
+    scrambleCube: '打乱展开图',
+    scrambleCubeDescription: '选择何时显示打乱展开图。',
+    scrambleCubeModes: {
+      always: {
+        label: '始终显示',
+        description: '所有打乱都直接显示展开图。',
+      },
+      finished: {
+        label: '只显示已结束或已提交的',
+        description: '已结束或已提交的打乱直接显示，其他打乱需要单独点击显示。',
+      },
+      each: {
+        label: '每个打乱独立',
+        description: '默认全部隐藏，点击只显示当前打乱。',
+      },
+    },
   },
   user: {
     profile: '我的主页',

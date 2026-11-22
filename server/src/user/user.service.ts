@@ -385,7 +385,7 @@ export class UserService {
   async updatePreferences(user: Users, preferences: UserPreferences) {
     user.preferences = {
       ...user.preferences,
-      ...(preferences.scrambleCube !== undefined && { scrambleCube: preferences.scrambleCube }),
+      ...(preferences.scrambleCubeMode !== undefined && { scrambleCubeMode: preferences.scrambleCubeMode }),
     }
     await this.usersRepository.update(user.id, { preferences: user.preferences })
     return user.preferences

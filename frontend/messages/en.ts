@@ -250,8 +250,22 @@ export default {
   },
   settings: {
     title: 'Settings',
-    scrambleCube: 'Show scramble images',
-    scrambleCubeDescription: 'Show the unfolded cube of each scramble on homepage cards and in competitions you haven\'t submitted to. Competitions you have submitted to or that have ended always show it.',
+    scrambleCube: 'Scramble images',
+    scrambleCubeDescription: 'Choose when to show the unfolded cube of each scramble.',
+    scrambleCubeModes: {
+      always: {
+        label: 'Always show',
+        description: 'Show the image for every scramble.',
+      },
+      finished: {
+        label: 'Only ended or submitted',
+        description: 'Show it for ended competitions and scrambles you have submitted to; reveal others one at a time.',
+      },
+      each: {
+        label: 'Per scramble',
+        description: 'Hidden by default; clicking reveals only that scramble.',
+      },
+    },
   },
   user: {
     profile: 'My Profile',

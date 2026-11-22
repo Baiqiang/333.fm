@@ -7,8 +7,12 @@ import { Submissions } from './submissions.entity'
 import { UserInsertionFinders } from './user-insertion-finders.entity'
 import { UserRoles } from './user-roles.entity'
 
+export const SCRAMBLE_CUBE_MODES = ['always', 'finished', 'each'] as const
+
+export type ScrambleCubeMode = (typeof SCRAMBLE_CUBE_MODES)[number]
+
 export interface UserPreferences {
-  scrambleCube?: boolean
+  scrambleCubeMode?: ScrambleCubeMode
 }
 
 @Entity()

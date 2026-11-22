@@ -1,7 +1,9 @@
-import { IsBoolean, IsOptional } from 'class-validator'
+import { IsIn, IsOptional } from 'class-validator'
+
+import { SCRAMBLE_CUBE_MODES, ScrambleCubeMode } from '@/entities/users.entity'
 
 export class UpdatePreferencesDto {
   @IsOptional()
-  @IsBoolean()
-  scrambleCube?: boolean
+  @IsIn(SCRAMBLE_CUBE_MODES)
+  scrambleCubeMode?: ScrambleCubeMode
 }

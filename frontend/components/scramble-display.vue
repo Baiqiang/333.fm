@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   scramble: string
   sticky?: boolean
   cubieCube?: {
@@ -9,23 +9,17 @@ const props = withDefaults(defineProps<{
   }
   /** Follow the scramble image preference instead of always showing the cube. */
   optionalCube?: boolean
+  /** The competition has ended or the user has submitted to this scramble. */
+  finished?: boolean
 }>(), {
   sticky: true,
   optionalCube: false,
+  finished: false,
 })
-const preferCube = usePreference('scrambleCube', false)
-const showCube = computed(() => !props.optionalCube || preferCube.value)
 </script>
 
 <template>
   <StickyScramble :scramble="scramble" :sticky="sticky" />
-  <CubeExpanded v-if="showCube" :moves="scramble" :cubie-cube="cubieCube" />
-  <button
-    v-else
-    class="my-2 flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600"
-    @click="preferCube = true"
-  >
-    <Icon name="mdi:cube-unfolded" />
-    {{ $t('home.showCube') }}
-  </button>
+  <ScrambleCube v-if="optionalCube" :moves="scramble" :cubie-cube="cubieCube" :finished="finished" />
+  <CubeExpanded v-else :moves="scramble" :cubie-cube="cubieCube" />
 </template>

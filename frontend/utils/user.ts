@@ -1,6 +1,14 @@
+export const SCRAMBLE_CUBE_MODES = ['always', 'finished', 'each'] as const
+
+/**
+ * - `always`: always show scramble images.
+ * - `finished`: show them for ended or submitted competitions; others are revealed one by one.
+ * - `each`: hide all; each scramble is revealed independently.
+ */
+export type ScrambleCubeMode = typeof SCRAMBLE_CUBE_MODES[number]
+
 export interface UserPreferences {
-  /** Show scramble images on the homepage and in competitions not yet submitted to. */
-  scrambleCube?: boolean
+  scrambleCubeMode?: ScrambleCubeMode
 }
 
 export interface User {

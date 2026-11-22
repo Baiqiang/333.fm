@@ -6,7 +6,6 @@ const props = defineProps<{
   wide?: boolean
   hideCube?: boolean
 }>()
-const showCube = usePreference('scrambleCube', false)
 const name = computed(() => props.title ?? competitionName(props.competition))
 </script>
 
@@ -27,17 +26,9 @@ const name = computed(() => props.title ?? competitionName(props.competition))
       <div :class="{ 'sm:grid sm:grid-cols-3 sm:gap-x-4': wide }">
         <div v-for="{ scramble, number } in competition.scrambles" :key="number" class="mt-3">
           <Sequence :sequence="scramble" :source="scramble" :prefix="`No.${number} `" />
-          <CubeExpanded v-if="showCube && !hideCube" :moves="scramble" class="mt-1" />
+          <ScrambleCube v-if="!hideCube" :moves="scramble" class="mt-1" />
         </div>
       </div>
-      <button
-        v-if="!showCube && !hideCube"
-        class="mt-3 flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600"
-        @click="showCube = true"
-      >
-        <Icon name="mdi:cube-unfolded" />
-        {{ $t('home.showCube') }}
-      </button>
     </template>
   </HomeCard>
 </template>

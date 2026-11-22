@@ -102,7 +102,7 @@ bus.on(fetchData)
         :name="$t('weekly.scramble', { number: scramble.number })"
         :hash="`scramble-${scramble.number}`"
       >
-        <ScrambleDisplay :scramble="scramble.scramble" :optional-cube="!mySubmissions[scramble.id]?.length" />
+        <ScrambleDisplay :scramble="scramble.scramble" optional-cube :finished="!!mySubmissions[scramble.id]?.length" />
         <CompetitionForm
           :scramble="scramble"
           :competition="competition"
