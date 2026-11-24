@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { data } = await useApi<{
   latest: Practice[]
-  mostAttended: Practice[]
+  mostAttendedRecent: Practice[]
 }>('/practice')
 </script>
 
@@ -15,17 +15,17 @@ const { data } = await useApi<{
       <HomeMoreLink to="/practice" />
     </template>
     <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
-      <div>
+      <div class="min-w-0">
         <h3 class="text-xs text-gray-400">
           {{ $t('practice.latest') }}
         </h3>
-        <PracticeInfo v-for="competition in data?.latest.slice(0, 4)" :key="competition.id" :competition="competition" />
+        <PracticeInfo v-for="competition in data?.latest.slice(0, 6)" :key="competition.id" :competition="competition" />
       </div>
-      <div>
+      <div class="min-w-0">
         <h3 class="text-xs text-gray-400">
-          {{ $t('practice.mostAttended') }}
+          {{ $t('practice.mostAttendedRecent') }}
         </h3>
-        <PracticeInfo v-for="competition in data?.mostAttended.slice(0, 4)" :key="competition.id" :competition="competition" />
+        <PracticeInfo v-for="competition in data?.mostAttendedRecent.slice(0, 6)" :key="competition.id" :competition="competition" />
       </div>
     </div>
   </HomeCard>

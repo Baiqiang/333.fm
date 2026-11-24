@@ -637,6 +637,11 @@ export default {
     },
     latest: '最新练习',
     mostAttended: '最多参加',
+    mostAttendedRecent: '近 3 个月最多参加',
+    range: {
+      recent: '近 3 个月',
+      all: '全部',
+    },
     mostPractices: '最多练习',
     index: '练习 {index}',
     practices: '{n} 次练习',

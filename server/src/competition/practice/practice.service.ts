@@ -80,8 +80,22 @@ export class PracticeService {
     })
   }
 
+  getMostAttended(since?: Date) {
+    const qb = this.competitionsRepository
+      .createQueryBuilder('c')
+      .innerJoinAndSelect('c.user', 'u')
+      .leftJoin('c.results', 'r')
+      .loadRelationCountAndMap('c.attendees', 'c.results')
+      .addSelect('COUNT(r.id)', 'attendees')
+      .where('c.type = :type', { type: CompetitionType.PERSONAL_PRACTICE })
+    if (since) qb.andWhere('c.created_at >= :since', { since })
+    return qb.groupBy('c.id').orderBy('attendees', 'DESC').addOrderBy('c.created_at', 'DESC').limit(20).getMany()
+  }
+
   async getIndexInfo() {
-    const [latest, mostAttended, mostPractices] = await Promise.all([
+    const recentSince = new Date()
+    recentSince.setMonth(recentSince.getMonth() - 3)
+    const [latest, mostAttended, mostAttendedRecent, mostPractices] = await Promise.all([
       this.competitionsRepository
         .createQueryBuilder('c')
         .innerJoinAndSelect('c.user', 'u')
@@ -92,17 +106,8 @@ export class PracticeService {
         .orderBy('c.created_at', 'DESC')
         .limit(20)
         .getMany(),
-      this.competitionsRepository
-        .createQueryBuilder('c')
-        .innerJoinAndSelect('c.user', 'u')
-        .leftJoin('c.results', 'r')
-        .loadRelationCountAndMap('c.attendees', 'c.results')
-        .addSelect('COUNT(r.id)', 'attendees')
-        .where('c.type = :type', { type: CompetitionType.PERSONAL_PRACTICE })
-        .groupBy('c.id')
-        .orderBy('attendees', 'DESC')
-        .limit(20)
-        .getMany(),
+      this.getMostAttended(),
+      this.getMostAttended(recentSince),
       this.usersRepository
         .createQueryBuilder('u')
         .leftJoin('u.submissions', 's')
@@ -124,6 +129,7 @@ export class PracticeService {
     return {
       latest,
       mostAttended,
+      mostAttendedRecent,
       mostPractices,
     }
   }

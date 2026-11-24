@@ -2,10 +2,12 @@
 const { data } = await useApi<{
   latest: Practice[]
   mostAttended: Practice[]
+  mostAttendedRecent: Practice[]
   mostPractices: User[]
 }>('/practice')
 const latest = ref(data.value?.latest || [])
-const mostAttended = ref(data.value?.mostAttended || [])
+const attendedRange = ref<'recent' | 'all'>('recent')
+const mostAttended = computed(() => (attendedRange.value === 'recent' ? data.value?.mostAttendedRecent : data.value?.mostAttended) || [])
 const mostPractices = ref(data.value?.mostPractices || [])
 const { t } = useI18n()
 useSeoMeta({
@@ -31,9 +33,22 @@ useSeoMeta({
         />
       </div>
       <div class="col-span-12 md:col-span-6 lg:col-span-4">
-        <h2 class="my-2 font-bold text-lg">
-          {{ $t('practice.mostAttended') }}
-        </h2>
+        <div class="my-2 flex items-center justify-between gap-2">
+          <h2 class="font-bold text-lg">
+            {{ $t('practice.mostAttended') }}
+          </h2>
+          <div class="flex gap-1 p-0.5 bg-gray-200 text-sm">
+            <button
+              v-for="range in ['recent', 'all'] as const"
+              :key="range"
+              class="px-2 py-0.5 transition"
+              :class="attendedRange === range ? 'bg-white text-indigo-600 shadow-sm dark:bg-gray-700 dark:text-white' : 'text-gray-500 hover:text-gray-700'"
+              @click="attendedRange = range"
+            >
+              {{ $t(`practice.range.${range}`) }}
+            </button>
+          </div>
+        </div>
         <PracticeInfo
           v-for="competition in mostAttended"
           :key="competition.id"

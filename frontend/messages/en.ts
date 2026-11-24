@@ -637,6 +637,11 @@ export default {
     },
     latest: 'Latest Practice',
     mostAttended: 'Most Attended',
+    mostAttendedRecent: 'Most Attended (3 Months)',
+    range: {
+      recent: '3 Months',
+      all: 'All Time',
+    },
     mostPractices: 'Most Practices',
     index: 'Practice #{index}',
     practices: '1 Practice | {n} Practices',
